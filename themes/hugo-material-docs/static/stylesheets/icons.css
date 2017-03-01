@@ -1,0 +1,14 @@
+@font-face {
+        font-family: 'Icon';
+        src: url('../fonts/icon.eot?52m981');
+        src: url('../fonts/icon.eot?#iefix52m981')
+               format('embedded-opentype'),
+             url('../fonts/icon.woff?52m981')
+               format('woff'),
+             url('../fonts/icon.ttf?52m981')
+               format('truetype'),
+             url('../fonts/icon.svg?52m981#icon')
+               format('svg');
+        font-weight: normal;
+        font-style: normal;
+      }
