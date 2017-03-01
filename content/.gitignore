@@ -1,0 +1,5 @@
+*.html
+.httr-oauth
+aula08.Rmd
+p.rds
+Rplot.png
