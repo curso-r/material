@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+  
+  
+  
+  
+   <html class="no-js"> 
+
+  <head lang="pt-br">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=10" />
+    <meta name="google-site-verification" content="3wpHHnuvp_52dDrXvZoNa5_Vs4BWcyVoeM62GbQ7llc" />
+    <title>ggplot - Curso-R</title>
+    <meta name="generator" content="Hugo 0.17" />
+
+    
+    <meta name="description" content="Materiais para cursos de R">
+    
+    <link rel="canonical" href="../ggplot/">
+    
+    <meta name="author" content="Curso-R">
+    
+
+    <meta property="og:url" content="/ggplot/">
+    <meta property="og:title" content="Curso-R">
+    <meta property="og:image" content="/logo-curso-r.png">
+    <meta name="apple-mobile-web-app-title" content="Curso-R">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <link rel="shortcut icon" type="image/x-icon" href="//images/favicon.ico">
+    <link rel="icon" type="image/x-icon" href="//images/favicon.ico">
+    <link href="../stylesheets/prism/prism.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../stylesheets/icons.css">
+    <link rel="stylesheet" href="../stylesheets/application.css">
+    <link rel="stylesheet" href="../stylesheets/temporary.css">
+    <link rel="stylesheet" href="../stylesheets/palettes.css">
+    <link rel="stylesheet" href="../stylesheets/highlight/highlight.css">
+
+    
+    
+    
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ubuntu:400,700|Ubuntu&#43;Mono">
+    <style>
+      body, input {
+        font-family: 'Ubuntu', Helvetica, Arial, sans-serif;
+      }
+      pre, code {
+        font-family: 'Ubuntu Mono', 'Courier New', 'Courier', monospace;
+      }
+    </style>
+
+    
+    <script src="../javascripts/modernizr.js"></script>
+
+    
+
+  </head>
+  <body class="palette-primary-red palette-accent-teal">
+
+
+
+	
+	
+
+
+<div class="backdrop">
+	<div class="backdrop-paper"></div>
+</div>
+
+<input class="toggle" type="checkbox" id="toggle-drawer">
+<input class="toggle" type="checkbox" id="toggle-search">
+<label class="toggle-button overlay" for="toggle-drawer"></label>
+
+<header class="header">
+	<nav aria-label="Header">
+  <div class="bar default">
+    <div class="button button-menu" role="button" aria-label="Menu">
+      <label class="toggle-button icon icon-menu" for="toggle-drawer">
+        <span></span>
+      </label>
+    </div>
+    <div class="stretch">
+      <div class="title">
+        ggplot
+      </div>
+    </div>
+
+    
+
+    
+    <div class="button button-github" role="button" aria-label="GitHub">
+      <a href="https://github.com/curso-r" title="@curso-r on GitHub" target="_blank" class="toggle-button icon icon-github"></a>
+    </div>
+    
+    
+        
+  </div>
+  <div class="bar search">
+    <div class="button button-close" role="button" aria-label="Close">
+      <label class="toggle-button icon icon-back" for="toggle-search"></label>
+    </div>
+    <div class="stretch">
+      <div class="field">
+        <input class="query" type="text" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck>
+      </div>
+    </div>
+    <div class="button button-reset" role="button" aria-label="Search">
+      <button class="toggle-button icon icon-close" id="reset-search"></button>
+    </div>
+  </div>
+</nav>
+</header>
+
+<main class="main">
+	<div class="drawer">
+		<nav aria-label="Navigation">
+  <a href="http://material.curso-r.com" class="project">
+    <div class="banner">
+      
+        <div class="logo">
+          <img src="../logo-curso-r.png">
+        </div>
+      
+      <div class="name">
+        <strong>Curso-R </strong>
+        
+          <br>
+          http://material.curso-r.com
+        
+      </div>
+    </div>
+  </a>
+
+  <div class="scrollable">
+    <div class="wrapper">
+      
+        <ul class="repo">
+          <li class="repo-download">
+            <a href="http://material.curso-r.com/archive/master.zip" target="_blank" title="Download" data-action="download">
+              <i class="icon icon-download"></i> Download
+            </a>
+          </li>
+          <li class="repo-stars">
+            <a href="http://material.curso-r.com/stargazers" target="_blank" title="Stargazers" data-action="star">
+              <i class="icon icon-star"></i> Stars
+              <span class="count">&ndash;</span>
+            </a>
+          </li>
+        </ul>
+        <hr>
+      
+
+      <div class="toc">
+        
+        <ul>
+          
+
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="Curso R" href="../">
+	
+	Curso R
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="R básico" href="../rbase/">
+	
+	R básico
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="Pipe" href="../pipe/">
+	
+	Pipe
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="Stringr" href="../stringr/">
+	
+	Stringr
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="Forcats" href="../forcats/">
+	
+	Forcats
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="Transformação" href="../manip/">
+	
+	Transformação
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
+<a class="current" title="Visualização" href="../ggplot/">
+	
+	Visualização
+</a>
+
+
+<ul id="scrollspy">
+</ul>
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="Modelagem" href="../modelos/">
+	
+	Modelagem
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="Web Scraping" href="../scrape/">
+	
+	Web Scraping
+</a>
+
+
+
+  
+</li>
+
+
+        </ul>
+        
+
+        
+        <hr>
+        <span class="section">The author</span>
+        
+        <ul>
+          
+
+          
+          <li>
+            <a href="https://github.com/curso-r" target="_blank" title="@curso-r on GitHub">
+              @curso-r on GitHub
+            </a>
+          </li>
+          
+
+          
+          <li>
+            <a href="mailto:contato@curso-r.com" title="Email of contato@curso-r.com">
+              Contact via email
+            </a>
+          </li>
+          
+        </ul>
+        
+      </div>
+    </div>
+  </div>
+</nav>
+
+	</div>
+
+	<article class="article">
+		<div class="wrapper">
+			<h1>ggplot </h1>
+
+			
+
+<p>Para este tópico vamos utilizar o <code>ggplot2</code>. O <code>ggplot2</code> é um pacote do R voltado
+para a criação de gráficos estatísticos. Ele é baseado na Gramática dos Gráficos
+(<em>grammar of graphics</em>, em inglês), criado por Leland Wilkinson, que é uma
+resposta para a pergunta: o que é um gráfico estatístico? Resumidamente, a gramática
+diz que um gráfico estatístico é um mapeamento dos dados a partir de atributos
+estéticos (cores, formas, tamanho) em formas geométricas (pontos, linhas, barras).</p>
+
+<p>Para mais informações sobre a Gramática dos Gráficos, você pode consultar o livro
+<a href="http://www.springer.com/statistics/computational+statistics/book/978-0-387-24544-7"><em>The Grammar of graphics</em></a>,
+escrito pelo Leland Wilkinson e o livro <a href="http://ggplot2.org/book/">ggplot2: elegant graphics for data analysis</a>, do Hadley Wickham.
+Um <a href="http://moderngraphics11.pbworks.com/f/ggplot2-Book09hWickham.pdf">pdf do livro</a> também está disponível.</p>
+
+<p>Para quem quiser se aprofundar mais com o <code>ggplot2</code>, o <a href="https://www.datacamp.com/">DataCamp</a> possui dois cursos
+focados em visualização. É possível começar o curso gratuitamente, mas para terminar,
+tem que pagar.</p>
+
+<ul>
+<li><a href="https://www.datacamp.com/courses/data-visualization-with-ggplot2-1">Data Visualization with ggplot2 (Part 1)</a></li>
+<li><a href="https://www.datacamp.com/courses/data-visualization-with-ggplot2-2">Data Visualization with ggplot2 (Part 2)</a></li>
+</ul>
+
+<p>Antes de começar, instale o pacote digitando <code>install.packages(&quot;ggplot2&quot;)</code>.</p>
+
+<h2 id="banco-de-dados">Banco de dados</h2>
+
+<p>A seguir, vamos discutir os aspectos básicos para a construção de gráficos com o
+pacote <code>ggplot2</code>. Para isso, utilizaremos o banco de dados contido no objeto <code>mtcars</code>.
+Para visualizar as primeiras linhas deste banco, utilize o comando:</p>
+
+<pre><code class="language-r">head(mtcars)
+##                    mpg cyl disp  hp drat    wt  qsec vs am gear carb
+## Mazda RX4         21.0   6  160 110 3.90 2.620 16.46  0  1    4    4
+## Mazda RX4 Wag     21.0   6  160 110 3.90 2.875 17.02  0  1    4    4
+## Datsun 710        22.8   4  108  93 3.85 2.320 18.61  1  1    4    1
+## Hornet 4 Drive    21.4   6  258 110 3.08 3.215 19.44  1  0    3    1
+## Hornet Sportabout 18.7   8  360 175 3.15 3.440 17.02  0  0    3    2
+## Valiant           18.1   6  225 105 2.76 3.460 20.22  1  0    3    1
+</code></pre>
+
+<p>O <code>mtcars</code> é um banco de dados de 1974 extraído da revista <em>Motor Trend US</em> que
+compreende consumo de combustível e outros 10 aspectos de performance e engenharia
+de 32 automóveis.</p>
+
+<p>Entre as variáveis deste banco de dados estão:</p>
+
+<ul>
+<li><code>mpg</code>: consumo de combustível (milhas por galão)</li>
+<li><code>disp</code>: cilindrada, que é o <a href="https://pt.wikipedia.org/wiki/Cilindrada">volume de deslocamento do motor</a></li>
+</ul>
+
+<p>Para saber mais sobre o <code>mtcarts</code>, digite <code>help(mtcars)</code>.</p>
+
+<h2 id="as-camadas-de-um-gráfico">As camadas de um gráfico</h2>
+
+<p>Antes de mais nada, vamos carregar o <code>ggplot2</code> usando:</p>
+
+<pre><code class="language-r">library(ggplot2)
+</code></pre>
+
+<p>No <code>ggplot2</code>, os gráficos são construídos camada por camada (ou, <em>layers</em>, em inglês),
+sendo que a primeira delas é dada pela função <code>ggplot()</code> (não tem o &ldquo;2&rdquo;). Cada camada
+representa um tipo de mapeamento ou personalização do gráfico. O código abaixo é um
+exemplo de um gráfico bem simples, construído a partir das duas principais camadas.</p>
+
+<pre><code class="language-r">ggplot(data = mtcars) + 
+  geom_point(mapping = aes(x = disp, y = mpg))
+</code></pre>
+
+<p><img src="figures//grafico1-1.png" title="plot of chunk grafico1" alt="plot of chunk grafico1" width="40%" height="40%" /></p>
+
+<p>Observe que o primeiro argumento da função <code>ggplot</code> é um data frame. A função <code>aes()</code>
+descreve como as variáveis são mapeadas em aspectos visuais de formas geométricas
+definidas pelos <em>geoms</em>. Aqui, essas formas geométricas são pontos, selecionados pela
+função <code>geom_point()</code>, gerando, assim, um gráfico de dispersão. A combinação dessas
+duas camadas define o tipo de gráfico que você deseja construir.</p>
+
+<h2 id="aesthetics">Aesthetics</h2>
+
+<p>A primeira camada de um gráfico deve indicar a relação entre os dados e cada aspecto
+visual do gráfico, como qual variável será representada no eixo x, qual será
+representada no eixo y, a cor e o tamanho dos componentes geométricos etc. Os aspectos
+que podem ou devem ser mapeados depende do tipo de gráfico que você deseja fazer.</p>
+
+<p>No exemplo acima, atribuímos aspectos de posição: ao eixo y mapeamos a variável <code>mpg</code>
+(milhas por galão) e ao eixo x a variável <code>disp</code> (cilindradas). Outro aspecto que pode
+ser mapeado nesse gráfico é a cor dos pontos</p>
+
+<pre><code class="language-r">ggplot(data = mtcars) + 
+  geom_point(mapping = aes(x = disp, y = mpg, colour = as.factor(am)))
+</code></pre>
+
+<p><img src="figures//mapear_am-1.png" title="plot of chunk mapear_am" alt="plot of chunk mapear_am" width="40%" height="40%" /></p>
+
+<p>Agora, a variável <code>am</code> (tipo de transmissão) foi mapeada à cor dos pontos, sendo que pontos vermelhos correspondem à transmissão automática (valor 0) e pontos azuis à transmissão manual (valor 1). Observe que inserimos a variável <code>am</code> como um fator, pois temos interesse apenas nos valores &ldquo;0&rdquo; e &ldquo;1&rdquo;. No entanto, também podemos mapear uma variável contínua à cor dos pontos:</p>
+
+<pre><code class="language-r">ggplot(mtcars) + 
+  geom_point(mapping = aes(x = disp, y = mpg, colour = cyl))
+</code></pre>
+
+<p><img src="figures//mapear_cor-1.png" title="plot of chunk mapear_cor" alt="plot of chunk mapear_cor" width="40%" height="40%" /></p>
+
+<p>Aqui, o número de cilindros, <code>cyl</code>, é representado pela tonalidade da cor azul.</p>
+
+<p><strong>Nota</strong>: por <em>default</em>, a legenda é insirida no gráfico automaticamente.</p>
+
+<p>Também podemos mapear o tamanho dos pontos a uma variável de interesse:</p>
+
+<pre><code class="language-r">ggplot(mtcars) +
+  geom_point(mapping = aes(x = disp, y = mpg, colour = cyl, size = wt))
+</code></pre>
+
+<p><img src="figures//mapear_tamanaho-1.png" title="plot of chunk mapear_tamanaho" alt="plot of chunk mapear_tamanaho" width="40%" height="40%" /></p>
+
+<p><strong>Exercício</strong>: pesquisar mais aspectos que podem ser alterados no gráfico de dispersão. <a href="http://ggplot2.tidyverse.org/articles/ggplot2-specs.html">Essa</a> é uma
+boa referência.</p>
+
+<h2 id="geoms">Geoms</h2>
+
+<p>Os <em>geoms</em> definem qual forma geométrica será utilizada para a visualização dos
+dados no gráfico. Como já vimos, a função <code>geom_point()</code> gera gráficos de dispersão
+transformando pares (x,y) em pontos. Veja a seguir outros <em>geoms</em> bastante utilizados:</p>
+
+<ul>
+<li><code>geom_line</code> - para linhas definidas por pares (x,y)</li>
+<li><code>geom_abline</code> - para retas definidas por um intercepto e uma inclinação</li>
+<li><code>geom_hline</code> - para retas horizontais</li>
+<li><code>geom_boxplot</code> - para boxplots</li>
+<li><code>geom_histogram</code> - para histogramas</li>
+<li><code>geom_density</code> - para densidades</li>
+<li><code>geom_area</code> - para áreas</li>
+<li><code>geom_bar</code> - para barras</li>
+</ul>
+
+<p>Veja a seguir como é fácil gerar diversos gráficos diferentes utilizando a mesma estrutura do gráfico de dispersão acima:</p>
+
+<pre><code class="language-r">ggplot(mtcars) + 
+  geom_boxplot(aes(x = as.factor(cyl), y = mpg))
+</code></pre>
+
+<p><img src="figures//unnamed-chunk-7-1.png" title="plot of chunk unnamed-chunk-7" alt="plot of chunk unnamed-chunk-7" width="40%" height="40%" /></p>
+
+<p><strong>Note</strong> que para fazer um boxplot para cada grupo, precisamos passar para o aspecto
+x do gráfico uma variável do tipo <code>factor</code>.</p>
+
+<pre><code class="language-r">ggplot(mtcars) + 
+  geom_histogram(aes(x = mpg))
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+</code></pre>
+
+<p><img src="figures//unnamed-chunk-8-1.png" title="plot of chunk unnamed-chunk-8" alt="plot of chunk unnamed-chunk-8" width="40%" height="40%" /></p>
+
+<pre><code class="language-r">ggplot(mtcars) + 
+  geom_bar(aes(x = as.factor(cyl)))
+</code></pre>
+
+<p><img src="figures//unnamed-chunk-9-1.png" title="plot of chunk unnamed-chunk-9" alt="plot of chunk unnamed-chunk-9" width="40%" height="40%" /></p>
+
+<div class='admonition note'>
+<p class='admonition-title'>
+Um padrão para os gráficos
+</p>
+<p>
+Você deve ter percebido que, para fazer um gráfico usando `ggplot2` e a gramática
+dos gráficos, existe um padrão:
+<br> 
+<br>
+ggplot(data = DATA) + GEOM_FUNCTION(mapping = aes(MAPPINGS))
+<br>
+<br>
+Para fazer um gráfico, basta substituir DATA por um banco de dados, GEOM_FUNCTION por
+uma função geométrica e MAPPINGS por uma coleção de <b>mapas estéticos</b>. Isso será muito útil quando você for fazer o seu próprio gráfico.
+</p>
+</div>
+
+<h3 id="exercícios">Exercícios</h3>
+
+<ol>
+<li>Rode <code>ggplot(data = mtcars)</code>. O que você vê?</li>
+<li>Quantas linhas existem no <code>mtcars</code>. Quantas colunas? <strong>Dica</strong>: use a função <code>nrows</code>.</li>
+<li>O que a variável <code>qsec</code> descreve. Leia o help do <code>mtcars</code> para encontrar.</li>
+<li>Faça um gráfico de dispersão de <code>mpg</code> por <code>qsec</code></li>
+<li>O que acontece se você fizer um gráfico de dispersão de <code>vs</code> por <code>mpg</code>? Porque o
+gráfico não é útil?</li>
+</ol>
+
+<h2 id="combinando-gráficos">Combinando gráficos</h2>
+
+<p>Considere os 2 gráficos a seguir.</p>
+
+<pre><code class="language-r"># esquerda
+ggplot(mtcars) + 
+  geom_point(aes(y = mpg, x = disp))
+# direita
+ggplot(mtcars) + 
+  geom_smooth(aes(y = mpg, x = disp))
+## `geom_smooth()` using method = 'loess'
+</code></pre>
+
+<p><img src="figures//duplochunk-1.png" title="plot of chunk duplochunk" alt="plot of chunk duplochunk" width="50%" height="40%" /><img src="figures//duplochunk-2.png" title="plot of chunk duplochunk" alt="plot of chunk duplochunk" width="50%" height="40%" /></p>
+
+<p>Os gráficos são similares e completaam-se. O da esquerda, mostra como os pontos estão distribuídos. Ele mostra uma tendência de aumento do consumo de combustível de acordo
+com as cilindradas. Já o gráfico da direita resume essa relação. Simplificando-a para uma linha de tendência com alguma margem de confiança.</p>
+
+<p>Esses dois gráficos se completam e ficam bons juntos. Com o <code>ggplot2</code>, é muito fácil
+sobrepor os dois gráficos, pois ele é pensado para que cada gráfico seja feito com
+uma combinação de camadas. Veja o código abaixo.</p>
+
+<pre><code class="language-r">ggplot(mtcars) + 
+  geom_point(aes(y = mpg, x = disp)) +
+  geom_smooth(aes(y = mpg, x = disp))
+## `geom_smooth()` using method = 'loess'
+</code></pre>
+
+<p><img src="figures//unnamed-chunk-10-1.png" title="plot of chunk unnamed-chunk-10" alt="plot of chunk unnamed-chunk-10" width="40%" height="40%" /></p>
+
+<p>Desta forma, sobrepusemos os pontos e a linha de suavização. No entanto, duplicamos alguns trechos no nosso código, o que geralmente não é bom. Imagine se você precisar
+mudar a variável do eixo <code>y</code>, você precisará trocar o nome da variável em mais de um
+lugar do código. Para resolver isso, você pode definir o <em>mapping</em> apenas uma vez
+dentro da declaração do gráfico, conforme o código a seguir.</p>
+
+<pre><code class="language-r">ggplot(mtcars, aes(y = mpg, x = disp)) + 
+  geom_point() +
+  geom_smooth()
+## `geom_smooth()` using method = 'loess'
+</code></pre>
+
+<p><img src="figures//unnamed-chunk-11-1.png" title="plot of chunk unnamed-chunk-11" alt="plot of chunk unnamed-chunk-11" width="40%" height="40%" /></p>
+
+<p>Veja que isso gera o mesmo gráfico!</p>
+
+<p>Veja que mesmo com dois <code>geom</code>&rsquo;s, o <code>ggplot</code> segue a mesma regra para mapear as
+variáveis para as <code>aesthetics</code>. Por exemplo, se você mapear uma variável para
+a cor, você obterá o seguinte gráfico.</p>
+
+<pre><code class="language-r">ggplot(mtcars, aes(y = mpg, x = disp, colour = as.factor(cyl))) + 
+  geom_point() +
+  geom_smooth(method = &quot;lm&quot;)
+</code></pre>
+
+<p><img src="figures//unnamed-chunk-12-1.png" title="plot of chunk unnamed-chunk-12" alt="plot of chunk unnamed-chunk-12" width="40%" height="40%" /></p>
+
+<p>O <code>ggplot2</code> agora desenhou uma reta para cada um dos grupos de pontos e coloriu
+cada grupo de pontos de uma cor diferente. Em alguns casos, você pode querer mapear
+a cor em apenas uma das camadas do gráfico. Isso pode ser feito da seguinte forma:</p>
+
+<pre><code class="language-r">ggplot(mtcars, aes(y = mpg, x = disp)) + 
+  geom_point(aes(colour = as.factor(cyl))) +
+  geom_smooth(method = &quot;lm&quot;)
+</code></pre>
+
+<p><img src="figures//unnamed-chunk-13-1.png" title="plot of chunk unnamed-chunk-13" alt="plot of chunk unnamed-chunk-13" width="40%" height="40%" /></p>
+
+<p>Agora, cada grupo de pontos tem uma cor, mas a reta é única para todos os pontos.</p>
+
+<h2 id="alterando-os-padrões-do-gráfico">Alterando os padrões do gráfico</h2>
+
+<p>Até agora, sempre <em>mapeamos</em> uma forma estética à uma variável. Muitas vezes
+queremos apenas modificar esta forma estética sem mapeá-la a outra variável.
+Por exemplo, no gráfico a seguir, modificamos a cor de todos os pontos.</p>
+
+<pre><code class="language-r">ggplot(mtcars, aes(y = mpg, x = disp)) + 
+  geom_point(colour = &quot;red&quot;)
+</code></pre>
+
+<p><img src="figures//unnamed-chunk-14-1.png" title="plot of chunk unnamed-chunk-14" alt="plot of chunk unnamed-chunk-14" width="40%" height="40%" /></p>
+
+<p>A principal diferença aqui é que especificamos o argumento <code>colour</code> fora da função
+<code>aes</code>. Dessa forma, podemos controlar todos os parâmetros
+de cada forma geométrica.</p>
+
+<pre><code class="language-r">ggplot(mtcars, aes(y = mpg, x = disp)) + 
+  geom_point(colour = &quot;red&quot;, size = 2, shape = 3, alpha = 0.5)
+</code></pre>
+
+<p><img src="figures//unnamed-chunk-15-1.png" title="plot of chunk unnamed-chunk-15" alt="plot of chunk unnamed-chunk-15" width="40%" height="40%" /></p>
+
+<h2 id="facets">Facets</h2>
+
+<p>Uma funcionalidade muito útil do <code>ggplot2</code> é a possibilidade de usar <code>facets</code>.
+Isso auxilia na visualização de diferentes subconjuntos dos dados em gráficos
+separados, permitindo a visualização de comportamentos diferentes dependendo
+do grupo.</p>
+
+<pre><code class="language-r">ggplot(mtcars, aes(y = mpg, x = disp)) + 
+  geom_point() +
+  geom_smooth(method = &quot;lm&quot;) + 
+  facet_wrap(~am)
+</code></pre>
+
+<p><img src="figures//unnamed-chunk-16-1.png" title="plot of chunk unnamed-chunk-16" alt="plot of chunk unnamed-chunk-16" width="40%" height="40%" /></p>
+
+<p>No gráfico acima, rapidamente conseguimos visualizar que se o carro não é automático o consumo de combustível é muito menor do que quando o carro é automático. Também conseguimos ver que a inclinação das retas é bem diferente dependendo do carro ser
+automático/manual.</p>
+
+<h3 id="exercício"><strong>Exercício</strong></h3>
+
+<ol>
+<li>O que tem de errado no código abaixo? Por que os pontos não ficaram azuis?</li>
+</ol>
+
+<pre><code class="language-r">ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy, color = &quot;blue&quot;))
+</code></pre>
+
+<p><img src="figures//unnamed-chunk-19-1.png" title="plot of chunk unnamed-chunk-19" alt="plot of chunk unnamed-chunk-19" width="40%" height="40%" /></p>
+
+<ol>
+<li>Mapeie uma variável contínua para uma cor, tamanho e forma. Como essas formas
+estéticas se comportam diferente para variáveis categóricas vs. contínuas?</li>
+</ol>
+
+<p>Começando de um simples boxplot feito no <code>ggplot2</code> vamos fazer diversas alterações nas legendas. O gráfico inicial é construido da seguinte forma:</p>
+
+<pre><code class="language-r">library(ggplot2)
+# boxplot simples
+bp &lt;- ggplot(data=PlantGrowth, aes(x=group, y=weight, fill=group)) + geom_boxplot()
+bp
+</code></pre>
+
+<p><img src="figures//unnamed-chunk-21-1.png" title="plot of chunk unnamed-chunk-21" alt="plot of chunk unnamed-chunk-21" width="40%" height="40%" /></p>
+
+<h2 id="removendo-totalmente-a-legenda">Removendo totalmente a legenda</h2>
+
+<p>Existem diversas maneiras para remover a legenda de um gráfico no <code>ggplot2</code>. A forma mais simples é usar <code>guides(fill = FALSE)</code> com <code>fill</code> sendo o atributo gráfico do qual você deseja remover a legenda.</p>
+
+<pre><code class="language-r"># aqui definimos fill = FALSE, porque é o atributo do gráfico que relacionamos 
+# a alguma variável.
+bp + guides(fill = FALSE)
+
+# também é possível remover a legenda por meio da escala de cores
+# aqui também usamos o scale_fill_discrete, porque associamos fill
+# a uma variável anteriormente.
+bp + scale_fill_discrete(guide = F)
+</code></pre>
+
+<p><img src="figures//unnamed-chunk-22-1.png" title="plot of chunk unnamed-chunk-22" alt="plot of chunk unnamed-chunk-22" width="50%" height="40%" /><img src="figures//unnamed-chunk-22-2.png" title="plot of chunk unnamed-chunk-22" alt="plot of chunk unnamed-chunk-22" width="50%" height="40%" /></p>
+
+<pre><code class="language-r"># o comando a seguir remove todas as legendas, não importa o atributo que ela
+# esteja representando.
+bp + theme(legend.position=&quot;none&quot;)
+</code></pre>
+
+<p><img src="figures//unnamed-chunk-23-1.png" title="plot of chunk unnamed-chunk-23" alt="plot of chunk unnamed-chunk-23" width="40%" height="40%" /></p>
+
+<h2 id="alterando-a-ordem-dos-itens">Alterando a ordem dos itens</h2>
+
+<p>Para alterar a ordem dos itens na legenda do gráfico no <code>ggplot2</code>, usamos o comando da escala de cores.</p>
+
+<pre><code class="language-r">bp + scale_fill_discrete(breaks=c(&quot;trt1&quot;,&quot;ctrl&quot;,&quot;trt2&quot;))
+</code></pre>
+
+<p><img src="figures//unnamed-chunk-24-1.png" title="plot of chunk unnamed-chunk-24" alt="plot of chunk unnamed-chunk-24" width="40%" height="40%" /></p>
+
+<pre><code class="language-r">bp
+</code></pre>
+
+<p><img src="figures//unnamed-chunk-24-2.png" title="plot of chunk unnamed-chunk-24" alt="plot of chunk unnamed-chunk-24" width="40%" height="40%" /></p>
+
+<p>Dependendo dos aspectos gráficos (cores, formatos, preenchimentos) especificados, você pode precisar usar alguma das seguintes funções: <code>scale_fill_manual</code>, <code>scale_colour_hue</code>, <code>scale_colour_manual</code>, <code>scale_shape_discrete</code>, <code>scale_linetype_discrete</code>.</p>
+
+<p>Você pode também querer inverter a ordem dos itens da legenda. Isso pode ser feito de uma das seguintes maneiras.</p>
+
+<pre><code class="language-r">bp + guides(fill = guide_legend(reverse=TRUE))
+bp + scale_fill_discrete(guide = guide_legend(reverse=TRUE))
+</code></pre>
+
+<p><img src="figures//unnamed-chunk-25-1.png" title="plot of chunk unnamed-chunk-25" alt="plot of chunk unnamed-chunk-25" width="50%" height="40%" /><img src="figures//unnamed-chunk-25-2.png" title="plot of chunk unnamed-chunk-25" alt="plot of chunk unnamed-chunk-25" width="50%" height="40%" /></p>
+
+<h2 id="removendo-os-títulos-da-legenda">Removendo os títulos da legenda</h2>
+
+<p>Algumas vezes é necessário remover o título das legendas do gráfico feito no <code>ggplot2</code>.
+Veja a seguir algumas maneiras:</p>
+
+<pre><code class="language-r"># Remove o título apenas da legenda do preenchimento (fill)
+bp + guides(fill=guide_legend(title=NULL))
+
+# Remove o título de todas as legendas
+bp + theme(legend.title=element_blank())
+</code></pre>
+
+<p><img src="figures//unnamed-chunk-26-1.png" title="plot of chunk unnamed-chunk-26" alt="plot of chunk unnamed-chunk-26" width="50%" height="40%" /><img src="figures//unnamed-chunk-26-2.png" title="plot of chunk unnamed-chunk-26" alt="plot of chunk unnamed-chunk-26" width="50%" height="40%" /></p>
+
+<h2 id="modificando-texto-cores-e-rótulos">Modificando texto, cores e rótulos</h2>
+
+<p>Existem duas formas para modificar os textos e rótulos das legendas. Uma delas é modificar o <code>data.frame</code> de forma com que os fatores tenham o mesmo nome que você deseja na legenda. Outra forma é usando as funções de <code>scale</code>.</p>
+
+<p>Veja algumas modificações que podem ser feitas por meio das funções de <code>scale</code>. Como a variável <code>group</code> está associada ao atributo <code>fill</code>, usamos as funções <code>scale_fill_xxx</code>.</p>
+
+<pre><code class="language-r"># usamos scale_fill_discrete porque não queremos alterar as cores padrão,
+# mas queremos que cada fator esteja associado a uma cor de tom diferente.
+# mudamos aqui os rótulos e o título da legenda.
+bp + scale_fill_discrete(name=&quot;Experimental\nCondition&quot;,
+                         breaks=c(&quot;ctrl&quot;, &quot;trt1&quot;, &quot;trt2&quot;),
+                         labels=c(&quot;Control&quot;, &quot;Treatment 1&quot;, &quot;Treatment 2&quot;))
+
+
+# usamos scale_fill_manual porque queremos alterar as cores padrão.
+# aqui escolhemos as cores da escala hexadecimal.
+bp + scale_fill_manual(values=c(&quot;#999999&quot;, &quot;#E69F00&quot;, &quot;#56B4E9&quot;), 
+                       name=&quot;Experimental\nCondition&quot;,
+                       breaks=c(&quot;ctrl&quot;, &quot;trt1&quot;, &quot;trt2&quot;),
+                       labels=c(&quot;Control&quot;, &quot;Treatment 1&quot;, &quot;Treatment 2&quot;))
+</code></pre>
+
+<p><img src="figures//unnamed-chunk-27-1.png" title="plot of chunk unnamed-chunk-27" alt="plot of chunk unnamed-chunk-27" width="50%" height="40%" /><img src="figures//unnamed-chunk-27-2.png" title="plot of chunk unnamed-chunk-27" alt="plot of chunk unnamed-chunk-27" width="50%" height="40%" /></p>
+
+<p>Veja que isso não aletrou o eixo X do gráfico.</p>
+
+<h2 id="modificando-a-aparência-da-legenda">Modificando a aparência da legenda</h2>
+
+<p>Existem inúmeras modificações que podem ser realizadas na aparência da legenda. Todas elas estão relacionadas à modificação do <code>element_text</code>. Veja neste <a href="http://docs.ggplot2.org/0.9.2.1/element_text.html">link</a> todos os atributos que podem ser modificados.</p>
+
+<pre><code class="language-r"># Mudando a aparência do título
+bp + theme(legend.title = element_text(colour=&quot;blue&quot;, size=16, face=&quot;bold&quot;))
+</code></pre>
+
+<p><img src="figures//unnamed-chunk-28-1.png" title="plot of chunk unnamed-chunk-28" alt="plot of chunk unnamed-chunk-28" width="40%" height="40%" /></p>
+
+<pre><code class="language-r"># Mudando a aparência dos rótulos
+bp + theme(legend.text = element_text(colour=&quot;blue&quot;, size = 16, face = &quot;bold&quot;))
+</code></pre>
+
+<p><img src="figures//unnamed-chunk-29-1.png" title="plot of chunk unnamed-chunk-29" alt="plot of chunk unnamed-chunk-29" width="40%" height="40%" /></p>
+
+<h2 id="modificando-a-posição-da-legenda">Modificando a posição da legenda</h2>
+
+<p>É possível controlar a posição da legenda facilmente escolhendo uma das posições (left/right/top/bottom).</p>
+
+<pre><code class="language-r">bp + theme(legend.position=&quot;top&quot;)
+</code></pre>
+
+<p><img src="figures//unnamed-chunk-30-1.png" title="plot of chunk unnamed-chunk-30" alt="plot of chunk unnamed-chunk-30" width="40%" height="40%" /></p>
+
+<p>Também é possível controlar a posição da legenda de forma precisa usando a função <code>theme()</code>. A legenda será posicionada dentro do gráfico com o ponto central sendo o valor do argumento <code>legend.position</code>. Esses valores são definidos de forma que o ponto (0,0) seja o canto inferior esquerdo e (1,1) seja o canto superior direito.</p>
+
+<pre><code class="language-r">bp + theme(legend.position=c(.5, .5))
+</code></pre>
+
+<p><img src="figures//unnamed-chunk-31-1.png" title="plot of chunk unnamed-chunk-31" alt="plot of chunk unnamed-chunk-31" width="40%" height="40%" /></p>
+
+
+			<aside class="copyright" role="note">
+				
+				&copy; 2017 Disponível sobre Licença MIT &ndash;
+				
+				Site built with
+				<a href="https://www.gohugo.io" target="_blank">Hugo</a>
+				using the
+				<a href="http://github.com/digitalcraftsman/hugo-material-docs" target="_blank">Material</a> theme.
+			</aside>
+
+			<footer class="footer">
+				
+
+<nav class="pagination" aria-label="Footer">
+  <div class="previous">
+  
+      <a href="../modelos/" title="Modelagem">
+        <span class="direction">
+          Previous
+        </span>
+        <div class="page">
+          <div class="button button-previous" role="button" aria-label="Previous">
+            <i class="icon icon-back"></i>
+          </div>
+          <div class="stretch">
+            <div class="title">
+              Modelagem
+            </div>
+          </div>
+        </div>
+      </a>
+  
+  </div>
+
+  <div class="next">
+  
+      <a href="../forcats/" title="Introdução">
+        <span class="direction">
+          Next
+        </span>
+        <div class="page">
+          <div class="stretch">
+            <div class="title">
+              Introdução
+            </div>
+          </div>
+          <div class="button button-next" role="button" aria-label="Next">
+            <i class="icon icon-forward"></i>
+          </div>
+        </div>
+      </a>
+  
+  </div>
+</nav>
+
+
+
+
+
+			</footer>
+		</div>
+	</article>
+
+	<div class="results" role="status" aria-live="polite">
+		<div class="scrollable">
+			<div class="wrapper">
+				<div class="meta"></div>
+				<div class="list"></div>
+			</div>
+		</div>
+	</div>
+</main>
+
+    <script>
+    
+      var base_url = '\/';
+      var repo_id  = 'http:\/\/material.curso-r.com';
+    
+    </script>
+    
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="../javascripts/application.js"></script>
+    <script src="../javascripts/datacamp.js"></script>
+    
+
+    <script>
+      /* Add headers to scrollspy */
+      var div_h2    = document.getElementsByClassName("section level2")
+      var headers   = document.getElementsByTagName("h2");	
+      var scrollspy = document.getElementById('scrollspy');
+      
+      if(scrollspy) {
+        if(headers.length > 0) {
+          for(var i = 0; i < headers.length; i++) {
+            var li = document.createElement("li");
+            li.setAttribute("class", "anchor");
+
+            var a  = document.createElement("a");
+
+
+	    if(headers[i].id == ""){
+	     a.setAttribute("href", "#" + div_h2[i].id);
+	    } else {
+	     a.setAttribute("href", "#" + headers[i].id);
+	    }
+
+            a.setAttribute("title", headers[i].innerHTML);
+            a.innerHTML = headers[i].innerHTML;
+            
+            li.appendChild(a)
+            scrollspy.appendChild(li);
+          }
+        } else {
+          scrollspy.parentElement.removeChild(scrollspy)
+        }
+      }
+      
+      
+      /* Add permanent link next to the headers */
+      var headers = document.querySelectorAll("h1, h2, h3, h4, h5, h6");
+
+      for(var i = 0; i < headers.length; i++) {
+          var a = document.createElement("a");
+          a.setAttribute("class", "headerlink");
+          a.setAttribute("href", "#" + headers[i].id);
+          a.setAttribute("title", "Permanent link")
+          a.innerHTML = "#";
+          headers[i].appendChild(a);
+      }
+    </script>
+
+    
+      <script>
+        (function(i,s,o,g,r,a,m){
+          i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||
+          []).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;
+          m.parentNode.insertBefore(a,m)
+        })(window, document,
+          'script', '//www.google-analytics.com/analytics.js', 'ga');
+         
+        ga('create', 'UA-87272102-1', 'auto');
+        ga('set', 'anonymizeIp', true);
+        ga('send', 'pageview');
+         
+        var buttons = document.querySelectorAll('a');
+        Array.prototype.map.call(buttons, function(item) {
+          if (item.host != document.location.host) {
+            item.addEventListener('click', function() {
+              var action = item.getAttribute('data-action') || 'follow';
+              ga('send', 'event', 'outbound', action, item.href);
+            });
+          }
+        });
+         
+        var query = document.querySelector('.query');
+        query.addEventListener('blur', function() {
+          if (this.value) {
+            var path = document.location.pathname;
+            ga('send', 'pageview', path + '?q=' + this.value);
+          }
+        });
+      </script>
+    
+
+    <script src="//gohugo.io/js/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <script src="../javascripts/prism.js"></script> 
+    
+    <script type="text/javascript"
+      src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+    </script>
+    
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [['$','$']],
+          displayMath: [['$$','$$']],
+          processEscapes: true,
+          processEnvironments: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+          TeX: { equationNumbers: { autoNumber: "AMS" },
+               extensions: ["AMSmath.js", "AMSsymbols.js"] }
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        
+        
+        
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i = 0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+    </script>
+  </body>
+</html>
+

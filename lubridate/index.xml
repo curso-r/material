@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Lubridate-rsses on Curso-R</title>
+    <link>/lubridate/index.xml</link>
+    <description>Recent content in Lubridate-rsses on Curso-R</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>pt-br</language>
+    <copyright>Disponível sobre Licença MIT</copyright>
+    <lastBuildDate>Sun, 29 Jan 2017 00:00:00 +0000</lastBuildDate>
+    <atom:link href="/lubridate/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Introdução</title>
+      <link>/lubridate/</link>
+      <pubDate>Sun, 29 Jan 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/lubridate/</guid>
+      <description>
+
+&lt;h2 id=&#34;lubridate&#34;&gt;Lubridate&lt;/h2&gt;
+
+&lt;p&gt;O pacote lubridate faz o trabalho com datas ser muito mais fácil. Ela foi criada por Garrett Grolemund e Hadley Wickham.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;library(lubridate)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;## Loading required package: methods
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;## 
+## Attaching package: &#39;lubridate&#39;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;## The following object is masked from &#39;package:base&#39;:
+## 
+##     date
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;library(magrittr)
+library(dplyr)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;## 
+## Attaching package: &#39;dplyr&#39;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;## The following objects are masked from &#39;package:lubridate&#39;:
+## 
+##     intersect, setdiff, union
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     filter, lag
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;## The following objects are masked from &#39;package:base&#39;:
+## 
+##     intersect, setdiff, setequal, union
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Resumo do que aprenderemos:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;transformar character de diversos formatos em data.&lt;/li&gt;
+&lt;li&gt;transformar data em character de diversos formatos.&lt;/li&gt;
+&lt;li&gt;extrair informações das datas &lt;code&gt;y m d h m s&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;funções úteis (&lt;code&gt;today()&lt;/code&gt;, &lt;code&gt;now()&lt;/code&gt;, etc)&lt;/li&gt;
+&lt;li&gt;timezones&lt;/li&gt;
+&lt;li&gt;operações aritméticas com datas&lt;/li&gt;
+&lt;li&gt;gerar datas&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Vamos usar o banco de dados &lt;code&gt;lakers&lt;/code&gt; para os exemplos.&lt;/p&gt;
+
+&lt;h2 id=&#34;transformar-character-em-date&#34;&gt;Transformar &lt;code&gt;character&lt;/code&gt; em &lt;code&gt;date&lt;/code&gt;&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;df &amp;lt;- data_frame(`entrada` = c(&amp;quot;&amp;quot;)
+                 , `função` = c(&amp;quot;&amp;quot;)
+                 , `saída` = c(&amp;quot;&amp;quot;))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Exemplos com datas&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;lakers %&amp;gt;% 
+  select(date) %&amp;gt;% 
+  mutate(`date %&amp;gt;% ymd` = date %&amp;gt;% ymd,
+         `date %&amp;gt;% ymd_hm` = date %&amp;gt;% ymd_hm) %&amp;gt;% 
+  head %&amp;gt;%
+  knitr::kable()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;## Warning: All formats failed to parse. No formats found.
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align=&#34;right&#34;&gt;date&lt;/th&gt;
+&lt;th align=&#34;left&#34;&gt;date %&amp;gt;% ymd&lt;/th&gt;
+&lt;th align=&#34;left&#34;&gt;date %&amp;gt;% ymd_hm&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td align=&#34;right&#34;&gt;20081028&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;2008-10-28&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;NA&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;right&#34;&gt;20081028&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;2008-10-28&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;NA&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;right&#34;&gt;20081028&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;2008-10-28&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;NA&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;right&#34;&gt;20081028&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;2008-10-28&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;NA&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;right&#34;&gt;20081028&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;2008-10-28&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;NA&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;right&#34;&gt;20081028&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;2008-10-28&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;NA&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;Exemplos com datas e horas&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;lakers %&amp;gt;% 
+  select(date, time) %&amp;gt;% 
+  mutate(`paste(date, time) %&amp;gt;% ymd` = paste(date, time) %&amp;gt;% ymd,
+         `paste(date, time) %&amp;gt;% ymd_hm` = paste(date, time) %&amp;gt;% ymd_hm,
+         `time %&amp;gt;% hm` = time %&amp;gt;% hm,
+         `time %&amp;gt;% hms` = time %&amp;gt;% hms
+         ) %&amp;gt;% 
+  head %&amp;gt;%
+  knitr::kable()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;## Warning: All formats failed to parse. No formats found.
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;## Warning in .parse_hms(..., order = &amp;quot;HMS&amp;quot;, quiet = quiet): Some strings
+## failed to parse
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align=&#34;right&#34;&gt;date&lt;/th&gt;
+&lt;th align=&#34;left&#34;&gt;time&lt;/th&gt;
+&lt;th align=&#34;left&#34;&gt;paste(date, time) %&amp;gt;% ymd&lt;/th&gt;
+&lt;th align=&#34;left&#34;&gt;paste(date, time) %&amp;gt;% ymd_hm&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;time %&amp;gt;% hm&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;time %&amp;gt;% hms&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td align=&#34;right&#34;&gt;20081028&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;12:00&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;NA&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;2008-10-28 12:00:00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;12H 0M 0S&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;NA&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;right&#34;&gt;20081028&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;11:39&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;NA&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;2008-10-28 11:39:00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;11H 39M 0S&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;NA&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;right&#34;&gt;20081028&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;11:37&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;NA&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;2008-10-28 11:37:00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;11H 37M 0S&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;NA&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;right&#34;&gt;20081028&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;11:25&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;NA&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;2008-10-28 11:25:00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;11H 25M 0S&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;NA&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;right&#34;&gt;20081028&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;11:23&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;NA&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;2008-10-28 11:23:00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;11H 23M 0S&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;NA&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td align=&#34;right&#34;&gt;20081028&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;11:22&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;NA&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;2008-10-28 11:22:00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;11H 22M 0S&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;NA&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;h2 id=&#34;transformar-date-em-character&#34;&gt;Transformar &lt;code&gt;date&lt;/code&gt; em &lt;code&gt;character&lt;/code&gt;&lt;/h2&gt;
+
+&lt;h2 id=&#34;extrair-informações-de-datas&#34;&gt;Extrair informações de datas&lt;/h2&gt;
+
+&lt;h2 id=&#34;funções-úteis&#34;&gt;Funções úteis&lt;/h2&gt;
+
+&lt;h2 id=&#34;operações-aritméticas-entre-datas&#34;&gt;Operações aritméticas entre datas&lt;/h2&gt;
+
+&lt;h2 id=&#34;gerar-datas&#34;&gt;Gerar datas&lt;/h2&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

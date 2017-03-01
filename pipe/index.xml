@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Pipe-rsses on Curso-R</title>
+    <link>/pipe/index.xml</link>
+    <description>Recent content in Pipe-rsses on Curso-R</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>pt-br</language>
+    <copyright>Disponível sobre Licença MIT</copyright>
+    <lastBuildDate>Fri, 03 Feb 2017 00:00:00 +0000</lastBuildDate>
+    <atom:link href="/pipe/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Introdução</title>
+      <link>/pipe/</link>
+      <pubDate>Fri, 03 Feb 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/pipe/</guid>
+      <description>
+
+&lt;h2 id=&#34;pipe&#34;&gt;Pipe &lt;code&gt;%&amp;gt;%&lt;/code&gt;&lt;/h2&gt;
+
+&lt;p&gt;As duas linhas abaixo são equivalentes:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;f(x, y)
+x %&amp;gt;% f(y)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;O operador &lt;code&gt;%&amp;gt;%&lt;/code&gt; (&lt;em&gt;pipe&lt;/em&gt; ) usa o resultado do seu lado esquerdo como primeiro argumento da funçăo do lado direito. Ele foi uma das grandes revoluções recentes do R, tornando a leitura de códigos mais lógica, fácil e compreensível. Este operador foi introduzido por Stefan Milton Bache no pacote &lt;code&gt;magrittr&lt;/code&gt;, e já existem diversos pacotes construidos para facilitar a sua utilizaçăo.&lt;/p&gt;
+
+&lt;p&gt;O operador &lt;code&gt;%&amp;gt;%&lt;/code&gt; pertence ao pacote &lt;code&gt;magrittr&lt;/code&gt;. Instale este pacote para utilizá-lo.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;install.packages(&amp;quot;magrittr&amp;quot;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;No exemplo a seguir, o operador calcula a raiz quadrada da soma dos valores de 1 a 4.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;library(magrittr)
+
+x &amp;lt;- c(1, 2, 3, 4)
+x %&amp;gt;% sum %&amp;gt;% sqrt
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;## [1] 3.162278
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Escrever esse cálculo na forma usual ficaria da seguinte forma:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;sqrt(sum(x))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;## [1] 3.162278
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;O caminho que o código &lt;code&gt;x %&amp;gt;% sum %&amp;gt;% sqrt&lt;/code&gt; seguiu foi enviar o objeto &lt;code&gt;x&lt;/code&gt; como argumento da função &lt;code&gt;sum()&lt;/code&gt; e, em seguida, enviar a saida da expressão &lt;code&gt;sum(x)&lt;/code&gt; como argumento da função &lt;code&gt;sqrt()&lt;/code&gt;. Observe que não é necessário colocar os parênteses após o nome das funções.&lt;/p&gt;
+
+&lt;p&gt;Pela simplicidade do exemplo, a utilização do &lt;code&gt;%&amp;gt;%&lt;/code&gt; não parece trazer grandes vantagens, pois a expressão &lt;code&gt;sqrt(sum(x))&lt;/code&gt; é facilmente compreendida. No entanto, se tivermos um grande número de funções aninhadas, a utilizaçăo do &lt;code&gt;pipe&lt;/code&gt; transforma um código confuso e difícil de ser lido em algo simples e intuitivo. Como exemplo, imagine escrever uma receita de um bolo usando o R, e cada passo da receita é uma função:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;esfrie(asse(coloque(bata(acrescente(recipiente(rep(&amp;quot;farinha&amp;quot;, 2), &amp;quot;água&amp;quot;, &amp;quot;fermento&amp;quot;, &amp;quot;leite&amp;quot;, &amp;quot;óleo&amp;quot;), &amp;quot;farinha&amp;quot;, até = &amp;quot;macio&amp;quot;), duração = &amp;quot;3min&amp;quot;), lugar = &amp;quot;forma&amp;quot;, tipo = &amp;quot;grande&amp;quot;, untada = TRUE), duração = &amp;quot;50min&amp;quot;), &amp;quot;geladeira&amp;quot;, &amp;quot;20min&amp;quot;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Tente entender o que é preciso fazer. Depois de desistir, veja como fica escrevendo com o operador &lt;code&gt;%&amp;gt;%&lt;/code&gt;:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;recipiente(rep(&amp;quot;farinha&amp;quot;, 2), &amp;quot;água&amp;quot;, &amp;quot;fermento&amp;quot;, &amp;quot;leite&amp;quot;, &amp;quot;óleo&amp;quot;) %&amp;gt;%
+  acrescente(&amp;quot;farinha&amp;quot;, até = &amp;quot;macio&amp;quot;) %&amp;gt;%
+  bata(duraço = &amp;quot;3min&amp;quot;) %&amp;gt;%
+  coloque(lugar = &amp;quot;forma&amp;quot;, tipo = &amp;quot;grande&amp;quot;, untada = TRUE) %&amp;gt;%
+  asse(duração = &amp;quot;50min&amp;quot;) %&amp;gt;%
+  esfrie(&amp;quot;geladeira&amp;quot;, &amp;quot;20min&amp;quot;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Agora, o código realmente parece uma receita de bolo.&lt;/p&gt;
+
+&lt;p&gt;Para mais informações sobre o &lt;code&gt;pipe&lt;/code&gt; e exemplos de utilização, visite a página &lt;a href=&#34;http://cran.r-project.org/web/packages/magrittr/vignettes/magrittr.html&#34;&gt;Ceci n&amp;rsquo;est pas un pipe&lt;/a&gt;.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
