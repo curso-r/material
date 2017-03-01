@@ -1,0 +1,98 @@
+baseurl = "/"
+languageCode = "pt-br"
+title = "Curso-R"
+theme = "hugo-material-docs"
+metadataformat = "yaml"
+canonifyurls = true
+relativeurls = true
+# Enable Google Analytics by entering your tracking id
+googleAnalytics = "UA-87272102-1"
+
+[params]
+  # General information
+  author = "Curso-R"
+  description = "Materiais para cursos de R"
+  copyright = "Disponível sobre Licença MIT"
+
+  # Repository
+  provider = "GitHub"
+  repo_url = "http://material.curso-r.com"
+
+  version = ""
+  logo = "logo-curso-r.png"
+  favicon = ""
+
+  permalink = "#"
+
+  # Custom assets
+  custom_css = []
+  custom_js  = []
+
+  # Syntax highlighting theme
+  highlight_css  = ""
+
+  [params.palette]
+      primary = "red"
+      accent  = "teal"
+
+    [params.font]
+      text = "Ubuntu"
+      code = "Ubuntu Mono"
+
+
+[social]
+  twitter = ""
+  github  = "curso-r"
+  email   = "contato@curso-r.com"
+
+
+[[menu.main]]
+  name   = "Curso R"
+  url    = "/"
+  weight = 0
+  
+[[menu.main]]
+  name   = "R básico"
+  url    = "rbase/"
+  weight = 10
+
+[[menu.main]]
+  name   = "Pipe"
+  url    = "pipe/"
+  weight = 18
+
+[[menu.main]]
+  name   = "Stringr"
+  url    = "stringr/"
+  weight = 20
+
+[[menu.main]]
+  name   = "Forcats"
+  url    = "forcats/"
+  weight = 23
+
+[[menu.main]]
+  name   = "Transformação"
+  url    = "manip/"
+  weight = 30
+  
+[[menu.main]]
+  name   = "Visualização"
+  url    = "ggplot/"
+  weight = 40
+
+[[menu.main]]
+  name   = "Modelagem"
+  url    = "modelos/"
+  weight = 50
+
+[[menu.main]]
+  name   = "Web Scraping"
+  url    = "scrape/"
+  weight = 60
+
+[blackfriday]
+  smartypants  = true
+  fractions = true
+  smartDashes = true
+  plainIDAnchors = true
