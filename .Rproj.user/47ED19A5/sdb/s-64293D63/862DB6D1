@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "Package: material\nTitle: placeholder\nVersion: 0.0.0.9000\nAuthors@R: c(\n    person(\"Daniel\", \"Falbel\", email = \"dfalbel@gmail.com\", role = \"cre\"),\n    person(\"Julio\", \"Trecenti\", email = \"jtrecenti@jtrecenti.com\", role = \"aut\"),\n    person(\"Athos\", \"Damiani\", email = \"athos.damiani@gmail.com\", role = \"aut\"),\n    person(\"William\", \"Amorim\", email = \"thewilliam89@gmail.com\", role = \"aut\"),\n    person(\"Fernando\", \"Correa\", email = \"fptcorrea@gmail.com\", role = \"aut\"))\nDescription: Just a placeholder to install deps.\nDepends:\n    R (>= 3.2.3)\nLicense: MIT + file LICENSE\nEncoding: UTF-8\nLazyData: true\nRemotes:\n    rstudio/blogdown\nImports:\n    stringr,\n    purrr,\n    httr,\n    magrittr,\n    bookdown,\n    devtools,\n    blogdown,\n    tutorial,\n    desc,\n    forcats,\n    haven,\n    readr,\n    tibble,\n    tidyr,\n    dplyr,\n    ggplot2,\n    lubridate\nRoxygenNote: 5.0.1\nPowerUps:\n    curso-r/pu.manip,\n    curso-r/pu.ggplot,\n    curso-r/pu.rbase,\n    curso-r/pu.stringr,\n    curso-r/pu.lubridate,\n    curso-r/pu.forcats,\n    curso-r/pu.modelos,\n    curso-r/pu.pipe,\n    curso-r/pu.scrape\n",
+    "created" : 1488409161107.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3586948519",
+    "id" : "862DB6D1",
+    "lastKnownWriteTime" : 1488409165,
+    "last_content_update" : 1488409165369,
+    "path" : "~/curso-r/material/DESCRIPTION",
+    "project_path" : "DESCRIPTION",
+    "properties" : {
+    },
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "dcf"
+}
