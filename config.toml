@@ -50,6 +50,11 @@ googleAnalytics = "UA-87272102-1"
   name   = "Curso R"
   url    = "/"
   weight = 0
+
+[[menu.main]]
+  name   = "Instalação"
+  url    = "instalacao/"
+  weight = 05
   
 [[menu.main]]
   name   = "R básico"
