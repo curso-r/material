@@ -1,6 +1,6 @@
 ---
 title: "Material para cursos de R"
-author: "Julio Trecenti, Daniel Falbel"
+author: "Julio Trecenti, Daniel Falbel, William Amorim"
 date: "2016-11-09"
 type: index
 ---

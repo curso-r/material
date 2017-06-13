@@ -18,11 +18,11 @@ googleAnalytics = "UA-87272102-1"
   provider = "GitHub"
   repo_url = "http://material.curso-r.com"
 
-  version = ""
+  version = "1.1"
   logo = "logo-curso-r.png"
   favicon = ""
 
-  permalink = "#"
+  permalink = "%>%"
 
   # Custom assets
   custom_css = []
@@ -32,7 +32,7 @@ googleAnalytics = "UA-87272102-1"
   highlight_css  = ""
 
   [params.palette]
-      primary = "red"
+      primary = "blue"
       accent  = "teal"
 
     [params.font]
