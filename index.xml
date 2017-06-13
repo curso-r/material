@@ -5222,7 +5222,7 @@ library(dplyr)
       <pubDate>Wed, 09 Nov 2016 00:00:00 +0000</pubDate>
       
       <guid>/</guid>
-      <description>&lt;p&gt;O material dessa página ajuda a usar o R na execução de tarefas corriqueiras de forma eficiente e concisa. Ao final dos estudos, será possível:&lt;/p&gt;
+      <description>&lt;p&gt;O material desta página ajuda a usar o R na execução de tarefas corriqueiras de forma eficiente e concisa. Ao final dos estudos, será possível:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;strong&gt;Carregar&lt;/strong&gt; o banco de dados para dentro do R.&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;Arrumar&lt;/strong&gt; os dados na melhor estrutura para a análise.&lt;/li&gt;
