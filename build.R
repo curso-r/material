@@ -35,5 +35,5 @@ download_and_extract_pu <- function(power_up){
 purrr::walk(power_ups, download_and_extract_pu)
 
 # install hugo & build site
-blogdown::install_hugo(version = "0.17")
+blogdown::install_hugo(version = "0.21")
 blogdown::build_site()
