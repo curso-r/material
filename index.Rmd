@@ -1,6 +1,6 @@
 ---
 title: "Material para cursos de R"
-author: "Julio Trecenti, Daniel Falbel"
+author: "Julio Trecenti, Daniel Falbel, William Amorim"
 date: "2016-11-09"
 type: index
 ---
@@ -9,33 +9,35 @@ type: index
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-O materiais dessa página ajuda a usar o R na execução de tarefas
+O material dessa página ajuda a usar o R na execução de tarefas
 corriqueiras de forma eficiente e concisa. Ao final dos estudos, será possível:
 
-- **Carregar** - Carregar o banco de dados para dentro do R. 
-- **Arrumar** - Deixar os dados na melhor estrutura para a análise.
-- **Transformar** - Agregar, criar novas variáveis etc. 
-- **Visualizar** - Criar gráficos e visualizações.
-- **Modelar** - Ajustar modelos que ajudam na interpretação dos dados.
-- **Comunicar** - Apresentar os resultados de forma eficiente.
+- **Carregar** o banco de dados para dentro do R. 
+- **Arrumar** os dados na melhor estrutura para a análise.
+- **Transformar**, agregar, criar novas variáveis etc. 
+- **Visualizar** informações escondidas utilizando gráficos e tabelas.
+- **Modelar** os dados para fazer inferência ou previsão.
+- **Comunicar** os resultados de forma eficiente.
 
-O conteúdo é baseado no [*R for Data Science*](http://r4ds.had.co.nz/), que por
-sua vez é baseado no [`tidyverse`](http://tidyverse.org/), ou *universo arrumado*,
-um conjunto de pacotes que dividem uma mesma filosofia e foram feitos para serem
+O conteúdo é baseado no [*R for Data Science*](http://r4ds.had.co.nz/), que, por
+sua vez, é baseado no [`tidyverse`](http://tidyverse.org/). O *tidyverse*, ou *universo arrumado*, é um conjunto de pacotes que dividem uma mesma filosofia e foram feitos para serem
 utilizados conjuntamente.
 
 ## Público Alvo
 
 - Estudantes de graduação em estatística que desejam ganhar tempo nos trabalhos da faculdade e entrar no mercado de trabalho com bons diferenciais.
-- Profissionais do mercado de trabalho que desejam inserir o R no fluxo de atividades do setor/empresa.
+- Profissionais do mercado de trabalho que desejam inserir o R no fluxo de atividades do setor ou da empresa.
 - Acadêmicos com interesse em tornar suas análises e códigos mais legíveis, reprodutíveis, eficientes e organizados.
 
 ## Softwares
 
-Você precisará instalar os seguintes softwares/pacotes:
+Você precisará instalar os seguintes softwares:
 
 - R: Instale pelo site do [CRAN](https://cloud.r-project.org/).
 - RStudio: Faça o download [aqui](https://www.rstudio.com/products/rstudio/download/preview/).
+
+E, para começar, o seguinte pacote:
+
 - `tidyverse` - No console do R, digite o código abaixo.
 
 ```{r eval=FALSE}
@@ -45,7 +47,7 @@ devtools::install_github('curso-r/pu.deps')
 
 ## Pré-requisitos
 
-Para melhor aproveitamento do material, é importante ter alguns conhecimentos sobre **Lógica de programação**. Não se preocupe! Se você já fez qualquer curso de programação na vida, já será o suficiente. 
+Para melhor aproveitamento do material, é importante ter alguns conhecimentos sobre **lógica de programação**. Não se preocupe! Se você já fez qualquer curso de programação na vida, já será o suficiente. 
 
 Se não for familiarizado com R, recomendamos abrir o RStudio e tentar rodar e entender os comandos [desta página](http://material.curso-r.com/r-como-calculadora/). Tente
 fazer os [exercícios](http://material.curso-r.com/r-como-calculadora/#exercicios).
