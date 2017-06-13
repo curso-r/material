@@ -22,7 +22,7 @@ googleAnalytics = "UA-87272102-1"
   logo = "logo-curso-r.png"
   favicon = ""
 
-  permalink = "%>%"
+  permalink = "#"
 
   # Custom assets
   custom_css = []
