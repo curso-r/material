@@ -9,7 +9,7 @@ type: index
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-O material dessa página ajuda a usar o R na execução de tarefas
+O material desta página ajuda a usar o R na execução de tarefas
 corriqueiras de forma eficiente e concisa. Ao final dos estudos, será possível:
 
 - **Carregar** o banco de dados para dentro do R. 
