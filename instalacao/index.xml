@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Instalacaos on Curso-R</title>
+    <link>/instalacao/index.xml</link>
+    <description>Recent content in Instalacaos on Curso-R</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>pt-br</language>
+    <copyright>Disponível sobre Licença MIT</copyright>
+    <lastBuildDate>Fri, 10 Mar 2017 00:00:00 +0000</lastBuildDate>
+    <atom:link href="/instalacao/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Instalação</title>
+      <link>/instalacao/</link>
+      <pubDate>Fri, 10 Mar 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/instalacao/</guid>
+      <description>
+
+&lt;p&gt;A seguir teremos alguns tutoriais de instalação do R, RStudio e alguns pacotes
+nos principais sistemas operacionais.&lt;/p&gt;
+
+&lt;h2 id=&#34;instalação-no-windows&#34;&gt;Instalação no Windows&lt;/h2&gt;
+
+&lt;h3 id=&#34;instalação-do-r&#34;&gt;Instalação do R&lt;/h3&gt;
+
+&lt;p&gt;Para instalar o R no Windows, o primeiro passo é fazer o download do instalador.
+Entre &lt;a href=&#34;https://cran.r-project.org/bin/windows/base/&#34;&gt;neste link&lt;/a&gt; e clique em
+&amp;ldquo;Download R 3.3.3 for Windows (71 megabytes, &lt;sup&gt;32&lt;/sup&gt;&amp;frasl;&lt;sub&gt;64&lt;/sub&gt; bit)&amp;rdquo; (a versão pode não ser
+a mesma.).&lt;/p&gt;
+
+&lt;p&gt;Salve este arquivo em qualquer pasta do seu computador. No meu caso salvei na pasta
+&amp;ldquo;Downloads&amp;rdquo;.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;img/01-r-salvo.PNG&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Clique duas vezes com o botão esquerdo neste arquivo. Ele pedirá para você selecionar
+a linguagem da instalação. Selecione o idioma do seu interesse e clique em OK.
+Em seguida é só ir clicando em avançar, como em uma instalação comum. Preste a atenção
+apenas na tela em que ele pede para você escolher a pasta de instalação. Se você escolher
+uma pasta que não está dentro da pasta do seu usuário, você precisará de acesso de
+administrador. Se escolher uma pasta dentro do seu usuário (como na imagem abaixo),
+não precisará.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;img/06-r-pasta.PNG&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Clique em avançar até o final e depois em concluir.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;img/09-conclusao.PNG&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Pronto! Agora o R está instalado!&lt;/p&gt;
+
+&lt;h3 id=&#34;instalação-do-rstudio&#34;&gt;Instalação do RStudio&lt;/h3&gt;
+
+&lt;p&gt;Agora vamos instalar o RStudio, a IDE que usamos para editar e executar códigos em
+R. Para fazer o download, entre &lt;a href=&#34;https://www.rstudio.com/products/rstudio/download/&#34;&gt;nesta página&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;img/rstudio-download-opt.PNG&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Nessa página você tem duas opções:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Se você tiver acesso administrador, baixe a versão que está na lista de &lt;em&gt;Installers for Supported Platforms&lt;/em&gt;.  Em seguida a instalação
+será bem simples: fazer o download, abrir o instalador e ir clicando no botão
+avançar.&lt;/li&gt;
+&lt;li&gt;Se você não tiver acesso de administrador na máquina faça o download da versão
+que está na lista &lt;em&gt;Zip/Tarballs&lt;/em&gt;. (veja imagem acima)&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h4 id=&#34;1-instalando-se-você-for-administrador&#34;&gt;1.  Instalando se você for administrador&lt;/h4&gt;
+
+&lt;p&gt;Clique duas vezes no arquivo que você fez o download da página do RStudio (ver
+imagem abaixo) e siga as instruções de instalação.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;img/rstudio-instalador.PNG&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;h4 id=&#34;2-instalação-se-você-não-for-administrador&#34;&gt;2. Instalação se você não for administrador&lt;/h4&gt;
+
+&lt;p&gt;Se você não for administrador, você deve ter feito o download de um arquivo do tipo
+&lt;em&gt;.zip&lt;/em&gt; que contém o código do RStudio. É o arquivo selecionado na imagem abaixo.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;img/rstudio-zip.PNG&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Clique com o botão direito neste arquivo e dedpois em &lt;em&gt;Extrair Tudo&lt;/em&gt; conforme a
+imagem abaixo.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;img/rstudio-extrair.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Você verá uma tela como a imagem a seguir. Não mude nada e clique em extrair.
+Espere o Windows completar a extração.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;img/extrair-tudo-rstudio.PNG&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Agora na pasta &lt;em&gt;Downloads&lt;/em&gt; (a pasta que deixamos como local de extração - imagem acima)
+você terá uma pasta chamada: &lt;code&gt;RStudio-1.0.136&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Abra essa pasta e entre na subpasta com nome &lt;code&gt;bin&lt;/code&gt;. Em seguida procure pelo arquivo]chamado &lt;code&gt;rstudio&lt;/code&gt;
+e clique duas vezes. Isso abrirá o RStudio. Recomendo fixar o programa na barra de tarefas
+para não ter que ficar procurando nessa pasta sempre que quiser abrí-la.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;NOTE&lt;/strong&gt;: se você excluir a pasta que extraimos, o RStudio irá parar de funcionar.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;img/rstudio-bin.PNG&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;instalação-de-pacotes-do-r&#34;&gt;Instalação de pacotes do R&lt;/h3&gt;
+
+&lt;p&gt;Com o RStudio aberto, você verá a seguinte tela. Digite &lt;code&gt;install.packages(&amp;quot;tidyverse&amp;quot;)&lt;/code&gt; no console e aperte &lt;code&gt;Enter&lt;/code&gt;, como está na imagem abaixo. Isso irá instalar uma série de pacotes muito
+utilizados no R. Ao rodar este código uma série de comandos aparecerá no console,
+no final de tudo você deve encontrar algo do tipo:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;package ‘tidyverse’ successfully unpacked and MD5 sums checked
+
+The downloaded binary packages are in
+	C:\Users\dfigueiredo\AppData\Local\Temp\Rtmpym4SPN\downloaded_packages
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Indicando que o pacote foi instalado corretamente.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;img/rstudio-tidyverse.PNG&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

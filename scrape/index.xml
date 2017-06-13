@@ -1,0 +1,949 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Scrapes on Curso-R</title>
+    <link>/scrape/index.xml</link>
+    <description>Recent content in Scrapes on Curso-R</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>pt-br</language>
+    <copyright>Disponível sobre Licença MIT</copyright>
+    <lastBuildDate>Wed, 15 Feb 2017 00:00:00 +0000</lastBuildDate>
+    <atom:link href="/scrape/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Introdução</title>
+      <link>/scrape/</link>
+      <pubDate>Wed, 15 Feb 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/scrape/</guid>
+      <description>
+
+&lt;h2 id=&#34;pacotes-httr-xml2-e-rvest&#34;&gt;Pacotes &lt;code&gt;httr&lt;/code&gt;, &lt;code&gt;xml2&lt;/code&gt; e &lt;code&gt;rvest&lt;/code&gt;&lt;/h2&gt;
+
+&lt;p&gt;Esses são os três pacotes mais modernos do R utilizados para fazer web scraping.
+O pacote &lt;code&gt;xml2&lt;/code&gt; tem a finalidade de estruturar arquivos HTML ou XML de forma eficiente,
+tornando possível a obtenção de &lt;em&gt;tags&lt;/em&gt; e seus atributos dentro de um arquivo.
+Já o pacote &lt;code&gt;httr&lt;/code&gt; é responsável por realizar requisições web para
+obtenção das páginas de interesse,
+buscando reduzir ao máximo a complexidade da programação.
+O pacote &lt;code&gt;rvest&lt;/code&gt; é escrito &lt;strong&gt;sobre&lt;/strong&gt; os dois anteriores e por isso
+eleva ainda mais o nível de especialização para raspagem de dados.&lt;/p&gt;
+
+&lt;p&gt;As características dos pacotes implicam na seguinte regra de bolso.
+Para trabalhar com páginas simples,
+basta carregar o &lt;code&gt;rvest&lt;/code&gt; e utilizar suas funcionalidades.
+Caso o acesso à página exija ações mais complexas e/ou
+artifícios de ferramentas web, será necessário utilizar o &lt;code&gt;httr&lt;/code&gt;.
+O &lt;code&gt;xml2&lt;/code&gt; só será usado explicitamente nos casos raros em que
+a página está em XML, que pode ser visto como uma generalização do HTML.&lt;/p&gt;
+
+&lt;p&gt;Esses pacotes não são suficientes para acessar todo tipo de conteúdo da web.
+Um exemplo claro disso são páginas em que o conteúdo é produzido por &lt;code&gt;javascript&lt;/code&gt;,
+o que acontece em muitos sites modernos.
+Para trabalhar com esses sites, é necessário realmente &amp;ldquo;simular&amp;rdquo; um navegador que
+acessa a página web. Uma das melhores ferramentas para isso é o &lt;code&gt;selenium&lt;/code&gt;.
+Não discutiremos &lt;code&gt;selenium&lt;/code&gt; nesse curso, mas caso queira se aprofundar, acesse
+&lt;a href=&#34;http://www.seleniumhq.org/&#34;&gt;aqui&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h3 id=&#34;sessões-e-cookies&#34;&gt;Sessões e cookies&lt;/h3&gt;
+
+&lt;p&gt;No momento que acessamos uma página web,
+nosso navegador baixa alguns arquivos que &amp;ldquo;identificam&amp;rdquo; nosso acesso à página.
+Esses arquivos são chamados cookies e
+são usados pelos sites para realizar diversas atividades,
+como carregar uma página pré-definida pelo usuário caso este acesse o site pela segunda vez.&lt;/p&gt;
+
+&lt;p&gt;O &lt;code&gt;httr&lt;/code&gt; e por consequência o &lt;code&gt;rvest&lt;/code&gt; já guardam esses cookies de forma automática,
+de forma que o usuário não precise se preocupar com isso.
+Em casos raros, para construir o web scraper é necessário modificar esses cookies.
+Nesses casos, estude a função &lt;code&gt;cookies()&lt;/code&gt; do &lt;code&gt;httr&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h3 id=&#34;get-e-post&#34;&gt;&lt;code&gt;GET&lt;/code&gt; e &lt;code&gt;POST&lt;/code&gt;&lt;/h3&gt;
+
+&lt;p&gt;Uma requisição &lt;strong&gt;GET&lt;/strong&gt; envia uma &lt;code&gt;url&lt;/code&gt; ao servidor, possivelmente com alguns parâmetros nessa &lt;code&gt;url&lt;/code&gt;
+(que ficam no final da &lt;code&gt;url&lt;/code&gt; depois do &lt;code&gt;?&lt;/code&gt;). O servidor, por sua vez, recebe essa &lt;code&gt;url&lt;/code&gt;,
+processa os parâmetros e retorna uma página HTML para o navegador.&lt;/p&gt;
+
+&lt;p&gt;A requisição &lt;strong&gt;POST&lt;/strong&gt;, no entanto, envia uma &lt;code&gt;url&lt;/code&gt; não modificada para o servidor,
+mas envia também uma lista de dados preenchidos pelo usuário,
+que podem ser números, textos ou até imagens.
+Na maioria dos casos, ao submeter um formulário de um site,
+fazemos uma requisição POST.&lt;/p&gt;
+
+&lt;p&gt;O &lt;code&gt;httr&lt;/code&gt; possui os métodos &lt;code&gt;GET&lt;/code&gt; e &lt;code&gt;POST&lt;/code&gt; implementados e são muito similares.
+A lista de parâmetros enviados pelo usuário pode ser armazenado numa &lt;code&gt;list&lt;/code&gt; nomeada,
+e adicionado ao &lt;code&gt;GET&lt;/code&gt; pelo parâmetro &lt;code&gt;query&lt;/code&gt; ou no &lt;code&gt;POST&lt;/code&gt; pelo parâmetro &lt;code&gt;body&lt;/code&gt;.
+Veremos exemplos disso mais adiante.&lt;/p&gt;
+
+&lt;h3 id=&#34;outras-funções-do-httr&#34;&gt;Outras funções do &lt;code&gt;httr&lt;/code&gt;&lt;/h3&gt;
+
+&lt;p&gt;Outras funções úteis:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;write_disk()&lt;/code&gt; para escrever uma requisição direto em disco, além de guardar na memória RAM.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;config()&lt;/code&gt; para adicionar configurações adicionais. Por exemplo, quando acessar uma página &lt;code&gt;https&lt;/code&gt; com certificados inadequados numa requisição GET, rode &lt;code&gt;GET(&#39;https://www...&#39;, config(ssl_verifypeer=F))&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;oauth_app()&lt;/code&gt; para trabalhar com APIs. Não discutiremos conexão com APIs nesse curso, mas é um importante conceito a ser estudado.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;principais-funções-do-rvest&#34;&gt;Principais funções do &lt;code&gt;rvest&lt;/code&gt;&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;library(rvest)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;## Loading required package: xml2
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;Para acessar páginas da web:&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;html_session()&lt;/code&gt; abre uma sessão do usuário (baixa página, carrega cookies etc).&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;follow_link()&lt;/code&gt;, &lt;code&gt;jump_to()&lt;/code&gt; acessa uma página web a partir de um link (tag &lt;code&gt;&amp;lt;a&amp;gt;&lt;/code&gt;) ou url.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;html_form()&lt;/code&gt; carrega todos os formulários contidos numa página.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;set_value()&lt;/code&gt; atribui valores a parâmetros do formulário.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;submit_form()&lt;/code&gt; submete um formulário obtido em &lt;code&gt;html_form&lt;/code&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;Para trabalhar com arquivos HTML:&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;read_html()&lt;/code&gt; lê o arquivo HTML de forma estruturada e facilita impressão.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;html_nodes()&lt;/code&gt; cria uma lista com os nós identificados por uma busca em CSS path ou XPath.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;html_node()&lt;/code&gt; é um caso especial que assume que só será encontrado um resultado.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;html_text()&lt;/code&gt; extrai todo o conteúdo de um objeto e retorna um texto.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;html_table()&lt;/code&gt; extrai o conteúdo de uma &lt;code&gt;&amp;lt;table&amp;gt;&lt;/code&gt; e transforma em um &lt;code&gt;data_frame&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;html_attr()&lt;/code&gt; extrai um atributo de uma tag, por exemplo &lt;code&gt;href&lt;/code&gt; da tag &lt;code&gt;&amp;lt;a&amp;gt;&lt;/code&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;css-path-e-xpath&#34;&gt;CSS path e XPath&lt;/h3&gt;
+
+&lt;p&gt;O CSS path e o XPath são formas distintas de buscar tags dentro de um documento HTML.
+O CSS path é mais simples de implementar e tem uma sintaxe menos verborrágica,
+mas o XPath é mais poderoso. A regra de bolso é tentar fazer a seleção primeiro em CSS e,
+caso não seja possível, implementar em XPath.&lt;/p&gt;
+
+&lt;p&gt;Esses paths serão mostrados &lt;em&gt;en passant&lt;/em&gt; durante o curso,
+mas não serão abordados em detalhe.
+Caso queira se aprofundar no assunto,
+comece pela ajuda da função &lt;code&gt;?html_nodes&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h3 id=&#34;apis-com-httr&#34;&gt;APIs com &lt;code&gt;httr&lt;/code&gt;&lt;/h3&gt;
+
+&lt;p&gt;O &lt;code&gt;httr&lt;/code&gt; foi criado pensando-se nas modernas APIs que vêm sendo desenvolvidas
+nos últimos anos. O &lt;code&gt;httr&lt;/code&gt; já tem métodos apropriados para trabalhar com
+Facebook, Twitter e Google, entre outros.&lt;/p&gt;
+
+&lt;p&gt;Para um guia completo de como utilizar APIs no R,
+acesse &lt;a href=&#34;https://cran.r-project.org/web/packages/httr/vignettes/api-packages.html&#34;&gt;esse tutorial&lt;/a&gt;.
+Um exemplo de pacote que utiliza API usando esse tutorial melhores práticas pode ser
+&lt;a href=&#34;https://github.com/jtrecenti/sptrans&#34;&gt;acessado aqui&lt;/a&gt;.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;h1 id=&#34;exemplo-1-chance-de-gol&#34;&gt;Exemplo 1: chance de gol&lt;/h1&gt;
+
+&lt;h2 id=&#34;parte-0-pacotes&#34;&gt;Parte 0: pacotes&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;library(tibble)
+library(httr)
+library(rvest)
+library(dplyr)
+library(ggplot2)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;parte-1-acessando-a-página-de-um-ano&#34;&gt;Parte 1: acessando a página de um ano&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;ano &amp;lt;- 2015
+cdg_url &amp;lt;- sprintf(&#39;http://www.chancedegol.com.br/br%02d.htm&#39;, ano - 2000)
+
+cdg_html &amp;lt;- cdg_url %&amp;gt;%
+  httr::GET() %&amp;gt;%
+  httr::content(&#39;text&#39;, encoding = &#39;latin1&#39;) %&amp;gt;%
+  xml2::read_html() %&amp;gt;%
+  rvest::html_node(&#39;table&#39;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;parte-2-cores-da-tabela&#34;&gt;Parte 2: cores da tabela&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;cores &amp;lt;- cdg_html %&amp;gt;%
+  html_nodes(xpath = &#39;//font[@color=&amp;quot;#FF0000&amp;quot;]&#39;) %&amp;gt;%
+  html_text()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;parte-3-nomes-e-estrutura-da-tabela&#34;&gt;Parte 3: nomes e estrutura da tabela&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;cdg_data &amp;lt;- cdg_html %&amp;gt;%
+  html_table(header = TRUE) %&amp;gt;%
+  setNames(c(&#39;dt_jogo&#39;, &#39;mandante&#39;, &#39;placar&#39;, &#39;visitante&#39;,
+             &#39;p_mandante&#39;, &#39;p_empate&#39;, &#39;p_visitante&#39;)) %&amp;gt;% 
+  mutate(p_vitorioso = cores) %&amp;gt;% 
+  as_tibble() %&amp;gt;% 
+  mutate(result = &#39;OK&#39;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;parte-4-colocando-dentro-de-uma-função&#34;&gt;Parte 4: colocando dentro de uma função&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;cdg_ano &amp;lt;- function(ano) {
+  cdg_url &amp;lt;- sprintf(&#39;http://www.chancedegol.com.br/br%02d.htm&#39;, ano - 2000)
+  
+  cdg_html &amp;lt;- cdg_url %&amp;gt;%
+    GET() %&amp;gt;%
+    content(&#39;text&#39;, encoding = &#39;latin1&#39;) %&amp;gt;%
+    read_html() %&amp;gt;%
+    html_node(&#39;table&#39;)
+  
+  cores &amp;lt;- cdg_html %&amp;gt;%
+    html_nodes(xpath = &#39;//font[@color=&amp;quot;#FF0000&amp;quot;]&#39;) %&amp;gt;%
+    html_text()
+  
+  cdg_data &amp;lt;- cdg_html %&amp;gt;%
+    html_table(header = TRUE) %&amp;gt;%
+    setNames(c(&#39;dt_jogo&#39;, &#39;mandante&#39;, &#39;placar&#39;, &#39;visitante&#39;,
+               &#39;p_mandante&#39;, &#39;p_empate&#39;, &#39;p_visitante&#39;)) %&amp;gt;% 
+    mutate(p_vitorioso = cores) %&amp;gt;% 
+    as_tibble() %&amp;gt;% 
+    mutate(result = &#39;OK&#39;)
+  
+  cdg_data
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;parte-5-vetorizando-anos&#34;&gt;Parte 5: vetorizando anos&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;cdg_anos &amp;lt;- function(anos) {
+  cdg_ano_safe &amp;lt;- failwith(tibble(result = &#39;erro&#39;), cdg_ano)
+  anos %&amp;gt;% 
+    setNames(anos) %&amp;gt;% 
+    purrr::map_df(cdg_ano_safe, .id = &#39;ano&#39;)
+}
+
+d_cdg &amp;lt;- cdg_anos(c(2014, 2015))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;hr /&gt;
+
+&lt;h1 id=&#34;exemplo-2-sabesp&#34;&gt;Exemplo 2: Sabesp&lt;/h1&gt;
+
+&lt;h2 id=&#34;passo-0-pacotes&#34;&gt;Passo 0: pacotes&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;library(tibble)
+library(httr)
+library(rvest)
+library(lubridate)
+library(stringr)
+library(purrr)
+library(dplyr)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;passo-1-acessa-página-principal&#34;&gt;Passo 1: acessa página principal&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;link &amp;lt;- &#39;http://www2.sabesp.com.br/mananciais/DivulgacaoSiteSabesp.aspx&#39;
+txt &amp;lt;- GET(link)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;passo-2-função-que-pega-viewstate-ou-eventvalidation-da-página&#34;&gt;Passo 2: função que pega viewstate ou eventvalidation da página&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;# tipo pode ser &amp;quot;#__VIEWSTATE&amp;quot; ou &amp;quot;#__EVENTVALIDATION&amp;quot;
+pegar_tags &amp;lt;- function(req, tipo) {
+  req %&amp;gt;% 
+    content(&#39;text&#39;) %&amp;gt;% 
+    read_html() %&amp;gt;% 
+    html_node(tipo) %&amp;gt;% 
+    html_attr(&#39;value&#39;)
+}
+
+# exemplo
+viewstate &amp;lt;- pegar_tags(txt, &amp;quot;#__VIEWSTATE&amp;quot;)
+eventval &amp;lt;- pegar_tags(txt, &amp;quot;#__EVENTVALIDATION&amp;quot;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;passo-3-dados-da-requisição&#34;&gt;Passo 3: dados da requisição&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;sabesp_dados &amp;lt;- function(data, vs, ev) {
+  data &amp;lt;- as.Date(data)
+  dados &amp;lt;- list(cmbDia = lubridate::day(data), 
+                cmbMes = lubridate::month(data), 
+                cmbAno = lubridate::year(data), 
+                Imagebutton1.x = &#39;0&#39;, 
+                Imagebutton1.y = &#39;0&#39;, 
+                &#39;__VIEWSTATE&#39; = vs, 
+                &#39;__EVENTVALIDATION&#39; = ev,
+                &#39;__VIEWSTATEENCRYPTED&#39; = &#39;&#39;)
+}
+
+# exemplo
+data &amp;lt;- &#39;2017-02-14&#39;
+form &amp;lt;- sabesp_dados(data, viewstate, eventval)
+# requisicao de busca
+result &amp;lt;- POST(link, body = form)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;passo-4-pegar-nomes-dos-sistemas&#34;&gt;Passo 4: pegar nomes dos sistemas&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;sabesp_nm_sistemas &amp;lt;- function(r) {
+  nomes &amp;lt;- r %&amp;gt;% 
+    content(&#39;text&#39;) %&amp;gt;% 
+    read_html() %&amp;gt;% 
+    html_nodes(&#39;img&#39;) %&amp;gt;% 
+    html_attr(&#39;src&#39;) %&amp;gt;% 
+    keep(~str_detect(.x, &#39;\\.gif$&#39;)) %&amp;gt;% 
+    map_chr(~str_match(.x, &#39;/(.+)\\.gif&#39;)[, 2])
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;passo-5-pegar-conteúdo-da-página&#34;&gt;Passo 5: pegar conteúdo da página&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;sabesp_conteudo &amp;lt;- function(r) {
+  nomes &amp;lt;- sabesp_nm_sistemas(r)
+  r %&amp;gt;% 
+    content(&#39;text&#39;) %&amp;gt;% 
+    read_html() %&amp;gt;% 
+    html_node(&#39;#tabDados&#39;) %&amp;gt;% 
+    html_table(fill = TRUE) %&amp;gt;%
+    select(titulo = X1, info = X2) %&amp;gt;%
+    filter(titulo != &#39;&#39;) %&amp;gt;%
+    mutate(lugar = rep(nomes, each = 4)) %&amp;gt;% #View
+    mutate(info = info %&amp;gt;% 
+             str_extract(&#39;[-0-9, %m]+$&#39;) %&amp;gt;% 
+             str_replace_all(&#39;^[^:]+:&#39;, &#39;&#39;) %&amp;gt;% 
+             str_replace_all(&#39;,&#39;, &#39;.&#39;) %&amp;gt;% 
+             str_replace_all(&#39;[^0-9.]&#39;, &#39;&#39;) %&amp;gt;%
+             as.numeric()) %&amp;gt;% 
+    as_tibble()
+}
+
+# exemplo
+sabesp_conteudo(result)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;## # A tibble: 24 × 3
+##                           titulo  info               lugar
+##                            &amp;lt;chr&amp;gt; &amp;lt;dbl&amp;gt;               &amp;lt;chr&amp;gt;
+## 1              volume armazenado  62.5   sistemaCantareira
+## 2            pluviometria do dia   0.0   sistemaCantareira
+## 3  pluviometria acumulada no mês  50.1   sistemaCantareira
+## 4         média histórica do mês 203.4   sistemaCantareira
+## 5              volume armazenado  53.9    sistemaAltoTiete
+## 6            pluviometria do dia   0.0    sistemaAltoTiete
+## 7  pluviometria acumulada no mês  54.0    sistemaAltoTiete
+## 8         média histórica do mês 194.9    sistemaAltoTiete
+## 9              volume armazenado  78.9 sistemaGuarapiranga
+## 10           pluviometria do dia   3.4 sistemaGuarapiranga
+## # ... with 14 more rows
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;passo-5-colocar-tudo-numa-função&#34;&gt;Passo 5: colocar tudo numa função&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;sabesp_dia &amp;lt;- function(data) {
+  link &amp;lt;- &#39;http://www2.sabesp.com.br/mananciais/DivulgacaoSiteSabesp.aspx&#39;
+  txt &amp;lt;- GET(link)
+  viewstate &amp;lt;- pegar_tags(txt, &amp;quot;#__VIEWSTATE&amp;quot;)
+  eventval &amp;lt;- pegar_tags(txt, &amp;quot;#__EVENTVALIDATION&amp;quot;)
+  form &amp;lt;- sabesp_dados(data, viewstate, eventval)
+  result &amp;lt;- POST(link, body = form)
+  d_res &amp;lt;- sabesp_conteudo(result) %&amp;gt;% 
+    mutate(result = &#39;OK&#39;)
+  return(d_res)
+}
+
+# exemplo
+sabesp_dia(&#39;2017-02-14&#39;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;## # A tibble: 24 × 4
+##                           titulo  info               lugar result
+##                            &amp;lt;chr&amp;gt; &amp;lt;dbl&amp;gt;               &amp;lt;chr&amp;gt;  &amp;lt;chr&amp;gt;
+## 1              volume armazenado  62.5   sistemaCantareira     OK
+## 2            pluviometria do dia   0.0   sistemaCantareira     OK
+## 3  pluviometria acumulada no mês  50.1   sistemaCantareira     OK
+## 4         média histórica do mês 203.4   sistemaCantareira     OK
+## 5              volume armazenado  53.9    sistemaAltoTiete     OK
+## 6            pluviometria do dia   0.0    sistemaAltoTiete     OK
+## 7  pluviometria acumulada no mês  54.0    sistemaAltoTiete     OK
+## 8         média histórica do mês 194.9    sistemaAltoTiete     OK
+## 9              volume armazenado  78.9 sistemaGuarapiranga     OK
+## 10           pluviometria do dia   3.4 sistemaGuarapiranga     OK
+## # ... with 14 more rows
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;sabesp_dias &amp;lt;- function(datas) {
+  sabesp_dia_safe &amp;lt;- failwith(tibble(result = &#39;erro&#39;), sabesp_dia)
+  datas %&amp;gt;% 
+    setNames(as.character(datas)) %&amp;gt;% 
+    purrr::map_df(sabesp_dia_safe, .id = &#39;data&#39;)
+}
+
+# exemplo
+dts &amp;lt;- as.Date(&#39;2017-02-14&#39;) - lubridate::days(0:13 * 30)
+d_sabesp &amp;lt;- sabesp_dias(dts)
+
+library(ggplot2)
+d_sabesp %&amp;gt;% 
+  filter(titulo == &#39;volume armazenado&#39;) %&amp;gt;% 
+  mutate(data = ymd(data)) %&amp;gt;% 
+  ggplot(aes(x = data, y = info, colour = lugar)) +
+  geom_line() +
+  theme_bw()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;figures//unnamed-chunk-16-1.png&#34; alt=&#34;plot of chunk unnamed-chunk-16&#34; /&gt;&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;h1 id=&#34;case-study-câmaras-tjsp-jurimetria&#34;&gt;Case study: câmaras TJSP (jurimetria)&lt;/h1&gt;
+
+&lt;h2 id=&#34;melhores-práticas-para-web-scraping&#34;&gt;Melhores práticas para web scraping&lt;/h2&gt;
+
+&lt;p&gt;Esta seção contém algumas melhores práticas na contrução de ferramentas no R
+que baixam e processam informações de sites disponíveis na web.
+O objetivo é ajudar o jurimetrista a desenvolver programas que sejam fáceis
+de adaptar no tempo.&lt;/p&gt;
+
+&lt;p&gt;É importante ressaltar que só estamos trabalhando com páginas que
+são acessíveis publicamente. Caso tenha interesse e &amp;ldquo;raspar&amp;rdquo; páginas que
+precisam de autenticação, recomendamos que estude os termos de uso do site.&lt;/p&gt;
+
+&lt;p&gt;Para ilustrar este texto, usaremos como exemplo o código utilizado no trabalho das câmaras,
+que acessa o site do Tribunal de Justiça de São Paulo para obter informações de
+processos judiciais.
+Trabalharemos principalmente com a
+&lt;a href=&#34;https://esaj.tjsp.jus.br/cjsg/consultaCompleta.do&#34;&gt;Consulta de Jurisprudência&lt;/a&gt; e a
+&lt;a href=&#34;https://esaj.tjsp.jus.br/cpo/sg/open.do&#34;&gt;Consulta de de Processos de Segundo Grau&lt;/a&gt;
+do TJSP.&lt;/p&gt;
+
+&lt;p&gt;Sugerimos como melhores práticas dividir todas as atividades em três tarefas
+principais: i) &lt;em&gt;buscar&lt;/em&gt;; ii) &lt;em&gt;coletar&lt;/em&gt; e iii) &lt;em&gt;processar&lt;/em&gt;.
+Quando já sabemos de antemão quais são as URLs que vamos acessar,
+a etapa de busca é desnecessária.&lt;/p&gt;
+
+&lt;p&gt;Na maior parte dos casos,
+deixar os algoritmos de &lt;em&gt;coleta&lt;/em&gt; e &lt;em&gt;processamento&lt;/em&gt; dos dados
+em funções distintas é uma boa prática pois aumenta o
+controle sobre o que as ferramentas estão fazendo,
+facilita o debug e a atualização.
+Por outro lado, em alguns casos
+isso pode tornar o código mais ineficiente e os
+arquivos obtidos podem ficar pesados.&lt;/p&gt;
+
+&lt;h3 id=&#34;diferença-entre-buscar-baixar-e-processar&#34;&gt;Diferença entre buscar, baixar e processar.&lt;/h3&gt;
+
+&lt;p&gt;Buscar documentos significa, de uma forma geral, utilizar ferramentas de
+busca (ou acessar links de um site) para obter informações de uma nova
+requisição a ser realizada. Ou seja, essa etapa do scraper serve para
+&amp;ldquo;procurar links&amp;rdquo; que não sabíamos que existiam previamente. Isso será
+resolvido através da função &lt;code&gt;cjsg&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Baixar documentos, no entando, significa simplesmente acessar páginas
+pré-estabelecidas e salvá-las em disco. Em algumas situações, os documentos
+baixados (depois de limpos) podem conter uma nova lista de páginas a serem
+baixadas, formando iterações de coletas. A tarefa de baixar documentos
+pré-estabelecidos será realizada pela função &lt;code&gt;cposg&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Finalmente, processar documentos significa carregar dados acessíveis em disco e
+transformar os dados brutos uma base &lt;em&gt;tidy&lt;/em&gt;.
+Usualmente separamos a estruturação em duas etapas:
+i) transformar arquivos não-estruturados em um arquivos semi-estruturados
+(e.g. um arquivo HTML em uma tabela mais um conjunto de textos livres) e
+ii) transformar arquivos semi-estruturados em uma base analítica (estruturada).
+A tarefa de processar as páginas HTML será realizada pelas
+funções &lt;code&gt;parse_cjsg&lt;/code&gt; e &lt;code&gt;parse_cpopg&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Na pesquisa das câmaras, seguimos o fluxo&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;buscar -&amp;gt; coletar -&amp;gt; processar -&amp;gt; coletar -&amp;gt; processar
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;para conseguir nossos dados.&lt;/p&gt;
+
+&lt;h2 id=&#34;buscar-documentos&#34;&gt;Buscar documentos&lt;/h2&gt;
+
+&lt;p&gt;A tarefa de listar os documentos de interesse é realizada
+acessando resultados de um formulário.
+Dependendo do site, será necessário realizar:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Uma busca e uma paginação;&lt;/li&gt;
+&lt;li&gt;Uma busca e muitas paginações;&lt;/li&gt;
+&lt;li&gt;Muitas buscas e uma paginação por busca;&lt;/li&gt;
+&lt;li&gt;Muitas buscas e muitas paginações por busca.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;No TJSP temos &lt;em&gt;uma busca e muitas paginações&lt;/em&gt;.
+Acesse a página do &lt;a href=&#34;http://esaj.tjsp.jus.br/cjsg/consultaCompleta.do&#34;&gt;e-SAJ&lt;/a&gt;,
+digite &amp;ldquo;acordam&amp;rdquo; no campo &amp;ldquo;Pesquisa Livre&amp;rdquo; e clique em &amp;ldquo;Pesquisar&amp;rdquo;,
+para ter uma ideia de como é essa página.&lt;/p&gt;
+
+&lt;p&gt;A página (acessada no dia 2017-02-15)
+é uma ferramenta de busca com vários campos,
+que não permite pesquisa com dados em branco.
+Na parte de baixo o site mostra uma série de documentos,
+organizados em páginas de vinte em vinte resultados.&lt;/p&gt;
+
+&lt;p&gt;Para realizar a coleta, precisamos de duas funções principais,
+uma que faz a busca e outra que acessa uma página específica
+(que será executada várias vezes).
+Utilizaremos as funções &lt;code&gt;cjsg&lt;/code&gt; e &lt;code&gt;cjsg_pag&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;cjsg_session &amp;lt;- function() {
+  rvest::html_session(&#39;http://esaj.tjsp.jus.br/cjsg/consultaCompleta.do&#39;)
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;cjsg &amp;lt;- function(s, parms = cjsg_parms(s), path = &#39;./cjsg&#39;, 
+                 max_pag = 10, overwrite = FALSE,
+                 verbose = TRUE, p = .05) {
+  dir.create(path, recursive = TRUE, showWarnings = FALSE)
+  if (!file.exists(path)) stop(sprintf(&#39;Pasta não &amp;quot;%s&amp;quot; pôde ser criada&#39;, path))
+  r0 &amp;lt;- s %&amp;gt;% 
+    rvest::submit_form(parms)
+  n_pags &amp;lt;- if (is.na(max_pag) || is.infinite(max_pag)) cjsg_npags(r0) else max_pag
+  abjutils::dvec(cjsg_pag, 1:n_pags, path = path, ow = overwrite, s = s)
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;cjsg_pag &amp;lt;- function(pag, path, ow, s) {
+  Sys.sleep(1)
+  u &amp;lt;- &#39;http://esaj.tjsp.jus.br/cjsg/trocaDePagina.do?tipoDeDecisao=A&amp;amp;pagina=%d&#39;
+  u_pag &amp;lt;- sprintf(u, pag)
+  arq &amp;lt;- sprintf(&#39;%s/%05d.html&#39;, path, pag)
+  if (!file.exists(arq) || ow) {
+    httr::GET(u_pag, httr::write_disk(arq, overwrite = ow), 
+              handle = s$handle)
+    tibble::data_frame(result = &#39;OK&#39;)
+  } else {
+    tibble::data_frame(result = &#39;já existe&#39;)
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;A função &lt;code&gt;cjsg_pag&lt;/code&gt; precisa ser capaz de realizar uma pesquisa e retornar
+a resposta do servidoe que contém a primeira página dos resultados. Para
+isso, ela recebe uma lista com dados da busca (do formulário) a url base e um
+método para realizar a requisição, podendo ser &amp;lsquo;get&amp;rsquo; ou &amp;lsquo;post&amp;rsquo;. Caso a pesquisa
+seja mais complicada, é possível adicionar também uma função que sobrepõe a
+busca padrão.&lt;/p&gt;
+
+&lt;p&gt;É possível visualizar a página baixada com a função &lt;code&gt;BROWSE&lt;/code&gt; do pacote &lt;code&gt;httr&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;arqs &amp;lt;- dir(&#39;data/cjsg&#39;, full.names = TRUE)
+httr::BROWSE(arqs[1])
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;OBS:&lt;/strong&gt; A imagem fica &amp;ldquo;feia&amp;rdquo; pois está sem a folha de estilos e as imagens.&lt;/p&gt;
+
+&lt;p&gt;Note que criamos uma função que facilita a entrada
+de parâmetros de busca. No nosso exemplo, existem parâmetros necessários na
+requisição que não precisam ser preenchidos, e parâmetros que precisam ser
+preenchidos de uma maneira específica, como as datas, que precisam ser
+inseridas no formato &lt;code&gt;%d/%m/%Y&lt;/code&gt;. Assim, incluimos uma função de &amp;ldquo;ajuda&amp;rdquo;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;cjsg_parms &amp;lt;- function(s, livre = &#39;&#39;, data_inicial = NULL, data_final = NULL, secoes = &#39;&#39;) {
+  secoes &amp;lt;- paste(secoes, collapse = &#39;,&#39;)
+  dt_inicial &amp;lt;- &#39;&#39;
+  if (!is.null(data_inicial)) {
+    dt_inicial &amp;lt;- sprintf(&#39;%02d/%02d/%d&#39;, lubridate::day(data_inicial),
+                          lubridate::month(data_inicial),
+                          lubridate::year(data_inicial))
+  }
+  dt_final &amp;lt;- &#39;&#39;
+  if (!is.null(data_final)) {
+    dt_final &amp;lt;- sprintf(&#39;%02d/%02d/%d&#39;, lubridate::day(data_final),
+                        lubridate::month(data_final),
+                        lubridate::year(data_final))
+  }
+  suppressWarnings({
+    s %&amp;gt;% 
+      rvest::html_form() %&amp;gt;% 
+      dplyr::first() %&amp;gt;% 
+      rvest::set_values(&#39;dados.buscaInteiroTeor&#39; = livre,
+                        &#39;secoesTreeSelection.values&#39; = secoes,
+                        &#39;dados.dtJulgamentoInicio&#39; = dt_inicial,
+                        &#39;dados.dtJulgamentoFim&#39; = dt_final)
+  })
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Também foi necessário realizar um pequeno processamento na primeira requisição,
+quando o usuário não souber a priori quantas páginas deseja baixar.
+Nesse caso, a função &lt;code&gt;cjsg_npags&lt;/code&gt; identifica o número de paginações necessárias.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;cjsg_npags &amp;lt;- function(req, parms = NULL) {
+  if (!is.null(parms)) req &amp;lt;- req %&amp;gt;% rvest::submit_form(parms)
+  num &amp;lt;- req$response %&amp;gt;% 
+    httr::content(&#39;text&#39;) %&amp;gt;% 
+    xml2::read_html() %&amp;gt;%
+    rvest::html_node(&#39;#nomeAba-A&#39;) %&amp;gt;% 
+    rvest::html_text() %&amp;gt;% 
+    tidyr::extract_numeric()
+  (num %/% 20) + 1
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;A função &lt;code&gt;dvec&lt;/code&gt; é uma função genérica que ajuda a
+aplicar uma função a cada elemento de determinados itens,
+como um &lt;code&gt;lapply&lt;/code&gt;, mas que o faz de forma mais verborrágica e
+não resulta em erro caso um elemento dê erro.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;#&#39; Vetorizando scrapers
+#&#39;
+#&#39; Vetoriza um scraper (função) para um vetor de itens
+#&#39;
+#&#39; @param fun função a ser aplicada em cada arquivo.
+#&#39; @param itens character vector dos caminhos de arquivos a serem transformados.
+#&#39; @param ... outros parâmetros a serem passados para \code{fun}
+#&#39; @param verbose se \code{TRUE} (default), mostra o item com probabilidade p.
+#&#39; @param p probabilidade de imprimir mensagem.
+#&#39; 
+#&#39; @export
+dvec &amp;lt;- function(fun, itens, ..., verbose = TRUE, p = .05) {
+  f &amp;lt;- dplyr::failwith(tibble::data_frame(result = &#39;erro&#39;), fun)
+  tibble::data_frame(item = itens) %&amp;gt;%
+    dplyr::distinct(item) %&amp;gt;%
+    dplyr::group_by(item) %&amp;gt;%
+    dplyr::do({
+      if (runif(1) &amp;lt; p &amp;amp;&amp;amp; verbose) print(.$item)
+      d &amp;lt;- f(.$item, ...)
+      if (tibble::has_name(d, &#39;result&#39;)) d$result &amp;lt;- &#39;OK&#39;
+      d
+    }) %&amp;gt;%
+    dplyr::ungroup()
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;No projeto das câmaras, rodamos o seguinte código:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;library(tjsp)
+
+sec &amp;lt;- list_secoes_2inst() %&amp;gt;% 
+  dplyr::filter(stringr::str_detect(secao, &#39;[Cc]rim&#39;),
+                stringr::str_detect(pai, &#39;CRIM&#39;)) %&amp;gt;% 
+  with(cod)
+
+session &amp;lt;- cjsg_session()
+parms &amp;lt;- session %&amp;gt;% 
+  cjsg_parms(secoes = sec, 
+             data_inicial = &#39;2015-01-01&#39;, 
+             data_final = &#39;2015-12-31&#39;)
+
+# numero de paginas a serem baixadas
+session %&amp;gt;% cjsg_npags(parms)
+
+d_result &amp;lt;- session %&amp;gt;% 
+  cjsg(parms, path = &#39;data/cjsg&#39;, max_pag = 10)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;Onde guardar os dados?&lt;/strong&gt; Ao construir um scraper,
+é importante guardar os dados brutos na máquina ou num servidor,
+para reprodutibilidade e manutenção do scraper.
+Se estiver construindo um pacote do R, o melhor lugar para guardar esses
+dados é na pasta &lt;code&gt;data&lt;/code&gt;, como sugerido no livro &lt;a href=&#34;http://r-pkgs.had.co.nz&#34;&gt;r-pkgs&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Se os dados forem muito volumosos,
+pode ser necessário colocar esses documentos numa pasta externa ao pacote.
+Para garantir a reprodutibilidade, recomendamos a criação de um
+pacote no R cujo objetivo é somente baixar e processar esses dados,
+além da criação de um repositório na nuvem (Dropbox, por exemplo).
+No pacote que contém as funções de extração,
+guarde os dados já processados (se couberem) num arquivo &lt;code&gt;.rda&lt;/code&gt; dentro da pasta
+&lt;code&gt;data&lt;/code&gt; do pacote.&lt;/p&gt;
+
+&lt;h2 id=&#34;coletar-processos&#34;&gt;Coletar processos&lt;/h2&gt;
+
+&lt;p&gt;Antes de coletar os processos, é necessário ler os arquivos HTML baixados na etapa anterior.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;parse_cjsg_um &amp;lt;- function(i, nodes) {
+  node &amp;lt;- nodes[[i]]
+  trim &amp;lt;- stringr::str_trim
+  id &amp;lt;- node %&amp;gt;%
+    rvest::html_node(&#39;.ementaClass&#39;) %&amp;gt;%
+    rvest::html_text() %&amp;gt;%
+    trim() %&amp;gt;%
+    stringr::str_replace_all(&#39;[^0-9]&#39;, &#39;&#39;)
+  infos &amp;lt;- node %&amp;gt;%
+    rvest::html_node(&#39;.downloadEmenta&#39;) %&amp;gt;% {
+      tibble::tibble(n_processo = trim(rvest::html_text(.)),
+                     cd_acordao = rvest::html_attr(., &#39;cdacordao&#39;))
+    }
+  ca &amp;lt;- node %&amp;gt;%
+    rvest::html_node(&#39;.assuntoClasse&#39;) %&amp;gt;%
+    rvest::html_text() %&amp;gt;%
+    trim()
+  tsf &amp;lt;- node %&amp;gt;%
+    rvest::html_node(&#39;textarea&#39;) %&amp;gt;%
+    rvest::html_text()
+  tab_infos &amp;lt;- node %&amp;gt;%
+    rvest::html_nodes(&#39;.ementaClass2&#39;) %&amp;gt;%
+    rvest::html_text() %&amp;gt;%
+    stringr::str_split_fixed(&#39;:&#39;, 2) %&amp;gt;%
+    data.frame(stringsAsFactors = FALSE) %&amp;gt;%
+    setNames(c(&#39;key&#39;, &#39;val&#39;)) %&amp;gt;%
+    dplyr::mutate_all(dplyr::funs(trim(.))) %&amp;gt;%
+    dplyr::mutate(key = tolower(abjutils::rm_accent(key)),
+                  key = stringr::str_replace_all(key, &#39; +&#39;, &#39;_&#39;),
+                  key = stringr::str_replace_all(key, &#39;[^a-z_]&#39;, &#39;&#39;),
+                  key = stringr::str_replace_all(key, &#39;_d[eo]_&#39;, &#39;_&#39;)) %&amp;gt;%
+    tidyr::spread(key, val) %&amp;gt;%
+    dplyr::bind_cols(infos) %&amp;gt;%
+    dplyr::mutate(id = id, classe_assunto = ca, txt_ementa = tsf) %&amp;gt;%
+    dplyr::select(id, cd_acordao, n_processo, dplyr::everything(), txt_ementa)
+  tab_infos
+}
+
+parse_cjsg_arq &amp;lt;- function(arq) {
+  itens &amp;lt;- xml2::read_html(arq, encoding = &#39;UTF-8&#39;) %&amp;gt;%
+    rvest::html_nodes(&#39;.fundocinza1&#39;)
+  abjutils::dvec(parse_cjsg_um, 1:length(itens), nodes = itens, verbose = FALSE) %&amp;gt;%
+    dplyr::select(-item)
+}
+
+parse_cjsg &amp;lt;- function(arqs) {
+  abjutils::dvec(parse_cjsg_arq, arqs) %&amp;gt;%
+    dplyr::rename(arq = item)
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Rodando a função criada.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;arqs &amp;lt;- dir(&#39;data/cjsg&#39;, full.names = TRUE)
+d_cjsg &amp;lt;- tjsp::parse_cjsg(arqs)
+saveRDS(d_cjsg, &#39;data/d_cjsg.rds&#39;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;d_cjsg &amp;lt;- readRDS(&#39;data/d_cjsg.rds&#39;)
+d_cjsg
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;## # A tibble: 200 × 14
+##                         arq    id cd_acordao                n_processo
+##                       &amp;lt;chr&amp;gt; &amp;lt;chr&amp;gt;      &amp;lt;chr&amp;gt;                     &amp;lt;chr&amp;gt;
+## 1  data-raw/cjsg/00001.html     1   10120659 0053149-48.2006.8.26.0050
+## 2  data-raw/cjsg/00001.html     2   10092189 0011582-56.2009.8.26.0236
+## 3  data-raw/cjsg/00001.html     3   10040923 0035263-74.2015.8.26.0000
+## 4  data-raw/cjsg/00001.html     4   10039029 0019944-66.2015.8.26.0000
+## 5  data-raw/cjsg/00001.html     5   10039023 0041547-98.2015.8.26.0000
+## 6  data-raw/cjsg/00001.html     6   10027377 0003710-93.2014.8.26.0048
+## 7  data-raw/cjsg/00001.html     7    9983410 7004537-07.2015.8.26.0482
+## 8  data-raw/cjsg/00001.html     8    9956156 0004870-37.2014.8.26.0604
+## 9  data-raw/cjsg/00001.html     9    9901809 7007051-30.2015.8.26.0482
+## 10 data-raw/cjsg/00001.html    10    9899013 0087445-23.2011.8.26.0050
+## # ... with 190 more rows, and 10 more variables: comarca &amp;lt;chr&amp;gt;,
+## #   data_julgamento &amp;lt;chr&amp;gt;, data_registro &amp;lt;chr&amp;gt;, ementa &amp;lt;chr&amp;gt;,
+## #   orgao_julgador &amp;lt;chr&amp;gt;, relatora &amp;lt;chr&amp;gt;, classe_assunto &amp;lt;chr&amp;gt;,
+## #   txt_ementa &amp;lt;chr&amp;gt;, result &amp;lt;chr&amp;gt;, outros_numeros &amp;lt;chr&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Agora criamos a função que baixa processos.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;dados_cposg &amp;lt;- function(p) {
+  list(&#39;conversationId&#39; = &#39;&#39;,
+       &#39;paginaConsulta&#39; = &#39;1&#39;,
+       &#39;localPesquisa.cdLocal&#39; = &#39;-1&#39;,
+       &#39;cbPesquisa&#39; = &#39;NUMPROC&#39;,
+       &#39;tipoNuProcesso&#39; = &#39;UNIFICADO&#39;,
+       &#39;numeroDigitoAnoUnificado&#39; = stringr::str_sub(p, 1, 11),
+       &#39;foroNumeroUnificado&#39; = stringr::str_sub(p, -4, -1),
+       &#39;dePesquisaNuUnificado&#39; = p,
+       &#39;dePesquisaNuAntigo&#39; = &#39;&#39;)
+}
+
+cposg_um &amp;lt;- function(p, path, ow) {
+  Sys.sleep(1)
+  arq &amp;lt;- sprintf(&#39;%s/%s.html&#39;, path, p)
+  if (!file.exists(arq) || ow) {
+    httr::GET(&#39;https://esaj.tjsp.jus.br/cposg/search.do&#39;,
+              query = dados_cposg(p),
+              config = httr::config(ssl_verifypeer = FALSE),
+              httr::write_disk(arq, overwrite = ow))
+    tibble::tibble(result = &#39;OK&#39;)
+  } else {
+    tibble::tibble(result = &#39;já existe&#39;)
+  }
+}
+
+cposg &amp;lt;- function(processos, path = &#39;data/cposg&#39;, overwrite = FALSE) {
+  suppressWarnings(dir.create(path, recursive = TRUE))
+  processos &amp;lt;- gsub(&#39;[^0-9]&#39;, &#39;&#39;, processos)
+  abjutils::dvec(cposg_um, processos, path = path, ow = overwrite)
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Rodando a função criada.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;d_cjsg %&amp;gt;% 
+  distinct(n_processo) %&amp;gt;% 
+  with(n_processo) %&amp;gt;% 
+  tjsp::cposg(path = &#39;data/cposg&#39;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Extraindo as partes do arquivo HTML.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;partes_cposg_um &amp;lt;- function(arq) {
+  h &amp;lt;- arq %&amp;gt;% xml2::read_html(encoding = &#39;UTF-8&#39;)
+  todas_partes &amp;lt;- h %&amp;gt;% rvest::html_nodes(&#39;#tableTodasPartes&#39;) %&amp;gt;% length()
+  if (todas_partes &amp;gt; 0) {
+    nodes &amp;lt;- h %&amp;gt;% 
+      rvest::html_nodes(&#39;#tableTodasPartes &amp;gt; .fundoClaro&#39;)
+  } else {
+    nodes &amp;lt;- h %&amp;gt;% 
+      rvest::html_nodes(&#39;#tablePartesPrincipais &amp;gt; .fundoClaro&#39;)
+  }
+  purrr::map_df(seq_along(nodes), function(i) {
+    node &amp;lt;- nodes[[i]]
+    titulos &amp;lt;- node %&amp;gt;% 
+      rvest::html_nodes(&#39;.mensagemExibindo&#39;) %&amp;gt;% 
+      rvest::html_text() %&amp;gt;% 
+      stringr::str_trim() %&amp;gt;% 
+      stringr::str_replace_all(&#39;&amp;amp;nbsp&#39;, &#39;&#39;)
+    tirar &amp;lt;- paste(titulos, collapse = &#39;|&#39;)
+    nomes &amp;lt;- titulos %&amp;gt;% 
+      tolower() %&amp;gt;% 
+      abjutils::rm_accent() %&amp;gt;% 
+      stringr::str_replace_all(&#39;[^a-z]&#39;, &#39;&#39;) %&amp;gt;% 
+      paste(sprintf(&#39;%02d&#39;, 1:length(.)), sep = &#39;_&#39;)
+    node %&amp;gt;% 
+      rvest::html_text() %&amp;gt;% 
+      stringr::str_trim() %&amp;gt;% 
+      stringr::str_replace_all(&#39;&amp;amp;nbsp&#39;, &#39;&#39;) %&amp;gt;% 
+      stringr::str_replace_all(tirar, &#39;&#39;) %&amp;gt;% 
+      stringr::str_trim() %&amp;gt;%
+      stringr::str_split(&#39;[\n\t\r ]{2,}&#39;, simplify = TRUE) %&amp;gt;% 
+      data.frame(stringsAsFactors = FALSE) %&amp;gt;% 
+      setNames(nomes) %&amp;gt;% 
+      tidyr::gather() %&amp;gt;% 
+      tibble::as_data_frame() %&amp;gt;% 
+      tidyr::separate(key, c(&#39;tipo&#39;, &#39;id_tipo&#39;), sep = &#39;_&#39;) %&amp;gt;% 
+      dplyr::mutate(id = i) %&amp;gt;% 
+      dplyr::select(id, id_tipo, tipo, nome = value) %&amp;gt;% 
+      dplyr::mutate(result = &#39;OK&#39;)
+  })
+}
+
+partes_cposg &amp;lt;- function(arqs, verbose = FALSE) {
+  abjutils::dvec(partes_cposg_um, arqs, verbose = verbose) %&amp;gt;% 
+    rename(arq = item)
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;arqs &amp;lt;- dir(&#39;data/cposg&#39;, full.names = TRUE)
+d_partes &amp;lt;-  partes_cposg(arqs)
+saveRDS(d_partes, &#39;data/d_partes.rds&#39;)
+d_partes
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;d_partes &amp;lt;- readRDS(&#39;data/d_partes.rds&#39;)
+d_partes
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;## # A tibble: 762 × 6
+##                                         arq    id id_tipo     tipo
+##                                       &amp;lt;chr&amp;gt; &amp;lt;int&amp;gt;   &amp;lt;chr&amp;gt;    &amp;lt;chr&amp;gt;
+## 1  data-raw/cposg/00000179520148260050.html     1      01 apteapdo
+## 2  data-raw/cposg/00000179520148260050.html     2      01 apdoapte
+## 3  data-raw/cposg/00000179520148260050.html     2      02 advogado
+## 4  data-raw/cposg/00000179520148260050.html     3      01 apdoapte
+## 5  data-raw/cposg/00000179520148260050.html     3      02 advogado
+## 6  data-raw/cposg/00000201120148260451.html     1      01 apelante
+## 7  data-raw/cposg/00000201120148260451.html     1      02 advogado
+## 8  data-raw/cposg/00000201120148260451.html     2      01  apelado
+## 9  data-raw/cposg/00000636120138260457.html     1      01 apelante
+## 10 data-raw/cposg/00000636120138260457.html     1      02 advogado
+## # ... with 752 more rows, and 2 more variables: nome &amp;lt;chr&amp;gt;, result &amp;lt;chr&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Extraindo as decisões.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;decisoes_cposg_um &amp;lt;- function(arq) {
+  html &amp;lt;- xml2::read_html(arq, encoding = &#39;UTF-8&#39;)
+  xpath &amp;lt;- &#39;(//table[@width=&amp;quot;98%&amp;quot; and @align=&amp;quot;center&amp;quot;])[last()]&#39;
+  r &amp;lt;- rvest::html_node(html, xpath = xpath)
+  tab &amp;lt;- rvest::html_table(r)
+  names(tab) &amp;lt;- c(&#39;data&#39;, &#39;situacao&#39;, &#39;decisao&#39;)
+  tab$result &amp;lt;- &#39;OK&#39;
+  return(tab)
+}
+
+decisoes_cposg &amp;lt;- function(arqs, verbose = FALSE) {
+  abjutils::dvec(decisoes_cposg_um, arqs, verbose = verbose) %&amp;gt;% 
+    dplyr::rename(arq = item)
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;arqs &amp;lt;- dir(&#39;data/cposg&#39;, full.names = TRUE)
+d_decisoes &amp;lt;- decisoes_cposg(arqs)
+saveRDS(d_decisoes, &#39;data/d_decisoes.rds&#39;)
+d_decisoes
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;d_decisoes &amp;lt;- readRDS(&#39;data/d_decisoes.rds&#39;)
+d_decisoes
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;## # A tibble: 361 × 5
+##                                         arq       data
+##                                       &amp;lt;chr&amp;gt;      &amp;lt;chr&amp;gt;
+## 1  data-raw/cposg/00000179520148260050.html 16/12/2015
+## 2  data-raw/cposg/00000201120148260451.html 03/12/2015
+## 3  data-raw/cposg/00000636120138260457.html 08/10/2015
+## 4  data-raw/cposg/00000636120138260457.html 24/09/2015
+## 5  data-raw/cposg/00000636120138260457.html 17/09/2015
+## 6  data-raw/cposg/00000681720138260576.html 16/12/2015
+## 7  data-raw/cposg/00001064420148260495.html 03/12/2015
+## 8  data-raw/cposg/00001241620138260361.html 29/10/2015
+## 9  data-raw/cposg/00001939320158260000.html 12/05/2015
+## 10 data-raw/cposg/00001939320158260000.html 14/04/2015
+## # ... with 351 more rows, and 3 more variables: situacao &amp;lt;chr&amp;gt;,
+## #   decisao &amp;lt;chr&amp;gt;, result &amp;lt;chr&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Visualizando!&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-r&#34;&gt;tipos_decisao &amp;lt;- function(decisoes) {
+  negaram &amp;lt;- regex(&#39;negaram&#39;, ignore_case = TRUE)
+  parcial &amp;lt;- regex(&#39;parcial&#39;, ignore_case = TRUE)
+  deram &amp;lt;- regex(&#39;deram&#39;, ignore_case = TRUE)
+  ifelse(
+    str_detect(decisoes, negaram), &#39;negado&#39;, ifelse(
+      str_detect(decisoes, parcial), &#39;parcial&#39;, ifelse(
+        str_detect(decisoes, deram), &#39;provido&#39;, &#39;outros&#39;
+    ))
+  )
+}
+
+partes_apelacoes &amp;lt;- d_partes %&amp;gt;% 
+  filter(tipo == &#39;apelado&#39;, str_detect(nome, &#39;[Mm]inist&#39;)) %&amp;gt;% 
+  mutate(n_processo = str_replace_all(arq, &#39;[^0-9]&#39;, &#39;&#39;)) %&amp;gt;% 
+  dplyr::select(n_processo)
+
+decisoes &amp;lt;- d_decisoes %&amp;gt;% 
+  mutate(n_processo = str_replace_all(arq, &#39;[^0-9]&#39;, &#39;&#39;)) %&amp;gt;% 
+  inner_join(partes_apelacoes, &#39;n_processo&#39;) %&amp;gt;% 
+  filter(situacao == &#39;Julgado&#39;) %&amp;gt;% 
+  distinct(n_processo, decisao) %&amp;gt;%
+  mutate(tipo_decisao = tipos_decisao(decisao)) %&amp;gt;% 
+  dplyr::select(n_processo, tipo_decisao)
+
+library(ggplot2)
+d_cjsg %&amp;gt;%
+  mutate(n_processo = str_replace_all(n_processo, &#39;[^0-9]&#39;, &#39;&#39;)) %&amp;gt;% 
+  inner_join(decisoes, &#39;n_processo&#39;) %&amp;gt;% 
+  filter(tipo_decisao != &#39;outros&#39;) %&amp;gt;% 
+  count(orgao_julgador, tipo_decisao) %&amp;gt;%
+  mutate(ntot = sum(n), prop = n / ntot) %&amp;gt;%
+  filter(ntot &amp;gt; 5) %&amp;gt;% 
+  ungroup() %&amp;gt;%
+  mutate(num = readr::parse_number(orgao_julgador),
+         num = sprintf(&#39;%02d&#39;, num)) %&amp;gt;% 
+  ggplot(aes(x = num, fill = tipo_decisao, y = prop)) +
+  geom_bar(stat = &#39;identity&#39;, colour = &#39;black&#39;, position = &#39;dodge&#39;) +
+  theme_bw() +
+  scale_y_continuous(labels = scales::percent) +
+  xlab(&#39;Órgão julgador&#39;) +
+  ylab(&#39;Proporção de processos por tipo de decisão&#39;) +
+  theme(legend.position = &amp;quot;bottom&amp;quot;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;figures//unnamed-chunk-36-1.png&#34; alt=&#34;plot of chunk unnamed-chunk-36&#34; /&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
