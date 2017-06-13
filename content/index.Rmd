@@ -33,8 +33,8 @@ utilizados conjuntamente.
 
 Você precisará instalar os seguintes softwares:
 
-- R: Instale pelo site do [CRAN](https://cloud.r-project.org/).
-- RStudio: Faça o download [aqui](https://www.rstudio.com/products/rstudio/download/preview/).
+- R - Instale pelo site do [CRAN](https://cloud.r-project.org/).
+- RStudio -  Faça o download [aqui](https://www.rstudio.com/products/rstudio/download/preview/).
 
 E, para começar, o seguinte pacote:
 
