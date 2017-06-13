@@ -5244,8 +5244,8 @@ library(dplyr)
 &lt;h2&gt;Softwares&lt;/h2&gt;
 &lt;p&gt;Você precisará instalar os seguintes softwares:&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;R: Instale pelo site do &lt;a href=&#34;https://cloud.r-project.org/&#34;&gt;CRAN&lt;/a&gt;.&lt;/li&gt;
-&lt;li&gt;RStudio: Faça o download &lt;a href=&#34;https://www.rstudio.com/products/rstudio/download/preview/&#34;&gt;aqui&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;R - Instale pelo site do &lt;a href=&#34;https://cloud.r-project.org/&#34;&gt;CRAN&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;RStudio - Faça o download &lt;a href=&#34;https://www.rstudio.com/products/rstudio/download/preview/&#34;&gt;aqui&lt;/a&gt;.&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;E, para começar, o seguinte pacote:&lt;/p&gt;
 &lt;ul&gt;
