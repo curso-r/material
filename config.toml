@@ -7,6 +7,7 @@ canonifyurls = true
 relativeurls = true
 # Enable Google Analytics by entering your tracking id
 googleAnalytics = "UA-87272102-1"
+pluralizeListTitles = false
 
 [params]
   # General information
@@ -16,13 +17,13 @@ googleAnalytics = "UA-87272102-1"
 
   # Repository
   provider = "GitHub"
-  repo_url = "http://material.curso-r.com"
+  repo_url = "https://github.com/curso-r/material"
 
   version = ""
   logo = "logo-curso-r.png"
   favicon = ""
 
-  permalink = "#"
+  permalink = "%>%"
 
   # Custom assets
   custom_css = []
@@ -44,12 +45,6 @@ googleAnalytics = "UA-87272102-1"
   twitter = ""
   github  = "curso-r"
   email   = "contato@curso-r.com"
-
-
-[[menu.main]]
-  name   = "Curso R"
-  url    = "/"
-  weight = 0
 
 [[menu.main]]
   name   = "Instalação"
