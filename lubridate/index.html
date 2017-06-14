@@ -10,8 +10,8 @@
     <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1">
     <meta http-equiv="X-UA-Compatible" content="IE=10" />
     <meta name="google-site-verification" content="3wpHHnuvp_52dDrXvZoNa5_Vs4BWcyVoeM62GbQ7llc" />
-    <title>Lubridates - Curso-R</title>
-    <meta name="generator" content="Hugo 0.19" />
+    <title>Lubridate - Curso-R</title>
+    <meta name="generator" content="Hugo 0.22" />
 
     
     <meta name="description" content="Materiais para cursos de R">
@@ -59,7 +59,7 @@
     
 
   </head>
-  <body class="palette-primary-blue palette-accent-teal">
+  <body class="palette-primary-red palette-accent-teal">
 
 
 <div class="backdrop">
@@ -80,7 +80,9 @@
     </div>
     <div class="stretch">
       <div class="title">
-        Lubridates
+        
+        <a href="../lubridate/" class="permalink">Lubridate</a>
+        
       </div>
     </div>
 
@@ -113,7 +115,7 @@
 <main class="main">
 	<div class="drawer">
 		<nav aria-label="Navigation">
-  <a href="http://material.curso-r.com" class="project">
+  <a href="../" class="project">
     <div class="banner">
       
         <div class="logo">
@@ -132,12 +134,12 @@
       
         <ul class="repo">
           <li class="repo-download">
-            <a href="http://material.curso-r.com/archive/master.zip" target="_blank" title="Download" data-action="download">
+            <a href="https://github.com/curso-r/material/archive/master.zip" target="_blank" title="Download" data-action="download">
               <i class="icon icon-download"></i> Download
             </a>
           </li>
           <li class="repo-stars">
-            <a href="http://material.curso-r.com/stargazers" target="_blank" title="Stargazers" data-action="star">
+            <a href="https://github.com/curso-r/material/stargazers" target="_blank" title="Stargazers" data-action="star">
               <i class="icon icon-star"></i> Stars
               <span class="count">&ndash;</span>
             </a>
@@ -315,24 +317,6 @@
 </li>
 
 
-
-<li>
-  
-    
-
-
-
-<a  title="Curso R" href="../">
-	
-	Curso R
-</a>
-
-
-
-  
-</li>
-
-
         </ul>
         
 
@@ -369,16 +353,235 @@
 
 	<article class="article">
 		<div class="wrapper">
-			<h1>Pages in Lubridate</h1>
+			<h1>Lubridate</h1>
 
 			
-			<a href="../lubridate/" title="Introdução">
-				<h2>Introdução</h2>
-			</a>
 
-			<br>
-			Lubridate O pacote lubridate faz o trabalho com datas ser muito mais fácil. Ela foi criada por Garrett Grolemund e Hadley Wickham.
-library(lubridate)  ## Loading required package: methods  ## ## Attaching package: &lsquo;lubridate&rsquo;  ## The following object is masked from &lsquo;package:base&rsquo;: ## ## date  library(magrittr) library(dplyr)  ## ## Attaching package: &lsquo;dplyr&rsquo;  ## The following objects are masked from &lsquo;package:lubridate&rsquo;: ## ## intersect, setdiff, union  ## The following objects are masked from &lsquo;package:stats&rsquo;: ## ## filter, lag  ## The following objects are masked from &lsquo;package:base&rsquo;: ## ## intersect, setdiff, setequal, union  Resumo do que aprenderemos:
+			
+
+<h2 id="lubridate">Lubridate</h2>
+
+<p>O pacote lubridate faz o trabalho com datas ser muito mais fácil. Ela foi criada por Garrett Grolemund e Hadley Wickham.</p>
+
+<pre><code class="language-r">library(lubridate)
+</code></pre>
+
+<pre><code>## Loading required package: methods
+</code></pre>
+
+<pre><code>## 
+## Attaching package: 'lubridate'
+</code></pre>
+
+<pre><code>## The following object is masked from 'package:base':
+## 
+##     date
+</code></pre>
+
+<pre><code class="language-r">library(magrittr)
+library(dplyr)
+</code></pre>
+
+<pre><code>## 
+## Attaching package: 'dplyr'
+</code></pre>
+
+<pre><code>## The following objects are masked from 'package:lubridate':
+## 
+##     intersect, setdiff, union
+</code></pre>
+
+<pre><code>## The following objects are masked from 'package:stats':
+## 
+##     filter, lag
+</code></pre>
+
+<pre><code>## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+</code></pre>
+
+<p>Resumo do que aprenderemos:</p>
+
+<ul>
+<li>transformar character de diversos formatos em data.</li>
+<li>transformar data em character de diversos formatos.</li>
+<li>extrair informações das datas <code>y m d h m s</code></li>
+<li>funções úteis (<code>today()</code>, <code>now()</code>, etc)</li>
+<li>timezones</li>
+<li>operações aritméticas com datas</li>
+<li>gerar datas</li>
+</ul>
+
+<p>Vamos usar o banco de dados <code>lakers</code> para os exemplos.</p>
+
+<h2 id="transformar-character-em-date">Transformar <code>character</code> em <code>date</code></h2>
+
+<pre><code class="language-r">df &lt;- data_frame(`entrada` = c(&quot;&quot;)
+                 , `função` = c(&quot;&quot;)
+                 , `saída` = c(&quot;&quot;))
+</code></pre>
+
+<p>Exemplos com datas</p>
+
+<pre><code class="language-r">lakers %&gt;% 
+  select(date) %&gt;% 
+  mutate(`date %&gt;% ymd` = date %&gt;% ymd,
+         `date %&gt;% ymd_hm` = date %&gt;% ymd_hm) %&gt;% 
+  head %&gt;%
+  knitr::kable()
+</code></pre>
+
+<pre><code>## Warning: All formats failed to parse. No formats found.
+</code></pre>
+
+<table>
+<thead>
+<tr>
+<th align="right">date</th>
+<th align="left">date %&gt;% ymd</th>
+<th align="left">date %&gt;% ymd_hm</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td align="right">20081028</td>
+<td align="left">2008-10-28</td>
+<td align="left">NA</td>
+</tr>
+
+<tr>
+<td align="right">20081028</td>
+<td align="left">2008-10-28</td>
+<td align="left">NA</td>
+</tr>
+
+<tr>
+<td align="right">20081028</td>
+<td align="left">2008-10-28</td>
+<td align="left">NA</td>
+</tr>
+
+<tr>
+<td align="right">20081028</td>
+<td align="left">2008-10-28</td>
+<td align="left">NA</td>
+</tr>
+
+<tr>
+<td align="right">20081028</td>
+<td align="left">2008-10-28</td>
+<td align="left">NA</td>
+</tr>
+
+<tr>
+<td align="right">20081028</td>
+<td align="left">2008-10-28</td>
+<td align="left">NA</td>
+</tr>
+</tbody>
+</table>
+
+<p>Exemplos com datas e horas</p>
+
+<pre><code class="language-r">lakers %&gt;% 
+  select(date, time) %&gt;% 
+  mutate(`paste(date, time) %&gt;% ymd` = paste(date, time) %&gt;% ymd,
+         `paste(date, time) %&gt;% ymd_hm` = paste(date, time) %&gt;% ymd_hm,
+         `time %&gt;% hm` = time %&gt;% hm,
+         `time %&gt;% hms` = time %&gt;% hms
+         ) %&gt;% 
+  head %&gt;%
+  knitr::kable()
+</code></pre>
+
+<pre><code>## Warning: All formats failed to parse. No formats found.
+</code></pre>
+
+<pre><code>## Warning in .parse_hms(..., order = &quot;HMS&quot;, quiet = quiet): Some strings
+## failed to parse
+</code></pre>
+
+<table>
+<thead>
+<tr>
+<th align="right">date</th>
+<th align="left">time</th>
+<th align="left">paste(date, time) %&gt;% ymd</th>
+<th align="left">paste(date, time) %&gt;% ymd_hm</th>
+<th align="right">time %&gt;% hm</th>
+<th align="right">time %&gt;% hms</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td align="right">20081028</td>
+<td align="left">12:00</td>
+<td align="left">NA</td>
+<td align="left">2008-10-28 12:00:00</td>
+<td align="right">12H 0M 0S</td>
+<td align="right">NA</td>
+</tr>
+
+<tr>
+<td align="right">20081028</td>
+<td align="left">11:39</td>
+<td align="left">NA</td>
+<td align="left">2008-10-28 11:39:00</td>
+<td align="right">11H 39M 0S</td>
+<td align="right">NA</td>
+</tr>
+
+<tr>
+<td align="right">20081028</td>
+<td align="left">11:37</td>
+<td align="left">NA</td>
+<td align="left">2008-10-28 11:37:00</td>
+<td align="right">11H 37M 0S</td>
+<td align="right">NA</td>
+</tr>
+
+<tr>
+<td align="right">20081028</td>
+<td align="left">11:25</td>
+<td align="left">NA</td>
+<td align="left">2008-10-28 11:25:00</td>
+<td align="right">11H 25M 0S</td>
+<td align="right">NA</td>
+</tr>
+
+<tr>
+<td align="right">20081028</td>
+<td align="left">11:23</td>
+<td align="left">NA</td>
+<td align="left">2008-10-28 11:23:00</td>
+<td align="right">11H 23M 0S</td>
+<td align="right">NA</td>
+</tr>
+
+<tr>
+<td align="right">20081028</td>
+<td align="left">11:22</td>
+<td align="left">NA</td>
+<td align="left">2008-10-28 11:22:00</td>
+<td align="right">11H 22M 0S</td>
+<td align="right">NA</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="transformar-date-em-character">Transformar <code>date</code> em <code>character</code></h2>
+
+<h2 id="extrair-informações-de-datas">Extrair informações de datas</h2>
+
+<h2 id="funções-úteis">Funções úteis</h2>
+
+<h2 id="operações-aritméticas-entre-datas">Operações aritméticas entre datas</h2>
+
+<h2 id="gerar-datas">Gerar datas</h2>
+
 
 			<hr>
 			
@@ -458,7 +661,7 @@ library(lubridate)  ## Loading required package: methods  ## ## Attaching packag
           a.setAttribute("class", "headerlink");
           a.setAttribute("href", "#" + headers[i].id);
           a.setAttribute("title", "Permanent link")
-          a.innerHTML = "#";
+          a.innerHTML = "%\u003e%";
           headers[i].appendChild(a);
       }
     </script>

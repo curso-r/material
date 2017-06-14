@@ -10,8 +10,8 @@
     <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1">
     <meta http-equiv="X-UA-Compatible" content="IE=10" />
     <meta name="google-site-verification" content="3wpHHnuvp_52dDrXvZoNa5_Vs4BWcyVoeM62GbQ7llc" />
-    <title>Pipes - Curso-R</title>
-    <meta name="generator" content="Hugo 0.19" />
+    <title>Pipe - Curso-R</title>
+    <meta name="generator" content="Hugo 0.22" />
 
     
     <meta name="description" content="Materiais para cursos de R">
@@ -59,7 +59,7 @@
     
 
   </head>
-  <body class="palette-primary-blue palette-accent-teal">
+  <body class="palette-primary-red palette-accent-teal">
 
 
 <div class="backdrop">
@@ -80,7 +80,9 @@
     </div>
     <div class="stretch">
       <div class="title">
-        Pipes
+        
+        <a href="../pipe/" class="permalink">Pipe</a>
+        
       </div>
     </div>
 
@@ -113,7 +115,7 @@
 <main class="main">
 	<div class="drawer">
 		<nav aria-label="Navigation">
-  <a href="http://material.curso-r.com" class="project">
+  <a href="../" class="project">
     <div class="banner">
       
         <div class="logo">
@@ -132,12 +134,12 @@
       
         <ul class="repo">
           <li class="repo-download">
-            <a href="http://material.curso-r.com/archive/master.zip" target="_blank" title="Download" data-action="download">
+            <a href="https://github.com/curso-r/material/archive/master.zip" target="_blank" title="Download" data-action="download">
               <i class="icon icon-download"></i> Download
             </a>
           </li>
           <li class="repo-stars">
-            <a href="http://material.curso-r.com/stargazers" target="_blank" title="Stargazers" data-action="star">
+            <a href="https://github.com/curso-r/material/stargazers" target="_blank" title="Stargazers" data-action="star">
               <i class="icon icon-star"></i> Stars
               <span class="count">&ndash;</span>
             </a>
@@ -318,24 +320,6 @@
 </li>
 
 
-
-<li>
-  
-    
-
-
-
-<a  title="Curso R" href="../">
-	
-	Curso R
-</a>
-
-
-
-  
-</li>
-
-
         </ul>
         
 
@@ -372,16 +356,67 @@
 
 	<article class="article">
 		<div class="wrapper">
-			<h1>Pages in Pipe</h1>
+			<h1>Pipe</h1>
 
 			
-			<a href="../pipe/" title="Introdução">
-				<h2>Introdução</h2>
-			</a>
 
-			<br>
-			Pipe %&gt;% As duas linhas abaixo são equivalentes:
-f(x, y) x %&gt;% f(y)  O operador %&gt;% (pipe ) usa o resultado do seu lado esquerdo como primeiro argumento da funçăo do lado direito. Ele foi uma das grandes revoluções recentes do R, tornando a leitura de códigos mais lógica, fácil e compreensível. Este operador foi introduzido por Stefan Milton Bache no pacote magrittr, e já existem diversos pacotes construidos para facilitar a sua utilizaçăo.
+			
+
+<h2 id="pipe">Pipe <code>%&gt;%</code></h2>
+
+<p>As duas linhas abaixo são equivalentes:</p>
+
+<pre><code class="language-r">f(x, y)
+x %&gt;% f(y)
+</code></pre>
+
+<p>O operador <code>%&gt;%</code> (<em>pipe</em> ) usa o resultado do seu lado esquerdo como primeiro argumento da funçăo do lado direito. Ele foi uma das grandes revoluções recentes do R, tornando a leitura de códigos mais lógica, fácil e compreensível. Este operador foi introduzido por Stefan Milton Bache no pacote <code>magrittr</code>, e já existem diversos pacotes construidos para facilitar a sua utilizaçăo.</p>
+
+<p>O operador <code>%&gt;%</code> pertence ao pacote <code>magrittr</code>. Instale este pacote para utilizá-lo.</p>
+
+<pre><code class="language-r">install.packages(&quot;magrittr&quot;)
+</code></pre>
+
+<p>No exemplo a seguir, o operador calcula a raiz quadrada da soma dos valores de 1 a 4.</p>
+
+<pre><code class="language-r">library(magrittr)
+
+x &lt;- c(1, 2, 3, 4)
+x %&gt;% sum %&gt;% sqrt
+</code></pre>
+
+<pre><code>## [1] 3.162278
+</code></pre>
+
+<p>Escrever esse cálculo na forma usual ficaria da seguinte forma:</p>
+
+<pre><code class="language-r">sqrt(sum(x))
+</code></pre>
+
+<pre><code>## [1] 3.162278
+</code></pre>
+
+<p>O caminho que o código <code>x %&gt;% sum %&gt;% sqrt</code> seguiu foi enviar o objeto <code>x</code> como argumento da função <code>sum()</code> e, em seguida, enviar a saida da expressão <code>sum(x)</code> como argumento da função <code>sqrt()</code>. Observe que não é necessário colocar os parênteses após o nome das funções.</p>
+
+<p>Pela simplicidade do exemplo, a utilização do <code>%&gt;%</code> não parece trazer grandes vantagens, pois a expressão <code>sqrt(sum(x))</code> é facilmente compreendida. No entanto, se tivermos um grande número de funções aninhadas, a utilizaçăo do <code>pipe</code> transforma um código confuso e difícil de ser lido em algo simples e intuitivo. Como exemplo, imagine escrever uma receita de um bolo usando o R, e cada passo da receita é uma função:</p>
+
+<pre><code class="language-r">esfrie(asse(coloque(bata(acrescente(recipiente(rep(&quot;farinha&quot;, 2), &quot;água&quot;, &quot;fermento&quot;, &quot;leite&quot;, &quot;óleo&quot;), &quot;farinha&quot;, até = &quot;macio&quot;), duração = &quot;3min&quot;), lugar = &quot;forma&quot;, tipo = &quot;grande&quot;, untada = TRUE), duração = &quot;50min&quot;), &quot;geladeira&quot;, &quot;20min&quot;)
+</code></pre>
+
+<p>Tente entender o que é preciso fazer. Depois de desistir, veja como fica escrevendo com o operador <code>%&gt;%</code>:</p>
+
+<pre><code class="language-r">recipiente(rep(&quot;farinha&quot;, 2), &quot;água&quot;, &quot;fermento&quot;, &quot;leite&quot;, &quot;óleo&quot;) %&gt;%
+  acrescente(&quot;farinha&quot;, até = &quot;macio&quot;) %&gt;%
+  bata(duraço = &quot;3min&quot;) %&gt;%
+  coloque(lugar = &quot;forma&quot;, tipo = &quot;grande&quot;, untada = TRUE) %&gt;%
+  asse(duração = &quot;50min&quot;) %&gt;%
+  esfrie(&quot;geladeira&quot;, &quot;20min&quot;)
+</code></pre>
+
+<p>Agora, o código realmente parece uma receita de bolo.</p>
+
+<p>Para mais informações sobre o <code>pipe</code> e exemplos de utilização, visite a página <a href="http://cran.r-project.org/web/packages/magrittr/vignettes/magrittr.html">Ceci n&rsquo;est pas un pipe</a>.</p>
+
 
 			<hr>
 			
@@ -461,7 +496,7 @@ f(x, y) x %&gt;% f(y)  O operador %&gt;% (pipe ) usa o resultado do seu lado esq
           a.setAttribute("class", "headerlink");
           a.setAttribute("href", "#" + headers[i].id);
           a.setAttribute("title", "Permanent link")
-          a.innerHTML = "#";
+          a.innerHTML = "%\u003e%";
           headers[i].appendChild(a);
       }
     </script>
