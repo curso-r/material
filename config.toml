@@ -33,7 +33,7 @@ pluralizeListTitles = false
   highlight_css  = ""
 
   [params.palette]
-      primary = "blue"
+      primary = "red"
       accent  = "teal"
 
     [params.font]
