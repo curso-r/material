@@ -5216,52 +5216,5 @@ library(dplyr)
 </description>
     </item>
     
-    <item>
-      <title>Material para cursos de R</title>
-      <link>/</link>
-      <pubDate>Wed, 09 Nov 2016 00:00:00 +0000</pubDate>
-      
-      <guid>/</guid>
-      <description>&lt;p&gt;O material desta página ajuda a usar o R na execução de tarefas corriqueiras de forma eficiente e concisa. Ao final dos estudos, será possível:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;Carregar&lt;/strong&gt; o banco de dados para dentro do R.&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Arrumar&lt;/strong&gt; os dados na melhor estrutura para a análise.&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Transformar&lt;/strong&gt;, agregar, criar novas variáveis etc.&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Visualizar&lt;/strong&gt; informações escondidas utilizando gráficos e tabelas.&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Modelar&lt;/strong&gt; os dados para fazer inferência ou previsão.&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Comunicar&lt;/strong&gt; os resultados de forma eficiente.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;O conteúdo é baseado no &lt;a href=&#34;http://r4ds.had.co.nz/&#34;&gt;&lt;em&gt;R for Data Science&lt;/em&gt;&lt;/a&gt;, que, por sua vez, é baseado no &lt;a href=&#34;http://tidyverse.org/&#34;&gt;&lt;code&gt;tidyverse&lt;/code&gt;&lt;/a&gt;. O &lt;em&gt;tidyverse&lt;/em&gt;, ou &lt;em&gt;universo arrumado&lt;/em&gt;, é um conjunto de pacotes que dividem uma mesma filosofia e foram feitos para serem utilizados conjuntamente.&lt;/p&gt;
-&lt;div id=&#34;publico-alvo&#34; class=&#34;section level2&#34;&gt;
-&lt;h2&gt;Público Alvo&lt;/h2&gt;
-&lt;ul&gt;
-&lt;li&gt;Estudantes de graduação em estatística que desejam ganhar tempo nos trabalhos da faculdade e entrar no mercado de trabalho com bons diferenciais.&lt;/li&gt;
-&lt;li&gt;Profissionais do mercado de trabalho que desejam inserir o R no fluxo de atividades do setor ou da empresa.&lt;/li&gt;
-&lt;li&gt;Acadêmicos com interesse em tornar suas análises e códigos mais legíveis, reprodutíveis, eficientes e organizados.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;div id=&#34;softwares&#34; class=&#34;section level2&#34;&gt;
-&lt;h2&gt;Softwares&lt;/h2&gt;
-&lt;p&gt;Você precisará instalar os seguintes softwares:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;R - Instale pelo site do &lt;a href=&#34;https://cloud.r-project.org/&#34;&gt;CRAN&lt;/a&gt;.&lt;/li&gt;
-&lt;li&gt;RStudio - Faça o download &lt;a href=&#34;https://www.rstudio.com/products/rstudio/download/preview/&#34;&gt;aqui&lt;/a&gt;.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;E, para começar, o seguinte pacote:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;tidyverse&lt;/code&gt; - No console do R, digite o código abaixo.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;install.packages(&amp;#39;devtools&amp;#39;)
-devtools::install_github(&amp;#39;curso-r/pu.deps&amp;#39;)&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;div id=&#34;pre-requisitos&#34; class=&#34;section level2&#34;&gt;
-&lt;h2&gt;Pré-requisitos&lt;/h2&gt;
-&lt;p&gt;Para melhor aproveitamento do material, é importante ter alguns conhecimentos sobre &lt;strong&gt;lógica de programação&lt;/strong&gt;. Não se preocupe! Se você já fez qualquer curso de programação na vida, já será o suficiente.&lt;/p&gt;
-&lt;p&gt;Se não for familiarizado com R, recomendamos abrir o RStudio e tentar rodar e entender os comandos &lt;a href=&#34;http://material.curso-r.com/r-como-calculadora/&#34;&gt;desta página&lt;/a&gt;. Tente fazer os &lt;a href=&#34;http://material.curso-r.com/r-como-calculadora/#exercicios&#34;&gt;exercícios&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;Dica: familiarize-se com &lt;a href=&#34;http://rmarkdown.rstudio.com/lesson-1.html&#34;&gt;RMarkdown&lt;/a&gt;. Utilizamos este formato de arquivo extensivamente.&lt;/p&gt;
-&lt;/div&gt;
-</description>
-    </item>
-    
   </channel>
 </rss>
