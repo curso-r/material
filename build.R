@@ -36,4 +36,4 @@ purrr::walk(power_ups, download_and_extract_pu)
 
 # install hugo & build site
 blogdown::install_hugo(version = "0.22", force = TRUE)
-blogdown::hugo_build()
+blogdown::build_site()
