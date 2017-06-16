@@ -7,7 +7,7 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>pt-br</language>
     <copyright>Disponível sobre Licença MIT</copyright>
-    <lastBuildDate>Fri, 10 Mar 2017 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 16 Jun 2017 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/instalacao/index.xml" rel="self" type="application/rss+xml" />
     
@@ -15,12 +15,11 @@
     <item>
       <title>Instalação</title>
       <link>/instalacao/</link>
-      <pubDate>Fri, 10 Mar 2017 00:00:00 +0000</pubDate>
+      <pubDate>Fri, 16 Jun 2017 00:00:00 +0000</pubDate>
       
       <guid>/instalacao/</guid>
-      <description>A seguir teremos alguns tutoriais de instalação do R, RStudio e alguns pacotes nos principais sistemas operacionais.
-Instalação no Windows Instalação do R Para instalar o R no Windows, o primeiro passo é fazer o download do instalador. Entre neste link e clique em &amp;ldquo;Download R 3.3.3 for Windows (71 megabytes, 32&amp;frasl;64 bit)&amp;rdquo; (a versão pode não ser a mesma.).
-Salve este arquivo em qualquer pasta do seu computador. No meu caso salvei na pasta &amp;ldquo;Downloads&amp;rdquo;.</description>
+      <description>A seguir apresentamos tutoriais para a instalação do R e do RStudio nos principais sistemas operacionais. Também damos um exemplo de como instalar pacotes no R.
+No Windows Instalação do R Para instalar o R no Windows, o primeiro passo é fazer o download do instalador. Para isso, entre neste link e clique em &amp;ldquo;Download R x.x.x for Windows&amp;rdquo;, em que x.x.x é o número da versão mais recente disponível.</description>
     </item>
     
   </channel>
