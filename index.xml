@@ -7,7 +7,7 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>pt-br</language>
     <copyright>Disponível sobre Licença MIT</copyright>
-    <lastBuildDate>Fri, 16 Jun 2017 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 17 Jun 2017 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     
@@ -15,11 +15,21 @@
     <item>
       <title>Instalação</title>
       <link>/instalacao/</link>
-      <pubDate>Fri, 16 Jun 2017 00:00:00 +0000</pubDate>
+      <pubDate>Sat, 17 Jun 2017 00:00:00 +0000</pubDate>
       
       <guid>/instalacao/</guid>
       <description>A seguir apresentamos tutoriais para a instalação do R e do RStudio nos principais sistemas operacionais. Também damos um exemplo de como instalar pacotes no R.
 No Windows Instalação do R Para instalar o R no Windows, o primeiro passo é fazer o download do instalador. Para isso, entre neste link e clique em &amp;ldquo;Download R x.x.x for Windows&amp;rdquo;, em que x.x.x é o número da versão mais recente disponível.</description>
+    </item>
+    
+    <item>
+      <title>Introdução</title>
+      <link>/rbase/</link>
+      <pubDate>Sat, 17 Jun 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/rbase/</guid>
+      <description>Introdução A linguagem R é bem intuitiva. É possível fazer bastante coisa à base da tentativa e erro! Além disso, grande parte do conhecimento é escalável, isto é, quando você aprende a utilizar um certo tipo de função, o aprendizado pode ser replicado para funções parecidas. Essa ideia ficará bem clara quando falarmos dos pacotes do tidyverse, como o dplyr e o ggplot2.
+Quando o aprendizado não for muito intuitivo ou a utilização de uma função for muito complicada, demandando às vezes conhecimento de Estatística ou Programação, você pode acabar precisando de uma forcinha.</description>
     </item>
     
     <item>
@@ -78,17 +88,6 @@ Felizmente, depois de aprender a usar o tidyverse você não terá mais esse pro
       <guid>/pipe/</guid>
       <description>Pipe %&amp;gt;% As duas linhas abaixo são equivalentes:
 f(x, y) x %&amp;gt;% f(y)  O operador %&amp;gt;% (pipe ) usa o resultado do seu lado esquerdo como primeiro argumento da funçăo do lado direito. Ele foi uma das grandes revoluções recentes do R, tornando a leitura de códigos mais lógica, fácil e compreensível. Este operador foi introduzido por Stefan Milton Bache no pacote magrittr, e já existem diversos pacotes construidos para facilitar a sua utilizaçăo.</description>
-    </item>
-    
-    <item>
-      <title>Introdução</title>
-      <link>/rbase/</link>
-      <pubDate>Fri, 03 Feb 2017 00:00:00 +0000</pubDate>
-      
-      <guid>/rbase/</guid>
-      <description>Introdução A linguagem R é intuitiva. Muita coisa sai do jeito certo no chute! Para ver um exemplo disso, é interessante começar fazendo do R uma grande calculadora.
-Mas antes disso, vamos aprender a mexer no RStudio!
-1 elefante(s) incomoda(m) muita gente -- 2 elefante(s) incomoda(m) incomoda(m) muito mais -- 3 elefante(s) incomoda(m) muita gente -- 4 elefante(s) incomoda(m) incomoda(m) incomoda(m) incomoda(m) muito mais -- RStudio O RStudio é o melhor ambiente de desenvolvimento de R disponível.</description>
     </item>
     
     <item>

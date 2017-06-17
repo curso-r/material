@@ -364,11 +364,9 @@
 
 <h2 id="introdução">Introdução</h2>
 
-<p>A linguagem <code>R</code> é intuitiva. Muita coisa sai do jeito certo no chute! Para ver um exemplo disso, é interessante começar fazendo do R uma grande calculadora.</p>
+<p>A linguagem <code>R</code> é bem intuitiva. É possível fazer bastante coisa à base da tentativa e erro! Além disso, grande parte do conhecimento é escalável, isto é, quando você aprende a utilizar um certo tipo de função, o aprendizado pode ser replicado para funções parecidas. Essa ideia ficará bem clara quando falarmos dos pacotes do <code>tidyverse</code>, como o <code>dplyr</code> e o <code>ggplot2</code>.</p>
 
-<p>Mas antes disso, vamos aprender a mexer no RStudio!</p>
-
-<hr />
+<h2 id="quando-o-aprendizado-não-for-muito-intuitivo-ou-a-utilização-de-uma-função-for-muito-complicada-demandando-às-vezes-conhecimento-de-estatística-ou-programação-você-pode-acabar-precisando-de-uma-forcinha-felizmente-a-comunidade-r-é-bem-ativa-e-há-várias-formas-de-se-conseguir-ajuda-nesta-seção-vamos-listar-algumas-dessas-maneiras-em-seguida-faremos-uma-introdução-ao-rstudio-mostrando-as-suas-principais-funcionalidades-então-começaremos-a-conhecer-o-r-explorando-diversos-conceitos-básicos">Quando o aprendizado não for muito intuitivo ou a utilização de uma função for muito complicada, demandando às vezes conhecimento de Estatística ou Programação, você pode acabar precisando de uma forcinha. Felizmente, a comunidade R é bem ativa, e há várias formas de se conseguir ajuda. Nesta seção, vamos listar algumas dessas maneiras. Em seguida, faremos uma introdução ao RStudio, mostrando as suas principais funcionalidades. Então começaremos a conhecer o R, explorando diversos conceitos básicos.</h2>
 
 <!-- ## Exercícios -->
 
@@ -439,6 +437,79 @@
 <!-- 16. **Difícil** Faça um histograma dos resultados da soma de 3 dados. Isto é, crie um vetor com 1000 resultados que aconteceram após somar 3 dados. Em seguida faça o histograma. -->
 
 <!-- **Esses exercícios possuem resposta [aqui](https://curso-r.github.io/verao2017/r-como-calculadora/respostas)** -->
+
+<h2 id="pedindo-ajuda">Pedindo Ajuda</h2>
+
+<p>No R, há quatro principais entidades para se pedir ajuda:</p>
+
+<ul>
+<li><p>Help/documentação do R (comandos <code>help(nome_da_funcao)</code> ou <code>?nome_da_funcao</code>)</p></li>
+
+<li><p>Google</p></li>
+
+<li><p>Stack Overflow</p></li>
+
+<li><p>Coleguinha</p></li>
+</ul>
+
+<p>A busca por ajuda é feita preferencialmente, mas não necessariamente, na ordem acima.</p>
+
+<h3 id="documentação-do-r">Documentação do R</h3>
+
+<p>A documentação do R serve para você aprender a usar uma determinada função.</p>
+
+<pre><code class="language-r">?mean
+help(mean)
+</code></pre>
+
+<p>Cinco dicas:</p>
+
+<ol>
+<li>Os exemplos no final são particularmente úteis.</li>
+<li>Leia a seção <strong>Usage</strong> para ter noção de como usar.</li>
+<li>Os parâmetros estão descritos em <strong>Arguments</strong>. Identifique quais tipos de objetos eles recebem.</li>
+<li>Caso essa função não atenda às suas necessidades, a seção <strong>See Also</strong> sugere funções relacionadas.</li>
+<li>Alguns pacotes possuem tutorias de uso mais completos. Esses textos são chamados de <code>vignettes</code> e podem ser acessados com a função <code>vignette(package = 'nomeDoPacote')</code>. Por exemplo, <code>vignette(package = 'dplyr')</code>. Depois de ver a lista de artigos, escolha um nome e rode <code>vignette(topic = 'nome', package = 'nomeDoPacote')</code>. Por exemplo, <code>vignette(topic = 'introduction', package = 'dplyr')</code>.</li>
+</ol>
+
+<h3 id="google">Google</h3>
+
+<p>Há uma comunidade gigantesca de usuários de R gerando diariamente uma infinidade de conteúdos e discussões. Não raramente, você irá encontrar discussões sobre o seu problema simplesmente jogando o seu erro no Google. Essa deve ser sua primeira tentativa! Pesquisas em inglês aumentam consideravelmente a chance de encontrar uma resposta.</p>
+
+<p>Exemplo (repare no &lsquo;r&rsquo; adicionado na busca, isso ajuda bastante):</p>
+
+<pre><code class="language-r">log(&quot;5&quot;)
+## Error in log(&quot;5&quot;): non-numeric argument to mathematical function
+</code></pre>
+
+<p><img src="figures/ajuda_google.png" alt="" /></p>
+
+<h3 id="stack-overflow">Stack Overflow</h3>
+
+<p>O <a href="http://stackoverflow.com/">Stack Overflow</a> e o <a href="http://pt.stackoverflow.com/">Stack Overflow em Português</a> são sites de Pergunta e Resposta amplamente utilizados por todas as linguagens de programação, e R é uma delas. Nos EUA, chegam até a usar a reputação dos usuários como diferencial no currículo!</p>
+
+<p>Provavelmente, o Google lhe indicará uma página deles quando você estiver procurando ajuda. E quando todas as fontes possíveis de ajuda falharem, o Stack Overflow lhe dará o espaço para <strong>criar sua própria pergunta</strong>.</p>
+
+<p><strong>Um ponto importante</strong>: como fazer uma <strong>boa</strong> pergunta no Stack Overflow?</p>
+
+<p>No site, tem um tutorial com uma lista de boas práticas, <a href="http://pt.stackoverflow.com/help/how-to-ask">que se encontra aqui</a>. Algumas dicas são</p>
+
+<ul>
+<li>ser conciso;</li>
+<li>ser específico;</li>
+<li>ter mente aberta; e</li>
+<li>ser gentil.</li>
+</ul>
+
+<p>Porém, no caso do R, há outro requisito que vai aumentar muito sua chance de ter uma boa resposta: <strong>exemplinho minimal e reprodutível</strong>.</p>
+
+<ul>
+<li><p>Ser <strong>minimal</strong>: usar bancos de dados menores e utilizar pedaços de códigos apenas suficientes para apresentar o seu problema. Não precisa de banco de dados de um milhão de linhas e nem colocar o seu código inteiro para descrever a sua dúvida.</p></li>
+
+<li><p>Ser <strong>reprodutível</strong>: o seu código deve rodar fora da sua máquina. Se você não fornecer uma versão do seu problema que rode (ou que imite seu erro), as pessoas vão logo desistir de te ajudar. Por isso, nunca coloque bancos de dados que só você tem acesso. Use bancos de dados que já vem no R ou disponibilize um exemplo (possivelmente anonimizado) em <code>.csv</code> na web para baixar. E se precisar utilizar funções diferentes, coloque as <code>library</code>&rsquo;s correspondentes.</p></li>
+</ul>
+
+<hr />
 
 <h2 id="rstudio">RStudio</h2>
 
@@ -525,7 +596,7 @@ Este site foi escrito em RMarkdown. Toda vez que aparecer exemplos de código de
 <pre><code class="language-r">knitr::include_graphics(&quot;figures/criar_rmarkdown.png&quot;)
 </code></pre>
 
-<p><img src="figures/criar_rmarkdown.png" alt="plot of chunk unnamed-chunk-20" /></p>
+<p><img src="figures/criar_rmarkdown.png" alt="plot of chunk unnamed-chunk-22" /></p>
 
 <p>Para detalhes sobre como utilizar o RMarkdown, leia  <a href="http://r4ds.had.co.nz/r-markdown.html">aqui</a> e <a href="http://rmarkdown.rstudio.com/lesson-1.html"> aqui</a>.</p>
 
@@ -575,76 +646,6 @@ Error: unexpected input in &quot;5 % 5&quot;
 &gt; 5 - 5
 [1] 0
 </code></pre>
-
-<hr />
-
-<h2 id="pedindo-ajuda">Pedindo Ajuda</h2>
-
-<p>No R, há quatro principais entidades para se pedir ajuda:</p>
-
-<ul>
-<li>Help/documentação do R (comandos <code>help(nome_da_funcao)</code> ou <code>?nome_da_funcao</code>)</li>
-<li>Google</li>
-<li>Stack Overflow</li>
-<li>Coleguinha</li>
-</ul>
-
-<p>A busca por ajuda é feita preferencialmente, mas não necessariamente, na ordem acima.</p>
-
-<h3 id="documentação-do-r">Documentação do R</h3>
-
-<p>A documentação do R serve para você aprender a usar uma determinada função.</p>
-
-<pre><code class="language-r">?mean
-help(mean)
-</code></pre>
-
-<p>Cinco dicas:</p>
-
-<ul>
-<li>Os exemplos no final são particularmente úteis.</li>
-<li>Atente-se na seção <strong>Usage</strong> para ter noção de como usar.</li>
-<li>Os parâmetros estão descritos em <strong>Arguments</strong>. Identifique quais tipos de objetos eles recebem.</li>
-<li>Caso essa função não atenda às suas necessidades, a seção <strong>See Also</strong> sugere funções relacionadas.</li>
-<li>Alguns pacotes possuem tutorias de uso mais completos. Esses textos são chamados de <code>vignettes</code> e podem ser acessados com a função <code>vignette(package = 'nomeDoPacote')</code>. Por exemplo, <code>vignette(package = 'dplyr')</code>. Depois de ver a lista de artigos, escolha um nome e rode <code>vignette(topic = 'nome', package = 'nomeDoPacote')</code>. Por exemplo, <code>vignette(topic = 'introduction', package = 'dplyr')</code>.</li>
-</ul>
-
-<h3 id="google">Google</h3>
-
-<p>Há uma comunidade gigantesca de usuários de R gerando diariamente uma infinidade de conteúdos e discussões. Não raramente, você irá encontrar discussões sobre o seu problema simplesmente jogando o copiar/colar do seu erro no Google. Essa deve ser sua primeira tentativa!</p>
-
-<p>Exemplo (repare no &lsquo;r&rsquo; adicionado na busca, também ajuda):</p>
-
-<pre><code class="language-r">log(&quot;5&quot;)
-## Error in log(&quot;5&quot;): non-numeric argument to mathematical function
-</code></pre>
-
-<p><img src="figures/ajuda_google.png" alt="" /></p>
-
-<h3 id="stack-overflow">Stack Overflow</h3>
-
-<p>O <a href="http://stackoverflow.com/">Stack Overflow</a> e o <a href="http://pt.stackoverflow.com/">Stack Overflow em Português</a> são sites de Pergunta e Resposta amplamente utilizados por todas as linguagens de programação, e R é uma delas. Nos EUA, chegam até a usar a reputação dos usuários como diferencial no currículo!</p>
-
-<p>Provavelmente, o Google lhe indicará uma página deles quando você estiver procurando ajuda. E quando todas as fontes possíveis de ajuda falharem, o Stack Overflow lhe dará o espaço para <strong>criar sua própria pergunta</strong>.</p>
-
-<p><strong>Um ponto importante:</strong> como fazer uma <strong>boa</strong> pergunta no Stack Overflow?</p>
-
-<p>No site, tem um tutorial com uma lista de boas práticas, <a href="http://pt.stackoverflow.com/help/how-to-ask">que se encontra aqui</a>. Algumas dicas são</p>
-
-<ul>
-<li>ser conciso;</li>
-<li>ser específico;</li>
-<li>ter mente aberta; e</li>
-<li>ser gentil.</li>
-</ul>
-
-<p>Porém, no caso do R, há outro requisito que vai aumentar muito sua chance de ter uma boa resposta: <strong>exemplinho minimal e reprodutível</strong>.</p>
-
-<ul>
-<li><p>Ser <strong>minimal</strong>: usar bancos de dados menores e utilizar pedaços de códigos apenas suficientes para gerar o seu problema. Não precisa de banco de dados de um milhão de linhas e nem colocar o seu código inteiro para mostrar seu problema.</p></li>
-
-<li><p>Ser <strong>reprodutível</strong>: o seu código deve rodar fora da sua máquina. Se você não fornecer uma versão do seu problema que rode (ou que imite seu erro), as pessoas vão logo desistir de te ajudar. Por isso, nunca coloque bancos de dados que só você tem acesso. Use bancos de dados que já vem no R ou disponibilize um exemplo (possivelmente anonimizado) em <code>.csv</code> na web para baixar. E se precisar utilizar funções diferentes, coloque as <code>library</code>&rsquo;s correspondentes.</p></li>
-</ul>
 
 <hr />
 

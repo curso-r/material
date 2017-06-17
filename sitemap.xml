@@ -4,7 +4,12 @@
   
   <url>
     <loc>/instalacao/</loc>
-    <lastmod>2017-06-16T00:00:00+00:00</lastmod>
+    <lastmod>2017-06-17T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/rbase/</loc>
+    <lastmod>2017-06-17T00:00:00+00:00</lastmod>
   </url>
   
   <url>
@@ -38,11 +43,6 @@
   </url>
   
   <url>
-    <loc>/rbase/</loc>
-    <lastmod>2017-02-03T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>/stringr/</loc>
     <lastmod>2017-02-03T00:00:00+00:00</lastmod>
   </url>
@@ -64,7 +64,7 @@
   
   <url>
     <loc>/</loc>
-    <lastmod>2017-06-16T00:00:00+00:00</lastmod>
+    <lastmod>2017-06-17T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -82,7 +82,7 @@
   
   <url>
     <loc>/instalacao/</loc>
-    <lastmod>2017-06-16T00:00:00+00:00</lastmod>
+    <lastmod>2017-06-17T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -112,7 +112,7 @@
   
   <url>
     <loc>/rbase/</loc>
-    <lastmod>2017-02-03T00:00:00+00:00</lastmod>
+    <lastmod>2017-06-17T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   

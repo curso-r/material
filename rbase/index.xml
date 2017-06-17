@@ -7,7 +7,7 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>pt-br</language>
     <copyright>Disponível sobre Licença MIT</copyright>
-    <lastBuildDate>Fri, 03 Feb 2017 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 17 Jun 2017 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/rbase/index.xml" rel="self" type="application/rss+xml" />
     
@@ -15,12 +15,11 @@
     <item>
       <title>Introdução</title>
       <link>/rbase/</link>
-      <pubDate>Fri, 03 Feb 2017 00:00:00 +0000</pubDate>
+      <pubDate>Sat, 17 Jun 2017 00:00:00 +0000</pubDate>
       
       <guid>/rbase/</guid>
-      <description>Introdução A linguagem R é intuitiva. Muita coisa sai do jeito certo no chute! Para ver um exemplo disso, é interessante começar fazendo do R uma grande calculadora.
-Mas antes disso, vamos aprender a mexer no RStudio!
-1 elefante(s) incomoda(m) muita gente -- 2 elefante(s) incomoda(m) incomoda(m) muito mais -- 3 elefante(s) incomoda(m) muita gente -- 4 elefante(s) incomoda(m) incomoda(m) incomoda(m) incomoda(m) muito mais -- RStudio O RStudio é o melhor ambiente de desenvolvimento de R disponível.</description>
+      <description>Introdução A linguagem R é bem intuitiva. É possível fazer bastante coisa à base da tentativa e erro! Além disso, grande parte do conhecimento é escalável, isto é, quando você aprende a utilizar um certo tipo de função, o aprendizado pode ser replicado para funções parecidas. Essa ideia ficará bem clara quando falarmos dos pacotes do tidyverse, como o dplyr e o ggplot2.
+Quando o aprendizado não for muito intuitivo ou a utilização de uma função for muito complicada, demandando às vezes conhecimento de Estatística ou Programação, você pode acabar precisando de uma forcinha.</description>
     </item>
     
   </channel>
