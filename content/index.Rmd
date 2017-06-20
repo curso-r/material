@@ -12,9 +12,9 @@ knitr::opts_chunk$set(echo = TRUE)
 O material desta página ajuda a usar o R na execução de tarefas
 corriqueiras de forma eficiente e concisa. Ao final dos estudos, será possível:
 
-- **Carregar** o banco de dados para dentro do R. 
-- **Arrumar** os dados na melhor estrutura para a análise.
-- **Transformar**, agregar, criar novas variáveis etc. 
+- **Importar** o banco de dados para dentro do R. 
+- **Estruturar** os dados para a análise.
+- **Transformar**, agregar e criar variáveis. 
 - **Visualizar** informações escondidas utilizando gráficos e tabelas.
 - **Modelar** os dados para fazer inferência ou previsão.
 - **Comunicar** os resultados de forma eficiente.
