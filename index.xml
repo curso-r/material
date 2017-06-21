@@ -7,10 +7,20 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>pt-br</language>
     <copyright>Disponível sobre Licença MIT</copyright>
-    <lastBuildDate>Sat, 17 Jun 2017 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 21 Jun 2017 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Introdução</title>
+      <link>/rbase/</link>
+      <pubDate>Wed, 21 Jun 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/rbase/</guid>
+      <description>Introdução A linguagem R é bem intuitiva. É possível fazer bastante coisa à base da tentativa e erro! Além disso, grande parte do conhecimento é escalável, isto é, quando você aprende a utilizar um certo tipo de função, o aprendizado pode ser replicado para funções parecidas. Essa ideia ficará bem clara quando falarmos dos pacotes do tidyverse, como o dplyr e o ggplot2.
+Quando o aprendizado não for muito intuitivo ou a utilização de uma função for muito complicada, demandando às vezes conhecimento de Estatística ou Programação, você pode acabar precisando de uma forcinha.</description>
+    </item>
     
     <item>
       <title>Instalação</title>
@@ -20,16 +30,6 @@
       <guid>/instalacao/</guid>
       <description>A seguir apresentamos tutoriais para a instalação do R e do RStudio nos principais sistemas operacionais. Também damos um exemplo de como instalar pacotes no R.
 No Windows Instalação do R Para instalar o R no Windows, o primeiro passo é fazer o download do instalador. Para isso, entre neste link e clique em &amp;ldquo;Download R x.x.x for Windows&amp;rdquo;, em que x.x.x é o número da versão mais recente disponível.</description>
-    </item>
-    
-    <item>
-      <title>Introdução</title>
-      <link>/rbase/</link>
-      <pubDate>Sat, 17 Jun 2017 00:00:00 +0000</pubDate>
-      
-      <guid>/rbase/</guid>
-      <description>Introdução A linguagem R é bem intuitiva. É possível fazer bastante coisa à base da tentativa e erro! Além disso, grande parte do conhecimento é escalável, isto é, quando você aprende a utilizar um certo tipo de função, o aprendizado pode ser replicado para funções parecidas. Essa ideia ficará bem clara quando falarmos dos pacotes do tidyverse, como o dplyr e o ggplot2.
-Quando o aprendizado não for muito intuitivo ou a utilização de uma função for muito complicada, demandando às vezes conhecimento de Estatística ou Programação, você pode acabar precisando de uma forcinha.</description>
     </item>
     
     <item>

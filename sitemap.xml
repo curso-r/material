@@ -3,12 +3,12 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>/instalacao/</loc>
-    <lastmod>2017-06-17T00:00:00+00:00</lastmod>
+    <loc>/rbase/</loc>
+    <lastmod>2017-06-21T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>/rbase/</loc>
+    <loc>/instalacao/</loc>
     <lastmod>2017-06-17T00:00:00+00:00</lastmod>
   </url>
   
@@ -64,7 +64,7 @@
   
   <url>
     <loc>/</loc>
-    <lastmod>2017-06-17T00:00:00+00:00</lastmod>
+    <lastmod>2017-06-21T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -112,7 +112,7 @@
   
   <url>
     <loc>/rbase/</loc>
-    <lastmod>2017-06-17T00:00:00+00:00</lastmod>
+    <lastmod>2017-06-21T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
