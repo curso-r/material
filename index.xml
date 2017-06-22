@@ -7,7 +7,7 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>pt-br</language>
     <copyright>Disponível sobre Licença MIT</copyright>
-    <lastBuildDate>Wed, 21 Jun 2017 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 22 Jun 2017 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     
@@ -15,7 +15,7 @@
     <item>
       <title>Introdução</title>
       <link>/rbase/</link>
-      <pubDate>Wed, 21 Jun 2017 00:00:00 +0000</pubDate>
+      <pubDate>Thu, 22 Jun 2017 00:00:00 +0000</pubDate>
       
       <guid>/rbase/</guid>
       <description>Introdução A linguagem R é bem intuitiva. É possível fazer bastante coisa à base da tentativa e erro! Além disso, grande parte do conhecimento é escalável, isto é, quando você aprende a utilizar um certo tipo de função, o aprendizado pode ser replicado para funções parecidas. Essa ideia ficará bem clara quando falarmos dos pacotes do tidyverse, como o dplyr e o ggplot2.
@@ -117,7 +117,7 @@ library(lubridate)  ## Loading required package: methods  ## ## Attaching packag
       
       <guid>/</guid>
       <description>O material desta página ajuda a usar o R na execução de tarefas corriqueiras de forma eficiente e concisa. Ao final dos estudos, será possível:
- Importar o banco de dados para dentro do R. Estruturar os dados para a análise. Transformar, agregar e criar variáveis. Visualizar informações escondidas utilizando gráficos e tabelas. Modelar os dados para fazer inferência ou previsão. Comunicar os resultados de forma eficiente.  O conteúdo é baseado no R for Data Science, que, por sua vez, é baseado no tidyverse.</description>
+ Importar o banco de dados para o R. Estruturar os dados para a análise. Transformar, agregar e criar variáveis. Visualizar informações escondidas utilizando gráficos e tabelas. Modelar os dados para fazer inferência ou previsão. Comunicar os resultados de forma eficiente.  O conteúdo é baseado no R for Data Science, que, por sua vez, é baseado no tidyverse.</description>
     </item>
     
   </channel>

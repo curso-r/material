@@ -441,9 +441,11 @@ help(mean)
 <li><p>Ser <strong>reprodutível</strong>: o seu código deve rodar fora da sua máquina. Se você não fornecer uma versão do seu problema que rode (ou que imite seu erro), as pessoas vão logo desistir de te ajudar. Por isso, nunca coloque bancos de dados que só você tem acesso. Use bancos de dados que já vem no R ou disponibilize um exemplo (possivelmente anonimizado) em <code>.csv</code> na web para baixar. E se precisar utilizar funções diferentes, coloque as <code>library</code>&rsquo;s correspondentes.</p></li>
 </ul>
 
+<hr />
+
 <h2 id="rstudio">RStudio</h2>
 
-<p>O RStudio é o melhor ambiente de desenvolvimento de códigos em R disponível. Você pode <a href="https://www.rstudio.com/products/rstudio/download/preview/">baixá-lo aqui</a>.</p>
+<p>O RStudio é o melhor ambiente de desenvolvimento de códigos em R disponível. Você pode baixá-lo <a href="https://www.rstudio.com/products/rstudio/download/preview/">neste link</a>.</p>
 
 <p>Muitas das ferramentas são aprendidas conforme o uso, e há bons materiais sobre o Rstudio na internet (por exemplo, <a href="https://csgillespie.github.io/efficientR/set-up.html#rstudio">esta página</a>). Uma funcionalidade importante é a criação de projetos, permitindo dividir o trabalho em múltiplos ambientes, cada um com o seu diretório, documentos e <em>workspace</em>. A seguir, apresentamos algumas estruturas para a organização de um projeto.</p>
 
@@ -501,7 +503,7 @@ help(mean)
 <li><strong>History</strong>: painel com um histórico dos comandos rodados.</li>
 </ul>
 
-<p>Saber atalhos ajuda bastante quando estamos programando no RStudio. Veja os principais:</p>
+<p>Conhecer atalhos ajuda bastante quando estamos programando no RStudio. Veja os principais:</p>
 
 <ul>
 <li><strong>CTRL+ENTER</strong>: roda a linha selecionada no script. Os atalhos mais utilizado.</li>
@@ -549,9 +551,65 @@ Este site foi escrito em R Markdown. Toda vez que aparecer exemplos de código d
 <pre><code class="language-r">knitr::include_graphics(&quot;figures/criar_rmarkdown.png&quot;)
 </code></pre>
 
-<p><img src="figures/criar_rmarkdown.png" alt="plot of chunk unnamed-chunk-22" /></p>
+<p><img src="figures/criar_rmarkdown.png" alt="plot of chunk unnamed-chunk-21" /></p>
 
 <p>Para detalhes sobre como utilizar o R Markdown, leia o  <a href="http://r4ds.had.co.nz/r-markdown.html">r4ds</a> e <a href="http://rmarkdown.rstudio.com/lesson-1.html">o tutorial do RStudio</a>.</p>
+
+<hr />
+
+<h2 id="instalar-pacotes">Instalar pacotes</h2>
+
+<p>O grande trunfo do R são seus pacotes. Assim, fique bastante à vontade para instalar e atualizar muitos e muitos pacotes ao longo da sua experiência com o R.</p>
+
+<p>Existem três principais maneiras de instalar pacotes. Em ordem de frequência, são:</p>
+
+<ul>
+<li>Via CRAN (Comprehensive R Archive Network): <code>install.packages(&quot;nome-do-pacote&quot;)</code>.</li>
+<li>Via Github: <code>devtools::install_github(&quot;nome-do-repo/nome-do-pacote&quot;)</code>.</li>
+<li>Via arquivo .zip/.tar.gz: <code>install.packages(&quot;C:/caminho/nome-do-pacote.zip&quot;, repos = NULL)</code>.</li>
+</ul>
+
+<h3 id="via-cran">Via CRAN</h3>
+
+<p>Instale pacotes que não estão na sua biblioteca usando a função <code>install.packages(&quot;nome_do_pacote&quot;)</code>. Por exemplo:</p>
+
+<pre><code class="language-r">install.packages(&quot;magrittr&quot;)
+</code></pre>
+
+<p>E, de agora em diante, não precisa mais instalar. Basta carregar o pacote com <code>library(magrittr)</code>.</p>
+
+<div class='admonition note'>
+<p class='admonition-title'>
+Dica!
+</p>
+<p>
+Escreva nome_do_pacote::nome_da_funcao() se quiser usar apenas uma função de um determinado pacote. O operador :: serve para isso. Essa forma também é útil quando se tem duas funções com o mesmo nome e precisamos garantir que o código vá usar a função do pacote correto.
+</p>
+</div>
+
+<h3 id="via-github">Via Github</h3>
+
+<p>Desenvolvedores costumam disponibilizar a última versão de seus pacotes no Github, e alguns deles sequer estão no CRAN. Mesmo assim ainda é possível utilizá-los instalando diretamente pelo github. O comando é igualmente simples:</p>
+
+<pre><code class="language-r">devtools::install_github(&quot;rstudio/shiny&quot;)
+</code></pre>
+
+<p>Apenas será necessário o username e o nome do repositório (que geralmente tem o mesmo nome do pacote). No exemplo, o username foi &ldquo;rstudio&rdquo; e o repositório foi &ldquo;shiny&rdquo;.</p>
+
+<p>Se você não é familiar com o github, não se preocupe! Os pacotes disponibilizados na plataforma geralmente têm um <code>README</code> cuja primeira instrução é sobre a instalação. Se não tiver, provavelmente este pacote não te merece! =)</p>
+
+<h3 id="via-arquivo-zip-tar-gz">Via arquivo .zip/.tar.gz</h3>
+
+<p>Se você precisar instalar um pacote que está zipado no seu computador (ou em algum servidor), utilize o seguinte comando:</p>
+
+<pre><code class="language-r">install.packages(&quot;C:/caminho/para/o/arquivo/zipapo/nome-do-pacote.zip&quot;, repos = NULL)
+</code></pre>
+
+<p>É semelhante a instalar pacotes via CRAN, com a diferença que agora o nome do pacote é o caminho inteiro até o arquivo. O parâmetro <code>repos = NULL</code> informa que estamos instalando a partir da máquina local.</p>
+
+<p>A aba <strong><em>Packages</em></strong> do RStudio também ajuda a administrar os seus pacotes.</p>
+
+<p><img src="figures/instalar_pacote_rstudio.png" alt="" /></p>
 
 <hr />
 
@@ -565,24 +623,38 @@ Este site foi escrito em R Markdown. Toda vez que aparecer exemplos de código d
 </code></pre>
 
 <p>Esse comando é uma forma simplificada de criar um vetor de inteiros de 1 a 30.
-Os números que aparecem entre colchetes ([1] e [24]) indicam o índice do primeiro elemento impresso nessa linha.</p>
+Os números que aparecem entre colchetes ([1] e [24]) indicam o índice do primeiro elemento impresso em cada linha.</p>
 
 <div class='admonition note'>
 <p class='admonition-title'>
 Quando compilamos?
 </p>
 <p>
-Quem vem de linguagens como o C ou Java espera que seja necessário compilar o código em texto para o código de máquinas (geralmente um código binário). No R, isso não é necessário. O R é uma linguagem de programação dinâmica que interpreta o seu código enquanto você o executa.
+Quem vem de linguagens como o C ou Java espera que seja necessário compilar o código em texto para o código das máquinas (geralmente um código binário). No R, isso não é necessário. O R é uma linguagem de programação dinâmica que interpreta o seu código enquanto você o executa.
 </p>
 </div>
 
-<p>Tente jogar no console <code>2 * 2 - (4 + 4) / 2</code>. Pronto! Com essa simples expressão você já é capaz de imaginar (certeiramente) como pedir ao R para fazer qualquer tipo de operação aritmética. Lição aprendida!</p>
+<p>Tente jogar no console <code>2 * 2 - (4 + 4) / 2</code>. Pronto! Com essa simples expressão você já é capaz de pedir ao R para fazer qualquer uma das quatro operações aritméticas básicas. A seguir, apresentamos uma lista resumindo como fazer as principais operações no R.</p>
+
+<pre><code class="language-r">1 + 1    # adição
+## [1] 2
+4 - 2    # subtração
+## [1] 2
+2 * 3    # multiplicação
+## [1] 6
+5 / 3    # divisão
+## [1] 1.666667
+4 ^ 2    # potência
+## [1] 16
+5 %% 3   # resto da divisão de 5 por 3
+## [1] 2
+5 %/% 3  # parte inteira da divisão de 5 por 3
+## [1] 1
+</code></pre>
 
 <p>Além do mais, as operações e suas precedências são mantidas como na matemática, ou seja, divisão e multiplicação são calculadas antes da adição e subtração. E os parênteses nunca são demais!</p>
 
-<p>Agora que você já conhece o RStudio, digite a expressão <code>2 * 2 - (4 + 4) / 2</code> no
-<strong>console</strong> e tecle <code>Enter</code>. Uma outra forma de chamar uma expressão é escrever
-o código no <strong>editor</strong> e teclar <code>Ctrl + Enter</code> ou <code>Ctrl + R</code>. Assim, o comando é enviado para o <strong>console</strong>, onde é diretamente executado.</p>
+<p>Uma outra forma de executar uma expressão é escrever o código no <strong>editor</strong> e teclar <code>Ctrl + Enter</code> ou <code>Ctrl + R</code>. Assim, o comando é enviado para o <strong>console</strong>, onde é diretamente executado.</p>
 
 <p>Se você digitar um comando incompleto, como <code>5 +</code>, e apertar <code>Enter</code>, o R mostrará um <code>+</code>, o que não tem nada a ver com somar alguma coisa. Isso significa que o R está esperando que você complete o seu comando. Termine o seu comando ou aperte <code>Esc</code> para recomeçar.</p>
 
@@ -592,152 +664,17 @@ o código no <strong>editor</strong> e teclar <code>Ctrl + Enter</code> ou <code
 [1] 0
 </code></pre>
 
-<p>Se você digitar um comando que o R não reconhece, ele retornará uma mensagem de erro. NÃO ENTRE EM PÂNICO! Ele só está avisando que não conseguiu interpretar o comando. Você pode digitar outro comando normalmente em seguida.</p>
+<p>Se você digitar um comando que o R não reconhece, ele retornará uma mensagem de erro.</p>
+
+<p>NÃO ENTRE EM PÂNICO!</p>
+
+<p>Ele só está avisando que não conseguiu interpretar o comando. Você pode digitar outro comando normalmente em seguida.</p>
 
 <pre><code>&gt; 5 % 5
 Error: unexpected input in &quot;5 % 5&quot;
 &gt; 5 - 5
 [1] 0
 </code></pre>
-
-<hr />
-
-<h2 id="instalar-pacotes">Instalar pacotes</h2>
-
-<p>O grande trunfo do R são seus pacotes. Assim, fique bastante à vontade para instalar e atualizar muitos e muitos pacotes ao longo da sua experiência com o R.</p>
-
-<p>Existem três principais maneiras de instalar pacotes. Em ordem de frequência, são:</p>
-
-<ul>
-<li>Via CRAN (Comprehensive R Archive Network): <code>install.packages(&quot;magrittr&quot;)</code>.</li>
-<li>Via Github: <code>devtools::install_github(&quot;rstudio/shiny&quot;)</code>.</li>
-<li>Via arquivo .zip/.tar.gz: <code>install.packages(&quot;C:/caminho/pacote.zip&quot;, repos = NULL)</code>.</li>
-</ul>
-
-<h3 id="via-cran">Via CRAN</h3>
-
-<p>Instale pacotes que não estão na sua biblioteca usando a função <code>install.packages(&quot;nome_do_pacote&quot;)</code>. Por exemplo:</p>
-
-<pre><code class="language-r">install.packages(&quot;magrittr&quot;)
-</code></pre>
-
-<p>E, de agora em diante, basta carregar o pacote com <code>library(magrittr)</code>. Não precisa mais instalar.</p>
-
-<div class='admonition note'>
-<p class='admonition-title'>
-Dica!
-</p>
-<p>
-Escreva `nome_do_pacote::nome_da_funcao()` se quiser usar apenas uma função de um determinado pacote. O operador `::` serve para isso. Essa forma também é útil quando se tem duas funções com o mesmo nome, e precisamos garantir que o código vá usar a função do pacote correto.
-</p>
-</div>
-
-<h3 id="via-github">Via Github</h3>
-
-<p>Desenvolvedores costumam disponibilizar a última versão de seus pacotes no Github, e alguns deles sequer estão no CRAN. Mesmo assim ainda é possível utilizá-los instalando diretamente pelo github. O comando é igualmente simples:</p>
-
-<pre><code class="language-r">devtools::install_github(&quot;rstudio/shiny&quot;)
-</code></pre>
-
-<p>Apenas será necessário o username e o nome do repositório. No exemplo, o username foi &ldquo;rstudio&rdquo; e o pacote foi &ldquo;shiny&rdquo;.</p>
-
-<p>Não se preocupe! Os pacotes disponibilizados no github geralmente têm um <code>README</code> cuja primeira instrução é sobre a instalação. Se não tiver, provavelmente este pacote não te merece! =)</p>
-
-<h3 id="via-arquivo-zip-tar-gz">Via arquivo .zip/.tar.gz</h3>
-
-<p>Se você precisar instalar um pacote que está zipado no seu computador (ou em algum servidor), utilize o seguinte comando:</p>
-
-<pre><code class="language-r">install.packages(&quot;C:/caminho/para/o/arquivo/zipapo/pacote.zip&quot;, repos = NULL)
-</code></pre>
-
-<p>É semelhante a instalar pacotes via CRAN, com a diferença que agora o nome do pacote é o caminho inteiro até o arquivo. O parâmetro <code>repos = NULL</code> informa que estamos instalando a partir da máquina local.</p>
-
-<p>A aba <strong><em>Packages</em></strong> do RStudio também ajuda a administrar os seus pacotes.</p>
-
-<p><img src="figures/instalar_pacote_rstudio.png" alt="" /></p>
-
-<hr />
-
-<h2 id="controles-de-fluxo">Controles de Fluxo</h2>
-
-<p>Como toda boa linguagem de programação, o R possui estruturas de <code>if</code>&rsquo;s, <code>else</code>&rsquo;s, <code>for</code>&rsquo;s, <code>while</code>&rsquo;s etc. Esses <strong>controles de fluxo</strong> são importantes na hora de programar.</p>
-
-<h3 id="if-e-else">IF e ELSE</h3>
-
-<p>O seguinte trecho de código só será executado se o objeto <code>x</code> for igual a 1.</p>
-
-<pre><code class="language-r">x &lt;- 2
-if(x == 1) {
-  print(&quot;oi&quot;)
-}
-</code></pre>
-
-<pre><code class="language-r">x &lt;- 1
-if(x == 1) {
-  print(&quot;oi&quot;)
-}
-## [1] &quot;oi&quot;
-</code></pre>
-
-<p>O R só vai executar o que está na expressão dentro das chaves <code>{}</code> se o que estiver dentro dos parênteses <code>()</code> retornar <code>TRUE</code>.</p>
-
-<p>A sintaxe com o <code>else</code> e o <code>if else</code> é</p>
-
-<pre><code class="language-r">if(&lt;condição1&gt;) {
-  
-} else if (&lt;condição2&gt;) {
-  
-} else if (&lt;condição3&gt;) {
-  
-} else {
-  
-}
-</code></pre>
-
-<div class='admonition note'>
-<p class='admonition-title'>
-Diferença entre SQL e R nas comparações lógicas
-</p>
-<p>
-<b>Igualdade</b> no SQL é só um sinal de igual: <2 = 1. No R são dois: 2 == 1.
-<br>
-<b>Diferença</b> O teste de diferente no R é != ao invés de de <>.
-<br>
-<b>Negação</b> ao invés de usar a palavra "not" igual ao SQL, usamos !. Por exemplo, "entidade_id not in ('100515')" fica "!entidade_id %in% c('100515')".
-</p>
-</div>
-
-<h3 id="for">for</h3>
-
-<p>Sintaxe do <code>for</code>:</p>
-
-<pre><code class="language-r">for(contador in 1:5){
-  # várias coisas...
-  print(contador)
-}
-## [1] 1
-## [1] 2
-## [1] 3
-## [1] 4
-## [1] 5
-</code></pre>
-
-<p>Outro exemplo:</p>
-
-<pre><code class="language-r">vetor &lt;- 30:35
-indices &lt;- seq_along(vetor)
-for(i in indices){
-  print(vetor[1:i] / 2)
-}
-## [1] 15
-## [1] 15.0 15.5
-## [1] 15.0 15.5 16.0
-## [1] 15.0 15.5 16.0 16.5
-## [1] 15.0 15.5 16.0 16.5 17.0
-## [1] 15.0 15.5 16.0 16.5 17.0 17.5
-</code></pre>
-
-<p>No trecho de código acima, preste atenção no resultado individual de cada uma das operações para entender como o R funciona.</p>
 
 <hr />
 
@@ -1072,266 +1009,104 @@ str(iris)
 
 <hr />
 
-<h2 id="funções">Funções</h2>
+<h2 id="controles-de-fluxo">Controles de Fluxo</h2>
 
-<p>O R vem com muitas funções implementadas com as quais você pode fazer muitas  tarefas complicadas, como gerar números aleatórios. Geralmente, o nome das funções é bem intuitivo, por exemplo, <code>mean</code> é a função que calcula a média, <code>round</code> é a função que arredonda um número etc.</p>
+<p>Como toda boa linguagem de programação, o R possui estruturas de <code>if</code>&rsquo;s, <code>else</code>&rsquo;s, <code>for</code>&rsquo;s, <code>while</code>&rsquo;s etc. Esses <strong>controles de fluxo</strong> são importantes na hora de programar.</p>
 
-<pre><code class="language-r">round(5.634)
-## [1] 6
-</code></pre>
+<h3 id="if-e-else">IF e ELSE</h3>
 
-<p>Para entender melhor o funcionamento das funções no R, considere o seguinte exemplo:</p>
+<p>O seguinte trecho de código só será executado se o objeto <code>x</code> for igual a 1. Repare que a condição de igualdade é representada por dois iguais (==).</p>
 
-<pre><code class="language-r">die &lt;- 1:6
-round(mean(die))
-## [1] 4
-</code></pre>
+<pre><code class="language-r">x &lt;- 2
 
-<p>A ilustração abaixo mostra o que acontece quando você executa <code>round(mean(die))</code> no R.</p>
-
-<p><img src="figures/round.png" alt="" /></p>
-
-<p>Passamos dados para as funções por meio de argumentos. No R, esses argumentos estão documentados na página de ajuda de cada uma das funções, que pode ser acessada digitando <code>help(nome_da_funcao)</code> ou <code>?nome_da_funcao</code>.</p>
-
-<h3 id="criando-suas-próprias-funções">Criando suas próprias funções</h3>
-
-<p>Sintaxe:</p>
-
-<pre><code class="language-r">soma &lt;- function(x, y = 0) {
-  resposta &lt;- x + y
-  return(resposta)
+if(x == 1) {         
+  Sys.time()      # Devolve a data/hora no momento da execução.
 }
 </code></pre>
 
-<p>A função acima tem:</p>
+<pre><code class="language-r">x &lt;- 1
 
-<ul>
-<li>o nome <code>soma</code>;</li>
-<li>os argumentos <code>x</code> e <code>y</code>;</li>
-<li>o corpo <code>resposta &lt;- x + y</code>; e</li>
-<li>o valor padrão <code>0</code> para o argumento <code>y</code> (<code>y = 0</code>).</li>
-</ul>
-
-<p>Use-a como qualquer outra função:</p>
-
-<pre><code class="language-r">soma(2, 1) # soma de 2 + 1
-## [1] 3
-soma(2) # soma de 2 + 0
-## [1] 2
+if(x == 1) {
+  Sys.time()
+}
+## [1] &quot;2017-06-22 00:45:40 UTC&quot;
 </code></pre>
 
-<p>O argumento <code>y</code> possui o valor padrão <code>0</code>. Isso quer dizer que ele valerá zero caso o usuário não passe um valor explicitamente.</p>
+<p>O R só vai executar o que está na expressão dentro das chaves <code>{}</code> se o que estiver dentro dos parênteses <code>()</code> retornar <code>TRUE</code>.</p>
 
-<p>O <a href="http://adv-r.had.co.nz/">Advanced-R</a> é um excelente livro para quem quiser masterizar a arte de se fazer funções.</p>
+<p>A sintaxe com o <code>else</code> e o <code>if else</code> é</p>
 
-<hr />
+<pre><code class="language-r">if(x &lt; 0) {
+  
+  sinal &lt;- &quot;negativo&quot;
+  
+} else if(x == 0) {
+  
+  sinal &lt;- &quot;neutro&quot;
+  
+} else if(x &gt; 0) {
+  
+  sinal &lt;- &quot;positivo&quot;
+}
 
-<h2 id="gráficos-base">Gráficos (base)</h2>
-
-<p>O R já vem com funções básicas que fazem gráficos estatísticos de todas as naturezas.</p>
-
-<ul>
-<li>Vantagens: são rápidas e simples.</li>
-<li>Desvantagens: são feias e difíceis para gerar gráficos complexos.</li>
-</ul>
-
-<h3 id="gráfico-de-dispersão">Gráfico de dispersão</h3>
-
-<p><strong>Funçăo</strong> <code>plot()</code></p>
-
-<p>Parâmetros principais (ver <code>help(hist)</code> para mais detalhes):</p>
-
-<ul>
-<li><code>x</code>, <code>y</code> - Vetores para representarem os eixos x e y.</li>
-<li><code>type</code> -  Tipo de gráfico. Pode ser pontos, linhas, escada etc.</li>
-</ul>
+sinal
+## [1] &quot;positivo&quot;
+</code></pre>
 
 <div class='admonition note'>
 <p class='admonition-title'>
-Atenção!
+Diferença entre SQL e R nas comparações lógicas
 </p>
-<p> 
-Além de gerar gráficos de dispersão, tentar chamar a função <b>plot(objeto_diferentao)<b> para qualquer tipo de objeto do R geralmente sai um gráfico interessante! Sempre tente fazer isso, a menos que seu objeto seja um <b>data.frame<b> com milhares de colunas!!!
+<p>
+<b>Igualdade</b>: no SQL é só um sinal de igual: <2 = 1. No R são dois: 2 == 1.
+<br>
+<b>Diferença</b>: teste de diferente no R é != em vez de de <>.
+<br>
+<b>Negação</b>: em vez de usar a palavra "not" igual ao SQL, usamos !. Por exemplo, "entidade_id not in ('100515')" fica "!entidade_id %in% c('100515')".
 </p>
 </div>
 
-<pre><code class="language-r">n &lt;- 100
-x &lt;- 1:n
-y &lt;- 5 + 2 * x + rnorm(n, sd = 30)
-plot(x, y)
+<h3 id="for">for</h3>
+
+<p>Vamos usar o <code>for</code> para somar todos os elementos de um vetor.</p>
+
+<pre><code class="language-r">
+x &lt;- 1:10   # Cria um vetor com a sequência 1, 2, ..., 10.
+soma &lt;- 0
+
+for(i in 1:10) {
+  soma &lt;- soma + x[i]
+}
+
+soma
+## [1] 55
 </code></pre>
 
-<p><img src="figures//unnamed-chunk-58-1.png" alt="plot of chunk unnamed-chunk-58" /></p>
+<p>De forma equivalente, podemos usar diretamente a função <code>sum()</code>.</p>
 
-<p>O parâmetro <code>type = &quot;l&quot;</code> indica que queremos que os pontos sejam interligados por linhas.</p>
-
-<pre><code class="language-r">plot(x, y, type = &quot;l&quot;)
+<pre><code class="language-r">sum(x)
+## [1] 55
 </code></pre>
 
-<p><img src="figures//unnamed-chunk-59-1.png" alt="plot of chunk unnamed-chunk-59" /></p>
+<p>Agora, vamos imprimir na tela o resultado da divisão de cada elemento de um vetor por dois. Para isso, utilizaremos a função <code>print()</code>.</p>
 
-<h3 id="histograma">Histograma</h3>
-
-<p><strong>Funçăo</strong> <code>hist()</code></p>
-
-<p>Parâmetros principais (ver <code>help(hist)</code> para mais detalhes):</p>
-
-<ul>
-<li><code>x</code> - O vetor numérico pra histogramar.</li>
-<li><code>breaks</code> - O número (aproximado) de retângulos.</li>
-</ul>
-
-<pre><code class="language-r">hist(rnorm(1000))
+<pre><code class="language-r">vetor &lt;- 30:35
+indices &lt;- seq_along(vetor) # cria o vetor de índices segundo o tamanho 
+                            # do objeto vetor.   
+for(i in indices) {
+  print(vetor[1:i] / 2)
+}
+## [1] 15
+## [1] 15.0 15.5
+## [1] 15.0 15.5 16.0
+## [1] 15.0 15.5 16.0 16.5
+## [1] 15.0 15.5 16.0 16.5 17.0
+## [1] 15.0 15.5 16.0 16.5 17.0 17.5
 </code></pre>
 
-<p><img src="figures//unnamed-chunk-60-1.png" alt="plot of chunk unnamed-chunk-60" /></p>
+<p>No trecho de código acima, preste atenção no resultado individual de cada uma das operações para entender como o R funciona.</p>
 
-<h3 id="boxplot">Boxplot</h3>
-
-<p><strong>Função</strong> <code>boxplot()</code></p>
-
-<p>Parâmetros principais (ver <code>help(boxplot)</code> para mais detalhes):</p>
-
-<p><strong>Uma variável</strong></p>
-
-<pre><code class="language-r">boxplot(InsectSprays$count, col = &quot;lightgray&quot;)
-</code></pre>
-
-<p><img src="figures//unnamed-chunk-61-1.png" alt="plot of chunk unnamed-chunk-61" /></p>
-
-<p><strong>Duas variáveis</strong> - Usamos fórmula e o parâmetro <code>data</code>!</p>
-
-<pre><code class="language-r">boxplot(count ~ spray, data = InsectSprays, col = &quot;lightgray&quot;)
-</code></pre>
-
-<p><img src="figures//unnamed-chunk-62-1.png" alt="plot of chunk unnamed-chunk-62" /></p>
-
-<h3 id="gráfico-de-barras">Gráfico de barras</h3>
-
-<p><strong>Função</strong> <code>table()</code>, <code>barplot()</code></p>
-
-<p>Primeiro crie uma tabela de frequências (ou qualquer outro sumário). Então crie o gráfico com <code>barplot()</code>.</p>
-
-<p><strong>Tabela com uma variável</strong> usando <code>table()</code>.</p>
-
-<pre><code class="language-r">data(diamonds, package = &quot;ggplot2&quot;)
-tabela &lt;- table(diamonds$color)
-tabela
-## 
-##     D     E     F     G     H     I     J 
-##  6775  9797  9542 11292  8304  5422  2808
-barplot(tabela)
-</code></pre>
-
-<p><img src="figures//unnamed-chunk-63-1.png" alt="plot of chunk unnamed-chunk-63" /></p>
-
-<p><strong>Tabela com duas variáveis</strong> em uma tabela de dupla entrada.</p>
-
-<pre><code class="language-r">VADeaths
-##       Rural Male Rural Female Urban Male Urban Female
-## 50-54       11.7          8.7       15.4          8.4
-## 55-59       18.1         11.7       24.3         13.6
-## 60-64       26.9         20.3       37.0         19.3
-## 65-69       41.0         30.9       54.6         35.1
-## 70-74       66.0         54.3       71.1         50.0
-barplot(VADeaths) 
-</code></pre>
-
-<p><img src="figures//unnamed-chunk-64-1.png" alt="plot of chunk unnamed-chunk-64" /></p>
-
-<hr />
-
-<h2 id="fórmulas">Fórmulas</h2>
-
-<pre><code class="language-r">formula &lt;- y ~ x1 + x2
-class(formula)
-## [1] &quot;formula&quot;
-</code></pre>
-
-<p>Fórmulas são coisas do tipo <code>y ~ x</code>. As funções as usam de maneiras diversas, mas o exemplo mais emblemático vem da modelagem estatística.</p>
-
-<p>A função <code>lm()</code> é a que ajusta uma regressão linear no R, e <code>lm(y ~ x)</code> lê-se &ldquo;regressão linear de y explicada por x&rdquo;.</p>
-
-<pre><code class="language-r">minha_formula &lt;- Sepal.Width ~ Petal.Length + Petal.Width
-class(minha_formula)
-## [1] &quot;formula&quot;
-lm(minha_formula, data = iris)
-## 
-## Call:
-## lm(formula = minha_formula, data = iris)
-## 
-## Coefficients:
-##  (Intercept)  Petal.Length   Petal.Width  
-##       3.5870       -0.2571        0.3640
-</code></pre>
-
-<p>No caso específico das regressões lineares, são nas fórmulas que conseguimos descrever as variáveis explicativas e suas interações. A fórmula <code>y ~ x1 * x2</code> significa &ldquo;y regredido por x1, x2 e a interação entre x1 e x2&rdquo;. Fórmulas aparecem frequentemente em tarefas de modelagem.</p>
-
-<p>Demais usos de fórmulas aparecerão em outras funções (como o <code>ggplot</code>) com outros significados, e a documentação nos dirá como usá-las.</p>
-
-<hr />
-
-<h2 id="miscelâneas">Miscelâneas</h2>
-
-<h3 id="vetor-de-letras-do-alfabeto">Vetor de letras do alfabeto</h3>
-
-<pre><code class="language-r">letters
-##  [1] &quot;a&quot; &quot;b&quot; &quot;c&quot; &quot;d&quot; &quot;e&quot; &quot;f&quot; &quot;g&quot; &quot;h&quot; &quot;i&quot; &quot;j&quot; &quot;k&quot; &quot;l&quot; &quot;m&quot; &quot;n&quot; &quot;o&quot; &quot;p&quot; &quot;q&quot;
-## [18] &quot;r&quot; &quot;s&quot; &quot;t&quot; &quot;u&quot; &quot;v&quot; &quot;w&quot; &quot;x&quot; &quot;y&quot; &quot;z&quot;
-LETTERS
-##  [1] &quot;A&quot; &quot;B&quot; &quot;C&quot; &quot;D&quot; &quot;E&quot; &quot;F&quot; &quot;G&quot; &quot;H&quot; &quot;I&quot; &quot;J&quot; &quot;K&quot; &quot;L&quot; &quot;M&quot; &quot;N&quot; &quot;O&quot; &quot;P&quot; &quot;Q&quot;
-## [18] &quot;R&quot; &quot;S&quot; &quot;T&quot; &quot;U&quot; &quot;V&quot; &quot;W&quot; &quot;X&quot; &quot;Y&quot; &quot;Z&quot;
-</code></pre>
-
-<h3 id="operadores-aritméticos">Operadores aritméticos</h3>
-
-<table>
-<thead>
-<tr>
-<th align="left">Operador</th>
-<th align="left">Descrição</th>
-</tr>
-</thead>
-
-<tbody>
-<tr>
-<td align="left">x + y</td>
-<td align="left">Adição de x com y.</td>
-</tr>
-
-<tr>
-<td align="left">x - y</td>
-<td align="left">Subtração de y em x.</td>
-</tr>
-
-<tr>
-<td align="left">x * y</td>
-<td align="left">Multiplicaçăo de x e y.</td>
-</tr>
-
-<tr>
-<td align="left">x / y</td>
-<td align="left">Divisão de x por y.</td>
-</tr>
-
-<tr>
-<td align="left">x^y ou x**y</td>
-<td align="left">x elevado a y-ésima potência.</td>
-</tr>
-
-<tr>
-<td align="left">x%%y</td>
-<td align="left">Resto da divisão de x por y (módulo).</td>
-</tr>
-
-<tr>
-<td align="left">x%/%y</td>
-<td align="left">Parte inteira da divisão de x por y.</td>
-</tr>
-</tbody>
-</table>
-
-<h3 id="operadores-lógicos">Operadores lógicos</h3>
+<p>Para finalizar, listamos na tabela abaixo os principais operadores lógicos.</p>
 
 <table>
 <thead>
@@ -1393,6 +1168,205 @@ LETTERS
 </tr>
 </tbody>
 </table>
+
+<hr />
+
+<h2 id="funções">Funções</h2>
+
+<p>O R vem com muitas funções implementadas com as quais você pode fazer muitas  tarefas complicadas, como gerar números aleatórios. Geralmente, o nome das funções é bem intuitivo, por exemplo, <code>mean</code> é a função que calcula a média, <code>round</code> é a função que arredonda um número etc.</p>
+
+<pre><code class="language-r">round(5.634)
+## [1] 6
+</code></pre>
+
+<p>Para entender melhor o funcionamento das funções no R, considere o seguinte exemplo:</p>
+
+<pre><code class="language-r">die &lt;- 1:6
+round(mean(die))
+## [1] 4
+</code></pre>
+
+<p>A ilustração abaixo mostra o que acontece quando você executa <code>round(mean(die))</code> no R.</p>
+
+<p><img src="figures/round.png" alt="" /></p>
+
+<p>Passamos dados para as funções por meio de argumentos. No R, esses argumentos estão documentados na página de ajuda de cada uma das funções, que pode ser acessada digitando <code>help(nome_da_funcao)</code> ou <code>?nome_da_funcao</code>.</p>
+
+<h3 id="criando-suas-próprias-funções">Criando suas próprias funções</h3>
+
+<p>Sintaxe:</p>
+
+<pre><code class="language-r">soma &lt;- function(x, y = 0) {
+  resposta &lt;- x + y
+  return(resposta)
+}
+</code></pre>
+
+<p>A função acima tem:</p>
+
+<ul>
+<li>o nome <code>soma</code>;</li>
+<li>os argumentos <code>x</code> e <code>y</code>;</li>
+<li>o corpo <code>resposta &lt;- x + y</code>; e</li>
+<li>o valor padrão <code>0</code> para o argumento <code>y</code> (<code>y = 0</code>).</li>
+</ul>
+
+<p>Use-a como qualquer outra função:</p>
+
+<pre><code class="language-r">soma(2, 1) # soma de 2 + 1
+## [1] 3
+soma(2) # soma de 2 + 0
+## [1] 2
+</code></pre>
+
+<p>O argumento <code>y</code> possui o valor padrão <code>0</code>. Isso quer dizer que ele valerá zero caso o usuário não passe um valor explicitamente.</p>
+
+<p>O <a href="http://adv-r.had.co.nz/">Advanced-R</a> é um excelente livro para quem quiser masterizar a arte de se fazer funções.</p>
+
+<hr />
+
+<h2 id="fórmulas">Fórmulas</h2>
+
+<pre><code class="language-r">formula &lt;- y ~ x1 + x2
+class(formula)
+## [1] &quot;formula&quot;
+</code></pre>
+
+<p>Fórmulas são coisas do tipo <code>y ~ x</code>. As funções as usam de maneiras diversas, mas o exemplo mais emblemático vem da modelagem estatística.</p>
+
+<p>A função <code>lm()</code> é a que ajusta uma regressão linear no R, e <code>lm(y ~ x)</code> lê-se &ldquo;regressão linear de y explicada por x&rdquo;.</p>
+
+<pre><code class="language-r">minha_formula &lt;- Sepal.Width ~ Petal.Length + Petal.Width
+class(minha_formula)
+## [1] &quot;formula&quot;
+lm(minha_formula, data = iris)
+## 
+## Call:
+## lm(formula = minha_formula, data = iris)
+## 
+## Coefficients:
+##  (Intercept)  Petal.Length   Petal.Width  
+##       3.5870       -0.2571        0.3640
+</code></pre>
+
+<p>No caso específico das regressões lineares, são nas fórmulas que conseguimos descrever as variáveis explicativas e suas interações. A fórmula <code>y ~ x1 * x2</code> significa &ldquo;y regredido por x1, x2 e a interação entre x1 e x2&rdquo;. Fórmulas aparecem frequentemente em tarefas de modelagem.</p>
+
+<p>Demais usos de fórmulas aparecerão em outras funções (como o <code>ggplot</code>) com outros significados, e a documentação nos dirá como usá-las.</p>
+
+<hr />
+
+<h2 id="gráficos-base">Gráficos (base)</h2>
+
+<p>O R já vem com funções básicas que fazem gráficos estatísticos de todas as naturezas.</p>
+
+<ul>
+<li>Vantagens: são rápidas e simples.</li>
+<li>Desvantagens: são feias e difíceis para gerar gráficos complexos.</li>
+</ul>
+
+<h3 id="gráfico-de-dispersão">Gráfico de dispersão</h3>
+
+<p><strong>Funçăo</strong> <code>plot()</code></p>
+
+<p>Parâmetros principais (ver <code>help(hist)</code> para mais detalhes):</p>
+
+<ul>
+<li><code>x</code>, <code>y</code> - Vetores para representarem os eixos x e y.</li>
+<li><code>type</code> -  Tipo de gráfico. Pode ser pontos, linhas, escada etc.</li>
+</ul>
+
+<div class='admonition note'>
+<p class='admonition-title'>
+Atenção!
+</p>
+<p> 
+Além de gerar gráficos de dispersão, tentar chamar a função <b>plot(objeto_diferentao)<b> para qualquer tipo de objeto do R geralmente sai um gráfico interessante! Sempre tente fazer isso, a menos que seu objeto seja um <b>data.frame<b> com milhares de colunas!!!
+</p>
+</div>
+
+<pre><code class="language-r">n &lt;- 100
+x &lt;- 1:n
+y &lt;- 5 + 2 * x + rnorm(n, sd = 30)
+plot(x, y)
+</code></pre>
+
+<p><img src="figures//unnamed-chunk-62-1.png" alt="plot of chunk unnamed-chunk-62" /></p>
+
+<p>O parâmetro <code>type = &quot;l&quot;</code> indica que queremos que os pontos sejam interligados por linhas.</p>
+
+<pre><code class="language-r">plot(x, y, type = &quot;l&quot;)
+</code></pre>
+
+<p><img src="figures//unnamed-chunk-63-1.png" alt="plot of chunk unnamed-chunk-63" /></p>
+
+<h3 id="histograma">Histograma</h3>
+
+<p><strong>Funçăo</strong> <code>hist()</code></p>
+
+<p>Parâmetros principais (ver <code>help(hist)</code> para mais detalhes):</p>
+
+<ul>
+<li><code>x</code> - O vetor numérico pra histogramar.</li>
+<li><code>breaks</code> - O número (aproximado) de retângulos.</li>
+</ul>
+
+<pre><code class="language-r">hist(rnorm(1000))
+</code></pre>
+
+<p><img src="figures//unnamed-chunk-64-1.png" alt="plot of chunk unnamed-chunk-64" /></p>
+
+<h3 id="boxplot">Boxplot</h3>
+
+<p><strong>Função</strong> <code>boxplot()</code></p>
+
+<p>Parâmetros principais (ver <code>help(boxplot)</code> para mais detalhes):</p>
+
+<p><strong>Uma variável</strong></p>
+
+<pre><code class="language-r">boxplot(InsectSprays$count, col = &quot;lightgray&quot;)
+</code></pre>
+
+<p><img src="figures//unnamed-chunk-65-1.png" alt="plot of chunk unnamed-chunk-65" /></p>
+
+<p><strong>Duas variáveis</strong> - Usamos fórmula e o parâmetro <code>data</code>!</p>
+
+<pre><code class="language-r">boxplot(count ~ spray, data = InsectSprays, col = &quot;lightgray&quot;)
+</code></pre>
+
+<p><img src="figures//unnamed-chunk-66-1.png" alt="plot of chunk unnamed-chunk-66" /></p>
+
+<h3 id="gráfico-de-barras">Gráfico de barras</h3>
+
+<p><strong>Função</strong> <code>table()</code>, <code>barplot()</code></p>
+
+<p>Primeiro crie uma tabela de frequências (ou qualquer outro sumário). Então crie o gráfico com <code>barplot()</code>.</p>
+
+<p><strong>Tabela com uma variável</strong> usando <code>table()</code>.</p>
+
+<pre><code class="language-r">data(diamonds, package = &quot;ggplot2&quot;)
+tabela &lt;- table(diamonds$color)
+tabela
+## 
+##     D     E     F     G     H     I     J 
+##  6775  9797  9542 11292  8304  5422  2808
+barplot(tabela)
+</code></pre>
+
+<p><img src="figures//unnamed-chunk-67-1.png" alt="plot of chunk unnamed-chunk-67" /></p>
+
+<p><strong>Tabela com duas variáveis</strong> em uma tabela de dupla entrada.</p>
+
+<pre><code class="language-r">VADeaths
+##       Rural Male Rural Female Urban Male Urban Female
+## 50-54       11.7          8.7       15.4          8.4
+## 55-59       18.1         11.7       24.3         13.6
+## 60-64       26.9         20.3       37.0         19.3
+## 65-69       41.0         30.9       54.6         35.1
+## 70-74       66.0         54.3       71.1         50.0
+barplot(VADeaths) 
+</code></pre>
+
+<p><img src="figures//unnamed-chunk-68-1.png" alt="plot of chunk unnamed-chunk-68" /></p>
 
 <hr />
 
