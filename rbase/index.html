@@ -447,7 +447,7 @@ help(mean)
 
 <p>O RStudio é o melhor ambiente de desenvolvimento de códigos em R disponível. Você pode baixá-lo <a href="https://www.rstudio.com/products/rstudio/download/preview/">neste link</a>.</p>
 
-<p>Muitas das ferramentas são aprendidas conforme o uso, e há bons materiais sobre o Rstudio na internet (por exemplo, <a href="https://csgillespie.github.io/efficientR/set-up.html#rstudio">esta página</a>). Uma funcionalidade importante é a criação de projetos, permitindo dividir o trabalho em múltiplos ambientes, cada um com o seu diretório, documentos e <em>workspace</em>. A seguir, apresentamos algumas estruturas para a organização de um projeto.</p>
+<p>Muitas das ferramentas são aprendidas conforme o uso, e há bons materiais sobre o RStudio na internet (por exemplo, <a href="https://csgillespie.github.io/efficientR/set-up.html#rstudio">esta página</a>). Uma funcionalidade importante é a criação de projetos, permitindo dividir o trabalho em múltiplos ambientes, cada um com o seu diretório, documentos e <em>workspace</em>. A seguir, apresentamos algumas estruturas para a organização de um projeto.</p>
 
 <p><strong>Estrutura 1</strong>. Por extensão de arquivo.</p>
 
@@ -491,7 +491,7 @@ help(mean)
 
 <p>Esses quadrantes representam o <strong>editor</strong>, o <strong>console</strong>, o <strong>environment</strong> e o <strong>output</strong>.  Eles vêm nesta ordem, e depois você pode organizá-los da forma que preferir.</p>
 
-<p>Listamos abaixo as funções dos principais paineis:</p>
+<p>Listamos abaixo as funções dos principais painéis:</p>
 
 <ul>
 <li><strong>Editor/Scripts</strong>: é onde escrevemos nossos códigos.</li>
@@ -680,60 +680,133 @@ Error: unexpected input in &quot;5 % 5&quot;
 
 <h2 id="objetos">Objetos</h2>
 
+<p>O R te permite salvar dados dentro de um objeto. Para isso, utilizamos o operador <code>&lt;-</code>.</p>
+
+<p>No exemplo abaixo, salvamos o valor 1 em <code>a</code>. Sempre que o R encontrar o símbolo <code>a</code>, ele vai substituí-lo por 1.</p>
+
 <pre><code class="language-r">a &lt;- 1
 a
 ## [1] 1
 </code></pre>
-
-<p>O R te permite salvar dados dentro de um objeto.</p>
-
-<p>No exemplo acima, salvamos o valor <code>1</code> em <code>a</code>, e sempre que o R encontrar o nome <code>a</code> ele vai substituir por <code>1</code>.</p>
 
 <div class='admonition note'>
 <p class='admonition-title'>
 Atenção!
 </p>
 <p>
-O R entende letras maiúsculas e minúsculas, isto é <b>a</b> é considerado um objeto diferente de <b>A</b>.
+O R diferencia letras maiúsculas e minúsculas, isto é, <b>a</b> é considerado um objeto diferente de <b>A</b>.
 </p>
 </div>
 
 <h3 id="objetos-atômicos">Objetos atômicos</h3>
 
-<p>Existem cinco classes básicas ou &ldquo;atômicas&rdquo; no R:</p>
+<p>Existem cinco classes básicas ou “atômicas” no R:</p>
 
 <ul>
-<li>character <code>&quot;UAH!&quot;</code> (é o varchar do SQL)</li>
-<li>numeric <code>0.95</code> (números reais)</li>
-<li>integer <code>100515</code> (inteiros)</li>
-<li>complex <code>2 + 5i</code> (números complexos, a + bi)</li>
-<li>logical <code>TRUE</code> (booleanos, TRUE/FALSE)</li>
+<li>character</li>
+<li>numeric</li>
+<li>integer</li>
+<li>complex</li>
+<li>logical</li>
 </ul>
+
+<p>Veja alguns exemplos:</p>
+
+<pre><code class="language-r"># characters
+
+&quot;a&quot;
+## [1] &quot;a&quot;
+&quot;1&quot;
+## [1] &quot;1&quot;
+&quot;positivo&quot;
+## [1] &quot;positivo&quot;
+&quot;Error: objeto x não encontrado&quot;
+## [1] &quot;Error: objeto x não encontrado&quot;
+
+# numeric
+
+1
+## [1] 1
+0.10
+## [1] 0.1
+0.95
+## [1] 0.95
+pi
+## [1] 3.141593
+
+# integer
+
+1L
+## [1] 1
+5L
+## [1] 5
+10L
+## [1] 10
+
+# complex (raramente utilizado para análise de dados)
+
+2 + 5i
+## [1] 2+5i
+
+# logical
+
+TRUE
+## [1] TRUE
+FALSE
+## [1] FALSE
+</code></pre>
+
+<p>Para saber a classe de um objetivo, você pode usar a função <code>class()</code>.</p>
+
+<pre><code class="language-r">x &lt;- 1
+class(x)
+## [1] &quot;numeric&quot;
+
+y &lt;- &quot;a&quot;
+class(y)
+## [1] &quot;character&quot;
+
+z &lt;- TRUE
+class(z)
+## [1] &quot;logical&quot;
+</code></pre>
 
 <h3 id="vetores">Vetores</h3>
 
 <p>Vetores no R são os objetos mais simples que podem guardar objetos atômicos.</p>
 
-<pre><code class="language-r">vetor &lt;- c(1, 2, 3, 4)
-class(vetor)
+<pre><code class="language-r">vetor1 &lt;- c(1, 2, 3, 4)
+vetor2 &lt;- c(&quot;a&quot;, &quot;b&quot;, &quot;c&quot;)
+
+vetor1
+## [1] 1 2 3 4
+vetor2
+## [1] &quot;a&quot; &quot;b&quot; &quot;c&quot;
+</code></pre>
+
+<p>Um vetor tem sempre a mesma classe dos objetos que guarda.</p>
+
+<pre><code class="language-r">class(vetor1)
 ## [1] &quot;numeric&quot;
+class(vetor2)
+## [1] &quot;character&quot;
 </code></pre>
 
 <p>De forma bastante intuitiva, você pode fazer operações com vetores.</p>
 
-<pre><code class="language-r">vetor - 1
+<pre><code class="language-r">vetor1 - 1
 ## [1] 0 1 2 3
 </code></pre>
 
-<p>Quando você faz <code>vetor - 1</code>, o R subtrai <code>1</code> de cada um dos elementos do vetor. O mesmo acontece quando você faz qualquer operação aritmética com vetores no R. Tente jogar o código abaixo no console.</p>
+<p>Quando você faz <code>vetor1 - 1</code>, o R subtrai <code>1</code> de cada um dos elementos do vetor. O mesmo acontece quando você faz qualquer operação aritmética com vetores no R.</p>
 
-<pre><code class="language-r">vetor / 2
-vetor * 10
+<pre><code class="language-r">vetor1 / 2
+vetor1 * 10
 </code></pre>
 
 <p>Você também pode fazer operações que envolvem mais de um vetor:</p>
 
-<pre><code class="language-r">vetor * vetor
+<pre><code class="language-r">vetor1 * vetor1
 ## [1]  1  4  9 16
 </code></pre>
 
@@ -741,14 +814,10 @@ vetor * 10
 
 <pre><code class="language-r">vetor2 &lt;- 1:3
 vetor * vetor2
-## Warning in vetor * vetor2: longer object length is not a multiple of
-## shorter object length
-## [1] 1 4 9 4
+## Error in eval(expr, envir, enclos): object 'vetor' not found
 </code></pre>
 
-<p>Agora o R alinhou os dois vetores. Como eles não possuíam o mesmo tamanho, foi repetindo o vetor menor até completar o vetor maior.</p>
-
-<p>Esse comportamento é chamado de <strong>reciclagem</strong> e é útil para fazer operações <em>elemento por elemento</em> (vetorizadamente), mas às vezes pode ser confuso. Com o tempo, você aprenderá a se aproveitar dele.</p>
+<p>O R alinhou os dois vetores e, como eles não possuíam o mesmo tamanho, foi repetindo o vetor menor até completar o vetor maior. Esse comportamento é chamado de <strong>reciclagem</strong> e é útil para fazer operações elemento por elemento (vetorizadamente), mas às vezes pode ser confuso. Com o tempo, você aprenderá a se aproveitar dele.</p>
 
 <h3 id="misturando-objetos">Misturando objetos</h3>
 
@@ -774,7 +843,7 @@ y &lt;- c(TRUE, &quot;a&quot;) ## character
 
 <h3 id="forçando-classes-explicitamente">Forçando classes explicitamente</h3>
 
-<p>Assim como o <code>convert()</code> do SQL faz, você pode coagir um objeto a ser de uma classe da sua escolha com as funções <code>as.character()</code>, <code>as.numeric()</code>, <code>as.integer()</code> e <code>as.logical()</code>.</p>
+<p>Você pode coagir um objeto a ser de uma classe específica com as funções <code>as.character()</code>, <code>as.numeric()</code>, <code>as.integer()</code> e <code>as.logical()</code>. É equivalente à função <code>convert()</code> do SQL.</p>
 
 <pre><code class="language-r">x &lt;- 0:4
 class(x)
@@ -800,7 +869,7 @@ as.numeric(x)
 Observação
 </p>
 <p>
-O <b>NA</b> tem o mesmo papel que o <b>null</b> do SQL. Porém, há um <b>NULL</b> no R também, com diferenças sutis que vamos abordar mais adiante. Não confundir!
+O <b>NA</b> tem o mesmo papel que o <b>null</b> do SQL. Porém, há um <b>NULL</b> no R também, com diferenças sutis que vamos abordar mais adiante.
 </p>
 </div>
 
@@ -819,19 +888,19 @@ dim(m) # funçăo dim() retorna a dimensăo do objeto.
 
 <p>Repare que os números de 1 a 6 foram dispostos na matriz coluna por coluna (<em>column-wise</em>), ou seja, preenchendo de cima para baixo e depois da esquerda para a direita.</p>
 
-<p><strong>Utilidades</strong></p>
+<p><strong>Operações úteis</strong></p>
 
-<pre><code class="language-r">m[3,  ]   # seleciona uma linha
-m[ , 2]   # seleciona uma coluna
-m[1, 2]   # seleciona um elemento
+<pre><code class="language-r">m[3,  ]   # seleciona a terceira linha
+m[ , 2]   # seleciona a segunda coluna
+m[1, 2]   # seleciona o primeiro elemento da segunda coluna
 t(m)      # matriz transposta
 m %*% n   # multiplicação matricial
-solve(m)  # matriz inversa
+solve(m)  # matriz inversa de m
 </code></pre>
 
 <h3 id="fatores">Fatores</h3>
 
-<p>Fatores podem ser vistos como vetores de inteiros que possuem rótulos (labels).</p>
+<p>Fatores podem ser vistos como vetores de inteiros que possuem rótulos (levels).</p>
 
 <pre><code class="language-r">sexo &lt;- c(&quot;M&quot;, &quot;H&quot;, &quot;H&quot;, &quot;H&quot;, &quot;M&quot;, &quot;M&quot;, &quot;H&quot;)
 fator &lt;- as.factor(sexo)
@@ -857,21 +926,21 @@ as.numeric(fator)
 Um erro comum e desastroso
 </p>
 <p>
-Quando um vetor de números está como <b>factor</b>, ao tentar transformar o vetor em <b>numeric</b>, você receberá um vetor de inteiros que não tem nada a ver com os valores originais!
+Quando um vetor de números está como <b>factor</b>, ao tentar transformá-lo em <b>numeric</b>, você receberá um vetor de inteiros que não tem nada a ver com os valores originais!
 </p>
 </div>
 
 <pre><code class="language-r">numeros &lt;- factor(c(&quot;10&quot;, &quot;55&quot;, &quot;55&quot;, &quot;12&quot;, &quot;10&quot;, &quot;-5&quot;, &quot;-90&quot;))
-</code></pre>
 
-<pre><code>as.numeric(numeros)
-## [1] 3 5 5 4 3 1 2    # &lt;-- Por essa eu năo esperava!
+as.numeric(numeros)
+#Por essa eu năo esperava!
 </code></pre>
 
 <p>Para evitar isso, use <code>as.character()</code> antes de transformar para número.</p>
 
-<pre><code>as.numeric(as.character(numeros))
-## [1]  10  55  55  12  10  -5 -90   # &lt;-- Agora está OK
+<pre><code class="language-r">as.numeric(as.character(numeros))
+## Error in eval(expr, envir, enclos): object 'numeros' not found
+# Agora está OK!
 </code></pre>
 
 <h3 id="valores-especiais">Valores especiais</h3>
@@ -914,12 +983,12 @@ x
 
 <p>É um dos objetos mais importantes para armazenar dados e vale a pena saber manuseá-los bem. Existem muitas funções que fazem das listas objetos incrivelmente úteis.</p>
 
-<p>Criamos uma lista pela função <code>list()</code>, que aceita um número arbitrário de elementos. Listas aceitam QUALQUER tipo de objeto. Podemos ter listas dentro de listas, por exemplo. Como para quase todos os objetos no R, as funções <code>is.list()</code> e <code>as.list()</code> também existem.</p>
+<p>Criamos uma lista com a função <code>list()</code>, que aceita um número arbitrário de elementos. Listas aceitam QUALQUER tipo de objeto. Podemos ter listas dentro de listas, por exemplo. Como para quase todas as classes de objetos no R, as funções <code>is.list()</code> e <code>as.list()</code> também existem.</p>
 
 <p>Na lista <code>pedido</code> abaixo, temos <code>numeric</code>, <code>Date</code>, <code>character</code>, vetor de <code>character</code> e <code>list</code> contida em uma lista:</p>
 
 <pre><code class="language-r">pedido &lt;- list(pedido_id = 8001406,
-               pedido_registro = as.Date(&quot;2016-12-12&quot;),
+               pedido_registro = as.Date(&quot;2017-05-25&quot;),
                nome = &quot;Athos&quot;, 
                sobrenome = &quot;Petri Damiani&quot;, 
                cpf = &quot;12345678900&quot;, 
@@ -943,7 +1012,7 @@ x
 )
 </code></pre>
 
-<p><strong>Utilidades</strong></p>
+<p><strong>Operações úteis</strong></p>
 
 <pre><code class="language-r">pedido$cpf     # elemento chamado 'cpf'
 pedido[1]      # nova lista com apenas o primeiro elemento
@@ -959,7 +1028,7 @@ pedido[&quot;nome&quot;] # nova lista com apenas o elemento chamado 'nome'
 
 <p>Usualmente, seus dados serão importados para um objeto <code>data.frame</code>. Em grande parte do curso, eles serão o principal objeto de estudo.</p>
 
-<p><code>data.frame</code>&rsquo;s são listas especiais em que todos os seus elementos possuem <strong>o mesmo comprimento</strong>. Cada elemento dessa lista pode ser pensado como uma coluna da tabela. Seu comprimento representa o número de linhas.</p>
+<p>Os <code>data.frame</code>&rsquo;s são listas especiais em que todos os elementos possuem <strong>o mesmo comprimento</strong>. Cada elemento dessa lista pode ser pensado como uma coluna da tabela. Seu comprimento representa o número de linhas.</p>
 
 <p>Já que são listas, essas colunas podem ser de classes diferentes. Essa é a grande diferença entre <code>data.frame</code>&rsquo;s e matrizes. Algumas funções úteis:</p>
 
@@ -988,25 +1057,6 @@ as.data.frame(minha_lista)
 ## 3 3 c
 </code></pre>
 
-<h4 id="exemplo-de-data-frame-iris">Exemplo de data.frame: iris {-}</h4>
-
-<pre><code class="language-r">head(iris)  
-##   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
-## 1          5.1         3.5          1.4         0.2  setosa
-## 2          4.9         3.0          1.4         0.2  setosa
-## 3          4.7         3.2          1.3         0.2  setosa
-## 4          4.6         3.1          1.5         0.2  setosa
-## 5          5.0         3.6          1.4         0.2  setosa
-## 6          5.4         3.9          1.7         0.4  setosa
-str(iris)
-## 'data.frame':	150 obs. of  5 variables:
-##  $ Sepal.Length: num  5.1 4.9 4.7 4.6 5 5.4 4.6 5 4.4 4.9 ...
-##  $ Sepal.Width : num  3.5 3 3.2 3.1 3.6 3.9 3.4 3.4 2.9 3.1 ...
-##  $ Petal.Length: num  1.4 1.4 1.3 1.5 1.4 1.7 1.4 1.5 1.4 1.5 ...
-##  $ Petal.Width : num  0.2 0.2 0.2 0.2 0.2 0.4 0.3 0.2 0.2 0.1 ...
-##  $ Species     : Factor w/ 3 levels &quot;setosa&quot;,&quot;versicolor&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
-</code></pre>
-
 <hr />
 
 <h2 id="controles-de-fluxo">Controles de Fluxo</h2>
@@ -1015,7 +1065,7 @@ str(iris)
 
 <h3 id="if-e-else">IF e ELSE</h3>
 
-<p>O seguinte trecho de código só será executado se o objeto <code>x</code> for igual a 1. Repare que a condição de igualdade é representada por dois iguais (==).</p>
+<p>O seguinte trecho de código só será executado se o objeto <code>x</code> for igual a 1. Repare que a condição de igualdade é representada por dois iguais <code>==</code>.</p>
 
 <pre><code class="language-r">x &lt;- 2
 
@@ -1029,7 +1079,7 @@ if(x == 1) {
 if(x == 1) {
   Sys.time()
 }
-## [1] &quot;2017-06-22 00:45:40 UTC&quot;
+## [1] &quot;2017-07-02 17:33:12 UTC&quot;
 </code></pre>
 
 <p>O R só vai executar o que está na expressão dentro das chaves <code>{}</code> se o que estiver dentro dos parênteses <code>()</code> retornar <code>TRUE</code>.</p>
@@ -1173,10 +1223,12 @@ for(i in indices) {
 
 <h2 id="funções">Funções</h2>
 
-<p>O R vem com muitas funções implementadas com as quais você pode fazer muitas  tarefas complicadas, como gerar números aleatórios. Geralmente, o nome das funções é bem intuitivo, por exemplo, <code>mean</code> é a função que calcula a média, <code>round</code> é a função que arredonda um número etc.</p>
+<p>O R vem com muitas funções implementadas, com as quais você pode fazer facilmente muitas  tarefas complicadas, como gerar números aleatórios. Em geral, o nome das funções é bem intuitivo, por exemplo, <code>mean()</code> é a função que calcula a média e <code>round()</code> é a função que arredonda um número.</p>
 
-<pre><code class="language-r">round(5.634)
-## [1] 6
+<pre><code class="language-r">mean(1:10)
+## [1] 5.5
+round(pi) #Note que 'pi' é um objeto pré-definido pelo R.
+## [1] 3
 </code></pre>
 
 <p>Para entender melhor o funcionamento das funções no R, considere o seguinte exemplo:</p>
@@ -1194,7 +1246,7 @@ round(mean(die))
 
 <h3 id="criando-suas-próprias-funções">Criando suas próprias funções</h3>
 
-<p>Sintaxe:</p>
+<p>No R, você pode (e deve) criar as suas próprias funções. É uma prática que evita retrabalho, simplifica o código e, eventualmente, diminui o tempo de execução das análises. Veja abaixo um exemplo de como criar uma função.</p>
 
 <pre><code class="language-r">soma &lt;- function(x, y = 0) {
   resposta &lt;- x + y
@@ -1211,30 +1263,30 @@ round(mean(die))
 <li>o valor padrão <code>0</code> para o argumento <code>y</code> (<code>y = 0</code>).</li>
 </ul>
 
-<p>Use-a como qualquer outra função:</p>
+<p>Após rodar o código anterior, você pode usá-la como qualquer outra função:</p>
 
 <pre><code class="language-r">soma(2, 1) # soma de 2 + 1
 ## [1] 3
-soma(2) # soma de 2 + 0
+soma(2) # soma de 2 + 0, pois y = 0 por default.
 ## [1] 2
 </code></pre>
 
 <p>O argumento <code>y</code> possui o valor padrão <code>0</code>. Isso quer dizer que ele valerá zero caso o usuário não passe um valor explicitamente.</p>
 
-<p>O <a href="http://adv-r.had.co.nz/">Advanced-R</a> é um excelente livro para quem quiser masterizar a arte de se fazer funções.</p>
+<p>O <a href="http://adv-r.had.co.nz/">Advanced-R</a> é um excelente livro para quem quiser masterizar a arte de criar funções.</p>
 
 <hr />
 
 <h2 id="fórmulas">Fórmulas</h2>
+
+<p>Fórmulas são objetos do tipo <code>y ~ x</code>. Em geral, elas representam associações entre objetos, como em um modelo de regressão. As funções as usam de diversas maneiras, mas o exemplo mais emblemático vem da modelagem estatística.</p>
 
 <pre><code class="language-r">formula &lt;- y ~ x1 + x2
 class(formula)
 ## [1] &quot;formula&quot;
 </code></pre>
 
-<p>Fórmulas são coisas do tipo <code>y ~ x</code>. As funções as usam de maneiras diversas, mas o exemplo mais emblemático vem da modelagem estatística.</p>
-
-<p>A função <code>lm()</code> é a que ajusta uma regressão linear no R, e <code>lm(y ~ x)</code> lê-se &ldquo;regressão linear de y explicada por x&rdquo;.</p>
+<p>A função <code>lm()</code> é a que ajusta um modelo linear no R, e <code>lm(y ~ x)</code> lê-se &ldquo;regressão linear de y explicada por x&rdquo;.</p>
 
 <pre><code class="language-r">minha_formula &lt;- Sepal.Width ~ Petal.Length + Petal.Width
 class(minha_formula)
@@ -1249,9 +1301,9 @@ lm(minha_formula, data = iris)
 ##       3.5870       -0.2571        0.3640
 </code></pre>
 
-<p>No caso específico das regressões lineares, são nas fórmulas que conseguimos descrever as variáveis explicativas e suas interações. A fórmula <code>y ~ x1 * x2</code> significa &ldquo;y regredido por x1, x2 e a interação entre x1 e x2&rdquo;. Fórmulas aparecem frequentemente em tarefas de modelagem.</p>
+<p>No caso específico dos modelos lineares, são nas fórmulas que conseguimos descrever as variáveis explicativas e suas interações. A fórmula <code>y ~ x1 * x2</code> significa &ldquo;y regredido por x1, x2 e a interação entre x1 e x2&rdquo;. Fórmulas aparecem frequentemente em tarefas de modelagem.</p>
 
-<p>Demais usos de fórmulas aparecerão em outras funções (como o <code>ggplot</code>) com outros significados, e a documentação nos dirá como usá-las.</p>
+<p>Demais usos de fórmulas aparecerão em outras funções, como as do pacote <code>ggplot2</code>, com outros significados, e a documentação nos dirá como usá-las.</p>
 
 <hr />
 
@@ -1264,23 +1316,25 @@ lm(minha_formula, data = iris)
 <li>Desvantagens: são feias e difíceis para gerar gráficos complexos.</li>
 </ul>
 
+<p>Nesta seção, mostraremos como construir alguns tipos de gráficos usando as funções base do R, mas <a href="http://material.curso-r.com/ggplot/">o nosso foco em visualização de dados</a> está nas funções do pacote <code>ggplot2</code>.</p>
+
 <h3 id="gráfico-de-dispersão">Gráfico de dispersão</h3>
 
-<p><strong>Funçăo</strong> <code>plot()</code></p>
-
-<p>Parâmetros principais (ver <code>help(hist)</code> para mais detalhes):</p>
+<p>Para construir um gráfico de dispersão, utilizamos a função <code>plot()</code>. Seus principais parâmetros são:</p>
 
 <ul>
 <li><code>x</code>, <code>y</code> - Vetores para representarem os eixos x e y.</li>
-<li><code>type</code> -  Tipo de gráfico. Pode ser pontos, linhas, escada etc.</li>
+<li><code>type</code> -  Tipo de gráfico. Pode ser pontos, linhas, escada, entre outros.</li>
 </ul>
+
+<p>Para mais detalhes sobre os argumentos, ver <code>help(plot)</code>.</p>
 
 <div class='admonition note'>
 <p class='admonition-title'>
-Atenção!
+Outras formas de utilizar a função plot()
 </p>
 <p> 
-Além de gerar gráficos de dispersão, tentar chamar a função <b>plot(objeto_diferentao)<b> para qualquer tipo de objeto do R geralmente sai um gráfico interessante! Sempre tente fazer isso, a menos que seu objeto seja um <b>data.frame<b> com milhares de colunas!!!
+Além de gerar gráficos de dispersão, tentar chamar a função <b>plot(objeto_diferentao)</b> para qualquer tipo de objeto do R geralmente gera um gráfico interessante! Sempre tente fazer isso, a menos que seu objeto seja um <b>data.frame<b> com milhares de colunas!
 </p>
 </div>
 
@@ -1290,58 +1344,61 @@ y &lt;- 5 + 2 * x + rnorm(n, sd = 30)
 plot(x, y)
 </code></pre>
 
-<p><img src="figures//unnamed-chunk-62-1.png" alt="plot of chunk unnamed-chunk-62" /></p>
+<p><img src="figures//unnamed-chunk-65-1.png" alt="plot of chunk unnamed-chunk-65" /></p>
 
 <p>O parâmetro <code>type = &quot;l&quot;</code> indica que queremos que os pontos sejam interligados por linhas.</p>
 
 <pre><code class="language-r">plot(x, y, type = &quot;l&quot;)
 </code></pre>
 
-<p><img src="figures//unnamed-chunk-63-1.png" alt="plot of chunk unnamed-chunk-63" /></p>
+<p><img src="figures//unnamed-chunk-66-1.png" alt="plot of chunk unnamed-chunk-66" /></p>
 
 <h3 id="histograma">Histograma</h3>
 
-<p><strong>Funçăo</strong> <code>hist()</code></p>
-
-<p>Parâmetros principais (ver <code>help(hist)</code> para mais detalhes):</p>
+<p>Para construir histogramas, utilizamos a função <code>hist()</code>. Os principais parâmetros são:</p>
 
 <ul>
-<li><code>x</code> - O vetor numérico pra histogramar.</li>
+<li><code>x</code> - O vetor numérico para o qual o histograma será construído.</li>
 <li><code>breaks</code> - O número (aproximado) de retângulos.</li>
 </ul>
 
 <pre><code class="language-r">hist(rnorm(1000))
 </code></pre>
 
-<p><img src="figures//unnamed-chunk-64-1.png" alt="plot of chunk unnamed-chunk-64" /></p>
+<p><img src="figures//unnamed-chunk-67-1.png" alt="plot of chunk unnamed-chunk-67" /></p>
+
+<pre><code class="language-r">hist(rnorm(1000), breaks = 6)
+</code></pre>
+
+<p><img src="figures//unnamed-chunk-68-1.png" alt="plot of chunk unnamed-chunk-68" /></p>
 
 <h3 id="boxplot">Boxplot</h3>
 
-<p><strong>Função</strong> <code>boxplot()</code></p>
+<p>Para construir histogramas, utilizamos a função <code>boxplot()</code>. Os principais parâmetros são:</p>
 
-<p>Parâmetros principais (ver <code>help(boxplot)</code> para mais detalhes):</p>
-
-<p><strong>Uma variável</strong></p>
+<ul>
+<li><code>x</code> - O vetor numérico para o qual o boxplot será construído.</li>
+</ul>
 
 <pre><code class="language-r">boxplot(InsectSprays$count, col = &quot;lightgray&quot;)
 </code></pre>
 
-<p><img src="figures//unnamed-chunk-65-1.png" alt="plot of chunk unnamed-chunk-65" /></p>
+<p><img src="figures//unnamed-chunk-69-1.png" alt="plot of chunk unnamed-chunk-69" /></p>
 
-<p><strong>Duas variáveis</strong> - Usamos fórmula e o parâmetro <code>data</code>!</p>
+<p>Observe que o argumento <code>col=</code> muda a cor da caixa do boxplot.</p>
+
+<p>Para mapear duas variáveis ao gráfico, utilizamos um objeto da classe <code>formula</code> e o argumento <code>data=</code>.</p>
 
 <pre><code class="language-r">boxplot(count ~ spray, data = InsectSprays, col = &quot;lightgray&quot;)
 </code></pre>
 
-<p><img src="figures//unnamed-chunk-66-1.png" alt="plot of chunk unnamed-chunk-66" /></p>
+<p><img src="figures//unnamed-chunk-70-1.png" alt="plot of chunk unnamed-chunk-70" /></p>
 
 <h3 id="gráfico-de-barras">Gráfico de barras</h3>
 
-<p><strong>Função</strong> <code>table()</code>, <code>barplot()</code></p>
+<p>Para construir gráficos de barras, precisamos combinar as funções <code>table()</code> e <code>barplot()</code>.</p>
 
-<p>Primeiro crie uma tabela de frequências (ou qualquer outro sumário). Então crie o gráfico com <code>barplot()</code>.</p>
-
-<p><strong>Tabela com uma variável</strong> usando <code>table()</code>.</p>
+<p>No gráfico abaixo, primeiro criamos uma tabela de frequências com a função <code>table()</code> e, em seguida, construímos o gráfico com a função <code>barplot()</code>. A função <code>data()</code> carrega bases de dados de pacotes instalados. Veja <code>help(data)</code> para mais detalhes.</p>
 
 <pre><code class="language-r">data(diamonds, package = &quot;ggplot2&quot;)
 tabela &lt;- table(diamonds$color)
@@ -1352,9 +1409,9 @@ tabela
 barplot(tabela)
 </code></pre>
 
-<p><img src="figures//unnamed-chunk-67-1.png" alt="plot of chunk unnamed-chunk-67" /></p>
+<p><img src="figures//unnamed-chunk-71-1.png" alt="plot of chunk unnamed-chunk-71" /></p>
 
-<p><strong>Tabela com duas variáveis</strong> em uma tabela de dupla entrada.</p>
+<p>Também podemos mapear duas variáveis a um gráfico de barras utilizando tabelas de dupla entrada.</p>
 
 <pre><code class="language-r">VADeaths
 ##       Rural Male Rural Female Urban Male Urban Female
@@ -1363,10 +1420,12 @@ barplot(tabela)
 ## 60-64       26.9         20.3       37.0         19.3
 ## 65-69       41.0         30.9       54.6         35.1
 ## 70-74       66.0         54.3       71.1         50.0
-barplot(VADeaths) 
 </code></pre>
 
-<p><img src="figures//unnamed-chunk-68-1.png" alt="plot of chunk unnamed-chunk-68" /></p>
+<pre><code class="language-r">barplot(VADeaths)
+</code></pre>
+
+<p><img src="figures//unnamed-chunk-73-1.png" alt="plot of chunk unnamed-chunk-73" /></p>
 
 <hr />
 
