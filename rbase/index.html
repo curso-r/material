@@ -1079,7 +1079,7 @@ if(x == 1) {
 if(x == 1) {
   Sys.time()
 }
-## [1] &quot;2017-07-03 23:43:23 UTC&quot;
+## [1] &quot;2017-07-03 23:55:01 UTC&quot;
 </code></pre>
 
 <p>O R só vai executar o que está na expressão dentro das chaves <code>{}</code> se o que estiver dentro dos parênteses <code>()</code> retornar <code>TRUE</code>.</p>
@@ -1435,23 +1435,17 @@ barplot(tabela)
 
 <hr />
 
-<ol>
-<li>Calculo o número de ouro no R.</li>
-</ol>
+<p><em>1.</em> Calculo o número de ouro no R.</p>
 
 <p>Dica: o número de ouro é dado pela expressão $\frac{1 + \sqrt{5}}{2}$.</p>
 
 <hr />
 
-<ol>
-<li>Qual o resultado da divisão de -1 por 0 no R? E de 1 por 0?</li>
-</ol>
+<p><em>2.</em> Qual o resultado da divisão de 1 por 0 no R? E de -1 por 0?</p>
 
 <hr />
 
-<ol>
-<li>Quais as diferenças entre <code>NaN</code>, <code>NULL</code>, <code>NA</code> e <code>Inf</code>? Digite expressões que retornam cada um desses resultados.</li>
-</ol>
+<p><em>3.</em> Quais as diferenças entre <code>NaN</code>, <code>NULL</code>, <code>NA</code> e <code>Inf</code>? Digite expressões que retornam cada um desses resultados.</p>
 
 <hr />
 
@@ -1513,131 +1507,321 @@ if(x = 4) {
 
 <hr />
 
-<script src="https://cdn.datacamp.com/datacamp-light-latest.min.js"></script>
+<h2 id="respostas">Respostas</h2>
 
-<script src="https://cdn.datacamp.com/datacamp-light-latest.min.js"></script>
+<hr />
 
 <ol>
-<li>Calcule o número de ouro no R.</li>
+<li>Calculo o número de ouro no R.</li>
 </ol>
 
-<p>$$ \frac{1 + \sqrt{5}}{2} $$</p>
+<p>Dica: o número de ouro é dado pela expressão $\frac{1 + \sqrt{5}}{2}$.</p>
 
-<div data-datacamp-exercise data-height="300" data-encoded="true">eyJsYW5ndWFnZSI6InIiLCJzYW1wbGUiOiIjIERpZ2l0ZSBhIGV4cHJlc3NcdTAwZTNvIHF1ZSBjYWxjdWxhIG8gblx1MDBmYW1lcm8gZGUgb3Vyby4iLCJzb2x1dGlvbiI6IiMgRGlnaXRlIGEgZXhwcmVzc1x1MDBlM28gcXVlIGNhbGN1bGEgbyBuXHUwMGZhbWVybyBkZSBvdXJvLlxuKDEgKyBzcXJ0KDUpKS8yIiwic2N0IjoidGVzdF9vdXRwdXRfY29udGFpbnMoXCIxLjYxODAzNFwiLCBpbmNvcnJlY3RfbXNnID0gXCJUZW0gY2VydGV6YSBkZSBxdWUgaW5kaWNvdSBhIGV4cHJlc3NcdTAwZTNvIGNvcnJldGFtZW50ZT9cIilcbnN1Y2Nlc3NfbXNnKFwiQ29ycmV0byFcIikifQ==</div>
+<p><strong>Resposta:</strong></p>
+
+<pre><code class="language-r">(1 + sqrt(5))/2
+## [1] 1.618034
+</code></pre>
+
+<hr />
 
 <ol>
-<li>O que dá divisão de 1 por 0 no R? E -1 por 0?</li>
+<li>Qual o resultado da divisão de 1 por 0 no R? E de -1 por 0?</li>
 </ol>
 
-<div data-datacamp-exercise data-height="300" data-encoded="true">eyJsYW5ndWFnZSI6InIiLCJzYW1wbGUiOiIgMS8wXG4tMS8wIiwic2N0IjoidGVzdF9vdXRwdXRfY29udGFpbnMoXCJJbmZcIiwgaW5jb3JyZWN0X21zZyA9IFwiVGVtIGNlcnRlemEgZGUgcXVlIGluZGljb3UgYSBleHByZXNzXHUwMGUzbyBjb3JyZXRhbWVudGU/XCIpXG50ZXN0X291dHB1dF9jb250YWlucyhcIi1JbmZcIiwgaW5jb3JyZWN0X21zZyA9IFwiVGVtIGNlcnRlemEgZGUgcXVlIGluZGljb3UgYSBleHByZXNzXHUwMGUzbyBjb3JyZXRhbWVudGU/XCIpXG5zdWNjZXNzX21zZyhcIkNvcnJldG8hXCIpIn0=</div>
+<p><strong>Resposta:</strong></p>
+
+<p>Infinito e -Infinito.</p>
+
+<pre><code class="language-r">1/0
+## [1] Inf
+-1/0
+## [1] -Inf
+</code></pre>
+
+<hr />
 
 <ol>
-<li>Quais as diferenças entre <code>NaN</code>, <code>NULL</code>, <code>NA</code> e <code>Inf</code>? Digite expressões que
-retornam cada um desses resultados.</li>
+<li>Quais as diferenças entre <code>NaN</code>, <code>NULL</code>, <code>NA</code> e <code>Inf</code>? Digite expressões que retornam cada um desses resultados.</li>
 </ol>
 
-<div data-datacamp-exercise data-height="300" data-encoded="true">eyJsYW5ndWFnZSI6InIiLCJzYW1wbGUiOiIjIE5hTlxuXG4jIE5VTExcblxuIyBOQVxuXG4jIEluZlxuIiwic29sdXRpb24iOiIjIE5hTiBcdTAwZTkgbyByZXN1bHRhZG8gZGUgdW1hIG9wZXJhXHUwMGU3XHUwMGUzbyBtYXRlbVx1MDBlMXRpY2EgaW52XHUwMGUxbGlkYS4gU2lnbmlmaWNhIE5vdCBBIE51bWJlclxuMC8wXG4jIE5VTEwgXHUwMGU5IG8gdmF6aW8gZG8gUi4gXHUwMGM5IGNvbW8gc2UgbyBvYmpldG8gblx1MDBlM28gZXhpc3Rpc3NlXG5OVUxMXG5hID0gTlVMTFxuaXMubnVsbChpbnRlZ2VyKGxlbmd0aCA9IDApKSAjIHZlamEgcXVlIHVtIHZldG9yLCBtZXNtbyBzZW0gZWxlbWVudG9zIG5cdTAwZTNvIFx1MDBlOSBOVUxMXG4jIE5BIFx1MDBlOSB1bWEgY29uc3RhbnRlIGxcdTAwZjNnaWNhIGRvIFIuIFNpZ2luaWZpY2EgTm90IEF2YWlsbGFibGUuIE5BIHBvZGUgc2VyIFxuIyBjb252ZXJ0aWRvIHBhcmEgcXVhc2UgdG9kb3Mgb3MgdGlwb3MgZGUgdmV0b3JlcyBkbyBSLiBcdTAwYzkgdXNhZG8gcHJpbmNpcGFsbWVudGUgcGFyYVxuIyBpbmRpY2FyIHZhbG9yZXMgZmFsdGFudGVzLlxuTkFcbiMgSW5mIFx1MDBlOSBzaWduaWZpY2EgaW5maW5pdG8uIFx1MDBjOSBvIHJlc3VsdGFkbyBkZSBvcGVyYVx1MDBlN1x1MDBmNWVzIG1hdGVtXHUwMGUxdGljYXMgY3VqbyBsaW1pdGUgXHUwMGU5IGluZmluaXRvLlxuMS8wXG4xL0luZiJ9</div>
+<p><strong>Resposta:</strong></p>
+
+<pre><code class="language-r"># NaN é o resultado de uma operação matemática inválida. 
+# Significa Not A Number.
+
+0/0
+## [1] NaN
+
+# NULL é o vazio do R. É como se o objeto não existisse.
+
+NULL
+## NULL
+a = NULL
+
+
+# veja que um vetor, mesmo sem elementos não é NULL
+
+is.null(integer(length = 0)) 
+## [1] FALSE
+
+# NA é uma constante lógica do R. Siginifica Not Availlable. 
+# NA pode ser convertido para quase todos os tipos de vetores do R. 
+# É usado principalmente para indicar valores faltantes.
+
+NA
+## [1] NA
+as.numeric(c(&quot;1&quot;, &quot;2&quot;, &quot;a&quot;))
+## Warning: NAs introduced by coercion
+## [1]  1  2 NA
+
+# Inf é significa infinito. É o resultado de operações matemáticas 
+# cujo limite é infinito.
+
+1/0
+## [1] Inf
+1/Inf
+## [1] 0
+</code></pre>
+
+<hr />
 
 <ol>
-<li><p>Tente mentalmente calcular o que dá a conta <code>5 + 3 * 10 %/% 3 == 15</code> no R, sem rodar.</p></li>
-
-<li><p>Adicionando apenas parênteses, faça a expressão acima retornar o resultado contrário.</p></li>
+<li>Sem rodar o código, calcule o que a expressão <code>5 + 3 * 10 %/% 3 == 15</code> vai resultar no R. Em seguida, apenas utilizando parênteses, faço a expressão retornar o valore contrário (i.e., se originariamente for <code>TRUE</code>, faça retornar <code>FALSE</code>).</li>
 </ol>
 
-<div data-datacamp-exercise data-height="300" data-encoded="true">eyJsYW5ndWFnZSI6InIiLCJzYW1wbGUiOiI1ICsgMyAqIDEwICUvJSAzID09IDE1Iiwic29sdXRpb24iOiI1ICsgKDMgKiAxMCkgJS8lIDMgPT0gMTUiLCJzY3QiOiJ0ZXN0X291dHB1dF9jb250YWlucyhcIlRSVUVcIiwgaW5jb3JyZWN0X21zZyA9IFwiVGVtIGNlcnRlemEgZGUgcXVlIGluZGljb3UgYSBleHByZXNzXHUwMGUzbyBjb3JyZXRhbWVudGU/XCIpXG5zdWNjZXNzX21zZyhcIkNvcnJldG8hXCIpIn0=</div>
+<p><strong>Resposta:</strong></p>
+
+<p>O resultado da parte esquerda é 14, por isso a expressão retornará <code>FALSE</code>. Para fazê-la retornar <code>TRUE</code>, basta colocar parênteses em volta de <code>3 * 10</code>.</p>
+
+<pre><code class="language-r">5 + (3 * 10) %/% 3 == 15
+## [1] TRUE
+</code></pre>
+
+<hr />
 
 <ol>
-<li>O que acontece se você rodar:</li>
+<li>Por que o código abaixo retorna erro? Arrume o código para retornar o valor <code>TRUE</code>.</li>
 </ol>
 
 <pre><code class="language-r">x &lt;- 4
 if(x = 4) {
-  'isso aqui apareceu'
+  TRUE
 }
-x
+## Error: &lt;text&gt;:2:6: unexpected '='
+## 1: x &lt;- 4
+## 2: if(x =
+##         ^
 </code></pre>
 
-<div data-datacamp-exercise data-height="300" data-encoded="true">eyJsYW5ndWFnZSI6InIiLCJzYW1wbGUiOiJ4IDwtIDRcbmlmKHggPSA0KSB7XG4gICdpc3NvIGFxdWkgYXBhcmVjZXUnXG59XG54In0=</div>
-
-<ol>
-<li>Como você faria para que o código da pergunta anterior fizesse com que <code>'isso aqui apareceu'</code> fosse impresso no console, mas nenhum erro aparecesse?</li>
-</ol>
-
-<div data-datacamp-exercise data-height="300" data-encoded="true">eyJsYW5ndWFnZSI6InIiLCJzYW1wbGUiOiJ4IDwtIDRcbmlmKHggPSA0KSB7XG4gICdpc3NvIGFxdWkgYXBhcmVjZXUnXG59XG54Iiwic29sdXRpb24iOiJ4IDwtIDRcbmlmKHggPT0gNCkge1xuICAnaXNzbyBhcXVpIGFwYXJlY2V1J1xufVxueCIsInNjdCI6InRlc3Rfb3V0cHV0X2NvbnRhaW5zKFwiaXNzbyBhcXVpIGFwYXJlY2V1XCIsIGluY29ycmVjdF9tc2cgPSBcIlRlbSBjZXJ0ZXphIGRlIHF1ZSBpbmRpY291IGEgZXhwcmVzc1x1MDBlM28gY29ycmV0YW1lbnRlP1wiKVxudGVzdF9lcnJvcigpXG5zdWNjZXNzX21zZyhcIkNvcnJldG8hXCIpIn0=</div>
+<p><strong>Resposta:</strong></p>
 
 <hr />
 
-<script src="https://cdn.datacamp.com/datacamp-light-latest.min.js"></script>
+<ol>
+<li>Usando <code>if</code> e <code>else</code>, escreva um código que retorne a string &ldquo;número&rdquo; caso o valor seja da classe <code>numeric</code> ou <code>integer</code>; a string &ldquo;palavra&rdquo; caso o valor seja da classe <code>character</code>; e <code>NULL</code> caso contrário.</li>
+</ol>
+
+<p><strong>Resposta:</strong></p>
+
+<hr />
+
+<ol>
+<li>Use o <code>for</code> para retornar o valor mínimo do seguinte vetor: <code>vetor &lt;- c(4, 2, 1, 5, 3)</code>. Modifique o seu código para receber vetores de qualquer tamanho.</li>
+</ol>
+
+<p><strong>Resposta:</strong></p>
+
+<hr />
+
+<ol>
+<li>Usando apenas <code>for</code> e a função <code>length()</code>, construa uma função que calcule a média de um vetor número qualquer. Construa uma condição para a função retornar <code>NULL</code> caso o vetor não seja numérico.</li>
+</ol>
+
+<p><strong>Resposta:</strong></p>
+
+<hr />
+
+<ol>
+<li>Rode <code>help(runif)</code> para descobrir o que a função <code>runif()</code> faz. Em seguida, use-a para escrever uma função que retorne um número aleatório inteiro entre 0 e 10 (0 e 10 incluvise).</li>
+</ol>
+
+<p><strong>Resposta:</strong></p>
+
+<hr />
+
+<ol>
+<li>Rode <code>help(sample)</code> para descobrir o que a função <code>sample()</code> faz. Em seguida, use-a para escrever uma função que escolha uma linha aleatoriamente de uma matriz e devolva os seus valores.</li>
+</ol>
+
+<p><strong>Resposta:</strong></p>
+
+<hr />
+
+<ol>
+<li>Rode <code>help(paste)</code> e <code>help(names)</code> para descobrir o que as funções <code>paste()</code> e <code>names()</code> fazem. Em seguida, use-as para escrever um código para gerar a fórmula <code>mpg ~ cyl + disp + hp + drat + wt + qsec + vs + am + gear + carb</code> a partir do dataframe <code>mtcars</code>.</li>
+</ol>
+
+<p><strong>Resposta:</strong></p>
+
+<hr />
 
 <ol>
 <li></li>
 </ol>
 
-<div data-datacamp-exercise data-height="300" data-encoded="true">eyJsYW5ndWFnZSI6InIiLCJzYW1wbGUiOiIoMSArIHNxcnQoNSkpLzIifQ==</div>
+<pre><code class="language-r">(1 + sqrt(5))/2
+## [1] 1.618034
+</code></pre>
 
 <ol>
 <li></li>
 </ol>
 
-<div data-datacamp-exercise data-height="300" data-encoded="true">eyJsYW5ndWFnZSI6InIiLCJzYW1wbGUiOiIxLzBcbi0xLzAifQ==</div>
+<pre><code class="language-r">1/0
+## [1] Inf
+-1/0
+## [1] -Inf
+</code></pre>
 
 <ol>
 <li></li>
 </ol>
 
-<div data-datacamp-exercise data-height="300" data-encoded="true">eyJsYW5ndWFnZSI6InIiLCJzYW1wbGUiOiIjIE5hTiBcdTAwZTkgbyByZXN1bHRhZG8gZGUgdW1hIG9wZXJhXHUwMGU3XHUwMGUzbyBtYXRlbVx1MDBlMXRpY2EgaW52XHUwMGUxbGlkYS4gU2lnbmlmaWNhIE5vdCBBIE51bWJlclxuMC8wXG4jIE5VTEwgXHUwMGU5IG8gdmF6aW8gZG8gUi4gXHUwMGM5IGNvbW8gc2UgbyBvYmpldG8gblx1MDBlM28gZXhpc3Rpc3NlXG5OVUxMXG5hID0gTlVMTFxuaXMubnVsbChpbnRlZ2VyKGxlbmd0aCA9IDApKSAjIHZlamEgcXVlIHVtIHZldG9yLCBtZXNtbyBzZW0gZWxlbWVudG9zIG5cdTAwZTNvIFx1MDBlOSBOVUxMXG4jIE5BIFx1MDBlOSB1bWEgY29uc3RhbnRlIGxcdTAwZjNnaWNhIGRvIFIuIFNpZ2luaWZpY2EgTm90IEF2YWlsbGFibGUuIE5BIHBvZGUgc2VyIFxuIyBjb252ZXJ0aWRvIHBhcmEgcXVhc2UgdG9kb3Mgb3MgdGlwb3MgZGUgdmV0b3JlcyBkbyBSLiBcdTAwYzkgdXNhZG8gcHJpbmNpcGFsbWVudGUgcGFyYVxuIyBpbmRpY2FyIHZhbG9yZXMgZmFsdGFudGVzLlxuTkFcbiMgSW5mIFx1MDBlOSBzaWduaWZpY2EgaW5maW5pdG8uIFx1MDBjOSBvIHJlc3VsdGFkbyBkZSBvcGVyYVx1MDBlN1x1MDBmNWVzIG1hdGVtXHUwMGUxdGljYXMgY3VqbyBsaW1pdGUgXHUwMGU5IGluZmluaXRvLlxuMS8wXG4xL0luZiJ9</div>
+<pre><code class="language-r"># NaN é o resultado de uma operação matemática inválida. Significa Not A Number
+0/0
+## [1] NaN
+# NULL é o vazio do R. É como se o objeto não existisse
+NULL
+## NULL
+a = NULL
+is.null(integer(length = 0)) # veja que um vetor, mesmo sem elementos não é NULL
+## [1] FALSE
+# NA é uma constante lógica do R. Siginifica Not Availlable. NA pode ser 
+# convertido para quase todos os tipos de vetores do R. É usado principalmente para
+# indicar valores faltantes.
+NA
+## [1] NA
+# Inf é significa infinito. É o resultado de operações matemáticas cujo limite é infinito.
+1/0
+## [1] Inf
+1/Inf
+## [1] 0
+</code></pre>
 
 <p>4.</p>
 
 <p>5.</p>
 
-<div data-datacamp-exercise data-height="300" data-encoded="true">eyJsYW5ndWFnZSI6InIiLCJzYW1wbGUiOiI1ICsgKDMgKiAxMCkgJS8lIDMgPT0gMTUifQ==</div>
+<pre><code class="language-r">5 + (3 * 10) %/% 3 == 15
+## [1] TRUE
+</code></pre>
 
 <ol>
 <li></li>
 </ol>
 
-<div data-datacamp-exercise data-height="300" data-encoded="true">eyJsYW5ndWFnZSI6InIiLCJzYW1wbGUiOiI+IHggPC0gNFxuPiBpZih4ID0gNCkge1xuRXJybzogJz0nIGluZXNwZXJhZG8gaW4gXCJpZih4ID1cIlxuPiAgICdpc3NvIGFxdWkgYXBhcmVjZXUnXG5bMV0gXCJpc3NvIGFxdWkgYXBhcmVjZXVcIlxuPiB9XG5FcnJvOiAnfScgaW5lc3BlcmFkbyBpbiBcIn1cIlxuPiB4XG5bMV0gNCJ9</div>
+<pre><code class="language-r">&gt; x &lt;- 4
+&gt; if(x = 4) {
+Erro: '=' inesperado in &quot;if(x =&quot;
+&gt;   'isso aqui apareceu'
+[1] &quot;isso aqui apareceu&quot;
+&gt; }
+Erro: '}' inesperado in &quot;}&quot;
+&gt; x
+[1] 4
+</code></pre>
 
 <p>7.</p>
 
-<div data-datacamp-exercise data-height="300" data-encoded="true">eyJsYW5ndWFnZSI6InIiLCJzYW1wbGUiOiJ4IDwtIDRcbmlmKHggPT0gNCkge1xuICAnaXNzbyBhcXVpIGFwYXJlY2V1J1xufVxueCJ9</div>
+<pre><code class="language-r">x &lt;- 4
+if(x == 4) {
+  'isso aqui apareceu'
+}
+## [1] &quot;isso aqui apareceu&quot;
+x
+## [1] 4
+</code></pre>
 
 <p>8.</p>
 
-<div data-datacamp-exercise data-height="300" data-encoded="true">eyJsYW5ndWFnZSI6InIiLCJzYW1wbGUiOiJmb3IgKGkgaW4gMTo0KXtcbiAgaWYoaSAlJSAyID09IDApe1xuICAgIHByaW50KHBhc3RlKGksIFwiZWxlZmFudGUocylcIiwgcGFzdGUocmVwKFwiaW5jb21vZGEobSlcIiwgdGltZXMgPSBpKSwgY29sbGFwc2UgPSBcIiBcIiksIFwibXVpdG8gbWFpc1wiKSlcbiAgfSBlbHNlIHtcbiAgIHByaW50KHBhc3RlKGksIFwiZWxlZmFudGUocykgaW5jb21vZGEobSkgbXVpdGEgZ2VudGVcIikpIFxuICB9XG59In0=</div>
+<pre><code class="language-r">for (i in 1:4){
+  if(i %% 2 == 0){
+    print(paste(i, &quot;elefante(s)&quot;, paste(rep(&quot;incomoda(m)&quot;, times = i), collapse = &quot; &quot;), &quot;muito mais&quot;))
+  } else {
+   print(paste(i, &quot;elefante(s) incomoda(m) muita gente&quot;)) 
+  }
+}
+## [1] &quot;1 elefante(s) incomoda(m) muita gente&quot;
+## [1] &quot;2 elefante(s) incomoda(m) incomoda(m) muito mais&quot;
+## [1] &quot;3 elefante(s) incomoda(m) muita gente&quot;
+## [1] &quot;4 elefante(s) incomoda(m) incomoda(m) incomoda(m) incomoda(m) muito mais&quot;
+</code></pre>
 
 <p>9.</p>
 
-<div data-datacamp-exercise data-height="300" data-encoded="true">eyJsYW5ndWFnZSI6InIiLCJzYW1wbGUiOiJ4IDwtIGMoMSwgMjAsIDQwLCA1MCwgNjApIn0=</div>
+<pre><code class="language-r">x &lt;- c(1, 20, 40, 50, 60)
+</code></pre>
 
 <p>10.</p>
 
-<div data-datacamp-exercise data-height="300" data-encoded="true">eyJsYW5ndWFnZSI6InIiLCJzYW1wbGUiOiJ4IDwtIHJ1bmlmKDEwMCkifQ==</div>
+<pre><code class="language-r">x &lt;- runif(100)
+</code></pre>
 
 <p>11.</p>
 
-<div data-datacamp-exercise data-height="300" data-encoded="true">eyJsYW5ndWFnZSI6InIiLCJzYW1wbGUiOiJtZWFuKHgpIn0=</div>
+<pre><code class="language-r">mean(x)
+## [1] 0.4983416
+</code></pre>
 
 <p>12.</p>
 
-<div data-datacamp-exercise data-height="300" data-encoded="true">eyJsYW5ndWFnZSI6InIiLCJzYW1wbGUiOiJ4IDwtIGMocnVuaWYoOTkpLCBOQSlcbm1lYW4oeCwgbmEucm0gPSBUKSJ9</div>
+<pre><code class="language-r">x &lt;- c(runif(99), NA)
+mean(x, na.rm = T)
+## [1] 0.4993858
+</code></pre>
 
 <p>13.</p>
 
-<div data-datacamp-exercise data-height="300" data-encoded="true">eyJsYW5ndWFnZSI6InIiLCJzYW1wbGUiOiJtZWRpYSA8LSBmdW5jdGlvbih4KXtcbiAgaSA8LSAxXG4gIHRhbWFuaG8gPC0gbGVuZ3RoKHgpXG4gIHNvbWEgPC0gMFxuICBmb3IoaSBpbiAxOnRhbWFuaG8pe1xuICAgIHNvbWEgPC0gc29tYSArIHhbaV1cbiAgfVxuICByZXR1cm4oc29tYS90YW1hbmhvKVxufSJ9</div>
+<pre><code class="language-r">media &lt;- function(x){
+  i &lt;- 1
+  tamanho &lt;- length(x)
+  soma &lt;- 0
+  for(i in 1:tamanho){
+    soma &lt;- soma + x[i]
+  }
+  return(soma/tamanho)
+}
+</code></pre>
 
 <p>14.</p>
 
-<div data-datacamp-exercise data-height="300" data-encoded="true">eyJsYW5ndWFnZSI6InIiLCJzYW1wbGUiOiJkYWRvIDwtIGZ1bmN0aW9uKCl7XG4gIHNhbXBsZSgxOjYsIDEpXG59In0=</div>
+<pre><code class="language-r">dado &lt;- function(){
+  sample(1:6, 1)
+}
+</code></pre>
 
 <p>15.</p>
 
-<div data-datacamp-exercise data-height="300" data-encoded="true">eyJsYW5ndWFnZSI6InIiLCJzYW1wbGUiOiJzb21hX2RhZG9zIDwtIGZ1bmN0aW9uKG4pe1xuICBzb21hIDwtIDBcbiAgZm9yKGkgaW4gMTpuKXtcbiAgICBzb21hIDwtIHNvbWEgKyBzYW1wbGUoMTo2LCAxKVxuICB9XG4gIHJldHVybihzb21hKVxufSJ9</div>
+<pre><code class="language-r">soma_dados &lt;- function(n){
+  soma &lt;- 0
+  for(i in 1:n){
+    soma &lt;- soma + sample(1:6, 1)
+  }
+  return(soma)
+}
+</code></pre>
 
 <p>16.</p>
 
-<div data-datacamp-exercise data-height="300" data-encoded="true">eyJsYW5ndWFnZSI6InIiLCJzYW1wbGUiOiJyZXN1bHRhZG9zIDwtIGludGVnZXIobGVuZ3RoID0gMTAwMClcbmZvcihpIGluIDE6MTAwMCl7XG4gIHJlc3VsdGFkb3NbaV0gPC0gc29tYV9kYWRvcygzKVxufVxuaGlzdChyZXN1bHRhZG9zKSJ9</div>
+<pre><code class="language-r">resultados &lt;- integer(length = 1000)
+for(i in 1:1000){
+  resultados[i] &lt;- soma_dados(3)
+}
+hist(resultados)
+</code></pre>
+
+<p><img src="figures//resp16-1.png" alt="plot of chunk resp16" /></p>
 
 
 			<hr>
