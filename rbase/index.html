@@ -551,7 +551,7 @@ Este site foi escrito em R Markdown. Toda vez que aparecer exemplos de código d
 <pre><code class="language-r">knitr::include_graphics(&quot;figures/criar_rmarkdown.png&quot;)
 </code></pre>
 
-<p><img src="figures/criar_rmarkdown.png" alt="plot of chunk unnamed-chunk-21" /></p>
+<p><img src="figures/criar_rmarkdown.png" alt="plot of chunk unnamed-chunk-22" /></p>
 
 <p>Para detalhes sobre como utilizar o R Markdown, leia o  <a href="http://r4ds.had.co.nz/r-markdown.html">r4ds</a> e <a href="http://rmarkdown.rstudio.com/lesson-1.html">o tutorial do RStudio</a>.</p>
 
@@ -1079,7 +1079,7 @@ if(x == 1) {
 if(x == 1) {
   Sys.time()
 }
-## [1] &quot;2017-07-02 17:56:05 UTC&quot;
+## [1] &quot;2017-07-03 23:43:23 UTC&quot;
 </code></pre>
 
 <p>O R só vai executar o que está na expressão dentro das chaves <code>{}</code> se o que estiver dentro dos parênteses <code>()</code> retornar <code>TRUE</code>.</p>
@@ -1344,14 +1344,14 @@ y &lt;- 5 + 2 * x + rnorm(n, sd = 30)
 plot(x, y)
 </code></pre>
 
-<p><img src="figures//unnamed-chunk-65-1.png" alt="plot of chunk unnamed-chunk-65" /></p>
+<p><img src="figures//unnamed-chunk-66-1.png" alt="plot of chunk unnamed-chunk-66" /></p>
 
 <p>O parâmetro <code>type = &quot;l&quot;</code> indica que queremos que os pontos sejam interligados por linhas.</p>
 
 <pre><code class="language-r">plot(x, y, type = &quot;l&quot;)
 </code></pre>
 
-<p><img src="figures//unnamed-chunk-66-1.png" alt="plot of chunk unnamed-chunk-66" /></p>
+<p><img src="figures//unnamed-chunk-67-1.png" alt="plot of chunk unnamed-chunk-67" /></p>
 
 <h3 id="histograma">Histograma</h3>
 
@@ -1365,12 +1365,12 @@ plot(x, y)
 <pre><code class="language-r">hist(rnorm(1000))
 </code></pre>
 
-<p><img src="figures//unnamed-chunk-67-1.png" alt="plot of chunk unnamed-chunk-67" /></p>
+<p><img src="figures//unnamed-chunk-68-1.png" alt="plot of chunk unnamed-chunk-68" /></p>
 
 <pre><code class="language-r">hist(rnorm(1000), breaks = 6)
 </code></pre>
 
-<p><img src="figures//unnamed-chunk-68-1.png" alt="plot of chunk unnamed-chunk-68" /></p>
+<p><img src="figures//unnamed-chunk-69-1.png" alt="plot of chunk unnamed-chunk-69" /></p>
 
 <h3 id="boxplot">Boxplot</h3>
 
@@ -1383,7 +1383,7 @@ plot(x, y)
 <pre><code class="language-r">boxplot(InsectSprays$count, col = &quot;lightgray&quot;)
 </code></pre>
 
-<p><img src="figures//unnamed-chunk-69-1.png" alt="plot of chunk unnamed-chunk-69" /></p>
+<p><img src="figures//unnamed-chunk-70-1.png" alt="plot of chunk unnamed-chunk-70" /></p>
 
 <p>Observe que o argumento <code>col=</code> muda a cor da caixa do boxplot.</p>
 
@@ -1392,7 +1392,7 @@ plot(x, y)
 <pre><code class="language-r">boxplot(count ~ spray, data = InsectSprays, col = &quot;lightgray&quot;)
 </code></pre>
 
-<p><img src="figures//unnamed-chunk-70-1.png" alt="plot of chunk unnamed-chunk-70" /></p>
+<p><img src="figures//unnamed-chunk-71-1.png" alt="plot of chunk unnamed-chunk-71" /></p>
 
 <h3 id="gráfico-de-barras">Gráfico de barras</h3>
 
@@ -1409,7 +1409,7 @@ tabela
 barplot(tabela)
 </code></pre>
 
-<p><img src="figures//unnamed-chunk-71-1.png" alt="plot of chunk unnamed-chunk-71" /></p>
+<p><img src="figures//unnamed-chunk-72-1.png" alt="plot of chunk unnamed-chunk-72" /></p>
 
 <p>Também podemos mapear duas variáveis a um gráfico de barras utilizando tabelas de dupla entrada.</p>
 
@@ -1425,7 +1425,91 @@ barplot(tabela)
 <pre><code class="language-r">barplot(VADeaths)
 </code></pre>
 
-<p><img src="figures//unnamed-chunk-73-1.png" alt="plot of chunk unnamed-chunk-73" /></p>
+<p><img src="figures//unnamed-chunk-74-1.png" alt="plot of chunk unnamed-chunk-74" /></p>
+
+<hr />
+
+<h2 id="exercícios">Exercícios</h2>
+
+<p><strong>Sugestão</strong>: resolva os exercícios em arquivo R Markdown, aproveitando para fazer anotações e registrar suas dúvidas ao longo do caminho.</p>
+
+<hr />
+
+<ol>
+<li>Calculo o número de ouro no R.</li>
+</ol>
+
+<p>Dica: o número de ouro é dado pela expressão $\frac{1 + \sqrt{5}}{2}$.</p>
+
+<hr />
+
+<ol>
+<li>Qual o resultado da divisão de -1 por 0 no R? E de 1 por 0?</li>
+</ol>
+
+<hr />
+
+<ol>
+<li>Quais as diferenças entre <code>NaN</code>, <code>NULL</code>, <code>NA</code> e <code>Inf</code>? Digite expressões que retornam cada um desses resultados.</li>
+</ol>
+
+<hr />
+
+<ol>
+<li>Sem rodar o código, calcule o que a expressão <code>5 + 3 * 10 %/% 3 == 15</code> vai resultar no R. Em seguida, apenas utilizando parênteses, faço a expressão retornar o valore contrário (i.e., se originariamente for <code>TRUE</code>, faça retornar <code>FALSE</code>).</li>
+</ol>
+
+<hr />
+
+<ol>
+<li>Por que o código abaixo retorna erro? Arrume o código para retornar o valor <code>TRUE</code>.</li>
+</ol>
+
+<pre><code class="language-r">x &lt;- 4
+if(x = 4) {
+  TRUE
+}
+## Error: &lt;text&gt;:2:6: unexpected '='
+## 1: x &lt;- 4
+## 2: if(x =
+##         ^
+</code></pre>
+
+<hr />
+
+<ol>
+<li>Usando <code>if</code> e <code>else</code>, escreva um código que retorne a string &ldquo;número&rdquo; caso o valor seja da classe <code>numeric</code> ou <code>integer</code>; a string &ldquo;palavra&rdquo; caso o valor seja da classe <code>character</code>; e <code>NULL</code> caso contrário.</li>
+</ol>
+
+<hr />
+
+<ol>
+<li>Use o <code>for</code> para retornar o valor mínimo do seguinte vetor: <code>vetor &lt;- c(4, 2, 1, 5, 3)</code>. Modifique o seu código para receber vetores de qualquer tamanho.</li>
+</ol>
+
+<hr />
+
+<ol>
+<li>Usando apenas <code>for</code> e a função <code>length()</code>, construa uma função que calcule a média de um vetor número qualquer. Construa uma condição para a função retornar <code>NULL</code> caso o vetor não seja numérico.</li>
+</ol>
+
+<hr />
+
+<ol>
+<li>Rode <code>help(runif)</code> para descobrir o que a função <code>runif()</code> faz. Em seguida, use-a para escrever uma função que retorne um número aleatório inteiro entre 0 e 10 (0 e 10 incluvise).</li>
+</ol>
+
+<hr />
+
+<ol>
+<li>Rode <code>help(sample)</code> para descobrir o que a função <code>sample()</code> faz. Em seguida, use-a para escrever uma função que escolha uma linha aleatoriamente de uma matriz e devolva os seus valores.</li>
+</ol>
+
+<hr />
+
+<ol>
+<li>Rode <code>help(paste)</code> e <code>help(names)</code> para descobrir o que as funções <code>paste()</code> e <code>names()</code> fazem. Em seguida, use-as para escrever um código para gerar a fórmula <code>mpg ~ cyl + disp + hp + drat + wt + qsec + vs + am + gear + carb</code> a partir do dataframe <code>mtcars</code>.</li>
+</ol>
 
 <hr />
 
