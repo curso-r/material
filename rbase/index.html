@@ -551,7 +551,7 @@ Este site foi escrito em R Markdown. Toda vez que aparecer exemplos de código d
 <pre><code class="language-r">knitr::include_graphics(&quot;figures/criar_rmarkdown.png&quot;)
 </code></pre>
 
-<p><img src="figures/criar_rmarkdown.png" alt="plot of chunk unnamed-chunk-22" /></p>
+<p><img src="figures/criar_rmarkdown.png" alt="plot of chunk unnamed-chunk-21" /></p>
 
 <p>Para detalhes sobre como utilizar o R Markdown, leia o  <a href="http://r4ds.had.co.nz/r-markdown.html">r4ds</a> e <a href="http://rmarkdown.rstudio.com/lesson-1.html">o tutorial do RStudio</a>.</p>
 
@@ -1079,7 +1079,7 @@ if(x == 1) {
 if(x == 1) {
   Sys.time()
 }
-## [1] &quot;2017-07-03 23:55:01 UTC&quot;
+## [1] &quot;2017-07-04 00:15:27 UTC&quot;
 </code></pre>
 
 <p>O R só vai executar o que está na expressão dentro das chaves <code>{}</code> se o que estiver dentro dos parênteses <code>()</code> retornar <code>TRUE</code>.</p>
@@ -1344,14 +1344,14 @@ y &lt;- 5 + 2 * x + rnorm(n, sd = 30)
 plot(x, y)
 </code></pre>
 
-<p><img src="figures//unnamed-chunk-66-1.png" alt="plot of chunk unnamed-chunk-66" /></p>
+<p><img src="figures//unnamed-chunk-65-1.png" alt="plot of chunk unnamed-chunk-65" /></p>
 
 <p>O parâmetro <code>type = &quot;l&quot;</code> indica que queremos que os pontos sejam interligados por linhas.</p>
 
 <pre><code class="language-r">plot(x, y, type = &quot;l&quot;)
 </code></pre>
 
-<p><img src="figures//unnamed-chunk-67-1.png" alt="plot of chunk unnamed-chunk-67" /></p>
+<p><img src="figures//unnamed-chunk-66-1.png" alt="plot of chunk unnamed-chunk-66" /></p>
 
 <h3 id="histograma">Histograma</h3>
 
@@ -1365,12 +1365,12 @@ plot(x, y)
 <pre><code class="language-r">hist(rnorm(1000))
 </code></pre>
 
-<p><img src="figures//unnamed-chunk-68-1.png" alt="plot of chunk unnamed-chunk-68" /></p>
+<p><img src="figures//unnamed-chunk-67-1.png" alt="plot of chunk unnamed-chunk-67" /></p>
 
 <pre><code class="language-r">hist(rnorm(1000), breaks = 6)
 </code></pre>
 
-<p><img src="figures//unnamed-chunk-69-1.png" alt="plot of chunk unnamed-chunk-69" /></p>
+<p><img src="figures//unnamed-chunk-68-1.png" alt="plot of chunk unnamed-chunk-68" /></p>
 
 <h3 id="boxplot">Boxplot</h3>
 
@@ -1383,7 +1383,7 @@ plot(x, y)
 <pre><code class="language-r">boxplot(InsectSprays$count, col = &quot;lightgray&quot;)
 </code></pre>
 
-<p><img src="figures//unnamed-chunk-70-1.png" alt="plot of chunk unnamed-chunk-70" /></p>
+<p><img src="figures//unnamed-chunk-69-1.png" alt="plot of chunk unnamed-chunk-69" /></p>
 
 <p>Observe que o argumento <code>col=</code> muda a cor da caixa do boxplot.</p>
 
@@ -1392,7 +1392,7 @@ plot(x, y)
 <pre><code class="language-r">boxplot(count ~ spray, data = InsectSprays, col = &quot;lightgray&quot;)
 </code></pre>
 
-<p><img src="figures//unnamed-chunk-71-1.png" alt="plot of chunk unnamed-chunk-71" /></p>
+<p><img src="figures//unnamed-chunk-70-1.png" alt="plot of chunk unnamed-chunk-70" /></p>
 
 <h3 id="gráfico-de-barras">Gráfico de barras</h3>
 
@@ -1409,7 +1409,7 @@ tabela
 barplot(tabela)
 </code></pre>
 
-<p><img src="figures//unnamed-chunk-72-1.png" alt="plot of chunk unnamed-chunk-72" /></p>
+<p><img src="figures//unnamed-chunk-71-1.png" alt="plot of chunk unnamed-chunk-71" /></p>
 
 <p>Também podemos mapear duas variáveis a um gráfico de barras utilizando tabelas de dupla entrada.</p>
 
@@ -1425,7 +1425,7 @@ barplot(tabela)
 <pre><code class="language-r">barplot(VADeaths)
 </code></pre>
 
-<p><img src="figures//unnamed-chunk-74-1.png" alt="plot of chunk unnamed-chunk-74" /></p>
+<p><img src="figures//unnamed-chunk-73-1.png" alt="plot of chunk unnamed-chunk-73" /></p>
 
 <hr />
 
@@ -1435,29 +1435,25 @@ barplot(tabela)
 
 <hr />
 
-<p><em>1.</em> Calculo o número de ouro no R.</p>
+<p><strong>1.</strong> Calculo o número de ouro no R.</p>
 
 <p>Dica: o número de ouro é dado pela expressão $\frac{1 + \sqrt{5}}{2}$.</p>
 
 <hr />
 
-<p><em>2.</em> Qual o resultado da divisão de 1 por 0 no R? E de -1 por 0?</p>
+<p><strong>2.</strong> Qual o resultado da divisão de 1 por 0 no R? E de -1 por 0?</p>
 
 <hr />
 
-<p><em>3.</em> Quais as diferenças entre <code>NaN</code>, <code>NULL</code>, <code>NA</code> e <code>Inf</code>? Digite expressões que retornam cada um desses resultados.</p>
+<p><strong>3.</strong> Quais as diferenças entre <code>NaN</code>, <code>NULL</code>, <code>NA</code> e <code>Inf</code>? Digite expressões que retornam cada um desses resultados.</p>
 
 <hr />
 
-<ol>
-<li>Sem rodar o código, calcule o que a expressão <code>5 + 3 * 10 %/% 3 == 15</code> vai resultar no R. Em seguida, apenas utilizando parênteses, faço a expressão retornar o valore contrário (i.e., se originariamente for <code>TRUE</code>, faça retornar <code>FALSE</code>).</li>
-</ol>
+<p><strong>4.</strong> Sem rodar o código, calcule o que a expressão <code>5 + 3 * 10 %/% 3 == 15</code> vai resultar no R. Em seguida, apenas utilizando parênteses, faço a expressão retornar o valore contrário (i.e., se originariamente for <code>TRUE</code>, faça retornar <code>FALSE</code>).</p>
 
 <hr />
 
-<ol>
-<li>Por que o código abaixo retorna erro? Arrume o código para retornar o valor <code>TRUE</code>.</li>
-</ol>
+<p><strong>5.</strong> Por que o código abaixo retorna erro? Arrume o código para retornar o valor <code>TRUE</code>.</p>
 
 <pre><code class="language-r">x &lt;- 4
 if(x = 4) {
@@ -1471,39 +1467,27 @@ if(x = 4) {
 
 <hr />
 
-<ol>
-<li>Usando <code>if</code> e <code>else</code>, escreva um código que retorne a string &ldquo;número&rdquo; caso o valor seja da classe <code>numeric</code> ou <code>integer</code>; a string &ldquo;palavra&rdquo; caso o valor seja da classe <code>character</code>; e <code>NULL</code> caso contrário.</li>
-</ol>
+<p><strong>6.</strong> Usando <code>if</code> e <code>else</code>, escreva um código que retorne a string &ldquo;número&rdquo; caso o valor seja da classe <code>numeric</code> ou <code>integer</code>; a string &ldquo;palavra&rdquo; caso o valor seja da classe <code>character</code>; e <code>NULL</code> caso contrário.</p>
 
 <hr />
 
-<ol>
-<li>Use o <code>for</code> para retornar o valor mínimo do seguinte vetor: <code>vetor &lt;- c(4, 2, 1, 5, 3)</code>. Modifique o seu código para receber vetores de qualquer tamanho.</li>
-</ol>
+<p><strong>7.</strong> Use o <code>for</code> para retornar o valor mínimo do seguinte vetor: <code>vetor &lt;- c(4, 2, 1, 5, 3)</code>. Modifique o seu código para receber vetores de qualquer tamanho.</p>
 
 <hr />
 
-<ol>
-<li>Usando apenas <code>for</code> e a função <code>length()</code>, construa uma função que calcule a média de um vetor número qualquer. Construa uma condição para a função retornar <code>NULL</code> caso o vetor não seja numérico.</li>
-</ol>
+<p><strong>8.</strong> Usando apenas <code>for</code> e a função <code>length()</code>, construa uma função que calcule a média de um vetor número qualquer. Construa uma condição para a função retornar <code>NULL</code> caso o vetor não seja numérico.</p>
 
 <hr />
 
-<ol>
-<li>Rode <code>help(runif)</code> para descobrir o que a função <code>runif()</code> faz. Em seguida, use-a para escrever uma função que retorne um número aleatório inteiro entre 0 e 10 (0 e 10 incluvise).</li>
-</ol>
+<p><strong>9.</strong> Rode <code>help(runif)</code> para descobrir o que a função <code>runif()</code> faz. Em seguida, use-a para escrever uma função que retorne um número aleatório inteiro entre 0 e 10 (0 e 10 incluvise).</p>
 
 <hr />
 
-<ol>
-<li>Rode <code>help(sample)</code> para descobrir o que a função <code>sample()</code> faz. Em seguida, use-a para escrever uma função que escolha uma linha aleatoriamente de uma matriz e devolva os seus valores.</li>
-</ol>
+<p><strong>10.</strong> Rode <code>help(sample)</code> para descobrir o que a função <code>sample()</code> faz. Em seguida, use-a para escrever uma função que escolha uma linha aleatoriamente de uma matriz e devolva os seus valores.</p>
 
 <hr />
 
-<ol>
-<li>Rode <code>help(paste)</code> e <code>help(names)</code> para descobrir o que as funções <code>paste()</code> e <code>names()</code> fazem. Em seguida, use-as para escrever um código para gerar a fórmula <code>mpg ~ cyl + disp + hp + drat + wt + qsec + vs + am + gear + carb</code> a partir do dataframe <code>mtcars</code>.</li>
-</ol>
+<p><em>11.</em> Rode <code>help(paste)</code> e <code>help(names)</code> para descobrir o que as funções <code>paste()</code> e <code>names()</code> fazem. Em seguida, use-as para escrever um código para gerar a fórmula <code>mpg ~ cyl + disp + hp + drat + wt + qsec + vs + am + gear + carb</code> a partir do dataframe <code>mtcars</code>.</p>
 
 <hr />
 
@@ -1511,9 +1495,7 @@ if(x = 4) {
 
 <hr />
 
-<ol>
-<li>Calculo o número de ouro no R.</li>
-</ol>
+<p><strong>1.</strong> Calculo o número de ouro no R.</p>
 
 <p>Dica: o número de ouro é dado pela expressão $\frac{1 + \sqrt{5}}{2}$.</p>
 
@@ -1525,9 +1507,7 @@ if(x = 4) {
 
 <hr />
 
-<ol>
-<li>Qual o resultado da divisão de 1 por 0 no R? E de -1 por 0?</li>
-</ol>
+<p><strong>2.</strong> Qual o resultado da divisão de 1 por 0 no R? E de -1 por 0?</p>
 
 <p><strong>Resposta:</strong></p>
 
@@ -1541,9 +1521,7 @@ if(x = 4) {
 
 <hr />
 
-<ol>
-<li>Quais as diferenças entre <code>NaN</code>, <code>NULL</code>, <code>NA</code> e <code>Inf</code>? Digite expressões que retornam cada um desses resultados.</li>
-</ol>
+<p><strong>3.</strong> Quais as diferenças entre <code>NaN</code>, <code>NULL</code>, <code>NA</code> e <code>Inf</code>? Digite expressões que retornam cada um desses resultados.</p>
 
 <p><strong>Resposta:</strong></p>
 
@@ -1586,9 +1564,7 @@ as.numeric(c(&quot;1&quot;, &quot;2&quot;, &quot;a&quot;))
 
 <hr />
 
-<ol>
-<li>Sem rodar o código, calcule o que a expressão <code>5 + 3 * 10 %/% 3 == 15</code> vai resultar no R. Em seguida, apenas utilizando parênteses, faço a expressão retornar o valore contrário (i.e., se originariamente for <code>TRUE</code>, faça retornar <code>FALSE</code>).</li>
-</ol>
+<p><strong>4.</strong> Sem rodar o código, calcule o que a expressão <code>5 + 3 * 10 %/% 3 == 15</code> vai resultar no R. Em seguida, apenas utilizando parênteses, faço a expressão retornar o valore contrário (i.e., se originariamente for <code>TRUE</code>, faça retornar <code>FALSE</code>).</p>
 
 <p><strong>Resposta:</strong></p>
 
@@ -1600,9 +1576,7 @@ as.numeric(c(&quot;1&quot;, &quot;2&quot;, &quot;a&quot;))
 
 <hr />
 
-<ol>
-<li>Por que o código abaixo retorna erro? Arrume o código para retornar o valor <code>TRUE</code>.</li>
-</ol>
+<p><strong>5.</strong> Por que o código abaixo retorna erro? Arrume o código para retornar o valor <code>TRUE</code>.</p>
 
 <pre><code class="language-r">x &lt;- 4
 if(x = 4) {
@@ -1616,212 +1590,86 @@ if(x = 4) {
 
 <p><strong>Resposta:</strong></p>
 
-<hr />
-
-<ol>
-<li>Usando <code>if</code> e <code>else</code>, escreva um código que retorne a string &ldquo;número&rdquo; caso o valor seja da classe <code>numeric</code> ou <code>integer</code>; a string &ldquo;palavra&rdquo; caso o valor seja da classe <code>character</code>; e <code>NULL</code> caso contrário.</li>
-</ol>
-
-<p><strong>Resposta:</strong></p>
-
-<hr />
-
-<ol>
-<li>Use o <code>for</code> para retornar o valor mínimo do seguinte vetor: <code>vetor &lt;- c(4, 2, 1, 5, 3)</code>. Modifique o seu código para receber vetores de qualquer tamanho.</li>
-</ol>
-
-<p><strong>Resposta:</strong></p>
-
-<hr />
-
-<ol>
-<li>Usando apenas <code>for</code> e a função <code>length()</code>, construa uma função que calcule a média de um vetor número qualquer. Construa uma condição para a função retornar <code>NULL</code> caso o vetor não seja numérico.</li>
-</ol>
-
-<p><strong>Resposta:</strong></p>
-
-<hr />
-
-<ol>
-<li>Rode <code>help(runif)</code> para descobrir o que a função <code>runif()</code> faz. Em seguida, use-a para escrever uma função que retorne um número aleatório inteiro entre 0 e 10 (0 e 10 incluvise).</li>
-</ol>
-
-<p><strong>Resposta:</strong></p>
-
-<hr />
-
-<ol>
-<li>Rode <code>help(sample)</code> para descobrir o que a função <code>sample()</code> faz. Em seguida, use-a para escrever uma função que escolha uma linha aleatoriamente de uma matriz e devolva os seus valores.</li>
-</ol>
-
-<p><strong>Resposta:</strong></p>
-
-<hr />
-
-<ol>
-<li>Rode <code>help(paste)</code> e <code>help(names)</code> para descobrir o que as funções <code>paste()</code> e <code>names()</code> fazem. Em seguida, use-as para escrever um código para gerar a fórmula <code>mpg ~ cyl + disp + hp + drat + wt + qsec + vs + am + gear + carb</code> a partir do dataframe <code>mtcars</code>.</li>
-</ol>
-
-<p><strong>Resposta:</strong></p>
-
-<hr />
-
-<ol>
-<li></li>
-</ol>
-
-<pre><code class="language-r">(1 + sqrt(5))/2
-## [1] 1.618034
-</code></pre>
-
-<ol>
-<li></li>
-</ol>
-
-<pre><code class="language-r">1/0
-## [1] Inf
--1/0
-## [1] -Inf
-</code></pre>
-
-<ol>
-<li></li>
-</ol>
-
-<pre><code class="language-r"># NaN é o resultado de uma operação matemática inválida. Significa Not A Number
-0/0
-## [1] NaN
-# NULL é o vazio do R. É como se o objeto não existisse
-NULL
-## NULL
-a = NULL
-is.null(integer(length = 0)) # veja que um vetor, mesmo sem elementos não é NULL
-## [1] FALSE
-# NA é uma constante lógica do R. Siginifica Not Availlable. NA pode ser 
-# convertido para quase todos os tipos de vetores do R. É usado principalmente para
-# indicar valores faltantes.
-NA
-## [1] NA
-# Inf é significa infinito. É o resultado de operações matemáticas cujo limite é infinito.
-1/0
-## [1] Inf
-1/Inf
-## [1] 0
-</code></pre>
-
-<p>4.</p>
-
-<p>5.</p>
-
-<pre><code class="language-r">5 + (3 * 10) %/% 3 == 15
-## [1] TRUE
-</code></pre>
-
-<ol>
-<li></li>
-</ol>
-
-<pre><code class="language-r">&gt; x &lt;- 4
-&gt; if(x = 4) {
-Erro: '=' inesperado in &quot;if(x =&quot;
-&gt;   'isso aqui apareceu'
-[1] &quot;isso aqui apareceu&quot;
-&gt; }
-Erro: '}' inesperado in &quot;}&quot;
-&gt; x
-[1] 4
-</code></pre>
-
-<p>7.</p>
+<p>A expressão <code>x = 4</code> está tentando atribuir o valor 4 ao objeto <code>x</code> dentro do if, o que não é permitido pois o controlador <code>if</code> só aceita valores lógicos. Para corrigir o código e fazê-lo retornar <code>TRUE</code>, basta trocar <code>=</code> por <code>==</code>.</p>
 
 <pre><code class="language-r">x &lt;- 4
 if(x == 4) {
-  'isso aqui apareceu'
+  TRUE
 }
-## [1] &quot;isso aqui apareceu&quot;
-x
-## [1] 4
+## [1] TRUE
 </code></pre>
 
-<p>8.</p>
+<hr />
 
-<pre><code class="language-r">for (i in 1:4){
-  if(i %% 2 == 0){
-    print(paste(i, &quot;elefante(s)&quot;, paste(rep(&quot;incomoda(m)&quot;, times = i), collapse = &quot; &quot;), &quot;muito mais&quot;))
-  } else {
-   print(paste(i, &quot;elefante(s) incomoda(m) muita gente&quot;)) 
+<p><strong>6.</strong> Usando <code>if</code> e <code>else</code>, escreva um código que retorne a string &ldquo;número&rdquo; caso o objeto <code>x</code> seja da classe <code>numeric</code> ou <code>integer</code>; a string &ldquo;palavra&rdquo; caso o objeto seja da classe <code>character</code>; e <code>NULL</code> caso contrário.</p>
+
+<p><strong>Resposta:</strong></p>
+
+<pre><code class="language-r">x &lt;- 1
+# x &lt;- 1L
+# x &lt;- &quot;1&quot;
+
+if(is.numeric(x)) {
+  &quot;número&quot;
+} else if(is.character(x)) {
+  &quot;palavra&quot;
+} else { 
+  NULL
+}
+## [1] &quot;número&quot;
+</code></pre>
+
+<p>Note que a função <code>is.numeric()</code> retorna <code>TRUE</code> para as classes <code>integer</code> e <code>numeric</code>.</p>
+
+<hr />
+
+<p><strong>7.</strong> Use o <code>for</code> para retornar o valor mínimo do seguinte vetor: <code>vetor &lt;- c(4, 2, 1, 5, 3)</code>. Modifique o seu código para receber vetores de qualquer tamanho.</p>
+
+<p><strong>Resposta:</strong></p>
+
+<pre><code class="language-r">
+vetor &lt;- c(4, 2, 1, 5, 3)
+minimo &lt;- Inf
+
+for(i in 1:5) {
+  
+  if(minimo &gt; vetor[i]) {
+    minimo &lt;- vetor[i]
   }
+  
 }
-## [1] &quot;1 elefante(s) incomoda(m) muita gente&quot;
-## [1] &quot;2 elefante(s) incomoda(m) incomoda(m) muito mais&quot;
-## [1] &quot;3 elefante(s) incomoda(m) muita gente&quot;
-## [1] &quot;4 elefante(s) incomoda(m) incomoda(m) incomoda(m) incomoda(m) muito mais&quot;
+
+minimo
+## [1] 1
 </code></pre>
 
-<p>9.</p>
+<p><strong>Observação</strong>: o R já possui a função <code>min()</code> para calcular o mínimo de um conjunto de valores.</p>
 
-<pre><code class="language-r">x &lt;- c(1, 20, 40, 50, 60)
-</code></pre>
+<hr />
 
-<p>10.</p>
+<p><strong>8.</strong> Usando apenas <code>for</code> e a função <code>length()</code>, construa uma função que calcule a média de um vetor número qualquer. Construa uma condição para a função retornar <code>NULL</code> caso o vetor não seja numérico.</p>
 
-<pre><code class="language-r">x &lt;- runif(100)
-</code></pre>
+<p><strong>Resposta:</strong></p>
 
-<p>11.</p>
+<hr />
 
-<pre><code class="language-r">mean(x)
-## [1] 0.4983416
-</code></pre>
+<p><strong>9.</strong> Rode <code>help(runif)</code> para descobrir o que a função <code>runif()</code> faz. Em seguida, use-a para escrever uma função que retorne um número aleatório inteiro entre 0 e 10 (0 e 10 incluvise).</p>
 
-<p>12.</p>
+<p><strong>Resposta:</strong></p>
 
-<pre><code class="language-r">x &lt;- c(runif(99), NA)
-mean(x, na.rm = T)
-## [1] 0.4993858
-</code></pre>
+<hr />
 
-<p>13.</p>
+<p><strong>10.</strong> Rode <code>help(sample)</code> para descobrir o que a função <code>sample()</code> faz. Em seguida, use-a para escrever uma função que escolha uma linha aleatoriamente de uma matriz e devolva os seus valores.</p>
 
-<pre><code class="language-r">media &lt;- function(x){
-  i &lt;- 1
-  tamanho &lt;- length(x)
-  soma &lt;- 0
-  for(i in 1:tamanho){
-    soma &lt;- soma + x[i]
-  }
-  return(soma/tamanho)
-}
-</code></pre>
+<p><strong>Resposta:</strong></p>
 
-<p>14.</p>
+<hr />
 
-<pre><code class="language-r">dado &lt;- function(){
-  sample(1:6, 1)
-}
-</code></pre>
+<p><strong>11.</strong> Rode <code>help(paste)</code> e <code>help(names)</code> para descobrir o que as funções <code>paste()</code> e <code>names()</code> fazem. Em seguida, use-as para escrever um código para gerar a fórmula <code>mpg ~ cyl + disp + hp + drat + wt + qsec + vs + am + gear + carb</code> a partir do dataframe <code>mtcars</code>.</p>
 
-<p>15.</p>
+<p><strong>Resposta:</strong></p>
 
-<pre><code class="language-r">soma_dados &lt;- function(n){
-  soma &lt;- 0
-  for(i in 1:n){
-    soma &lt;- soma + sample(1:6, 1)
-  }
-  return(soma)
-}
-</code></pre>
-
-<p>16.</p>
-
-<pre><code class="language-r">resultados &lt;- integer(length = 1000)
-for(i in 1:1000){
-  resultados[i] &lt;- soma_dados(3)
-}
-hist(resultados)
-</code></pre>
-
-<p><img src="figures//resp16-1.png" alt="plot of chunk resp16" /></p>
+<hr />
 
 
 			<hr>
