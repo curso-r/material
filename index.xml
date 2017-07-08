@@ -7,10 +7,20 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>pt-br</language>
     <copyright>Disponível sobre Licença MIT</copyright>
-    <lastBuildDate>Tue, 04 Jul 2017 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 08 Jul 2017 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Stringr</title>
+      <link>/stringr/</link>
+      <pubDate>Sat, 08 Jul 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/stringr/</guid>
+      <description>Variáveis de texto são muito comuns nos bancos de dados e, geralmente, dão bastante trabalho para serem manipuladas. É muito comum encontrarmos colunas com categorias não padronizadas, como, por exemplo, uma variável Estado com &amp;ldquo;SP&amp;rdquo;, &amp;ldquo;sp&amp;rdquo;, &amp;ldquo;Sao Paulo&amp;rdquo;, &amp;ldquo;São Paulo&amp;rdquo; etc, todas indicando o mesmo estado.
+O R possui várias funções para manipular textos (ou strings). No entanto, as funções do base não possuem uma interface consistente e cada uma tem a sua forma de passar os parâmetros, dificultando a programação durante a análise.</description>
+    </item>
     
     <item>
       <title>Introdução</title>
@@ -88,16 +98,6 @@ Felizmente, depois de aprender a usar o tidyverse você não terá mais esse pro
       <guid>/pipe/</guid>
       <description>Pipe %&amp;gt;% As duas linhas abaixo são equivalentes:
 f(x, y) x %&amp;gt;% f(y)  O operador %&amp;gt;% (pipe ) usa o resultado do seu lado esquerdo como primeiro argumento da funçăo do lado direito. Ele foi uma das grandes revoluções recentes do R, tornando a leitura de códigos mais lógica, fácil e compreensível. Este operador foi introduzido por Stefan Milton Bache no pacote magrittr, e já existem diversos pacotes construidos para facilitar a sua utilizaçăo.</description>
-    </item>
-    
-    <item>
-      <title>Stringr</title>
-      <link>/stringr/</link>
-      <pubDate>Fri, 03 Feb 2017 00:00:00 +0000</pubDate>
-      
-      <guid>/stringr/</guid>
-      <description>Variáveis do tipo texto são muito comuns nos bancos de dados e geralmente são colunas que dão bastante trabalho para serem manipuladas. É muito comun encontrar bancos de dados em que os textos de uma coluna não estão padronizados, por exemplo, uma coluna Estado com &amp;ldquo;SP&amp;rdquo;, &amp;ldquo;sp&amp;rdquo;, &amp;ldquo;Sao Paulo&amp;rdquo;, &amp;ldquo;São Paulo&amp;rdquo; etc, todas as variações indicando o mesmo estado.
-Para manipular esses textos, o R possui diversas funções para manipular textos.</description>
     </item>
     
     <item>
