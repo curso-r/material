@@ -636,6 +636,8 @@ str_detect(&quot;sao paulo sp&quot;, pattern = &quot;paulo$&quot;)
 <p>A lista de possibilidades com expressões regulares é extensa.
 Um bom lugar para testar o funcionamento das regex é o <a href="https://regex101.com/">regex101</a>.</p>
 
+<hr />
+
 <h2 id="funções-avançadas">Funções avançadas</h2>
 
 <p>Agora que já vimos as funções básicas do <code>stringr</code> e aprendemos um pouco de regex, vamos às funções mais avançadas. Basicamente, essas funções buscarão <code>patterns</code> em um vetor de <em>strings</em> e farão alguma coisa quando encontrá-lo.</p>
@@ -872,9 +874,14 @@ str_subset(frases, 'd[eo]')
 
 <hr />
 
-<pre><code class="language-r">library(tidyverse)
-## Error in library(tidyverse): there is no package called 'tidyverse'
-library(stringr)
+<pre><code>## 
+## Attaching package: 'magrittr'
+## The following object is masked from 'package:tidyr':
+## 
+##     extract
+## The following object is masked from 'package:purrr':
+## 
+##     set_names
 </code></pre>
 
 <h2 id="respostas">Respostas</h2>
@@ -971,7 +978,9 @@ glue(&quot;0{1:length(s)} - {s}&quot;)
 ## Error in glue(&quot;0{1:length(s)} - {s}&quot;): could not find function &quot;glue&quot;
 </code></pre>
 
-<h2 id="para-mais-informações-sobre-o-pacote-glue-confira-este-post-http-curso-r-com-blog-2017-04-17-2017-04-08-glue">Para mais informações sobre o pacote <code>glue</code>, confira <a href="http://curso-r.com/blog/2017/04/17/2017-04-08-glue/">este post</a>.</h2>
+<p>Para mais informações sobre o pacote <code>glue</code>, confira <a href="http://curso-r.com/blog/2017/04/17/2017-04-08-glue/">este post</a>.</p>
+
+<hr />
 
 <p><strong>3.</strong> Crie uma regex que capture múltiplas versões da palavra &lsquo;casa&rsquo;. Ela deve funcionar com as palavras &lsquo;Casa&rsquo;, &lsquo;CASA&rsquo;, &lsquo;CaSa&rsquo;, &lsquo;CAsa&rsquo;. Teste-a usando a função <code>str_detect()</code>.</p>
 
