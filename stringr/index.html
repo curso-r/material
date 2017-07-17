@@ -390,6 +390,8 @@ surgiu um novo pacote <code>stringi</code>, com sintaxe similar ao <code>stringr
 que decidiu reescrever o <code>stringr</code> como um <em>wrapper</em> do <code>stringi</code>.
 Veja <a href="https://github.com/tidyverse/stringr/blob/master/NEWS.md">essa página</a> para detalhes.</p>
 
+<hr />
+
 <h2 id="conceitos-básicos">Conceitos básicos</h2>
 
 <p>Todas as funções do <code>stringr</code> começam com o prefixo <code>str_</code>. Isso ajuda na hora de
@@ -499,6 +501,8 @@ str_to_title(s)
 </code></pre>
 
 <p>Essas são as funções mais simples do pacote <code>stringr</code> e não exigem nenhum conhecimento de <strong>expressões regulares</strong>. Note que nenhuma delas possui o parâmetro <code>pattern</code>. Você verá como especificar esse parâmetro nas próximas seções.</p>
+
+<hr />
 
 <h2 id="expressões-regulares">Expressões Regulares</h2>
 
@@ -624,7 +628,7 @@ str_detect(&quot;sao paulo sp&quot;, pattern = &quot;paulo$&quot;)
 
 <ul>
 <li>Use <code>abjutils::rm_accent()</code> para retirar os acentos de um texto.</li>
-<li>Use <code>|</code> para opções, por exemplo, <code>desfavor|desprov</code> reconhece tanto &ldquo;desfavorável&rdquo; quanto &ldquo;desprovido&rdquo;</li>
+<li>Use <code>|</code> para opções. Por exemplo, <code>desfavor|desprov</code> reconhece tanto &ldquo;desfavorável&rdquo; quanto &ldquo;desprovido&rdquo;</li>
 <li>O código <code>\n</code> pula linha, <code>\f</code> é final da página, <code>\t</code> é tab. Use <code>\</code> para transformar caracteres especiais em literais.</li>
 <li>Use as funções <code>tolower()</code> e <code>toupper()</code> para mudar o case de uma <em>string</em>.</li>
 </ul>
@@ -796,43 +800,53 @@ str_subset(frases, 'd[eo]')
 ## [1] &quot;a roupa do rei&quot; &quot;de roma&quot;
 </code></pre>
 
+<hr />
+
 <h2 id="exercícios">Exercícios</h2>
 
-<p><strong>1.</strong> Faça uma regex que capture múltiplas versões da palavra &lsquo;casa&rsquo;. Ela deve funcionar
-com as palavras &lsquo;Casa&rsquo;, &lsquo;CASA&rsquo;, &lsquo;CaSa&rsquo;, &lsquo;CAsa&rsquo;. Teste-a usando a função <code>str_detect</code>.</p>
+<p><strong>1.</strong> O CPF é um número de 11 dígitos, por exemplo: 54491651884. No entanto para facilitar a visualização costumamos mostrá-lo com separadores a cada 3 casas: 544.916.518-84. Crie uma função que transforma um número de 11 dígitos em uma string com as separações, como um CPF.</p>
 
-<pre><code class="language-r">palavras &lt;- c('Casa', 'CASA', 'CaSa', 'CAsa')
+<hr />
+
+<p><strong>2.</strong> Transforme o vetor de <em>strings</em> abaixo em <code>&quot;01 - Alto&quot; &quot;02 - Médio&quot; &quot;03 - Baixo&quot;</code>.</p>
+
+<pre><code class="language-r">s &lt;- c('Alto', 'Médio', 'Baixo')
 </code></pre>
 
-<p><strong>2.</strong> Imagine que você possui a seguinte string que é a parte final de uma URL:</p>
+<hr />
+
+<p><strong>3.</strong> Crie uma regex que capture múltiplas versões da palavra &lsquo;casa&rsquo;. Ela deve funcionar com as palavras &lsquo;Casa&rsquo;, &lsquo;CASA&rsquo;, &lsquo;CaSa&rsquo;, &lsquo;CAsa&rsquo;. Teste-a usando a função <code>str_detect()</code>.</p>
+
+<pre><code class="language-r">s &lt;- c('Casa', 'CASA', 'CaSa', 'CAsa')
+</code></pre>
+
+<hr />
+
+<p><strong>4.</strong> Imagine que a seguinte <em>string</em> é a parte final de uma URL.</p>
 
 <ul>
 <li><code>/ac/rio-branco/xpto-xyz-1-0-1fds2396-5</code></li>
 </ul>
 
-<p>Você precisa transformá-la em &lsquo;AC - Rio Branco&rsquo;. <strong>Dica</strong>: Use a função <code>str_split</code>.</p>
+<p>Transforme-a em &ldquo;AC - Rio Branco&rdquo; utilizando a função <code>str_split()</code>.</p>
 
 <pre><code class="language-r">url &lt;- c('/ac/rio-branco/xpto-xyz-1-0-1fds2396-5')
 </code></pre>
 
-<p><strong>3.</strong> Você possui o seguinte vetor de caracteres: <code>x &lt;- c('Alto', 'Médio', 'Baixo')</code>. A partir desse vetor,
-crie um vetor com os valores `&lsquo;03 - Alto&rsquo;, &lsquo;02 - Médio&rsquo; e &lsquo;03 - Baixo&rsquo;.</p>
+<hr />
 
-<p><strong>4.</strong> Crie uma função que retorna <code>TRUE</code> quando a string é um <a href="https://pt.wikipedia.org/wiki/Pal%C3%ADndromo">palíndromo</a> e <code>FALSO</code> caso não seja.
-<em>Palíndromo</em> é uma sequência que é lida da mesma forma tanto da direita pra esquerda quanto
-da esquerda para a direita. O nome &lsquo;Ana&rsquo;, por exemplo, é um palíndromo.</p>
+<p><strong>5.</strong> Crie uma função que retorna <code>TRUE</code> quando a string é um <a href="https://pt.wikipedia.org/wiki/Pal%C3%ADndromo">palíndromo</a> e <code>FALSO</code> caso não seja.</p>
 
-<p><strong>5.</strong> De acordo com as regras da língua portuguesa, antes de “P” ou “B” devemos usar a letra “M”. Em outras palavras, com outras consoantes, usamos a letra “N”. Suponha que você tem o seguinte
-texto com erros gramaticais.</p>
+<hr />
 
-<pre><code class="language-r">texto &lt;- 'Nós chamamos os bonbeiros quando começou o incêndio.'
+<p><strong>6.</strong> De acordo com as regras da língua portuguesa, antes de “p” ou “b” devemos usar a letra “m”. Em outras palavras, com outras consoantes, usamos a letra “N”. Suponha que você tem o seguinte texto com erros gramaticais:</p>
+
+<pre><code class="language-r">texto &lt;- 'Nós chamamos os bonbeiros quando começou o incêmdio.'
 </code></pre>
 
-<p>Crie uma função para corrigí-lo.</p>
+<p>Crie uma função para corrigi-lo.</p>
 
-<p><strong>6.</strong> O CPF é um número de 11 dígitos, por exemplo: 54491651884. No entanto para facilitar
-a visualização costumamos mostrá-lo com separadores a cada 3 casas: 544.916.518-84.
-Crie uma função que transforma um número de 11 dígitos em uma string com as separações, como um CPF.</p>
+<hr />
 
 <p><strong>7.</strong> Considere o seguinte texto</p>
 
@@ -841,18 +855,291 @@ Crie uma função que transforma um número de 11 dígitos em uma string com as 
 
 <p>Extraia todas as combinações da função <code>ymd</code>, sem repetições.</p>
 
-<p><strong>8.</strong> Considere os textos abaixo</p>
+<hr />
 
-<pre><code class="language-r">txts &lt;- c(
-  'o produto é muito bom',
-  'o produto não é bom',
-  'o produto não é muito bom',
-  'o produto não é ruim',
-  'o produto não é não bom'
+<p><strong>8.</strong> Considere as frases abaixo</p>
+
+<pre><code class="language-r">s &lt;- c(
+  'O produto é muito bom.',
+  'O produto não é bom.',
+  'O produto não é muito bom.',
+  'O produto não é ruim.',
+  'O produto não é não bom.'
 )
 </code></pre>
 
-<p>Crie uma regra para identificar se o texto refere-se a um feedback positivo ou negativo sobre o produto (considera não bom = ruim e vice-versa). Retorne um vetor lógico que vale <code>TRUE</code> se o feedback é positivo e <code>FALSE</code> caso contrário.</p>
+<p>Crie uma regra para identificar se o texto refere-se a um feedback positivo ou negativo sobre o produto (considere não bom = ruim e não ruim = bom). Retorne um vetor lógico que vale <code>TRUE</code> se o feedback é positivo e <code>FALSE</code> caso contrário.</p>
+
+<hr />
+
+<pre><code class="language-r">library(tidyverse)
+## Error in library(tidyverse): there is no package called 'tidyverse'
+library(stringr)
+</code></pre>
+
+<h2 id="respostas">Respostas</h2>
+
+<div class='admonition note'>
+<p class='admonition-title'>
+Nota
+</p>
+<p>
+Não há apenas uma maneira de resolver os exercícios. Você pode encontrar soluções diferentes das nossas, algumas vezes mais eficientes, outras vezes menos. Quando estiver fazendo suas análises, tente buscar o equilíbrio entre eficiência e praticidade. Economizar 1 hora com a execução do código pode não valer a pena se você demorou 2 horas a mais para programá-lo.
+</p>
+</div>
+
+<hr />
+
+<p><strong>1.</strong> O CPF é um número de 11 dígitos, por exemplo: 54491651884. No entanto para facilitar a visualização costumamos mostrá-lo com separadores a cada 3 casas: 544.916.518-84. Crie uma função que transforma um número de 11 dígitos em uma string com as separações, como um CPF.</p>
+
+<pre><code class="language-r">
+# Sem regex
+
+formata_CPF &lt;- function(num) {
+  
+  if(str_count(num) != 11) {
+    stop(&quot;Número inválido!&quot;)
+  }
+  
+  # Concatemos cada parte do número, interpolando
+  # com os pontos e o traço.
+  
+  s &lt;- str_c(
+    str_sub(num, start = 1, end = 3),
+    &quot;.&quot;,
+    str_sub(num, start = 4, end = 6),
+    &quot;.&quot;,
+    str_sub(num, start = 7, end = 9),
+    &quot;-&quot;,
+    str_sub(num, start = 10, end = 11)
+  )
+  
+}
+
+# Com regex
+
+formata_CPF &lt;- function(num) {
+  
+  if(str_count(num) != 11) {
+    stop(&quot;Número inválido!&quot;)
+  }
+  
+  str_replace(string = num, 
+              pattern = &quot;([0-9]{3})([0-9]{3})([0-9]{3})&quot;, 
+              replacement = &quot;\\1.\\2.\\3-&quot;)
+}
+
+</code></pre>
+
+<p>A função <code>str_replace()</code> faz o seguinte:</p>
+
+<ul>
+<li>O <code>pattern=</code> procurará um padrão de 9 números:
+
+<ul>
+<li>O primeiro <code>([0-9]{3})</code> pega os três primeiros números.</li>
+<li>O segundo <code>([0-9]{3})</code> pega os três próximos números (quarto ao sexto).</li>
+<li>O terceiro <code>([0-9]{3})</code> pega os três números seguintes (sétimo ao nono).</li>
+</ul></li>
+<li>O <code>replacement=</code> substituirá esses 9 números pela <em>string</em> formada por:
+
+<ul>
+<li><code>\\1</code>, a expressão dada pelo primeiro parêntese do <code>pattern=</code>, isto é, os três primeiros números.</li>
+<li><code>.</code>, o primeiro ponto.</li>
+<li><code>\\2</code>,  a expressão dada pelo segundo parêntese do <code>pattern=</code>, isto é, os três próximos números (quarto ao sexto).</li>
+<li><code>.</code>, o segundo ponto.</li>
+<li><code>\\3</code>, a expressão dada pelo terceiro parêntese do <code>pattern=</code>, isto é, os três números seguintes (sétimo ao nono).</li>
+<li><code>-</code>, o traço.
+<br /></li>
+</ul></li>
+</ul>
+
+<hr />
+
+<p><strong>2.</strong> Transforme o vetor de <em>strings</em> abaixo em <code>&quot;01 - Alto&quot; &quot;02 - Médio&quot; &quot;03 - Baixo&quot;</code>.</p>
+
+<pre><code class="language-r">s &lt;- c('Alto', 'Médio', 'Baixo')
+
+# Usando str_c()
+
+str_c(&quot;0&quot;, 1:length(s), &quot; - &quot;, s, sep = &quot;&quot;)
+## [1] &quot;01 - Alto&quot;  &quot;02 - Médio&quot; &quot;03 - Baixo&quot;
+
+# Usando o pacote glue
+
+glue(&quot;0{1:length(s)} - {s}&quot;)
+## Error in glue(&quot;0{1:length(s)} - {s}&quot;): could not find function &quot;glue&quot;
+</code></pre>
+
+<h2 id="para-mais-informações-sobre-o-pacote-glue-confira-este-post-http-curso-r-com-blog-2017-04-17-2017-04-08-glue">Para mais informações sobre o pacote <code>glue</code>, confira <a href="http://curso-r.com/blog/2017/04/17/2017-04-08-glue/">este post</a>.</h2>
+
+<p><strong>3.</strong> Crie uma regex que capture múltiplas versões da palavra &lsquo;casa&rsquo;. Ela deve funcionar com as palavras &lsquo;Casa&rsquo;, &lsquo;CASA&rsquo;, &lsquo;CaSa&rsquo;, &lsquo;CAsa&rsquo;. Teste-a usando a função <code>str_detect()</code>.</p>
+
+<pre><code class="language-r">s &lt;- c('Casa', 'CASA', 'CaSa', 'CAsa')
+
+str_detect(s, &quot;[CcAaSsAa]&quot;)
+## [1] TRUE TRUE TRUE TRUE
+str_detect(s, &quot;[Cc][Aa][Ss][Aa]&quot;)
+## [1] TRUE TRUE TRUE TRUE
+</code></pre>
+
+<hr />
+
+<p><strong>4.</strong> Imagine que a seguinte <em>string</em> é a parte final de uma URL.</p>
+
+<ul>
+<li><code>/ac/rio-branco/xpto-xyz-1-0-1fds2396-5</code></li>
+</ul>
+
+<p>Transforme-a em &ldquo;AC - Rio Branco&rdquo; utilizando a função <code>str_split()</code>.</p>
+
+<pre><code class="language-r">url &lt;- c('/ac/rio-branco/xpto-xyz-1-0-1fds2396-5')
+
+UF &lt;- url %&gt;% 
+  str_sub(start = 2) %&gt;% 
+  str_split(&quot;[/]&quot;, n = 2, simplify = TRUE) %&gt;% 
+  .[1,1] %&gt;% 
+  str_to_upper()
+
+cidade &lt;- url %&gt;% 
+  str_sub(start = 5) %&gt;% 
+  str_split(&quot;[/]&quot;, n = 3, simplify = TRUE) %&gt;% 
+  .[1,1] %&gt;% 
+  str_replace(&quot;-&quot;, &quot; &quot;) %&gt;% 
+  str_to_title()
+
+str_c(UF, &quot; - &quot;, cidade)
+## [1] &quot;AC - Rio Branco&quot;
+</code></pre>
+
+<hr />
+
+<p><strong>5.</strong> Crie uma função que retorna <code>TRUE</code> quando a string é um <a href="https://pt.wikipedia.org/wiki/Pal%C3%ADndromo">palíndromo</a> e <code>FALSO</code> caso não seja.</p>
+
+<pre><code class="language-r"># Solução 1: usando a função rev() para inverter uma string fragmentada
+
+testa_palindromo &lt;- function(s) {
+  
+  s %&gt;%
+    str_split(&quot;&quot;, simplify = T) %&gt;% 
+    rev %&gt;% 
+    str_c(collapse = &quot;&quot;) %&gt;% 
+    str_detect(s)
+  
+}
+
+testa_palindromo(&quot;ana&quot;)
+## [1] TRUE
+testa_palindromo(&quot;bananas&quot;)
+## [1] FALSE
+testa_palindromo(&quot;socorrammesubinoonibusemmarrocos&quot;)
+## [1] TRUE
+
+
+# Solução 2: usando a função str_reverse() do pacote stringi,
+# que já inverte a string diretamente.
+
+testa_palindromo &lt;- function(s) {
+  
+  s %&gt;% 
+    stringi::stri_reverse() %&gt;% 
+    str_detect(s)
+  
+}
+
+testa_palindromo(&quot;ana&quot;)
+## [1] TRUE
+testa_palindromo(&quot;bananas&quot;)
+## [1] FALSE
+testa_palindromo(&quot;socorrammesubinoonibusemmarrocos&quot;)
+## [1] TRUE
+</code></pre>
+
+<hr />
+
+<p><strong>6.</strong> De acordo com as regras da língua portuguesa, antes de “p” ou “b” devemos usar a letra “m”. Em outras palavras, com outras consoantes, usamos a letra “N”. Suponha que você tem o seguinte texto com erros gramaticais:</p>
+
+<pre><code class="language-r">s &lt;- 'Nós chamamos os bonbeiros quando começou o incêmdio.'
+</code></pre>
+
+<p>Crie uma função para corrigi-lo.</p>
+
+<pre><code class="language-r"># Função que funciona para o exemplo
+
+corrige_mn &lt;- function(s) {
+  
+  s %&gt;% 
+    str_replace(&quot;nb&quot;, &quot;mb&quot;) %&gt;% 
+    str_replace(&quot;md&quot;, &quot;nd&quot;)
+  
+}
+
+corrige_mn(s)
+## [1] &quot;Nós chamamos os bombeiros quando começou o incêndio.&quot;
+
+# Função que funciona no caso geral
+
+corrige_mn &lt;- function(s) {
+  
+  s %&gt;% 
+    str_replace_all(&quot;m([^aeioubp[[:space:]]+])&quot;, &quot;n\\1&quot;) %&gt;%  
+    str_replace_all(&quot;n([pb])&quot;, &quot;m\\1&quot;)
+  
+}
+
+corrige_mn(s)
+## [1] &quot;Nós chamamos os bombeiros quando começou o incêndio.&quot;
+</code></pre>
+
+<p>O padrão <code>[^aeioubp[[:space:]]+]</code> significa &ldquo;tudo menos vogais, b, p ou espaços&rdquo;. O <code>\\1</code> devolve o padrão encontrado pelo primeiro parêntese do argumento <code>patern=</code>.</p>
+
+<hr />
+
+<p><strong>7.</strong> Considere o seguinte texto</p>
+
+<pre><code class="language-r">s &lt;- &quot;A função mais importante para leitura de dados no `lubridate` é a `ymd`. Essa função serve para ler qualquer data de uma `string` no formato `YYYY-MM-DD`. Essa função é útil pois funciona com qualquer separador entre os elementos da data e também porque temos uma função para cada formato (`ymd`, `mdy`, `dmy`, `dym`, `myd`, `ydm`).&quot;
+</code></pre>
+
+<p>Extraia todas as combinações da função <code>ymd</code>, sem repetições.</p>
+
+<pre><code class="language-r">str_extract_all(s, &quot;[ymd]{3}&quot;) %&gt;% 
+  as_vector() %&gt;% 
+  unique
+## [1] &quot;ymd&quot; &quot;mdy&quot; &quot;dmy&quot; &quot;dym&quot; &quot;myd&quot; &quot;ydm&quot;
+</code></pre>
+
+<hr />
+
+<p><strong>8.</strong> Considere as frases abaixo</p>
+
+<pre><code class="language-r">s &lt;- c(
+  'O produto é bom.',
+  'O produto não é bom.',
+  'O produto não é muito bom.',
+  'O produto é muito bom',
+  'O produto não é ruim.',
+  'O produto não é não ruim.',
+  'O produto não é não bom.'
+)
+</code></pre>
+
+<p>Crie uma regra para identificar se o texto refere-se a um feedback positivo ou negativo sobre o produto (considere não bom = ruim e não ruim = bom). Retorne um vetor lógico que vale <code>TRUE</code> se o feedback for positivo e <code>FALSE</code> caso contrário.</p>
+
+<pre><code class="language-r">feedback &lt;- function(s) {
+  
+  s %&gt;% 
+    str_replace(&quot;não bom&quot;, &quot;ruim&quot;) %&gt;%
+    str_replace(&quot;não ruim&quot;, &quot;bom&quot;) %&gt;% 
+    str_replace(&quot;muito &quot;, &quot;&quot;) %&gt;% 
+    str_detect(&quot;(.*) produto é bom|(.*) não é ruim&quot;)
+  
+}
+
+feedback(s)
+## [1]  TRUE FALSE FALSE  TRUE  TRUE FALSE  TRUE
+</code></pre>
+
+<hr />
 
 
 			<hr>
