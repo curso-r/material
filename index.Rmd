@@ -22,14 +22,9 @@ corriqueiras de forma eficiente e concisa. Ao final dos estudos, será possível
 - **Comunicar** os resultados de forma eficiente.
 
 O conteúdo é baseado no [*R for Data Science*](http://r4ds.had.co.nz/), que, por
-sua vez, é baseado no [`tidyverse`](http://tidyverse.org/). O *tidyverse*, ou *universo arrumado*, é um conjunto de pacotes que dividem uma mesma filosofia e foram feitos para serem
-utilizados conjuntamente.
+sua vez, é baseado no [`tidyverse`](http://tidyverse.org/). O *tidyverse*, ou *universo arrumado*, é um conjunto de pacotes que dividem uma mesma filosofia e foram feitos para serem utilizados conjuntamente.
 
-Material da aula introdutória (Aula 0):
-
-- [em .Rmd]("https://github.com/curso-r/material/aulas/Rmds/aula_0.Rmd")
-- [em slides]("https://github.com/curso-r/material/aulas/slides/slides_aula_0.html")
-
+A aula introdutória (Aula 0) está disponível em [slides](aulas/slides/slides_aula_0.html) ou no formato [Rmd](aulas/Rmds/aula_0.Rmd).
 
 ## Público Alvo
 
