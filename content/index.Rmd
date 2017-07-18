@@ -24,8 +24,6 @@ corriqueiras de forma eficiente e concisa. Ao final dos estudos, será possível
 O conteúdo é baseado no [*R for Data Science*](http://r4ds.had.co.nz/), que, por
 sua vez, é baseado no [`tidyverse`](http://tidyverse.org/). O *tidyverse*, ou *universo arrumado*, é um conjunto de pacotes que dividem uma mesma filosofia e foram feitos para serem utilizados conjuntamente.
 
-A aula introdutória (Aula 0) está disponível em [slides](aulas/slides/slides_aula_0.html) ou no formato [Rmd](aulas/Rmds/aula_0.Rmd).
-
 ## Público Alvo
 
 - Estudantes de graduação em estatística que desejam ganhar tempo nos trabalhos da faculdade e entrar no mercado de trabalho com bons diferenciais.
