@@ -62,6 +62,11 @@ pluralizeListTitles = false
   weight = 18
 
 [[menu.main]]
+  name   = "Lubridate"
+  url    = "lubridate/"
+  weight = 18
+
+[[menu.main]]
   name   = "Pipe"
   url    = "pipe/"
   weight = 23
