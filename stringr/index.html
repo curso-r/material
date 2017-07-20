@@ -198,6 +198,24 @@
 
 
 
+<a  title="Lubridate" href="../lubridate/">
+	
+	Lubridate
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
 <a class="current" title="Stringr" href="../stringr/">
 	
 	Stringr
@@ -421,17 +439,29 @@ str_length(c(&quot;São Paulo&quot;, &quot;Rio de Janeiro&quot;,
 
 <p>Note que <code>str_length()</code> é diferente de <code>length()</code>. O primeiro retorna o número de caracteres e o segundo retorna o comprimento do objeto. Isso fica mais claro no seguinte exemplo:</p>
 
-<pre><code class="language-r">s &lt;- str_length(c(&quot;São Paulo&quot;, &quot;Rio de Janeiro&quot;, 
-                  &quot;Rio Grande do Norte&quot;, &quot;Acre&quot;))
-## Error in str_length(c(&quot;São Paulo&quot;, &quot;Rio de Janeiro&quot;, &quot;Rio Grande do Norte&quot;, : could not find function &quot;str_length&quot;
+<pre><code class="language-r">s &lt;- c(&quot;São Paulo&quot;, &quot;Rio de Janeiro&quot;, 
+       &quot;Rio Grande do Norte&quot;, &quot;Acre&quot;)
 
 str_length(s)
 ## Error in str_length(s): could not find function &quot;str_length&quot;
 length(s)
-## Error in eval(expr, envir, enclos): object 's' not found
+## [1] 4
 </code></pre>
 
 <p>A função <code>str_length()</code> retornou um vetor com o número de caracteres de cada elemento do vetor <code>s</code>, enquanto <code>length()</code> retornou o comprimento do vetor <code>s</code>.</p>
+
+<h3 id="str-to-upper-str-to-lower-str-to-title">str_to_upper, str_to_lower, str_to_title</h3>
+
+<p>Essas funções servem para modificar a caixa das letras. Veja alguns exemplos:</p>
+
+<pre><code class="language-r">s &lt;- &quot;Somos a curso-r&quot;
+str_to_lower(s)
+## Error in str_to_lower(s): could not find function &quot;str_to_lower&quot;
+str_to_upper(s)
+## Error in str_to_upper(s): could not find function &quot;str_to_upper&quot;
+str_to_title(s)
+## Error in str_to_title(s): could not find function &quot;str_to_title&quot;
+</code></pre>
 
 <h3 id="str-trim">str_trim</h3>
 
@@ -446,10 +476,10 @@ as.factor(s)
 
 <p>A função <code>str_trim()</code> ajuda removendo os espaços excedentes antes e depois da string.</p>
 
-<pre><code class="language-r">s2 &lt;- str_trim(s)
+<pre><code class="language-r">string_aparada &lt;- str_trim(s)
 ## Error in str_trim(s): could not find function &quot;str_trim&quot;
-as.factor(s2)
-## Error in is.factor(x): object 's2' not found
+as.factor(string_aparada)
+## Error in is.factor(x): object 'string_aparada' not found
 </code></pre>
 
 <h3 id="str-sub">str_sub</h3>
@@ -487,22 +517,78 @@ str_sub(s, 3, 4)
 ## Error in str_sub(s, 3, 4): could not find function &quot;str_sub&quot;
 </code></pre>
 
-<h3 id="str-to-upper-str-to-lower-str-to-title">str_to_upper, str_to_lower, str_to_title</h3>
+<h3 id="str-c">str_c</h3>
 
-<p>Essas funções servem para modificar a caixa das letras. Veja alguns exemplos:</p>
+<p>Concatena <em>strings</em> em uma única string.</p>
 
-<pre><code class="language-r">s &lt;- &quot;Somos a curso-r&quot;
-str_to_lower(s)
-## Error in str_to_lower(s): could not find function &quot;str_to_lower&quot;
-str_to_upper(s)
-## Error in str_to_upper(s): could not find function &quot;str_to_upper&quot;
-str_to_title(s)
-## Error in str_to_title(s): could not find function &quot;str_to_title&quot;
+<pre><code class="language-r">
+string1 &lt;- &quot;O valor p é: &quot;
+string2 &lt;- 0.03
+
+str_c(string1, string2)     # Números serão transformados em caracteres.
+## Error in str_c(string1, string2): could not find function &quot;str_c&quot;
+
+
+# Pode misturar objetos com strings definidas diretamente na função.
+
+string1 &lt;- &quot;Brigadeiro&quot;
+string2 &lt;- &quot;bom&quot;
+string3 &lt;- &quot;melhor&quot;
+
+str_c(string1, &quot; é a prova de que não existe nada tão &quot;, string2,
+      &quot; que não pode ficar &quot;, string3, &quot;.&quot;)
+## Error in str_c(string1, &quot; é a prova de que não existe nada tão &quot;, string2, : could not find function &quot;str_c&quot;
+
+# A função é vetorizada.
+
+string1 &lt;- c(&quot;Brigadeiro&quot;, &quot;A política brasileira&quot;)
+string2 &lt;- c(&quot;bom&quot;, &quot;ruim&quot;)
+string3 &lt;- c(&quot;melhor&quot;, &quot;pior&quot;)
+
+str_c(string1, &quot; é a prova de que não existe nada tão &quot;, string2,
+      &quot; que não pode ficar &quot;, string3, &quot;.&quot;)
+## Error in str_c(string1, &quot; é a prova de que não existe nada tão &quot;, string2, : could not find function &quot;str_c&quot;
+
+# Pode ser usada para &quot;criar código&quot;. 
+
+variaveis &lt;- names(mtcars)
+variaveis
+##  [1] &quot;mpg&quot;  &quot;cyl&quot;  &quot;disp&quot; &quot;hp&quot;   &quot;drat&quot; &quot;wt&quot;   &quot;qsec&quot; &quot;vs&quot;   &quot;am&quot;   &quot;gear&quot;
+## [11] &quot;carb&quot;
+
+variaveis_explicativas &lt;- str_c(variaveis[-1], collapse = &quot; + &quot;)
+## Error in str_c(variaveis[-1], collapse = &quot; + &quot;): could not find function &quot;str_c&quot;
+
+formula &lt;- str_c(variaveis[1], &quot; ~ &quot;, variaveis_explicativas)
+## Error in str_c(variaveis[1], &quot; ~ &quot;, variaveis_explicativas): could not find function &quot;str_c&quot;
+formula
+## function (x, ...) 
+## UseMethod(&quot;formula&quot;)
+## &lt;bytecode: 0x4272c48&gt;
+## &lt;environment: namespace:stats&gt;
+as.formula
+## function (object, env = parent.frame()) 
+## {
+##     if (inherits(object, &quot;formula&quot;)) 
+##         object
+##     else {
+##         rval &lt;- formula(object, env = baseenv())
+##         if (identical(environment(rval), baseenv()) || !missing(env)) 
+##             environment(rval) &lt;- env
+##         rval
+##     }
+## }
+## &lt;bytecode: 0x4144048&gt;
+## &lt;environment: namespace:stats&gt;
+
+# Modeloo linear (Off-topic)
+fit &lt;- lm(formula, data = mtcars)
+## Error: object of type 'closure' is not subsettable
+summary(fit)
+## Error in summary(fit): object 'fit' not found
 </code></pre>
 
-<p>Essas são as funções mais simples do pacote <code>stringr</code> e não exigem nenhum conhecimento de <strong>expressões regulares</strong>. Note que nenhuma delas possui o parâmetro <code>pattern</code>. Você verá como especificar esse parâmetro nas próximas seções.</p>
-
-<hr />
+<h2 id="essas-são-as-funções-mais-simples-do-pacote-stringr-e-não-exigem-nenhum-conhecimento-de-expressões-regulares-note-que-nenhuma-delas-possui-o-parâmetro-pattern-você-verá-como-especificar-esse-parâmetro-nas-próximas-seções">Essas são as funções mais simples do pacote <code>stringr</code> e não exigem nenhum conhecimento de <strong>expressões regulares</strong>. Note que nenhuma delas possui o parâmetro <code>pattern</code>. Você verá como especificar esse parâmetro nas próximas seções.</h2>
 
 <h2 id="expressões-regulares">Expressões Regulares</h2>
 
