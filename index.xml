@@ -7,7 +7,7 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>pt-br</language>
     <copyright>Disponível sobre Licença MIT</copyright>
-    <lastBuildDate>Wed, 19 Jul 2017 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 20 Jul 2017 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     
@@ -15,7 +15,7 @@
     <item>
       <title>Stringr</title>
       <link>/stringr/</link>
-      <pubDate>Wed, 19 Jul 2017 00:00:00 +0000</pubDate>
+      <pubDate>Thu, 20 Jul 2017 00:00:00 +0000</pubDate>
       
       <guid>/stringr/</guid>
       <description>Variáveis de texto são muito comuns nos bancos de dados e, geralmente, dão bastante trabalho para serem manipuladas. É muito comum encontrarmos colunas com categorias não padronizadas, como, por exemplo, uma variável Estado com &amp;ldquo;SP&amp;rdquo;, &amp;ldquo;sp&amp;rdquo;, &amp;ldquo;Sao Paulo&amp;rdquo;, &amp;ldquo;São Paulo&amp;rdquo; etc, todas indicando o mesmo estado.

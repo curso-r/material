@@ -423,7 +423,9 @@ aperte <strong>TAB</strong> para visualizar a lista de funções com esse prefix
 <p>Antes de mais nada, instale e carregue o pacote <code>stringr</code>.</p>
 
 <pre><code class="language-r">install.packages(&quot;stringr&quot;)
-library(stringr)
+</code></pre>
+
+<pre><code class="language-r">library(stringr)
 </code></pre>
 
 <h3 id="str-length">str_length</h3>
@@ -431,10 +433,10 @@ library(stringr)
 <p>A função mais simples do <code>stringr()</code> é a função <code>str_length()</code>. Esta função recebe como argumento um vetor de <em>strings</em> e retorna o número de caracteres de cada <em>string</em>. Repare que o espaço <code>&quot; &quot;</code> é considerado um caracter.</p>
 
 <pre><code class="language-r">str_length(&quot;São Paulo&quot;)
-## Error in str_length(&quot;São Paulo&quot;): could not find function &quot;str_length&quot;
+## [1] 9
 str_length(c(&quot;São Paulo&quot;, &quot;Rio de Janeiro&quot;, 
              &quot;Rio Grande do Norte&quot;, &quot;Acre&quot;))
-## Error in str_length(c(&quot;São Paulo&quot;, &quot;Rio de Janeiro&quot;, &quot;Rio Grande do Norte&quot;, : could not find function &quot;str_length&quot;
+## [1]  9 14 19  4
 </code></pre>
 
 <p>Note que <code>str_length()</code> é diferente de <code>length()</code>. O primeiro retorna o número de caracteres e o segundo retorna o comprimento do objeto. Isso fica mais claro no seguinte exemplo:</p>
@@ -443,7 +445,7 @@ str_length(c(&quot;São Paulo&quot;, &quot;Rio de Janeiro&quot;,
        &quot;Rio Grande do Norte&quot;, &quot;Acre&quot;)
 
 str_length(s)
-## Error in str_length(s): could not find function &quot;str_length&quot;
+## [1]  9 14 19  4
 length(s)
 ## [1] 4
 </code></pre>
@@ -456,11 +458,11 @@ length(s)
 
 <pre><code class="language-r">s &lt;- &quot;Somos a curso-r&quot;
 str_to_lower(s)
-## Error in str_to_lower(s): could not find function &quot;str_to_lower&quot;
+## [1] &quot;somos a curso-r&quot;
 str_to_upper(s)
-## Error in str_to_upper(s): could not find function &quot;str_to_upper&quot;
+## [1] &quot;SOMOS A CURSO-R&quot;
 str_to_title(s)
-## Error in str_to_title(s): could not find function &quot;str_to_title&quot;
+## [1] &quot;Somos A Curso-R&quot;
 </code></pre>
 
 <h3 id="str-trim">str_trim</h3>
@@ -477,9 +479,9 @@ as.factor(s)
 <p>A função <code>str_trim()</code> ajuda removendo os espaços excedentes antes e depois da string.</p>
 
 <pre><code class="language-r">string_aparada &lt;- str_trim(s)
-## Error in str_trim(s): could not find function &quot;str_trim&quot;
 as.factor(string_aparada)
-## Error in is.factor(x): object 'string_aparada' not found
+## [1] M F F M F M
+## Levels: F M
 </code></pre>
 
 <h3 id="str-sub">str_sub</h3>
@@ -492,29 +494,29 @@ as.factor(string_aparada)
 <p>Você pode querer apenas a parte final da string. Neste caso, pode usar a função <code>str_sub()</code>.</p>
 
 <pre><code class="language-r">str_sub(s, start = 4) # pegar do quarto até o último caractere
-## Error in str_sub(s, start = 4): could not find function &quot;str_sub&quot;
+## [1] &quot;Feminino&quot;   &quot;Masculino&quot;  &quot;Indefinido&quot;
 </code></pre>
 
 <p>Também é possível obter apenas os números.</p>
 
 <pre><code class="language-r">str_sub(s, end = 2) # pegar apenas os dois primeiros caracteres
-## Error in str_sub(s, end = 2): could not find function &quot;str_sub&quot;
+## [1] &quot;01&quot; &quot;02&quot; &quot;03&quot;
 </code></pre>
 
 <p>Em outros casos você precisa obter os últimos 2 caracteres.</p>
 
 <pre><code class="language-r">s &lt;- c(&quot;Feminino-01&quot;, &quot;Masculino-02&quot;, &quot;Indefinido-03&quot;)
 str_sub(s, end = -4)
-## Error in str_sub(s, end = -4): could not find function &quot;str_sub&quot;
+## [1] &quot;Feminino&quot;   &quot;Masculino&quot;  &quot;Indefinido&quot;
 str_sub(s, start = -2)
-## Error in str_sub(s, start = -2): could not find function &quot;str_sub&quot;
+## [1] &quot;01&quot; &quot;02&quot; &quot;03&quot;
 </code></pre>
 
 <p>É possível usar os argumentos <code>start</code> e <code>end</code> conjuntamente.</p>
 
 <pre><code class="language-r">s &lt;- c(&quot;__SP__&quot;, &quot;__MG__&quot;, &quot;__RJ__&quot;)
 str_sub(s, 3, 4)
-## Error in str_sub(s, 3, 4): could not find function &quot;str_sub&quot;
+## [1] &quot;SP&quot; &quot;MG&quot; &quot;RJ&quot;
 </code></pre>
 
 <h3 id="str-c">str_c</h3>
@@ -526,7 +528,7 @@ string1 &lt;- &quot;O valor p é: &quot;
 string2 &lt;- 0.03
 
 str_c(string1, string2)     # Números serão transformados em caracteres.
-## Error in str_c(string1, string2): could not find function &quot;str_c&quot;
+## [1] &quot;O valor p é: 0.03&quot;
 
 
 # Pode misturar objetos com strings definidas diretamente na função.
@@ -537,7 +539,7 @@ string3 &lt;- &quot;melhor&quot;
 
 str_c(string1, &quot; é a prova de que não existe nada tão &quot;, string2,
       &quot; que não pode ficar &quot;, string3, &quot;.&quot;)
-## Error in str_c(string1, &quot; é a prova de que não existe nada tão &quot;, string2, : could not find function &quot;str_c&quot;
+## [1] &quot;Brigadeiro é a prova de que não existe nada tão bom que não pode ficar melhor.&quot;
 
 # A função é vetorizada.
 
@@ -547,7 +549,8 @@ string3 &lt;- c(&quot;melhor&quot;, &quot;pior&quot;)
 
 str_c(string1, &quot; é a prova de que não existe nada tão &quot;, string2,
       &quot; que não pode ficar &quot;, string3, &quot;.&quot;)
-## Error in str_c(string1, &quot; é a prova de que não existe nada tão &quot;, string2, : could not find function &quot;str_c&quot;
+## [1] &quot;Brigadeiro é a prova de que não existe nada tão bom que não pode ficar melhor.&quot;          
+## [2] &quot;A política brasileira é a prova de que não existe nada tão ruim que não pode ficar pior.&quot;
 
 # Pode ser usada para &quot;criar código&quot;. 
 
@@ -557,15 +560,10 @@ variaveis
 ## [11] &quot;carb&quot;
 
 variaveis_explicativas &lt;- str_c(variaveis[-1], collapse = &quot; + &quot;)
-## Error in str_c(variaveis[-1], collapse = &quot; + &quot;): could not find function &quot;str_c&quot;
 
 formula &lt;- str_c(variaveis[1], &quot; ~ &quot;, variaveis_explicativas)
-## Error in str_c(variaveis[1], &quot; ~ &quot;, variaveis_explicativas): could not find function &quot;str_c&quot;
 formula
-## function (x, ...) 
-## UseMethod(&quot;formula&quot;)
-## &lt;bytecode: 0x4272c48&gt;
-## &lt;environment: namespace:stats&gt;
+## [1] &quot;mpg ~ cyl + disp + hp + drat + wt + qsec + vs + am + gear + carb&quot;
 as.formula
 ## function (object, env = parent.frame()) 
 ## {
@@ -578,17 +576,44 @@ as.formula
 ##         rval
 ##     }
 ## }
-## &lt;bytecode: 0x4144048&gt;
+## &lt;bytecode: 0x2c5ed20&gt;
 ## &lt;environment: namespace:stats&gt;
 
 # Modeloo linear (Off-topic)
 fit &lt;- lm(formula, data = mtcars)
-## Error: object of type 'closure' is not subsettable
 summary(fit)
-## Error in summary(fit): object 'fit' not found
+## 
+## Call:
+## lm(formula = formula, data = mtcars)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -3.4506 -1.6044 -0.1196  1.2193  4.6271 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)  
+## (Intercept) 12.30337   18.71788   0.657   0.5181  
+## cyl         -0.11144    1.04502  -0.107   0.9161  
+## disp         0.01334    0.01786   0.747   0.4635  
+## hp          -0.02148    0.02177  -0.987   0.3350  
+## drat         0.78711    1.63537   0.481   0.6353  
+## wt          -3.71530    1.89441  -1.961   0.0633 .
+## qsec         0.82104    0.73084   1.123   0.2739  
+## vs           0.31776    2.10451   0.151   0.8814  
+## am           2.52023    2.05665   1.225   0.2340  
+## gear         0.65541    1.49326   0.439   0.6652  
+## carb        -0.19942    0.82875  -0.241   0.8122  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 2.65 on 21 degrees of freedom
+## Multiple R-squared:  0.869,	Adjusted R-squared:  0.8066 
+## F-statistic: 13.93 on 10 and 21 DF,  p-value: 3.793e-07
 </code></pre>
 
-<h2 id="essas-são-as-funções-mais-simples-do-pacote-stringr-e-não-exigem-nenhum-conhecimento-de-expressões-regulares-note-que-nenhuma-delas-possui-o-parâmetro-pattern-você-verá-como-especificar-esse-parâmetro-nas-próximas-seções">Essas são as funções mais simples do pacote <code>stringr</code> e não exigem nenhum conhecimento de <strong>expressões regulares</strong>. Note que nenhuma delas possui o parâmetro <code>pattern</code>. Você verá como especificar esse parâmetro nas próximas seções.</h2>
+<p>Essas são as funções mais simples do pacote <code>stringr</code> e não exigem nenhum conhecimento de <strong>expressões regulares</strong>. Note que nenhuma delas possui o parâmetro <code>pattern</code>. Você verá como especificar esse parâmetro nas próximas seções.</p>
+
+<hr />
 
 <h2 id="expressões-regulares">Expressões Regulares</h2>
 
@@ -959,16 +984,6 @@ str_subset(frases, 'd[eo]')
 <p>Crie uma regra para identificar se o texto refere-se a um feedback positivo ou negativo sobre o produto (considere não bom = ruim e não ruim = bom). Retorne um vetor lógico que vale <code>TRUE</code> se o feedback é positivo e <code>FALSE</code> caso contrário.</p>
 
 <hr />
-
-<pre><code>## 
-## Attaching package: 'magrittr'
-## The following object is masked from 'package:tidyr':
-## 
-##     extract
-## The following object is masked from 'package:purrr':
-## 
-##     set_names
-</code></pre>
 
 <h2 id="respostas">Respostas</h2>
 
