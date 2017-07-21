@@ -57,16 +57,6 @@ pluralizeListTitles = false
   weight = 10
 
 [[menu.main]]
-  name   = "Stringr"
-  url    = "stringr/"
-  weight = 18
-
-[[menu.main]]
-  name   = "Lubridate"
-  url    = "lubridate/"
-  weight = 18
-
-[[menu.main]]
   name   = "Pipe"
   url    = "pipe/"
   weight = 23
@@ -80,6 +70,16 @@ pluralizeListTitles = false
   name   = "Visualização"
   url    = "ggplot/"
   weight = 40
+
+[[menu.main]]
+  name   = "Stringr"
+  url    = "stringr/"
+  weight = 18
+
+[[menu.main]]
+  name   = "Lubridate"
+  url    = "lubridate/"
+  weight = 18
   
 [[menu.main]]
   name   = "Forcats"
