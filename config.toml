@@ -69,17 +69,17 @@ pluralizeListTitles = false
 [[menu.main]]
   name   = "Visualização"
   url    = "ggplot/"
-  weight = 40
+  weight = 35
 
 [[menu.main]]
   name   = "Stringr"
   url    = "stringr/"
-  weight = 18
+  weight = 41
 
 [[menu.main]]
   name   = "Lubridate"
   url    = "lubridate/"
-  weight = 18
+  weight = 43
   
 [[menu.main]]
   name   = "Forcats"
