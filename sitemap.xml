@@ -48,11 +48,6 @@
   </url>
   
   <url>
-    <loc>/lubridate/</loc>
-    <lastmod>2017-01-29T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>/</loc>
     <lastmod>2016-11-09T00:00:00+00:00</lastmod>
   </url>
@@ -83,12 +78,6 @@
   <url>
     <loc>/instalacao/</loc>
     <lastmod>2017-06-17T00:00:00+00:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>/lubridate/</loc>
-    <lastmod>2017-01-29T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   

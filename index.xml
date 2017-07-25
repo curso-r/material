@@ -101,16 +101,6 @@ f(x, y) x %&amp;gt;% f(y)  O operador %&amp;gt;% (pipe ) usa o resultado do seu 
     </item>
     
     <item>
-      <title>Introdução</title>
-      <link>/lubridate/</link>
-      <pubDate>Sun, 29 Jan 2017 00:00:00 +0000</pubDate>
-      
-      <guid>/lubridate/</guid>
-      <description>Lubridate O pacote lubridate faz o trabalho com datas ser muito mais fácil. Ela foi criada por Garrett Grolemund e Hadley Wickham.
-library(lubridate)  ## Loading required package: methods  ## ## Attaching package: &#39;lubridate&#39;  ## The following object is masked from &#39;package:base&#39;: ## ## date  library(magrittr) library(dplyr)  ## ## Attaching package: &#39;dplyr&#39;  ## The following objects are masked from &#39;package:lubridate&#39;: ## ## intersect, setdiff, union  ## The following objects are masked from &#39;package:stats&#39;: ## ## filter, lag  ## The following objects are masked from &#39;package:base&#39;: ## ## intersect, setdiff, setequal, union  Resumo do que aprenderemos:</description>
-    </item>
-    
-    <item>
       <title>Material para cursos de R</title>
       <link>/</link>
       <pubDate>Wed, 09 Nov 2016 00:00:00 +0000</pubDate>
