@@ -10,18 +10,18 @@
     <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1">
     <meta http-equiv="X-UA-Compatible" content="IE=10" />
     <meta name="google-site-verification" content="3wpHHnuvp_52dDrXvZoNa5_Vs4BWcyVoeM62GbQ7llc" />
-    <title>Pipe - Curso-R</title>
+    <title>Lubridate - Curso-R</title>
     <meta name="generator" content="Hugo 0.22" />
 
     
     <meta name="description" content="Materiais para cursos de R">
     
-    <link rel="canonical" href="../pipe/">
+    <link rel="canonical" href="../lubridate/">
     
     <meta name="author" content="Curso-R">
     
 
-    <meta property="og:url" content="/pipe/">
+    <meta property="og:url" content="/lubridate/">
     <meta property="og:title" content="Curso-R">
     <meta property="og:image" content="/logo-curso-r.png">
     <meta name="apple-mobile-web-app-title" content="Curso-R">
@@ -54,8 +54,8 @@
     <script src="../javascripts/modernizr.js"></script>
 
     
-    <link href="../pipe/index.xml" rel="alternate" type="application/rss+xml" title="Curso-R" />
-    <link href="../pipe/index.xml" rel="feed" type="application/rss+xml" title="Curso-R" />
+    <link href="../lubridate/index.xml" rel="alternate" type="application/rss+xml" title="Curso-R" />
+    <link href="../lubridate/index.xml" rel="feed" type="application/rss+xml" title="Curso-R" />
     
 
   </head>
@@ -81,7 +81,7 @@
     <div class="stretch">
       <div class="title">
         
-        <a href="../pipe/" class="permalink">Pipe</a>
+        <a href="../lubridate/" class="permalink">Lubridate</a>
         
       </div>
     </div>
@@ -198,14 +198,11 @@
 
 
 
-<a class="current" title="O operador pipe" href="../pipe/">
+<a  title="O operador pipe" href="../pipe/">
 	
 	O operador pipe
 </a>
 
-
-<ul id="scrollspy">
-</ul>
 
 
   
@@ -291,11 +288,14 @@
 
 
 
-<a  title="Datas: o pacote lubridate" href="../lubridate/">
+<a class="current" title="Datas: o pacote lubridate" href="../lubridate/">
 	
 	Datas: o pacote lubridate
 </a>
 
+
+<ul id="scrollspy">
+</ul>
 
 
   
@@ -392,66 +392,262 @@
 
 	<article class="article">
 		<div class="wrapper">
-			<h1>Pipe</h1>
+			<h1>Lubridate</h1>
 
 			
 
 			
 
-<h2 id="pipe">Pipe <code>%&gt;%</code></h2>
+<h2 id="introdução">Introdução</h2>
 
-<p>As duas linhas abaixo são equivalentes:</p>
+<p>Trabalhar com datas no R pode ser uma chateação. As funções do R base são, em geral, contraintuitivas e podem mudar de acordo com o tipo do objeto que você está usando. Além disso, características como fusos horários, anos bissextos, horários de verão, entre outras, podem não estar bem especificadas pelos métodos criados ou nem mesmo sendo levadas em conta.</p>
 
-<pre><code class="language-r">f(x, y)
-x %&gt;% f(y)
+<p>O pacote lubridate lida com esses problemas, fazendo o trabalho com datas ser muito mais fácil. Ele foi criado por Garrett Grolemund e Hadley Wickham.</p>
+
+<p>Para instalar, siga uma das opções abaixo:</p>
+
+<pre><code class="language-r"># Instale ao lado de outros pacotes do tidyverse.
+install.packages(&quot;tidyverse&quot;)
+
+# Instale apenas o lubridate.
+install.packages(&quot;lubridate&quot;)
+
+# Instale a versão de desenvolvimento direto do Github.
+# Caso não tenha o devtools instalado: install.packages(&quot;devtools&quot;).
+devtools::install_github(&quot;tidyverse/lubridate&quot;)
 </code></pre>
 
-<p>O operador <code>%&gt;%</code> (<em>pipe</em> ) usa o resultado do seu lado esquerdo como primeiro argumento da funçăo do lado direito. Ele foi uma das grandes revoluções recentes do R, tornando a leitura de códigos mais lógica, fácil e compreensível. Este operador foi introduzido por Stefan Milton Bache no pacote <code>magrittr</code>, e já existem diversos pacotes construidos para facilitar a sua utilizaçăo.</p>
+<p>Para carregar o pacote, basta rodar</p>
 
-<p>O operador <code>%&gt;%</code> pertence ao pacote <code>magrittr</code>. Instale este pacote para utilizá-lo.</p>
-
-<pre><code class="language-r">install.packages(&quot;magrittr&quot;)
+<pre><code class="language-r">library(lubridate)
+## Loading required package: methods
+## 
+## Attaching package: 'lubridate'
+## The following object is masked from 'package:base':
+## 
+##     date
 </code></pre>
 
-<p>No exemplo a seguir, o operador calcula a raiz quadrada da soma dos valores de 1 a 4.</p>
+<p>Neste seção, aprenderemos:</p>
 
-<pre><code class="language-r">library(magrittr)
+<ul>
+<li>Transformar e extrair datas.</li>
+<li>Algumas funções úteis para trabalhar com datas.</li>
+<li>Trabalhar com fusos horários.</li>
+<li>Operações aritméticas com datas.</li>
+</ul>
 
-x &lt;- c(1, 2, 3, 4)
-x %&gt;% sum %&gt;% sqrt
+<hr />
+
+<h2 id="a-classe-date">A classe &ldquo;date&rdquo;</h2>
+
+<p>Datas no R são tratadas como um tipo especial de objeto, com classe <code>date</code>. Há várias formas de criar objetos dessa classe:</p>
+
+<pre><code class="language-r">data_string &lt;- &quot;21-10-2015&quot;
+class(data_string)
+## [1] &quot;character&quot;
+
+data_date &lt;- date(data_string)
+## Error in date(data_string): unused argument (data_string)
+class(data_date)
+## Error in eval(expr, envir, enclos): object 'data_date' not found
+
+data_as_date &lt;- as_date(data_string)
+class(data_as_date)
+## [1] &quot;Date&quot;
+
+data_mdy &lt;- dmy(data_string)
+class(data_mdy)
+## [1] &quot;Date&quot;
 </code></pre>
 
-<pre><code>## [1] 3.162278
+<p>Veja que as funções <code>date()</code> e <code>as_date()</code> converteram a <em>string</em> para data, mas não devolveram o valor esperado. A função <code>dmy()</code> resolve esse problema estabelecendo explicitamente a ordem dia-mês-ano. Existem funções para todas as ordens possíveis: <code>dmy()</code>, <code>mdy()</code>, <code>myd()</code>, <code>ymd()</code>, <code>ydm()</code> etc.</p>
+
+<p>As funções <code>date()</code> e <code>as_date()</code> assumem que a ordem é ano-mês-dia (ymd).</p>
+
+<pre><code class="language-r">date(&quot;2015-10-21&quot;)
+## Error in date(&quot;2015-10-21&quot;): unused argument (&quot;2015-10-21&quot;)
+as_date(&quot;2015-10-21&quot;)
+## [1] &quot;2015-10-21&quot;
 </code></pre>
 
-<p>Escrever esse cálculo na forma usual ficaria da seguinte forma:</p>
+<p>Uma grande facilidade que essas funções trazem é poder criar objetos com classe <code>date</code> a partir de números e <em>strings</em> em diversos formatos.</p>
 
-<pre><code class="language-r">sqrt(sum(x))
+<pre><code class="language-r">dmy(21102015)
+## [1] &quot;2015-10-21&quot;
+dmy(&quot;21102015&quot;)
+## [1] &quot;2015-10-21&quot;
+dmy(&quot;21/10/2015&quot;)
+## [1] &quot;2015-10-21&quot;
+dmy(&quot;21.10.2015&quot;)
+## [1] &quot;2015-10-21&quot;
 </code></pre>
 
-<pre><code>## [1] 3.162278
+<p>Se além da data você precisar especificar o horário, basta usar as funções do tipo <code>ymd_h()</code>, <code>ymd_hm()</code>, <code>ymd_hms()</code>, sendo que também há uma função para cada formato de dia-mês-ano.</p>
+
+<pre><code class="language-r">ymd_hms(20151021165411)
+## [1] &quot;2015-10-21 16:54:11 UTC&quot;
 </code></pre>
 
-<p>O caminho que o código <code>x %&gt;% sum %&gt;% sqrt</code> seguiu foi enviar o objeto <code>x</code> como argumento da função <code>sum()</code> e, em seguida, enviar a saida da expressão <code>sum(x)</code> como argumento da função <code>sqrt()</code>. Observe que não é necessário colocar os parênteses após o nome das funções.</p>
+<hr />
 
-<p>Pela simplicidade do exemplo, a utilização do <code>%&gt;%</code> não parece trazer grandes vantagens, pois a expressão <code>sqrt(sum(x))</code> é facilmente compreendida. No entanto, se tivermos um grande número de funções aninhadas, a utilizaçăo do <code>pipe</code> transforma um código confuso e difícil de ser lido em algo simples e intuitivo. Como exemplo, imagine escrever uma receita de um bolo usando o R, e cada passo da receita é uma função:</p>
+<h2 id="funções-úteis">Funções úteis</h2>
 
-<pre><code class="language-r">esfrie(asse(coloque(bata(acrescente(recipiente(rep(&quot;farinha&quot;, 2), &quot;água&quot;, &quot;fermento&quot;, &quot;leite&quot;, &quot;óleo&quot;), &quot;farinha&quot;, até = &quot;macio&quot;), duração = &quot;3min&quot;), lugar = &quot;forma&quot;, tipo = &quot;grande&quot;, untada = TRUE), duração = &quot;50min&quot;), &quot;geladeira&quot;, &quot;20min&quot;)
+<p>O <code>lubridate</code> traz diversas funções para extrair os componentes de um objeto da classe <code>date</code>.</p>
+
+<ul>
+<li><code>second()</code> - extrai os segundos.</li>
+<li><code>minute()</code> - extrai os minutos.</li>
+<li><code>hour()</code> - extrai a hora.</li>
+<li><code>wday()</code> - extrai o dia da semana.</li>
+<li><code>mday()</code> - extrai o dia do mês.</li>
+<li><code>month()</code> - extrai o mês.</li>
+<li><code>year()</code> - extrai o ano.</li>
+</ul>
+
+<p>Os nomes são tão óbvios que a explicação do que cada função faz é praticamente desnecessária.</p>
+
+<pre><code class="language-r">bday &lt;- ymd_hms(19890729030142)
+bday
+## [1] &quot;1989-07-29 03:01:42 UTC&quot;
+
+second(bday)
+## [1] 42
+day(bday)
+## [1] 29
+month(bday)
+## [1] 7
+year(bday)
+## [1] 1989
+
+wday(bday)
+## [1] 7
+wday(bday, label = TRUE)
+## [1] Sat
+## Levels: Sun &lt; Mon &lt; Tues &lt; Wed &lt; Thurs &lt; Fri &lt; Sat
 </code></pre>
 
-<p>Tente entender o que é preciso fazer. Depois de desistir, veja como fica escrevendo com o operador <code>%&gt;%</code>:</p>
+<p>Você também pode usar essas funções para atribuir esses componentes a uma data:</p>
 
-<pre><code class="language-r">recipiente(rep(&quot;farinha&quot;, 2), &quot;água&quot;, &quot;fermento&quot;, &quot;leite&quot;, &quot;óleo&quot;) %&gt;%
-  acrescente(&quot;farinha&quot;, até = &quot;macio&quot;) %&gt;%
-  bata(duraço = &quot;3min&quot;) %&gt;%
-  coloque(lugar = &quot;forma&quot;, tipo = &quot;grande&quot;, untada = TRUE) %&gt;%
-  asse(duração = &quot;50min&quot;) %&gt;%
-  esfrie(&quot;geladeira&quot;, &quot;20min&quot;)
+<pre><code class="language-r">data &lt;- dmy(01041991)
+data
+## [1] &quot;1991-04-01&quot;
+
+hour(data) &lt;- 20
+data
+## [1] &quot;1991-04-01 20:00:00 UTC&quot;
 </code></pre>
 
-<p>Agora, o código realmente parece uma receita de bolo.</p>
+<p>Também existem funções para extrair a data no instante da execução.</p>
 
-<p>Para mais informações sobre o <code>pipe</code> e exemplos de utilização, visite a página <a href="http://cran.r-project.org/web/packages/magrittr/vignettes/magrittr.html">Ceci n&rsquo;est pas un pipe</a>.</p>
+<pre><code class="language-r">today() 
+## [1] &quot;2017-07-25&quot;
+now()
+## [1] &quot;2017-07-25 05:14:37 UTC&quot;
+
+# Data e horário do dia em que essa página foi editada pela última vez.
+</code></pre>
+
+<hr />
+
+<h2 id="fusos-horários">Fusos horários</h2>
+
+<p>Uma característica inerente das datas é o fuso horário. Se você tiver trabalhando com datas de eventos no Brasil e na Escócia, por exemplo, é preciso verificar se os valores seguem o mesmo fuso horário. Além disso, quando a data exata de um evento for relevante, você pode precisar converter horários para outros fusos para comunicar seus resultados em outros países.</p>
+
+<p>Para fazer essas coisas, o <code>lubridate</code> fornece as funções <code>with_tz()</code> e <code>force_tz()</code>.</p>
+
+<pre><code class="language-r">estreia_GoT &lt;- ymd_hms(&quot;2017-07-16 22:00:00&quot;, tz = &quot;America/Sao_Paulo&quot;)
+estreia_GoT
+## [1] &quot;2017-07-16 22:00:00 BRT&quot;
+
+# Calcula qual seria a data em outro fuso
+
+with_tz(estreia_GoT, tzone = &quot;GMT&quot;)
+## [1] &quot;2017-07-17 01:00:00 GMT&quot;
+with_tz(estreia_GoT, tzone = &quot;US/Alaska&quot;)  
+## [1] &quot;2017-07-16 17:00:00 AKDT&quot;
+
+# Altera o fuso sem mudar a data
+
+force_tz(estreia_GoT, tzone = &quot;GMT&quot;)
+## [1] &quot;2017-07-16 22:00:00 GMT&quot;
+</code></pre>
+
+<hr />
+
+<h2 id="operações-com-datas">Operações com datas</h2>
+
+<p>O pacote <code>lubridate</code> possui ainda funções para calcular intervalos e fazer operações aritméticas com datas.</p>
+
+<h3 id="intervalos">Intervalos</h3>
+
+<p>Intervalos podem ser salvos em objetos com classe <code>interval</code>.</p>
+
+<pre><code class="language-r">inicio &lt;- dmy(&quot;01-04-1991&quot;)
+evento &lt;- dmy(&quot;31-10-1993&quot;)
+
+sobrev &lt;- interval(inicio, evento)
+sobrev
+## [1] 1991-04-01 UTC--1993-10-31 UTC
+class(sobrev)
+## [1] &quot;Interval&quot;
+## attr(,&quot;package&quot;)
+## [1] &quot;lubridate&quot;
+</code></pre>
+
+<p>Você pode verificar se dois intervalos tem intersecção com a função <code>int_overlaps()</code>.</p>
+
+<pre><code class="language-r"># Outra forma de definir um intervalo: o operador %--%
+intervalo_1 &lt;- dmy(&quot;01-02-2003&quot;) %--% dmy(&quot;02-03-2005&quot;)  
+
+intervalo_2 &lt;- dmy(&quot;04-05-2004&quot;) %--% dmy(&quot;12-03-2012&quot;)  
+
+int_overlaps(intervalo_1, intervalo_2)
+## [1] TRUE
+</code></pre>
+
+<h3 id="aritmética-com-datas">Aritmética com datas</h3>
+
+<p>Veja alguns exemplos de operações aritméticas que você pode fazer utilizando funções do <code>lubridate</code>:</p>
+
+<pre><code class="language-r">
+# Somando datas
+
+data &lt;- dmy(31012000)
+
+data + ddays(1)
+## [1] &quot;2000-02-01&quot;
+data + dyears(1)
+## [1] &quot;2001-01-30&quot;
+
+data + months(1)  # Operações que resultam em datas inválidas geram NAs.
+## [1] NA
+
+# Criando datas recorrentes
+
+reuniao &lt;- dmy(&quot;18-03-2017&quot;)
+reunioes &lt;- reuniao + weeks(0:10)
+reunioes
+##  [1] &quot;2017-03-18&quot; &quot;2017-03-25&quot; &quot;2017-04-01&quot; &quot;2017-04-08&quot; &quot;2017-04-15&quot;
+##  [6] &quot;2017-04-22&quot; &quot;2017-04-29&quot; &quot;2017-05-06&quot; &quot;2017-05-13&quot; &quot;2017-05-20&quot;
+## [11] &quot;2017-05-27&quot;
+
+# Duração de um intervalo 
+
+intervalo &lt;-dmy(&quot;01-03-2003&quot;) %--% dmy(&quot;31-03-2003&quot;) 
+
+intervalo / ddays(1)               # Número de dias
+## [1] 30
+intervalo / dminutes(1)            # Número de minutos
+## [1] 43200
+
+as.period(intervalo)
+## [1] &quot;30d 0H 0M 0S&quot;
+</code></pre>
+
+<p>Para mais informações sobre o<code>lubridate</code>, visite o <a href="https://cran.r-project.org/web/packages/lubridate/vignettes/lubridate.html">vignette do pacote</a>.</p>
+
+<hr />
 
 
 			<hr>

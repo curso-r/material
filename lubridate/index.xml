@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Lubridate on Curso-R</title>
+    <link>/lubridate/</link>
+    <description>Recent content in Lubridate on Curso-R</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>pt-br</language>
+    <copyright>Disponível sobre Licença MIT</copyright>
+    <lastBuildDate>Tue, 25 Jul 2017 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/lubridate/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Introdução</title>
+      <link>/lubridate/</link>
+      <pubDate>Tue, 25 Jul 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/lubridate/</guid>
+      <description>Introdução Trabalhar com datas no R pode ser uma chateação. As funções do R base são, em geral, contraintuitivas e podem mudar de acordo com o tipo do objeto que você está usando. Além disso, características como fusos horários, anos bissextos, horários de verão, entre outras, podem não estar bem especificadas pelos métodos criados ou nem mesmo sendo levadas em conta.
+O pacote lubridate lida com esses problemas, fazendo o trabalho com datas ser muito mais fácil.</description>
+    </item>
+    
+  </channel>
+</rss>
