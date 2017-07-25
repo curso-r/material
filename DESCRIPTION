@@ -28,6 +28,7 @@ Imports:
     forcats,
     haven,
     readr,
+    readxl,
     tibble,
     tidyr,
     dplyr,
@@ -44,4 +45,5 @@ PowerUps:
     curso-r/pu.modelos,
     curso-r/pu.pipe,
     curso-r/pu.scrape,
-    curso-r/pu.instalacao
+    curso-r/pu.instalacao,
+    curso-r/pu.import
