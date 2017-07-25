@@ -36,6 +36,7 @@ Imports:
 RoxygenNote: 5.0.1
 PowerUps:
     curso-r/pu.manip,
+    curso-r/pu.lubridate,
     curso-r/pu.ggplot,
     curso-r/pu.rbase,
     curso-r/pu.stringr,
