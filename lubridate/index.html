@@ -402,7 +402,7 @@
 
 <p>Trabalhar com datas no R pode ser uma chateação. As funções do R base são, em geral, contraintuitivas e podem mudar de acordo com o tipo do objeto que você está usando. Além disso, características como fusos horários, anos bissextos, horários de verão, entre outras, podem não estar bem especificadas pelos métodos criados ou nem mesmo sendo levadas em conta.</p>
 
-<p>O pacote lubridate lida com esses problemas, fazendo o trabalho com datas ser muito mais fácil. Ele foi criado por Garrett Grolemund e Hadley Wickham.</p>
+<p>O pacote <code>lubridate</code>, criado por <a href="https://github.com/garrettgman">Garrett Grolemund</a> e <a href="https://github.com/hadley">Hadley Wickham</a>, lida com esses problemas, fazendo o trabalho com datas ser muito mais fácil.</p>
 
 <p>Para instalar, siga uma das opções abaixo:</p>
 
@@ -413,28 +413,25 @@ install.packages(&quot;tidyverse&quot;)
 install.packages(&quot;lubridate&quot;)
 
 # Instale a versão de desenvolvimento direto do Github.
-# Caso não tenha o devtools instalado: install.packages(&quot;devtools&quot;).
 devtools::install_github(&quot;tidyverse/lubridate&quot;)
+
+# Se você não tiver o pacote devtools instalado...
+install.packages(&quot;devtools&quot;)
+
 </code></pre>
 
 <p>Para carregar o pacote, basta rodar</p>
 
 <pre><code class="language-r">library(lubridate)
-## Loading required package: methods
-## 
-## Attaching package: 'lubridate'
-## The following object is masked from 'package:base':
-## 
-##     date
 </code></pre>
 
-<p>Neste seção, aprenderemos:</p>
+<p>Neste seção, falaremos sobre:</p>
 
 <ul>
-<li>Transformar e extrair datas.</li>
-<li>Algumas funções úteis para trabalhar com datas.</li>
-<li>Trabalhar com fusos horários.</li>
-<li>Operações aritméticas com datas.</li>
+<li>transformar e extrair datas;</li>
+<li>algumas funções úteis para trabalhar com datas;</li>
+<li>trabalhar com fusos horários; e</li>
+<li>operações aritméticas com datas.</li>
 </ul>
 
 <hr />
@@ -463,7 +460,7 @@ class(data_mdy)
 
 <p>Veja que as funções <code>date()</code> e <code>as_date()</code> converteram a <em>string</em> para data, mas não devolveram o valor esperado. A função <code>dmy()</code> resolve esse problema estabelecendo explicitamente a ordem dia-mês-ano. Existem funções para todas as ordens possíveis: <code>dmy()</code>, <code>mdy()</code>, <code>myd()</code>, <code>ymd()</code>, <code>ydm()</code> etc.</p>
 
-<p>As funções <code>date()</code> e <code>as_date()</code> assumem que a ordem é ano-mês-dia (ymd).</p>
+<p>As funções <code>date()</code> e <code>as_date()</code> assumem que a ordem segue o padrão da língua inglesa: ano-mês-dia (ymd).</p>
 
 <pre><code class="language-r">date(&quot;2015-10-21&quot;)
 ## Error in date(&quot;2015-10-21&quot;): unused argument (&quot;2015-10-21&quot;)
@@ -541,9 +538,9 @@ data
 <p>Também existem funções para extrair a data no instante da execução.</p>
 
 <pre><code class="language-r">today() 
-## [1] &quot;2017-08-11&quot;
+## [1] &quot;2017-08-12&quot;
 now()
-## [1] &quot;2017-08-11 23:28:35 UTC&quot;
+## [1] &quot;2017-08-12 00:27:28 UTC&quot;
 
 # Data e horário do dia em que essa página foi editada pela última vez.
 </code></pre>
@@ -552,22 +549,22 @@ now()
 
 <h2 id="fusos-horários">Fusos horários</h2>
 
-<p>Uma característica inerente das datas é o fuso horário. Se você tiver trabalhando com datas de eventos no Brasil e na Escócia, por exemplo, é preciso verificar se os valores seguem o mesmo fuso horário. Além disso, quando a data exata de um evento for relevante, você pode precisar converter horários para outros fusos para comunicar seus resultados em outros países.</p>
+<p>Uma característica inerente das datas é o fuso horário. Se você estiver trabalhando com datas de eventos no Brasil e na Escócia, por exemplo, é preciso verificar se os valores seguem o mesmo fuso horário. Além disso, quando a data exata de um evento for relevante, você pode precisar converter horários para outros fusos para comunicar seus resultados em outros países.</p>
 
-<p>Para fazer essas coisas, o <code>lubridate</code> fornece as funções <code>with_tz()</code> e <code>force_tz()</code>.</p>
+<p>Para fazer essas coisas, o <code>lubridate</code> fornece as funções <code>with_tz()</code> e <code>force_tz()</code>. Veja um exemplo de como usá-las.</p>
 
 <pre><code class="language-r">estreia_GoT &lt;- ymd_hms(&quot;2017-07-16 22:00:00&quot;, tz = &quot;America/Sao_Paulo&quot;)
 estreia_GoT
 ## [1] &quot;2017-07-16 22:00:00 BRT&quot;
 
-# Calcula qual seria a data em outro fuso
+# Devolve qual seria a data em outro fuso
 
 with_tz(estreia_GoT, tzone = &quot;GMT&quot;)
 ## [1] &quot;2017-07-17 01:00:00 GMT&quot;
 with_tz(estreia_GoT, tzone = &quot;US/Alaska&quot;)  
 ## [1] &quot;2017-07-16 17:00:00 AKDT&quot;
 
-# Altera o fuso sem mudar a data
+# Altera o fuso sem mudar a hora
 
 force_tz(estreia_GoT, tzone = &quot;GMT&quot;)
 ## [1] &quot;2017-07-16 22:00:00 GMT&quot;
@@ -646,6 +643,171 @@ as.period(intervalo)
 </code></pre>
 
 <p>Para mais informações sobre o<code>lubridate</code>, visite o <a href="https://cran.r-project.org/web/packages/lubridate/vignettes/lubridate.html">vignette do pacote</a>.</p>
+
+<hr />
+
+<h2 id="exercícios">Exercícios</h2>
+
+<p>Nos exercícios a seguir, vamos utilizar a base <code>lakers</code>, que contém estatísticas jogo a jogo do <a href="http://www.nba.com/lakers/">Los Angeles Lakers</a> na temporada 2008-2009.</p>
+
+<pre><code class="language-r">head(lakers)
+##       date opponent game_type  time period     etype team
+## 1 20081028      POR      home 12:00      1 jump ball  OFF
+## 2 20081028      POR      home 11:39      1      shot  LAL
+## 3 20081028      POR      home 11:37      1   rebound  LAL
+## 4 20081028      POR      home 11:25      1      shot  LAL
+## 5 20081028      POR      home 11:23      1   rebound  LAL
+## 6 20081028      POR      home 11:22      1      shot  LAL
+##                player result points  type  x  y
+## 1                                 0       NA NA
+## 2           Pau Gasol missed      0  hook 23 13
+## 3 Vladimir Radmanovic             0   off NA NA
+## 4        Derek Fisher missed      0 layup 25  6
+## 5           Pau Gasol             0   off NA NA
+## 6           Pau Gasol   made      2  hook 25 10
+</code></pre>
+
+<hr />
+
+<p><strong>1.</strong></p>
+
+<p>Repare que a coluna <code>date</code> no data.frame é um vetor de inteiros. Transforme essa coluna em um vetor de valores com classe <code>date</code>.</p>
+
+<hr />
+
+<p><strong>2.</strong></p>
+
+<p>Crie uma coluna que junte as informações de data e tempo de jogo (colunas <code>date</code> e <code>time</code>) em objetos da classe <code>date</code>.</p>
+
+<hr />
+
+<p><strong>3.</strong></p>
+
+<p>Crie as colunas <code>dia</code>, <code>mês</code> e <code>ano</code> com as respectivas informações sobre a data do jogo.</p>
+
+<hr />
+
+<p><strong>4.</strong></p>
+
+<p>Em média, quanto tempo o Lakers demora para arremessar a primeira bola no primeiro período?</p>
+
+<p><strong>Dica</strong>: arremessos são representados pela categoria <code>shot</code> da coluna <code>etype</code>.</p>
+
+<hr />
+
+<p><strong>5.</strong></p>
+
+<p>Em média, quanto tempo demora para sair a primeira cesta de três pontos? Considere toda a base, e cestas de ambos os times.</p>
+
+<hr />
+
+<p><strong>6.</strong></p>
+
+<p>Construa boxplots do tempo entre pontos consecultivos para cada períodos. Considere toda a base de dados e apenas pontos do Lakers.</p>
+
+<hr />
+
+<p><strong>7.</strong></p>
+
+<p>Qual foi o dia e mês do jogo que o Lakers demorou mais tempo para fazer uma cesta? Quanto tempo foi?</p>
+
+<hr />
+
+<pre><code>## Error in library(dplyr): there is no package called 'dplyr'
+</code></pre>
+
+<h2 id="respostas">Respostas</h2>
+
+<div class='admonition note'>
+<p class='admonition-title'>
+Nota
+</p>
+<p>
+Não há apenas uma maneira de resolver os exercícios. Você pode encontrar soluções diferentes das nossas, algumas vezes mais eficientes, outras vezes menos. Quando estiver fazendo suas análises, tente buscar o equilíbrio entre eficiência e praticidade. Economizar 1 hora com a execução do código pode não valer a pena se você demorou 2 horas a mais para programá-lo.
+</p>
+</div>
+
+<hr />
+
+<p><strong>1.</strong></p>
+
+<p>Crie uma nova coluna no data.frame com as datas no formato dia-mês-ano.</p>
+
+<pre><code class="language-r">lakers %&gt;% 
+  mutate(date = ymd(date))
+## Error in mutate(., date = ymd(date)): could not find function &quot;mutate&quot;
+</code></pre>
+
+<p>Repare que <code>as_date()</code> não funciona neste caso.</p>
+
+<pre><code class="language-r">lakers %&gt;%
+  mutate(date = as_date(date))
+## Error in mutate(., date = as_date(date)): could not find function &quot;mutate&quot;
+</code></pre>
+
+<p>Para entender porque a função devolveu um dia do ano 56949, rode os códigos abaixo.</p>
+
+<pre><code class="language-r">as_date(0)
+## [1] &quot;1970-01-01&quot;
+as_date(-3:3)
+## [1] &quot;1969-12-29&quot; &quot;1969-12-30&quot; &quot;1969-12-31&quot; &quot;1970-01-01&quot; &quot;1970-01-02&quot;
+## [6] &quot;1970-01-03&quot; &quot;1970-01-04&quot;
+as_date(20081027:20081029)
+## [1] &quot;56949-12-26&quot; &quot;56949-12-27&quot; &quot;56949-12-28&quot;
+</code></pre>
+
+<hr />
+
+<p><strong>2.</strong></p>
+
+<p>Crie uma coluna que junte as informações de data e hora (colunas <code>date</code> e <code>time</code>) em objetos da classe <code>date</code>.</p>
+
+<pre><code class="language-r">lakers %&gt;% 
+  mutate(date_time = paste0(date, &quot; 00:&quot;, time) %&gt;% ymd_hms) %&gt;% 
+  select(date_time)
+## Error in mutate(., date_time = paste0(date, &quot; 00:&quot;, time) %&gt;% ymd_hms): could not find function &quot;mutate&quot;
+</code></pre>
+
+<hr />
+
+<p><strong>3.</strong></p>
+
+<p>Crie as colunas <code>dia</code>, <code>mes</code> e <code>ano</code> com as respectivas informações sobre a data do jogo.</p>
+
+<pre><code class="language-r">lakers %&gt;%
+  mutate(date = ymd(date),
+         dia = day(date),
+         mes = month(date),
+         ano = year(date)) %&gt;% 
+  select(date, dia, mes, ano)
+## Error in mutate(., date = ymd(date), dia = day(date), mes = month(date), : could not find function &quot;mutate&quot;
+</code></pre>
+
+<hr />
+
+<p><strong>4.</strong></p>
+
+<p>Em média, quanto tempo o Lakers demora para arremessar a primeira bola no primeiro período?</p>
+
+<p><strong>Dica</strong>: arremessos são representados pela categoria <code>shot</code> da coluna <code>etype</code>.</p>
+
+<hr />
+
+<p><strong>5.</strong></p>
+
+<p>Em média, quanto tempo demora para sair a primeira cesta de três pontos? Considere toda a base, e cestas de ambos os times.</p>
+
+<hr />
+
+<p><strong>6.</strong></p>
+
+<p>Construa boxplots do tempo entre pontos consecultivos para cada períodos. Considere toda a base de dados e apenas pontos do Lakers.</p>
+
+<hr />
+
+<p><strong>7.</strong></p>
+
+<p>Qual foi o dia e mês do jogo que o Lakers demorou mais tempo para fazer uma cesta? Quanto tempo foi?</p>
 
 <hr />
 
