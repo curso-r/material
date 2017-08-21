@@ -88,6 +88,10 @@
 
     
 
+    <div>
+      <p>Blog<a href="http://curso-r.com/blog/"></a></p>
+    </div>
+    
     
     <div class="button button-github" role="button" aria-label="GitHub">
       <a href="https://github.com/curso-r" title="@curso-r on GitHub" target="_blank" class="toggle-button icon icon-github"></a>
@@ -110,6 +114,7 @@
     </div>
   </div>
 </nav>
+
 </header>
 
 <main class="main">
@@ -538,9 +543,9 @@ data
 <p>Também existem funções para extrair a data no instante da execução.</p>
 
 <pre><code class="language-r">today() 
-## [1] &quot;2017-08-12&quot;
+## [1] &quot;2017-08-14&quot;
 now()
-## [1] &quot;2017-08-12 00:27:28 UTC&quot;
+## [1] &quot;2017-08-14 21:30:21 UTC&quot;
 
 # Data e horário do dia em que essa página foi editada pela última vez.
 </code></pre>
@@ -650,21 +655,8 @@ as.period(intervalo)
 
 <p>Nos exercícios a seguir, vamos utilizar a base <code>lakers</code>, que contém estatísticas jogo a jogo do <a href="http://www.nba.com/lakers/">Los Angeles Lakers</a> na temporada 2008-2009.</p>
 
-<pre><code class="language-r">head(lakers)
-##       date opponent game_type  time period     etype team
-## 1 20081028      POR      home 12:00      1 jump ball  OFF
-## 2 20081028      POR      home 11:39      1      shot  LAL
-## 3 20081028      POR      home 11:37      1   rebound  LAL
-## 4 20081028      POR      home 11:25      1      shot  LAL
-## 5 20081028      POR      home 11:23      1   rebound  LAL
-## 6 20081028      POR      home 11:22      1      shot  LAL
-##                player result points  type  x  y
-## 1                                 0       NA NA
-## 2           Pau Gasol missed      0  hook 23 13
-## 3 Vladimir Radmanovic             0   off NA NA
-## 4        Derek Fisher missed      0 layup 25  6
-## 5           Pau Gasol             0   off NA NA
-## 6           Pau Gasol   made      2  hook 25 10
+<pre><code class="language-r">lakers %&gt;% as_tibble()
+## Error in lakers %&gt;% as_tibble(): could not find function &quot;%&gt;%&quot;
 </code></pre>
 
 <hr />
@@ -789,13 +781,52 @@ as_date(20081027:20081029)
 
 <p>Em média, quanto tempo o Lakers demora para arremessar a primeira bola no primeiro período?</p>
 
-<p><strong>Dica</strong>: arremessos são representados pela categoria <code>shot</code> da coluna <code>etype</code>.</p>
+<p><strong>Dicas</strong>: arremessos são representados pela categoria <code>shot</code> da coluna <code>etype</code> e cada período tem 12 minutos.</p>
+
+<pre><code class="language-r">lakers %&gt;% 
+  dplyr::filter(etype == &quot;shot&quot;, period == 1, team == &quot;LAL&quot;) %&gt;% 
+  dplyr::mutate(time = hms(paste0(&quot;00:&quot;, time)),
+                cronometro = 12*60 - minute(time)*60 - second(time)) %&gt;% 
+  dplyr::group_by(date) %&gt;% 
+  dplyr::filter(cronometro == min(cronometro)) %&gt;% 
+  dplyr::ungroup() %&gt;% 
+  dplyr::summarise(media = mean(cronometro))
+## Error in loadNamespace(name): there is no package called 'dplyr'
+</code></pre>
+
+<p>O que foi feito:</p>
+
+<ul>
+<li><p>Primeiro filtramos a base para arremessos, <code>etype == &quot;shot&quot;</code>, do primeiro período, <code>period ==</code>, que fossem do Lakers, <code>team == &quot;LAL&quot;</code>.</p></li>
+
+<li><p>Em seguida, mudamos a classe da coluna <code>time</code>, de <code>character</code> para <code>period</code>, e criamos a coluna <code>cronometro</code>, que contém o tempo passado (em segundos) até o instante do evento.</p></li>
+
+<li><p>Então agrupamos a base pelo dia e a filtramos apenas para o primeiro evento de cada dia, isto é, o evento que tem o menor valor na coluna <code>cronometro</code>. Assim, a coluna <code>cronometro</code> da base resultante terá o tempo do primeiro arremesso de cada jogo.</p></li>
+
+<li><p>Por fim, desagrupamos a base e calculamos a média da coluna <code>cronometro</code>.</p></li>
+</ul>
 
 <hr />
 
 <p><strong>5.</strong></p>
 
-<p>Em média, quanto tempo demora para sair a primeira cesta de três pontos? Considere toda a base, e cestas de ambos os times.</p>
+<p>Em média, quanto tempo demora para sair a primeira cesta de três pontos em cada um dos quatro períodos? Considere toda a base, e cestas de ambos os times.</p>
+
+<pre><code class="language-r">lakers %&gt;% 
+  dplyr::filter(etype == &quot;shot&quot;, period %in% 1:4, points == &quot;3&quot;) %&gt;% 
+  dplyr::mutate(time = hms(paste0(&quot;00:&quot;, time)),
+                cronometro = 12*60 - minute(time)*60 - second(time)) %&gt;% 
+  dplyr::group_by(date, period) %&gt;% 
+  dplyr::filter(cronometro == min(cronometro)) %&gt;% 
+  dplyr::ungroup() %&gt;%
+  dplyr::group_by(period) %&gt;% 
+  dplyr::summarise(media = mean(cronometro))
+## Error in loadNamespace(name): there is no package called 'dplyr'
+</code></pre>
+
+<p>A resolução desse exercício é análoga ao anterior, só mudamos o filtro inicial e o agrupamento. Se você ficou com dúvidas, consulte o passo a passo na resolução do exercício 4.</p>
+
+<p>Repare que não precisarímos filtrar por <code>etype == &quot;shot&quot;</code>, já que o único evento que gera 3 pontos é a cesta de 3 pontos.</p>
 
 <hr />
 
