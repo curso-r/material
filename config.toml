@@ -57,7 +57,7 @@ pluralizeListTitles = false
   weight = 10
 
 [[menu.main]]
-  name   = "O operador pipe"
+  name   = "Pipe"
   url    = "pipe/"
   weight = 23
   
@@ -67,27 +67,27 @@ pluralizeListTitles = false
   weight = 25
 
 [[menu.main]]
-  name   = "Manipulação de dados"
+  name   = "Manipulação"
   url    = "manip/"
   weight = 30
   
 [[menu.main]]
-  name   = "Visualizações com ggplot2"
+  name   = "Visualizações"
   url    = "ggplot/"
   weight = 35
 
 [[menu.main]]
-  name   = "Strings: o pacote stringr"
+  name   = "Strings"
   url    = "stringr/"
   weight = 41
   
 [[menu.main]]
-  name   = "Datas: o pacote lubridate"
+  name   = "Datas"
   url    = "lubridate/"
   weight = 43
   
 [[menu.main]]
-  name   = "Fatores: o pacote forcats"
+  name   = "Fatores"
   url    = "forcats/"
   weight = 45  
 
