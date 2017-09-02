@@ -546,6 +546,82 @@ saida &lt;- round(media, 1)
 
 <hr />
 
+<h2 id="respostas">Respostas</h2>
+
+<div class='admonition note'>
+<p class='admonition-title'>
+Nota
+</p>
+<p>
+Não há apenas uma maneira de resolver os exercícios. Você pode encontrar soluções diferentes das nossas, algumas vezes mais eficientes, outras vezes menos. Quando estiver fazendo suas análises, tente buscar o equilíbrio entre eficiência e praticidade. Economizar 1 hora com a execução do código pode não valer a pena se você demorou 2 horas a mais para programá-lo.
+</p>
+</div>
+
+<hr />
+
+<p><strong>1.</strong></p>
+
+<p>Reescreva a expressão abaixo utilizando o <code>%&gt;%</code>.</p>
+
+<pre><code class="language-r">round(mean(sum(1:10)/3), digits = 1)
+## [1] 18.3
+
+1:10 %&gt;% 
+  sum %&gt;% 
+  divide_by(3) %&gt;% 
+  round(digits = 1)
+## [1] 18.3
+</code></pre>
+
+<hr />
+
+<p><strong>2.</strong></p>
+
+<p>Reescreva o código abaixo utilizando o <code>%&gt;%</code>.</p>
+
+<pre><code class="language-r">
+# Setamos a semente que gera números aleatórios para deixar o resultado reprodutível
+
+set.seed(137)
+
+x &lt;- rnorm(100)
+x.pos &lt;- x[x&gt;0]
+media &lt;- mean(x.pos)
+saida &lt;- round(media, 2)
+saida
+## [1] 0.78
+
+set.seed(137)
+
+rnorm(100) %&gt;% 
+  extract(. &gt; 0) %&gt;% 
+  mean %&gt;%
+  round(digits = 2)
+## [1] 0.78
+</code></pre>
+
+<hr />
+
+<p><strong>3.</strong></p>
+
+<p>Sem rodar, diga qual a saída do código abaixo. Consulte o help das funções caso precise.</p>
+
+<pre><code class="language-r">2 %&gt;% 
+  add(2) %&gt;% 
+  c(6, NA) %&gt;% 
+  mean(na.rm = T) %&gt;% 
+  equals(5)
+</code></pre>
+
+<ul>
+<li>Primeiro, somamos 2 com 2, gerando o valor 4.</li>
+<li>Então colocamos esse valor em um vetor com os valores 6 e <code>NA</code>.</li>
+<li>Em seguida, tiramos a média desse vetor, desconsiderando o <code>NA</code>, obtendo o valor 5.</li>
+<li>Por fim, testemos se o valor é igual a 5, obtendo o valor <code>TRUE</code>.</li>
+</ul>
+
+<hr />
+
 
 			<hr>
 			
