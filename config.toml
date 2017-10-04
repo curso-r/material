@@ -101,6 +101,11 @@ pluralizeListTitles = false
   url    = "scrape/"
   weight = 60
 
+[[menu.main]]
+  name   = "APIs"
+  url    = "api/"
+  weight = 70
+
 [blackfriday]
   smartypants  = true
   fractions = true
