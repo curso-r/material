@@ -46,5 +46,5 @@ PowerUps:
     curso-r/pu.pipe,
     curso-r/pu.scrape,
     curso-r/pu.instalacao,
-    curso-r/pu.import
+    curso-r/pu.import,
     curso-r/pu.api
