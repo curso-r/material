@@ -7,10 +7,20 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>pt-br</language>
     <copyright>Disponível sobre Licença MIT</copyright>
-    <lastBuildDate>Sat, 02 Sep 2017 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 04 Oct 2017 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Introdução</title>
+      <link>/api/</link>
+      <pubDate>Wed, 04 Oct 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/api/</guid>
+      <description>O fluxo da ciência de dados se encerra na parte de comunicação. Essa parte é responsável por transferir todo o conhecimento gerado durante a análise de dados. E isso não é nada fácil!!
+knitr::include_graphics(&amp;quot;figures/data-science-communicate.png&amp;quot;)  A forma de construir a comunicação depende muito do interlocutor. Por exemplo, se a pessoa que vai receber a comunicação é um técnico como você, é importante elaborar um documento que deixe claro o que você fez e como você chegou nos resultados.</description>
+    </item>
     
     <item>
       <title>Introdução</title>
@@ -31,6 +41,17 @@ install.packages(&amp;quot;magrittr&amp;quot;) library(magrittr)  A ideia do ope
       <guid>/lubridate/</guid>
       <description>Introdução Trabalhar com datas no R pode ser uma chateação. As funções do R base são, em geral, contraintuitivas e podem mudar de acordo com o tipo do objeto que você está usando. Além disso, características como fusos horários, anos bissextos, horários de verão, entre outras, podem não estar bem especificadas pelos métodos criados ou nem mesmo sendo levadas em conta.
 O pacote lubridate, criado por Garrett Grolemund e Hadley Wickham, lida com esses problemas, fazendo o trabalho com datas ser muito mais fácil.</description>
+    </item>
+    
+    <item>
+      <title>Introdução</title>
+      <link>/import/</link>
+      <pubDate>Tue, 25 Jul 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/import/</guid>
+      <description>Nesta seção, vamos introduzir os principais pacotes para importar dados para o R. Mostraremos como importar dados de arquivos de texto, de planilhas do excel, de extensões de outros programas estatísticos (SAS e SPSS, por exemplo), e como interagir com o SQL.
+As funções que apresentaremos aqui carregam os dados em tibbles, que diferem dos data.frames em dois pontos importantes:
+ imprime os dados na tela de uma forma muito mais organizada, resumida e legível; e</description>
     </item>
     
     <item>

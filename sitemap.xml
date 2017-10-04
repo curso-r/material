@@ -3,6 +3,11 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>/api/</loc>
+    <lastmod>2017-10-04T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>/pipe/</loc>
     <lastmod>2017-09-02T00:00:00+00:00</lastmod>
   </url>
@@ -10,6 +15,11 @@
   <url>
     <loc>/lubridate/</loc>
     <lastmod>2017-08-14T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/import/</loc>
+    <lastmod>2017-07-25T00:00:00+00:00</lastmod>
   </url>
   
   <url>
@@ -58,13 +68,19 @@
   </url>
   
   <url>
+    <loc>/api/</loc>
+    <lastmod>2017-10-04T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>/categories/</loc>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>/</loc>
-    <lastmod>2017-09-02T00:00:00+00:00</lastmod>
+    <lastmod>2017-10-04T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -77,6 +93,12 @@
   <url>
     <loc>/ggplot/</loc>
     <lastmod>2017-02-05T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/import/</loc>
+    <lastmod>2017-07-25T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
