@@ -13,11 +13,6 @@
   </url>
   
   <url>
-    <loc>/import/</loc>
-    <lastmod>2017-07-25T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>/stringr/</loc>
     <lastmod>2017-07-20T00:00:00+00:00</lastmod>
   </url>
@@ -82,12 +77,6 @@
   <url>
     <loc>/ggplot/</loc>
     <lastmod>2017-02-05T00:00:00+00:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>/import/</loc>
-    <lastmod>2017-07-25T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   

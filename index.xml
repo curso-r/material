@@ -34,17 +34,6 @@ O pacote lubridate, criado por Garrett Grolemund e Hadley Wickham, lida com esse
     </item>
     
     <item>
-      <title>Introdução</title>
-      <link>/import/</link>
-      <pubDate>Tue, 25 Jul 2017 00:00:00 +0000</pubDate>
-      
-      <guid>/import/</guid>
-      <description>Nesta seção, vamos introduzir os principais pacotes para importar dados para o R. Mostraremos como importar dados de arquivos de texto, de planilhas do excel, de extensões de outros programas estatísticos (SAS e SPSS, por exemplo), e como interagir com o SQL.
-As funções que apresentaremos aqui carregam os dados em tibbles, que diferem dos data.frames em dois pontos importantes:
- imprime os dados na tela de uma forma muito mais organizada, resumida e legível; e</description>
-    </item>
-    
-    <item>
       <title>Stringr</title>
       <link>/stringr/</link>
       <pubDate>Thu, 20 Jul 2017 00:00:00 +0000</pubDate>
