@@ -44,29 +44,29 @@
 
         {{ if isset .Site.Params "author" }}
         <hr>
-        <span class="section">Fale conosco</span>
+        <span class="section">Vamos trocar uma ideia?</span>
         
         <ul>
           {{ with .Site.Social.twitter }}
           <li>
-            <a href="https://twitter.com/{{ . }}" target="_blank" title="@{{ . }} on Twitter">
-              @{{ . }} on Twitter
+            <a href="https://twitter.com/{{ . }}" target="_blank" title="Twitter">
+              Twitter
             </a>
           </li>
           {{ end }}
           
           {{ with .Site.Social.facebook }}
           <li>
-            <a href="https://www.facebook.com/{{ . }}" target="_blank" title="Página {{ . }} no Facebook">
-              Página {{ . }} no Facebook
+            <a href="https://www.facebook.com/{{ . }}" target="_blank" title="Facebook">
+              Facebook
             </a>
           </li>
           {{ end }}
 
           {{ with .Site.Social.github }}
           <li>
-            <a href="https://github.com/{{ . }}" target="_blank" title="@{{ . }} on GitHub">
-              @{{ . }} no GitHub
+            <a href="https://github.com/{{ . }}" target="_blank" title="GitHub">
+              GitHub
             </a>
           </li>
           {{ end }}
@@ -74,7 +74,7 @@
           {{ with .Site.Social.email }}
           <li>
             <a href="mailto:{{ . }}" title="Email of {{ . }}">
-              Contate-nos via e-mail
+              E-mail
             </a>
           </li>
           {{ end }}
