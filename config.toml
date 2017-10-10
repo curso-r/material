@@ -42,13 +42,14 @@ pluralizeListTitles = false
 
 
 [social]
-  twitter = ""
+  twitter = "curso_r"
   github  = "curso-r"
+  facebook = "cursodeR"
   email   = "contato@curso-r.com"
 
 [[menu.main]]
   name   = "Instalação"
-  url    = "insta/"
+  url    = "instalacao/"
   weight = 05
   
 [[menu.main]]

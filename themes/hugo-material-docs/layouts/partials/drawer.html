@@ -44,7 +44,7 @@
 
         {{ if isset .Site.Params "author" }}
         <hr>
-        <span class="section">The author</span>
+        <span class="section">Fale conosco</span>
         
         <ul>
           {{ with .Site.Social.twitter }}
@@ -54,11 +54,19 @@
             </a>
           </li>
           {{ end }}
+          
+          {{ with .Site.Social.facebook }}
+          <li>
+            <a href="https://www.facebook.com/{{ . }}" target="_blank" title="Página {{ . }} no Facebook">
+              Página {{ . }} no Facebook
+            </a>
+          </li>
+          {{ end }}
 
           {{ with .Site.Social.github }}
           <li>
             <a href="https://github.com/{{ . }}" target="_blank" title="@{{ . }} on GitHub">
-              @{{ . }} on GitHub
+              @{{ . }} no GitHub
             </a>
           </li>
           {{ end }}
@@ -66,7 +74,7 @@
           {{ with .Site.Social.email }}
           <li>
             <a href="mailto:{{ . }}" title="Email of {{ . }}">
-              Contact via email
+              Contate-nos via e-mail
             </a>
           </li>
           {{ end }}
