@@ -7,7 +7,7 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>pt-br</language>
     <copyright>Disponível sobre Licença MIT</copyright>
-    <lastBuildDate>Sat, 17 Jun 2017 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 10 Oct 2017 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/instalacao/index.xml" rel="self" type="application/rss+xml" />
     
@@ -15,7 +15,7 @@
     <item>
       <title>Instalação</title>
       <link>/instalacao/</link>
-      <pubDate>Sat, 17 Jun 2017 00:00:00 +0000</pubDate>
+      <pubDate>Tue, 10 Oct 2017 00:00:00 +0000</pubDate>
       
       <guid>/instalacao/</guid>
       <description>A seguir apresentamos tutoriais para a instalação do R e do RStudio nos principais sistemas operacionais. Também damos um exemplo de como instalar pacotes no R.
