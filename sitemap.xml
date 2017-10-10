@@ -3,62 +3,62 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>/2api/</loc>
+    <loc>/api/</loc>
     <lastmod>2017-10-04T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>/2pipe/</loc>
+    <loc>/pipe/</loc>
     <lastmod>2017-09-02T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>/2lubridate/</loc>
+    <loc>/lubridate/</loc>
     <lastmod>2017-08-14T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>/2import/</loc>
+    <loc>/import/</loc>
     <lastmod>2017-07-25T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>/2stringr/</loc>
+    <loc>/stringr/</loc>
     <lastmod>2017-07-20T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>/2rbase/</loc>
+    <loc>/rbase/</loc>
     <lastmod>2017-07-04T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>/2instalacao/</loc>
+    <loc>/instalacao/</loc>
     <lastmod>2017-06-17T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>/2scrape/</loc>
+    <loc>/scrape/</loc>
     <lastmod>2017-02-15T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>/2manip/</loc>
+    <loc>/manip/</loc>
     <lastmod>2017-02-08T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>/2modelos/</loc>
+    <loc>/modelos/</loc>
     <lastmod>2017-02-06T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>/2ggplot/</loc>
+    <loc>/ggplot/</loc>
     <lastmod>2017-02-05T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>/2forcats/</loc>
+    <loc>/forcats/</loc>
     <lastmod>2017-02-03T00:00:00+00:00</lastmod>
   </url>
   
@@ -68,74 +68,8 @@
   </url>
   
   <url>
-    <loc>/2api/</loc>
+    <loc>/api/</loc>
     <lastmod>2017-10-04T00:00:00+00:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>/2forcats/</loc>
-    <lastmod>2017-02-03T00:00:00+00:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>/2ggplot/</loc>
-    <lastmod>2017-02-05T00:00:00+00:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>/2import/</loc>
-    <lastmod>2017-07-25T00:00:00+00:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>/2instalacao/</loc>
-    <lastmod>2017-06-17T00:00:00+00:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>/2lubridate/</loc>
-    <lastmod>2017-08-14T00:00:00+00:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>/2manip/</loc>
-    <lastmod>2017-02-08T00:00:00+00:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>/2modelos/</loc>
-    <lastmod>2017-02-06T00:00:00+00:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>/2pipe/</loc>
-    <lastmod>2017-09-02T00:00:00+00:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>/2rbase/</loc>
-    <lastmod>2017-07-04T00:00:00+00:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>/2scrape/</loc>
-    <lastmod>2017-02-15T00:00:00+00:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>/2stringr/</loc>
-    <lastmod>2017-07-20T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -147,6 +81,72 @@
   <url>
     <loc>/</loc>
     <lastmod>2017-10-04T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/forcats/</loc>
+    <lastmod>2017-02-03T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/ggplot/</loc>
+    <lastmod>2017-02-05T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/import/</loc>
+    <lastmod>2017-07-25T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/instalacao/</loc>
+    <lastmod>2017-06-17T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/lubridate/</loc>
+    <lastmod>2017-08-14T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/manip/</loc>
+    <lastmod>2017-02-08T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/modelos/</loc>
+    <lastmod>2017-02-06T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/pipe/</loc>
+    <lastmod>2017-09-02T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/rbase/</loc>
+    <lastmod>2017-07-04T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/scrape/</loc>
+    <lastmod>2017-02-15T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/stringr/</loc>
+    <lastmod>2017-07-20T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   

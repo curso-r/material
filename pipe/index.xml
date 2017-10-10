@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Pipe on Curso-R</title>
+    <link>/pipe/</link>
+    <description>Recent content in Pipe on Curso-R</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>pt-br</language>
+    <copyright>Disponível sobre Licença MIT</copyright>
+    <lastBuildDate>Sat, 02 Sep 2017 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/pipe/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Introdução</title>
+      <link>/pipe/</link>
+      <pubDate>Sat, 02 Sep 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/pipe/</guid>
+      <description>O operador %&amp;gt;% O operador %&amp;gt;% (pipe) foi uma das grandes revoluções recentes do R, tornando a leitura de códigos mais lógica, fácil e compreensível. Ele foi introduzido por Stefan Milton Bache no pacote magrittr e já existem diversos pacotes construidos para facilitar a sua utilizaçăo.
+Para começar a utilizar o pipe, instale e carregue o pacote magrittr.
+install.packages(&amp;quot;magrittr&amp;quot;) library(magrittr)  A ideia do operador %&amp;gt;% (pipe) é bem simples: usar o valor resultante da expressão do lado esquerdo como primeiro argumento da função do lado direito.</description>
+    </item>
+    
+  </channel>
+</rss>

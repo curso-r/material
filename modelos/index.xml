@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Modelos on Curso-R</title>
+    <link>/modelos/</link>
+    <description>Recent content in Modelos on Curso-R</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>pt-br</language>
+    <copyright>Disponível sobre Licença MIT</copyright>
+    <lastBuildDate>Mon, 06 Feb 2017 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/modelos/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Modelagem</title>
+      <link>/modelos/</link>
+      <pubDate>Mon, 06 Feb 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/modelos/</guid>
+      <description>Aprendizado Estatístico O termos Aprendizado Estatístico refere-se a uma vasta quantidade de ferramentas que são utilizadas para entender dados. Essas ferramentas são classificadas em supervisionadas e não-supervisionadas. De forma geral, aprendizado supervisionado envolve a construção de um modelo estatístico para prever ou estimar uma resposta de acordo com uma ou mais informações de entrada. No aprendizado não-supervisionado existem variáveis de entrada mas não existe uma variável resposta. Neste caso, o objetivo é entender a estrutura e a relação entre as variáveis.</description>
+    </item>
+    
+  </channel>
+</rss>
