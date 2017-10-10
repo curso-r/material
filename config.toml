@@ -48,7 +48,7 @@ pluralizeListTitles = false
 
 [[menu.main]]
   name   = "Instalação"
-  url    = "instalacao/"
+  url    = "insta/"
   weight = 05
   
 [[menu.main]]
