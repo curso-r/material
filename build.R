@@ -28,7 +28,7 @@ download_and_extract_pu <- function(power_up){
   system(sprintf(
     'mv content/%s-content content/%s/', 
     pu_name, 
-    stringr::str_replace(pu_name, '^pu.', '')
+    stringr::str_replace(pu_name, '^pu.', '2')
   ))
   file.remove(file)
 }
