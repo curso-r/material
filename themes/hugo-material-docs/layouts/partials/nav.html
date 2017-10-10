@@ -5,7 +5,7 @@
 {{ $.Scratch.Set "currentMenuEntry" . }}
 <li>
   {{ if .HasChildren }}
-    <span class="section">TESTE</span>
+    <span class="section">{{ .Name | title }}</span>
     <ul>
       {{ range .Children }}
         {{ $.Scratch.Set "currentMenuEntry" . }}

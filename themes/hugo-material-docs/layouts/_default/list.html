@@ -1,7 +1,3 @@
-{{ partial "head" . }}
-{{ $currentMenuEntry := .Scratch.Get "currentMenuEntry" }}
-{{ $isCurrent := eq .Permalink ($currentMenuEntry.URL | absURL | printf "%s") }}
-
 <div class="backdrop">
 	<div class="backdrop-paper"></div>
 </div>
