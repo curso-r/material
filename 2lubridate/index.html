@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+  
+  
+  
+  
+   <html class="no-js"> 
+
+  <head lang="pt-br">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=10" />
+    <meta name="google-site-verification" content="3wpHHnuvp_52dDrXvZoNa5_Vs4BWcyVoeM62GbQ7llc" />
+    <title>2lubridate - Curso-R</title>
+    <meta name="generator" content="Hugo 0.22" />
+
+    
+    <meta name="description" content="Materiais para cursos de R">
+    
+    <link rel="canonical" href="../2lubridate/">
+    
+    <meta name="author" content="Curso-R">
+    
+
+    <meta property="og:url" content="/2lubridate/">
+    <meta property="og:title" content="Curso-R">
+    <meta property="og:image" content="/logo-curso-r.png">
+    <meta name="apple-mobile-web-app-title" content="Curso-R">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <link rel="shortcut icon" type="image/x-icon" href="//images/favicon.ico">
+    <link rel="icon" type="image/x-icon" href="//images/favicon.ico">
+    <link href="../stylesheets/prism/prism.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../stylesheets/icons.css">
+    <link rel="stylesheet" href="../stylesheets/application.css">
+    <link rel="stylesheet" href="../stylesheets/temporary.css">
+    <link rel="stylesheet" href="../stylesheets/palettes.css">
+    <link rel="stylesheet" href="../stylesheets/highlight/highlight.css">
+
+    
+    
+    
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ubuntu:400,700|Ubuntu&#43;Mono">
+    <style>
+      body, input {
+        font-family: 'Ubuntu', Helvetica, Arial, sans-serif;
+      }
+      pre, code {
+        font-family: 'Ubuntu Mono', 'Courier New', 'Courier', monospace;
+      }
+    </style>
+
+    
+    <script src="../javascripts/modernizr.js"></script>
+
+    
+    <link href="../2lubridate/index.xml" rel="alternate" type="application/rss+xml" title="Curso-R" />
+    <link href="../2lubridate/index.xml" rel="feed" type="application/rss+xml" title="Curso-R" />
+    
+
+  </head>
+  <body class="palette-primary-red palette-accent-teal">
+
+
+<div class="backdrop">
+	<div class="backdrop-paper"></div>
+</div>
+
+<input class="toggle" type="checkbox" id="toggle-drawer">
+<input class="toggle" type="checkbox" id="toggle-search">
+<label class="toggle-button overlay" for="toggle-drawer"></label>
+
+<header class="header">
+	<nav aria-label="Header">
+  <div class="bar default">
+    <div class="button button-menu" role="button" aria-label="Menu">
+      <label class="toggle-button icon icon-menu" for="toggle-drawer">
+        <span></span>
+      </label>
+    </div>
+    <div class="stretch">
+      <div class="title">
+        
+        <a href="../2lubridate/" class="permalink">2lubridate</a>
+        
+      </div>
+    </div>
+
+    
+    <div class="button button-twitter" role="button" aria-label="Twitter">
+       <a href="https://twitter.com/curso_r" title="@curso_r on Twitter" target="_blank" class="toggle-button icon icon-twitter"></a>
+    </div>
+    
+    
+    
+    <div class="button button-github" role="button" aria-label="GitHub">
+      <a href="https://github.com/curso-r" title="@curso-r on GitHub" target="_blank" class="toggle-button icon icon-github"></a>
+    </div>
+    
+    
+        
+  </div>
+  <div class="bar search">
+    <div class="button button-close" role="button" aria-label="Close">
+      <label class="toggle-button icon icon-back" for="toggle-search"></label>
+    </div>
+    <div class="stretch">
+      <div class="field">
+        <input class="query" type="text" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck>
+      </div>
+    </div>
+    <div class="button button-reset" role="button" aria-label="Search">
+      <button class="toggle-button icon icon-close" id="reset-search"></button>
+    </div>
+  </div>
+</nav>
+
+</header>
+
+<main class="main">
+	<div class="drawer">
+		<nav aria-label="Navigation">
+  <a href="../" class="project">
+    <div class="banner">
+      
+        <div class="logo">
+          <img src="../logo-curso-r.png">
+        </div>
+      
+      <div class="name">
+        <strong>Curso-R </strong>
+        
+      </div>
+    </div>
+  </a>
+
+  <div class="scrollable">
+    <div class="wrapper">
+      
+        <ul class="repo">
+          <li class="repo-download">
+            <a href="https://github.com/curso-r/material/archive/master.zip" target="_blank" title="Download" data-action="download">
+              <i class="icon icon-download"></i> Download
+            </a>
+          </li>
+          <li class="repo-stars">
+            <a href="https://github.com/curso-r/material/stargazers" target="_blank" title="Stargazers" data-action="star">
+              <i class="icon icon-star"></i> Stars
+              <span class="count">&ndash;</span>
+            </a>
+          </li>
+        </ul>
+        <hr>
+      
+
+      <div class="toc">
+        
+        <ul>
+          
+
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="Instalação" href="../instalacao/">
+	
+	Instalação
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="R básico" href="../rbase/">
+	
+	R básico
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="Pipe" href="../pipe/">
+	
+	Pipe
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="Importação" href="../import/">
+	
+	Importação
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="Manipulação" href="../manip/">
+	
+	Manipulação
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="Visualizações" href="../ggplot/">
+	
+	Visualizações
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="Strings" href="../stringr/">
+	
+	Strings
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="Datas" href="../lubridate/">
+	
+	Datas
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="Fatores" href="../forcats/">
+	
+	Fatores
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="Modelagem" href="../modelos/">
+	
+	Modelagem
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="Web Scraping" href="../scrape/">
+	
+	Web Scraping
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="APIs" href="../api/">
+	
+	APIs
+</a>
+
+
+
+  
+</li>
+
+
+        </ul>
+        
+
+        
+        <hr>
+        <span class="section">Vamos trocar uma ideia?</span>
+        
+        <ul>
+          
+          <li>
+            <a href="https://twitter.com/curso_r" target="_blank" title="Twitter">
+              Twitter
+            </a>
+          </li>
+          
+          
+          
+          <li>
+            <a href="https://www.facebook.com/cursodeR" target="_blank" title="Facebook">
+              Facebook
+            </a>
+          </li>
+          
+
+          
+          <li>
+            <a href="https://github.com/curso-r" target="_blank" title="GitHub">
+              GitHub
+            </a>
+          </li>
+          
+
+          
+          <li>
+            <a href="mailto:contato@curso-r.com" title="Email of contato@curso-r.com">
+              E-mail
+            </a>
+          </li>
+          
+        </ul>
+        
+      </div>
+    </div>
+  </div>
+</nav>
+
+	</div>
+
+	<article class="article">
+		<div class="wrapper">
+			<h1>2lubridate</h1>
+
+			
+
+			
+
+<h2 id="introdução">Introdução</h2>
+
+<p>Trabalhar com datas no R pode ser uma chateação. As funções do R base são, em geral, contraintuitivas e podem mudar de acordo com o tipo do objeto que você está usando. Além disso, características como fusos horários, anos bissextos, horários de verão, entre outras, podem não estar bem especificadas pelos métodos criados ou nem mesmo sendo levadas em conta.</p>
+
+<p>O pacote <code>lubridate</code>, criado por <a href="https://github.com/garrettgman">Garrett Grolemund</a> e <a href="https://github.com/hadley">Hadley Wickham</a>, lida com esses problemas, fazendo o trabalho com datas ser muito mais fácil.</p>
+
+<p>Para instalar, siga uma das opções abaixo:</p>
+
+<pre><code class="language-r"># Instale ao lado de outros pacotes do tidyverse.
+install.packages(&quot;tidyverse&quot;)
+
+# Instale apenas o lubridate.
+install.packages(&quot;lubridate&quot;)
+
+# Instale a versão de desenvolvimento direto do Github.
+devtools::install_github(&quot;tidyverse/lubridate&quot;)
+
+# Se você não tiver o pacote devtools instalado...
+install.packages(&quot;devtools&quot;)
+
+</code></pre>
+
+<p>Para carregar o pacote, basta rodar</p>
+
+<pre><code class="language-r">library(lubridate)
+</code></pre>
+
+<p>Neste seção, falaremos sobre:</p>
+
+<ul>
+<li>transformar e extrair datas;</li>
+<li>algumas funções úteis para trabalhar com datas;</li>
+<li>trabalhar com fusos horários; e</li>
+<li>operações aritméticas com datas.</li>
+</ul>
+
+<hr />
+
+<h2 id="a-classe-date">A classe &ldquo;date&rdquo;</h2>
+
+<p>Datas no R são tratadas como um tipo especial de objeto, com classe <code>date</code>. Há várias formas de criar objetos dessa classe:</p>
+
+<pre><code class="language-r">data_string &lt;- &quot;21-10-2015&quot;
+class(data_string)
+## [1] &quot;character&quot;
+
+data_date &lt;- date(data_string)
+## Error in date(data_string): unused argument (data_string)
+class(data_date)
+## Error in eval(expr, envir, enclos): object 'data_date' not found
+
+data_as_date &lt;- as_date(data_string)
+class(data_as_date)
+## [1] &quot;Date&quot;
+
+data_mdy &lt;- dmy(data_string)
+class(data_mdy)
+## [1] &quot;Date&quot;
+</code></pre>
+
+<p>Veja que as funções <code>date()</code> e <code>as_date()</code> converteram a <em>string</em> para data, mas não devolveram o valor esperado. A função <code>dmy()</code> resolve esse problema estabelecendo explicitamente a ordem dia-mês-ano. Existem funções para todas as ordens possíveis: <code>dmy()</code>, <code>mdy()</code>, <code>myd()</code>, <code>ymd()</code>, <code>ydm()</code> etc.</p>
+
+<p>As funções <code>date()</code> e <code>as_date()</code> assumem que a ordem segue o padrão da língua inglesa: ano-mês-dia (ymd).</p>
+
+<pre><code class="language-r">date(&quot;2015-10-21&quot;)
+## Error in date(&quot;2015-10-21&quot;): unused argument (&quot;2015-10-21&quot;)
+as_date(&quot;2015-10-21&quot;)
+## [1] &quot;2015-10-21&quot;
+</code></pre>
+
+<p>Uma grande facilidade que essas funções trazem é poder criar objetos com classe <code>date</code> a partir de números e <em>strings</em> em diversos formatos.</p>
+
+<pre><code class="language-r">dmy(21102015)
+## [1] &quot;2015-10-21&quot;
+dmy(&quot;21102015&quot;)
+## [1] &quot;2015-10-21&quot;
+dmy(&quot;21/10/2015&quot;)
+## [1] &quot;2015-10-21&quot;
+dmy(&quot;21.10.2015&quot;)
+## [1] &quot;2015-10-21&quot;
+</code></pre>
+
+<p>Se além da data você precisar especificar o horário, basta usar as funções do tipo <code>ymd_h()</code>, <code>ymd_hm()</code>, <code>ymd_hms()</code>, sendo que também há uma função para cada formato de dia-mês-ano.</p>
+
+<pre><code class="language-r">ymd_hms(20151021165411)
+## [1] &quot;2015-10-21 16:54:11 UTC&quot;
+</code></pre>
+
+<hr />
+
+<h2 id="funções-úteis">Funções úteis</h2>
+
+<p>O <code>lubridate</code> traz diversas funções para extrair os componentes de um objeto da classe <code>date</code>.</p>
+
+<ul>
+<li><code>second()</code> - extrai os segundos.</li>
+<li><code>minute()</code> - extrai os minutos.</li>
+<li><code>hour()</code> - extrai a hora.</li>
+<li><code>wday()</code> - extrai o dia da semana.</li>
+<li><code>mday()</code> - extrai o dia do mês.</li>
+<li><code>month()</code> - extrai o mês.</li>
+<li><code>year()</code> - extrai o ano.</li>
+</ul>
+
+<p>Os nomes são tão óbvios que a explicação do que cada função faz é praticamente desnecessária.</p>
+
+<pre><code class="language-r">bday &lt;- ymd_hms(19890729030142)
+bday
+## [1] &quot;1989-07-29 03:01:42 UTC&quot;
+
+second(bday)
+## [1] 42
+day(bday)
+## [1] 29
+month(bday)
+## [1] 7
+year(bday)
+## [1] 1989
+
+wday(bday)
+## [1] 7
+wday(bday, label = TRUE)
+## [1] Sat
+## Levels: Sun &lt; Mon &lt; Tues &lt; Wed &lt; Thurs &lt; Fri &lt; Sat
+</code></pre>
+
+<p>Você também pode usar essas funções para atribuir esses componentes a uma data:</p>
+
+<pre><code class="language-r">data &lt;- dmy(01041991)
+data
+## [1] &quot;1991-04-01&quot;
+
+hour(data) &lt;- 20
+data
+## [1] &quot;1991-04-01 20:00:00 UTC&quot;
+</code></pre>
+
+<p>Também existem funções para extrair a data no instante da execução.</p>
+
+<pre><code class="language-r">today() 
+## [1] &quot;2017-08-14&quot;
+now()
+## [1] &quot;2017-08-14 21:30:21 UTC&quot;
+
+# Data e horário do dia em que essa página foi editada pela última vez.
+</code></pre>
+
+<hr />
+
+<h2 id="fusos-horários">Fusos horários</h2>
+
+<p>Uma característica inerente das datas é o fuso horário. Se você estiver trabalhando com datas de eventos no Brasil e na Escócia, por exemplo, é preciso verificar se os valores seguem o mesmo fuso horário. Além disso, quando a data exata de um evento for relevante, você pode precisar converter horários para outros fusos para comunicar seus resultados em outros países.</p>
+
+<p>Para fazer essas coisas, o <code>lubridate</code> fornece as funções <code>with_tz()</code> e <code>force_tz()</code>. Veja um exemplo de como usá-las.</p>
+
+<pre><code class="language-r">estreia_GoT &lt;- ymd_hms(&quot;2017-07-16 22:00:00&quot;, tz = &quot;America/Sao_Paulo&quot;)
+estreia_GoT
+## [1] &quot;2017-07-16 22:00:00 BRT&quot;
+
+# Devolve qual seria a data em outro fuso
+
+with_tz(estreia_GoT, tzone = &quot;GMT&quot;)
+## [1] &quot;2017-07-17 01:00:00 GMT&quot;
+with_tz(estreia_GoT, tzone = &quot;US/Alaska&quot;)  
+## [1] &quot;2017-07-16 17:00:00 AKDT&quot;
+
+# Altera o fuso sem mudar a hora
+
+force_tz(estreia_GoT, tzone = &quot;GMT&quot;)
+## [1] &quot;2017-07-16 22:00:00 GMT&quot;
+</code></pre>
+
+<hr />
+
+<h2 id="operações-com-datas">Operações com datas</h2>
+
+<p>O pacote <code>lubridate</code> possui ainda funções para calcular intervalos e fazer operações aritméticas com datas.</p>
+
+<h3 id="intervalos">Intervalos</h3>
+
+<p>Intervalos podem ser salvos em objetos com classe <code>interval</code>.</p>
+
+<pre><code class="language-r">inicio &lt;- dmy(&quot;01-04-1991&quot;)
+evento &lt;- dmy(&quot;31-10-1993&quot;)
+
+sobrev &lt;- interval(inicio, evento)
+sobrev
+## [1] 1991-04-01 UTC--1993-10-31 UTC
+class(sobrev)
+## [1] &quot;Interval&quot;
+## attr(,&quot;package&quot;)
+## [1] &quot;lubridate&quot;
+</code></pre>
+
+<p>Você pode verificar se dois intervalos tem intersecção com a função <code>int_overlaps()</code>.</p>
+
+<pre><code class="language-r"># Outra forma de definir um intervalo: o operador %--%
+intervalo_1 &lt;- dmy(&quot;01-02-2003&quot;) %--% dmy(&quot;02-03-2005&quot;)  
+
+intervalo_2 &lt;- dmy(&quot;04-05-2004&quot;) %--% dmy(&quot;12-03-2012&quot;)  
+
+int_overlaps(intervalo_1, intervalo_2)
+## [1] TRUE
+</code></pre>
+
+<h3 id="aritmética-com-datas">Aritmética com datas</h3>
+
+<p>Veja alguns exemplos de operações aritméticas que você pode fazer utilizando funções do <code>lubridate</code>:</p>
+
+<pre><code class="language-r">
+# Somando datas
+
+data &lt;- dmy(31012000)
+
+data + ddays(1)
+## [1] &quot;2000-02-01&quot;
+data + dyears(1)
+## [1] &quot;2001-01-30&quot;
+
+data + months(1)  # Operações que resultam em datas inválidas geram NAs.
+## [1] NA
+
+# Criando datas recorrentes
+
+reuniao &lt;- dmy(&quot;18-03-2017&quot;)
+reunioes &lt;- reuniao + weeks(0:10)
+reunioes
+##  [1] &quot;2017-03-18&quot; &quot;2017-03-25&quot; &quot;2017-04-01&quot; &quot;2017-04-08&quot; &quot;2017-04-15&quot;
+##  [6] &quot;2017-04-22&quot; &quot;2017-04-29&quot; &quot;2017-05-06&quot; &quot;2017-05-13&quot; &quot;2017-05-20&quot;
+## [11] &quot;2017-05-27&quot;
+
+# Duração de um intervalo 
+
+intervalo &lt;-dmy(&quot;01-03-2003&quot;) %--% dmy(&quot;31-03-2003&quot;) 
+
+intervalo / ddays(1)               # Número de dias
+## [1] 30
+intervalo / dminutes(1)            # Número de minutos
+## [1] 43200
+
+as.period(intervalo)
+## [1] &quot;30d 0H 0M 0S&quot;
+</code></pre>
+
+<p>Para mais informações sobre o<code>lubridate</code>, visite o <a href="https://cran.r-project.org/web/packages/lubridate/vignettes/lubridate.html">vignette do pacote</a>.</p>
+
+<hr />
+
+<h2 id="exercícios">Exercícios</h2>
+
+<p>Nos exercícios a seguir, vamos utilizar a base <code>lakers</code>, que contém estatísticas jogo a jogo do <a href="http://www.nba.com/lakers/">Los Angeles Lakers</a> na temporada 2008-2009.</p>
+
+<pre><code class="language-r">lakers %&gt;% as_tibble()
+## Error in lakers %&gt;% as_tibble(): could not find function &quot;%&gt;%&quot;
+</code></pre>
+
+<hr />
+
+<p><strong>1.</strong></p>
+
+<p>Repare que a coluna <code>date</code> no data.frame é um vetor de inteiros. Transforme essa coluna em um vetor de valores com classe <code>date</code>.</p>
+
+<hr />
+
+<p><strong>2.</strong></p>
+
+<p>Crie uma coluna que junte as informações de data e tempo de jogo (colunas <code>date</code> e <code>time</code>) em objetos da classe <code>date</code>.</p>
+
+<hr />
+
+<p><strong>3.</strong></p>
+
+<p>Crie as colunas <code>dia</code>, <code>mês</code> e <code>ano</code> com as respectivas informações sobre a data do jogo.</p>
+
+<hr />
+
+<p><strong>4.</strong></p>
+
+<p>Em média, quanto tempo o Lakers demora para arremessar a primeira bola no primeiro período?</p>
+
+<p><strong>Dica</strong>: arremessos são representados pela categoria <code>shot</code> da coluna <code>etype</code>.</p>
+
+<hr />
+
+<p><strong>5.</strong></p>
+
+<p>Em média, quanto tempo demora para sair a primeira cesta de três pontos? Considere toda a base, e cestas de ambos os times.</p>
+
+<hr />
+
+<p><strong>6.</strong></p>
+
+<p>Construa boxplots do tempo entre pontos consecultivos para cada períodos. Considere toda a base de dados e apenas pontos do Lakers.</p>
+
+<hr />
+
+<p><strong>7.</strong></p>
+
+<p>Qual foi o dia e mês do jogo que o Lakers demorou mais tempo para fazer uma cesta? Quanto tempo foi?</p>
+
+<hr />
+
+<pre><code>## Error in library(dplyr): there is no package called 'dplyr'
+</code></pre>
+
+<h2 id="respostas">Respostas</h2>
+
+<div class='admonition note'>
+<p class='admonition-title'>
+Nota
+</p>
+<p>
+Não há apenas uma maneira de resolver os exercícios. Você pode encontrar soluções diferentes das nossas, algumas vezes mais eficientes, outras vezes menos. Quando estiver fazendo suas análises, tente buscar o equilíbrio entre eficiência e praticidade. Economizar 1 hora com a execução do código pode não valer a pena se você demorou 2 horas a mais para programá-lo.
+</p>
+</div>
+
+<hr />
+
+<p><strong>1.</strong></p>
+
+<p>Crie uma nova coluna no data.frame com as datas no formato dia-mês-ano.</p>
+
+<pre><code class="language-r">lakers %&gt;% 
+  mutate(date = ymd(date))
+## Error in mutate(., date = ymd(date)): could not find function &quot;mutate&quot;
+</code></pre>
+
+<p>Repare que <code>as_date()</code> não funciona neste caso.</p>
+
+<pre><code class="language-r">lakers %&gt;%
+  mutate(date = as_date(date))
+## Error in mutate(., date = as_date(date)): could not find function &quot;mutate&quot;
+</code></pre>
+
+<p>Para entender porque a função devolveu um dia do ano 56949, rode os códigos abaixo.</p>
+
+<pre><code class="language-r">as_date(0)
+## [1] &quot;1970-01-01&quot;
+as_date(-3:3)
+## [1] &quot;1969-12-29&quot; &quot;1969-12-30&quot; &quot;1969-12-31&quot; &quot;1970-01-01&quot; &quot;1970-01-02&quot;
+## [6] &quot;1970-01-03&quot; &quot;1970-01-04&quot;
+as_date(20081027:20081029)
+## [1] &quot;56949-12-26&quot; &quot;56949-12-27&quot; &quot;56949-12-28&quot;
+</code></pre>
+
+<hr />
+
+<p><strong>2.</strong></p>
+
+<p>Crie uma coluna que junte as informações de data e hora (colunas <code>date</code> e <code>time</code>) em objetos da classe <code>date</code>.</p>
+
+<pre><code class="language-r">lakers %&gt;% 
+  mutate(date_time = paste0(date, &quot; 00:&quot;, time) %&gt;% ymd_hms) %&gt;% 
+  select(date_time)
+## Error in mutate(., date_time = paste0(date, &quot; 00:&quot;, time) %&gt;% ymd_hms): could not find function &quot;mutate&quot;
+</code></pre>
+
+<hr />
+
+<p><strong>3.</strong></p>
+
+<p>Crie as colunas <code>dia</code>, <code>mes</code> e <code>ano</code> com as respectivas informações sobre a data do jogo.</p>
+
+<pre><code class="language-r">lakers %&gt;%
+  mutate(date = ymd(date),
+         dia = day(date),
+         mes = month(date),
+         ano = year(date)) %&gt;% 
+  select(date, dia, mes, ano)
+## Error in mutate(., date = ymd(date), dia = day(date), mes = month(date), : could not find function &quot;mutate&quot;
+</code></pre>
+
+<hr />
+
+<p><strong>4.</strong></p>
+
+<p>Em média, quanto tempo o Lakers demora para arremessar a primeira bola no primeiro período?</p>
+
+<p><strong>Dicas</strong>: arremessos são representados pela categoria <code>shot</code> da coluna <code>etype</code> e cada período tem 12 minutos.</p>
+
+<pre><code class="language-r">lakers %&gt;% 
+  dplyr::filter(etype == &quot;shot&quot;, period == 1, team == &quot;LAL&quot;) %&gt;% 
+  dplyr::mutate(time = hms(paste0(&quot;00:&quot;, time)),
+                cronometro = 12*60 - minute(time)*60 - second(time)) %&gt;% 
+  dplyr::group_by(date) %&gt;% 
+  dplyr::filter(cronometro == min(cronometro)) %&gt;% 
+  dplyr::ungroup() %&gt;% 
+  dplyr::summarise(media = mean(cronometro))
+## Error in loadNamespace(name): there is no package called 'dplyr'
+</code></pre>
+
+<p>O que foi feito:</p>
+
+<ul>
+<li><p>Primeiro filtramos a base para arremessos, <code>etype == &quot;shot&quot;</code>, do primeiro período, <code>period ==</code>, que fossem do Lakers, <code>team == &quot;LAL&quot;</code>.</p></li>
+
+<li><p>Em seguida, mudamos a classe da coluna <code>time</code>, de <code>character</code> para <code>period</code>, e criamos a coluna <code>cronometro</code>, que contém o tempo passado (em segundos) até o instante do evento.</p></li>
+
+<li><p>Então agrupamos a base pelo dia e a filtramos apenas para o primeiro evento de cada dia, isto é, o evento que tem o menor valor na coluna <code>cronometro</code>. Assim, a coluna <code>cronometro</code> da base resultante terá o tempo do primeiro arremesso de cada jogo.</p></li>
+
+<li><p>Por fim, desagrupamos a base e calculamos a média da coluna <code>cronometro</code>.</p></li>
+</ul>
+
+<hr />
+
+<p><strong>5.</strong></p>
+
+<p>Em média, quanto tempo demora para sair a primeira cesta de três pontos em cada um dos quatro períodos? Considere toda a base, e cestas de ambos os times.</p>
+
+<pre><code class="language-r">lakers %&gt;% 
+  dplyr::filter(etype == &quot;shot&quot;, period %in% 1:4, points == &quot;3&quot;) %&gt;% 
+  dplyr::mutate(time = hms(paste0(&quot;00:&quot;, time)),
+                cronometro = 12*60 - minute(time)*60 - second(time)) %&gt;% 
+  dplyr::group_by(date, period) %&gt;% 
+  dplyr::filter(cronometro == min(cronometro)) %&gt;% 
+  dplyr::ungroup() %&gt;%
+  dplyr::group_by(period) %&gt;% 
+  dplyr::summarise(media = mean(cronometro))
+## Error in loadNamespace(name): there is no package called 'dplyr'
+</code></pre>
+
+<p>A resolução desse exercício é análoga ao anterior, só mudamos o filtro inicial e o agrupamento. Se você ficou com dúvidas, consulte o passo a passo na resolução do exercício 4.</p>
+
+<p>Repare que não precisarímos filtrar por <code>etype == &quot;shot&quot;</code>, já que o único evento que gera 3 pontos é a cesta de 3 pontos.</p>
+
+<hr />
+
+<p><strong>6.</strong></p>
+
+<p>Construa boxplots do tempo entre pontos consecultivos para cada períodos. Considere toda a base de dados e apenas pontos do Lakers.</p>
+
+<hr />
+
+<p><strong>7.</strong></p>
+
+<p>Qual foi o dia e mês do jogo que o Lakers demorou mais tempo para fazer uma cesta? Quanto tempo foi?</p>
+
+<hr />
+
+
+			<hr>
+			
+
+			<aside class="copyright" role="note">
+				
+				&copy; 2017 Disponível sobre Licença MIT &ndash;
+				
+				Site built with
+				<a href="https://www.gohugo.io" target="_blank">Hugo</a>
+				using the
+				<a href="http://github.com/digitalcraftsman/hugo-material-docs" target="_blank">Material</a> theme.
+			</aside>
+		</div>
+	</article>
+
+	<div class="results" role="status" aria-live="polite">
+		<div class="scrollable">
+			<div class="wrapper">
+				<div class="meta"></div>
+				<div class="list"></div>
+			</div>
+		</div>
+	</div>
+</main>
+
+    <script>
+    
+      var base_url = '';
+      var repo_id  = '';
+    
+    </script>
+    
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="../javascripts/application.js"></script>
+    <script src="../javascripts/datacamp.js"></script>
+    
+
+    <script>
+      /* Add headers to scrollspy */
+      var div_h2    = document.getElementsByClassName("section level2")
+      var headers   = document.getElementsByTagName("h2");	
+      var scrollspy = document.getElementById('scrollspy');
+      
+      if(scrollspy) {
+        if(headers.length > 0) {
+          for(var i = 0; i < headers.length; i++) {
+            var li = document.createElement("li");
+            li.setAttribute("class", "anchor");
+
+            var a  = document.createElement("a");
+
+
+	    if(headers[i].id == ""){
+	     a.setAttribute("href", "#" + div_h2[i].id);
+	    } else {
+	     a.setAttribute("href", "#" + headers[i].id);
+	    }
+
+            a.setAttribute("title", headers[i].innerHTML);
+            a.innerHTML = headers[i].innerHTML;
+            
+            li.appendChild(a)
+            scrollspy.appendChild(li);
+          }
+        } else {
+          scrollspy.parentElement.removeChild(scrollspy)
+        }
+      }
+      
+      
+      /* Add permanent link next to the headers */
+      var headers = document.querySelectorAll("h1, h2, h3, h4, h5, h6");
+
+      for(var i = 0; i < headers.length; i++) {
+          var a = document.createElement("a");
+          a.setAttribute("class", "headerlink");
+          a.setAttribute("href", "#" + headers[i].id);
+          a.setAttribute("title", "Permanent link")
+          a.innerHTML = "%\u003e%";
+          headers[i].appendChild(a);
+      }
+    </script>
+
+    
+      <script>
+        (function(i,s,o,g,r,a,m){
+          i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||
+          []).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;
+          m.parentNode.insertBefore(a,m)
+        })(window, document,
+          'script', '//www.google-analytics.com/analytics.js', 'ga');
+         
+        ga('create', 'UA-87272102-1', 'auto');
+        ga('set', 'anonymizeIp', true);
+        ga('send', 'pageview');
+         
+        var buttons = document.querySelectorAll('a');
+        Array.prototype.map.call(buttons, function(item) {
+          if (item.host != document.location.host) {
+            item.addEventListener('click', function() {
+              var action = item.getAttribute('data-action') || 'follow';
+              ga('send', 'event', 'outbound', action, item.href);
+            });
+          }
+        });
+         
+        var query = document.querySelector('.query');
+        query.addEventListener('blur', function() {
+          if (this.value) {
+            var path = document.location.pathname;
+            ga('send', 'pageview', path + '?q=' + this.value);
+          }
+        });
+      </script>
+    
+
+    <script src="//gohugo.io/js/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <script src="../javascripts/prism.js"></script> 
+    
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [['$','$']],
+          displayMath: [['$$','$$']],
+          processEscapes: true,
+          processEnvironments: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+          TeX: { equationNumbers: { autoNumber: "AMS" },
+               extensions: ["AMSmath.js", "AMSsymbols.js"] }
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        // Fix <code> tags after MathJax finishes running. This is a
+        // hack to overcome a shortcoming of Markdown. Discussion at
+        // https://github.com/mojombo/jekyll/issues/199
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i = 0; i &lt; all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+    </script>
+    
+    <script type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+    </script>
+    
+    
+  </body>
+</html>
+

@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+  
+  
+  
+  
+   <html class="no-js"> 
+
+  <head lang="pt-br">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=10" />
+    <meta name="google-site-verification" content="3wpHHnuvp_52dDrXvZoNa5_Vs4BWcyVoeM62GbQ7llc" />
+    <title>2manip - Curso-R</title>
+    <meta name="generator" content="Hugo 0.22" />
+
+    
+    <meta name="description" content="Materiais para cursos de R">
+    
+    <link rel="canonical" href="../2manip/">
+    
+    <meta name="author" content="Curso-R">
+    
+
+    <meta property="og:url" content="/2manip/">
+    <meta property="og:title" content="Curso-R">
+    <meta property="og:image" content="/logo-curso-r.png">
+    <meta name="apple-mobile-web-app-title" content="Curso-R">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <link rel="shortcut icon" type="image/x-icon" href="//images/favicon.ico">
+    <link rel="icon" type="image/x-icon" href="//images/favicon.ico">
+    <link href="../stylesheets/prism/prism.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../stylesheets/icons.css">
+    <link rel="stylesheet" href="../stylesheets/application.css">
+    <link rel="stylesheet" href="../stylesheets/temporary.css">
+    <link rel="stylesheet" href="../stylesheets/palettes.css">
+    <link rel="stylesheet" href="../stylesheets/highlight/highlight.css">
+
+    
+    
+    
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ubuntu:400,700|Ubuntu&#43;Mono">
+    <style>
+      body, input {
+        font-family: 'Ubuntu', Helvetica, Arial, sans-serif;
+      }
+      pre, code {
+        font-family: 'Ubuntu Mono', 'Courier New', 'Courier', monospace;
+      }
+    </style>
+
+    
+    <script src="../javascripts/modernizr.js"></script>
+
+    
+    <link href="../2manip/index.xml" rel="alternate" type="application/rss+xml" title="Curso-R" />
+    <link href="../2manip/index.xml" rel="feed" type="application/rss+xml" title="Curso-R" />
+    
+
+  </head>
+  <body class="palette-primary-red palette-accent-teal">
+
+
+<div class="backdrop">
+	<div class="backdrop-paper"></div>
+</div>
+
+<input class="toggle" type="checkbox" id="toggle-drawer">
+<input class="toggle" type="checkbox" id="toggle-search">
+<label class="toggle-button overlay" for="toggle-drawer"></label>
+
+<header class="header">
+	<nav aria-label="Header">
+  <div class="bar default">
+    <div class="button button-menu" role="button" aria-label="Menu">
+      <label class="toggle-button icon icon-menu" for="toggle-drawer">
+        <span></span>
+      </label>
+    </div>
+    <div class="stretch">
+      <div class="title">
+        
+        <a href="../2manip/" class="permalink">2manip</a>
+        
+      </div>
+    </div>
+
+    
+    <div class="button button-twitter" role="button" aria-label="Twitter">
+       <a href="https://twitter.com/curso_r" title="@curso_r on Twitter" target="_blank" class="toggle-button icon icon-twitter"></a>
+    </div>
+    
+    
+    
+    <div class="button button-github" role="button" aria-label="GitHub">
+      <a href="https://github.com/curso-r" title="@curso-r on GitHub" target="_blank" class="toggle-button icon icon-github"></a>
+    </div>
+    
+    
+        
+  </div>
+  <div class="bar search">
+    <div class="button button-close" role="button" aria-label="Close">
+      <label class="toggle-button icon icon-back" for="toggle-search"></label>
+    </div>
+    <div class="stretch">
+      <div class="field">
+        <input class="query" type="text" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck>
+      </div>
+    </div>
+    <div class="button button-reset" role="button" aria-label="Search">
+      <button class="toggle-button icon icon-close" id="reset-search"></button>
+    </div>
+  </div>
+</nav>
+
+</header>
+
+<main class="main">
+	<div class="drawer">
+		<nav aria-label="Navigation">
+  <a href="../" class="project">
+    <div class="banner">
+      
+        <div class="logo">
+          <img src="../logo-curso-r.png">
+        </div>
+      
+      <div class="name">
+        <strong>Curso-R </strong>
+        
+      </div>
+    </div>
+  </a>
+
+  <div class="scrollable">
+    <div class="wrapper">
+      
+        <ul class="repo">
+          <li class="repo-download">
+            <a href="https://github.com/curso-r/material/archive/master.zip" target="_blank" title="Download" data-action="download">
+              <i class="icon icon-download"></i> Download
+            </a>
+          </li>
+          <li class="repo-stars">
+            <a href="https://github.com/curso-r/material/stargazers" target="_blank" title="Stargazers" data-action="star">
+              <i class="icon icon-star"></i> Stars
+              <span class="count">&ndash;</span>
+            </a>
+          </li>
+        </ul>
+        <hr>
+      
+
+      <div class="toc">
+        
+        <ul>
+          
+
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="Instalação" href="../instalacao/">
+	
+	Instalação
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="R básico" href="../rbase/">
+	
+	R básico
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="Pipe" href="../pipe/">
+	
+	Pipe
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="Importação" href="../import/">
+	
+	Importação
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="Manipulação" href="../manip/">
+	
+	Manipulação
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="Visualizações" href="../ggplot/">
+	
+	Visualizações
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="Strings" href="../stringr/">
+	
+	Strings
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="Datas" href="../lubridate/">
+	
+	Datas
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="Fatores" href="../forcats/">
+	
+	Fatores
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="Modelagem" href="../modelos/">
+	
+	Modelagem
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="Web Scraping" href="../scrape/">
+	
+	Web Scraping
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="APIs" href="../api/">
+	
+	APIs
+</a>
+
+
+
+  
+</li>
+
+
+        </ul>
+        
+
+        
+        <hr>
+        <span class="section">Vamos trocar uma ideia?</span>
+        
+        <ul>
+          
+          <li>
+            <a href="https://twitter.com/curso_r" target="_blank" title="Twitter">
+              Twitter
+            </a>
+          </li>
+          
+          
+          
+          <li>
+            <a href="https://www.facebook.com/cursodeR" target="_blank" title="Facebook">
+              Facebook
+            </a>
+          </li>
+          
+
+          
+          <li>
+            <a href="https://github.com/curso-r" target="_blank" title="GitHub">
+              GitHub
+            </a>
+          </li>
+          
+
+          
+          <li>
+            <a href="mailto:contato@curso-r.com" title="Email of contato@curso-r.com">
+              E-mail
+            </a>
+          </li>
+          
+        </ul>
+        
+      </div>
+    </div>
+  </div>
+</nav>
+
+	</div>
+
+	<article class="article">
+		<div class="wrapper">
+			<h1>2manip</h1>
+
+			
+
+			
+
+<blockquote>
+<p>&rdquo;(&hellip;) The fact that data science exists as a field is a colossal failure of statistics. To me, what I do is what statistics is all about. It is gaining insight from data using modelling and visualization. Data munging and manipulation is hard and statistics has just said that’s not our domain.&rdquo;</p>
+
+<p>Hadley Wickham</p>
+</blockquote>
+
+<p>Esta seção trata do tema <em>transformação de dados</em>. Trata-se de uma tarefa dolorosa e demorada, tomando muitas vezes a maior parte do tempo de uma análise estatística. Essa etapa é essencial em qualquer análise de dados e, apesar de negligenciada pela academia, é decisiva para o sucesso de estudos aplicados.</p>
+
+<p>Usualmente, o cientista de dados parte de uma base &ldquo;crua&rdquo; e a transforma até obter uma base de dados analítica. A base crua pode ser não estruturada, semi-estruturada ou estruturada. Já a base analítica é necessariamente estruturada e está preparada para passar por análises estatísticas a menos de transformações simples.</p>
+
+<p>Um conceito importante para obtenção de uma base analítica é o <em>data tidying</em>, ou arrumação de dados. Uma base é considerada <em>tidy</em> se</p>
+
+<ol>
+<li>Cada linha da base representa uma observação.</li>
+<li>Cada coluna da base representa uma variável.</li>
+<li><del>Cada tabela considera informações de uma unidade amostral.</del></li>
+</ol>
+
+<p>A base de dados analítica é estruturada de tal forma que pode ser colocada diretamente em sistemas de modelagem estatística ou de visualização. Nem sempre uma base de dados analítica está no formato <em>tidy</em>, mas usualmente são necessários poucos passos para migrar de uma para outra.</p>
+
+<p>A Figura abaixo mostra a fase de &ldquo;disputa&rdquo; com os dados (<em>data wrangling</em>) para deixá-los no formato analítico.</p>
+
+<p><img src="http://r4ds.had.co.nz/diagrams/data-science-wrangle.png" title="Transformação no ciclo da ciência de dados." alt="Transformação no ciclo da ciência de dados." width="60%" height="60%" /></p>
+
+<h2 id="pacotes-dplyr-e-tidyr">Pacotes <code>dplyr</code> e <code>tidyr</code></h2>
+
+<p>O <code>dplyr</code> é o pacote mais útil para realizar transformação de dados, aliando simplicidade e eficiência de uma forma elegante. Os scripts em <code>R</code> que fazem uso inteligente dos verbos <code>dplyr</code> e as facilidades do operador <em>pipe</em> tendem a ficar mais legíveis e organizados sem perder velocidade de execução.</p>
+
+<p>Antes de apresentar as principais funções do <code>dplyr</code> e do <code>tidyr</code>, precisamos trabalhar com o conceito de <code>tibbles</code>.</p>
+
+<h3 id="trabalhando-com-tibble-s">Trabalhando com <code>tibble</code>&rsquo;s</h3>
+
+<p>Uma <code>tibble</code> nada mais é do que um <code>data.frame</code>, mas com um método de impressão mais adequado. Outras diferenças podem ser estudadas <a href="http://r4ds.had.co.nz/tibbles.html">neste link</a>.</p>
+
+<p>Considere a seguinte base de dados.</p>
+
+<pre><code class="language-r">pnud_min
+## # A tibble: 16,686 × 14
+##      ano                  muni    uf regiao  idhm idhm_e idhm_l idhm_r
+##    &lt;int&gt;                 &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+## 1   1991 ALTA FLORESTA D'OESTE    RO  Norte 0.329  0.112  0.617  0.516
+## 2   1991             ARIQUEMES    RO  Norte 0.432  0.199  0.684  0.593
+## 3   1991                CABIXI    RO  Norte 0.309  0.108  0.636  0.430
+## 4   1991                CACOAL    RO  Norte 0.407  0.171  0.667  0.593
+## 5   1991            CEREJEIRAS    RO  Norte 0.386  0.167  0.629  0.547
+## 6   1991     COLORADO DO OESTE    RO  Norte 0.376  0.151  0.658  0.536
+## 7   1991            CORUMBIARA    RO  Norte 0.203  0.039  0.572  0.373
+## 8   1991         COSTA MARQUES    RO  Norte 0.425  0.220  0.629  0.553
+## 9   1991       ESPIGÃO D'OESTE    RO  Norte 0.388  0.159  0.653  0.561
+## 10  1991         GUAJARÁ-MIRIM    RO  Norte 0.468  0.247  0.662  0.625
+## # ... with 16,676 more rows, and 6 more variables: espvida &lt;dbl&gt;,
+## #   rdpc &lt;dbl&gt;, gini &lt;dbl&gt;, pop &lt;int&gt;, lat &lt;dbl&gt;, lon &lt;dbl&gt;
+</code></pre>
+
+<h2 id="base-idh-municipal-pnud">Base IDH-Municipal - PNUD</h2>
+
+<p>Nessa seção, vamos trabalhar com uma base simplificada do <a href="http://www.atlasbrasil.org.br/2013/pt/download/base/">PNUD (Programa das Nações Unidas para o Desenvolvimento)</a>, contendo informações socioeconômicas de todos os municípios do país. Os resultados foram obtidos a partir dos Censos de 1991, 2000 e 2010.</p>
+
+<p>A base contém 16686 linhas e 14 colunas, descritas abaixo:</p>
+
+<ul>
+<li><code>ano</code> - Ano do Censo utilizado como base para cálculo do IDH-Municipal e outras métricas.</li>
+<li><code>muni</code> - Nome do município. Cada município aparece três vezes, um para cada ano.</li>
+<li><code>uf</code> - Unidade Federativa.</li>
+<li><code>regiao</code> - Região brasileira.</li>
+<li><code>idhm</code> - IDH municipal, dividido em
+
+<ul>
+<li><code>idhm_e</code> - IDH municipal - educação.</li>
+<li><code>idhm_l</code> - IDH municipal - longevidade.</li>
+<li><code>idhm_r</code> - IDH municipal - renda.</li>
+</ul></li>
+<li><code>espvida</code> - Expectativa de vida.</li>
+<li><code>rdpc</code> - Renda <em>per capita</em>.</li>
+<li><code>gini</code> - Coeficiente de gini municipal (mede desigualdade social).</li>
+<li><code>pop</code> - População residente do município.</li>
+<li><code>lat</code>, <code>lon</code> - Latitude e longitude do município (ponto médio).</li>
+</ul>
+
+<h2 id="os-cinco-verbos-do-dplyr">Os cinco verbos do <code>dplyr</code></h2>
+
+<p>As funções principais do <code>dplyr</code> são:</p>
+
+<ul>
+<li><code>filter</code> - filtra linhas</li>
+<li><code>select</code> - seleciona colunas</li>
+<li><code>mutate</code> - cria/modifica colunas</li>
+<li><code>arrange</code> - ordena a base</li>
+<li><code>summarise</code> - sumariza a base</li>
+</ul>
+
+<h3 id="características">Características</h3>
+
+<ul>
+<li>O <em>input</em>  é sempre uma <code>tibble</code> e o <em>output</em>  é sempre um <code>tibble</code>.</li>
+<li>Colocamos o <code>tibble</code> no primeiro argumento e o que queremos fazer nos outros argumentos.</li>
+<li>A utilização é facilitada com o emprego do operador <code>%&gt;%</code>.</li>
+<li>O pacote faz uso extensivo de NSE (<em>non standard evaluation</em>).</li>
+</ul>
+
+<h3 id="vantagens">Vantagens</h3>
+
+<ul>
+<li>Utiliza <code>C</code> e <code>C++</code> por trás da maioria das funções, o que geralmente torna o código mais eficiente.</li>
+<li>Pode trabalhar com diferentes fontes de dados, como bases relacionais (SQL) e <code>data.table</code>.</li>
+</ul>
+
+<hr />
+
+<h2 id="select"><code>select</code></h2>
+
+<ul>
+<li>Utilizar as funções <code>starts_with(x)</code>, <code>contains(x)</code>, <code>matches(x)</code>, <code>one_of(x)</code>.</li>
+<li>Possível colocar nomes, índices e intervalos de variáveis com <code>:</code>.</li>
+</ul>
+
+<pre><code class="language-r">pnud_min %&gt;% 
+  select(ano, regiao, muni)
+## # A tibble: 16,686 × 3
+##      ano regiao                  muni
+##    &lt;int&gt;  &lt;chr&gt;                 &lt;chr&gt;
+## 1   1991  Norte ALTA FLORESTA D'OESTE
+## 2   1991  Norte             ARIQUEMES
+## 3   1991  Norte                CABIXI
+## 4   1991  Norte                CACOAL
+## 5   1991  Norte            CEREJEIRAS
+## 6   1991  Norte     COLORADO DO OESTE
+## 7   1991  Norte            CORUMBIARA
+## 8   1991  Norte         COSTA MARQUES
+## 9   1991  Norte       ESPIGÃO D'OESTE
+## 10  1991  Norte         GUAJARÁ-MIRIM
+## # ... with 16,676 more rows
+</code></pre>
+
+<pre><code class="language-r">pnud_min %&gt;% 
+  select(ano:regiao, rdpc)
+## # A tibble: 16,686 × 5
+##      ano                  muni    uf regiao   rdpc
+##    &lt;int&gt;                 &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;  &lt;dbl&gt;
+## 1   1991 ALTA FLORESTA D'OESTE    RO  Norte 198.46
+## 2   1991             ARIQUEMES    RO  Norte 319.47
+## 3   1991                CABIXI    RO  Norte 116.38
+## 4   1991                CACOAL    RO  Norte 320.24
+## 5   1991            CEREJEIRAS    RO  Norte 240.10
+## 6   1991     COLORADO DO OESTE    RO  Norte 224.82
+## 7   1991            CORUMBIARA    RO  Norte  81.38
+## 8   1991         COSTA MARQUES    RO  Norte 250.08
+## 9   1991       ESPIGÃO D'OESTE    RO  Norte 263.03
+## 10  1991         GUAJARÁ-MIRIM    RO  Norte 391.37
+## # ... with 16,676 more rows
+</code></pre>
+
+<pre><code class="language-r">pnud_min %&gt;% 
+  select(ano, starts_with('idhm'))
+## # A tibble: 16,686 × 5
+##      ano  idhm idhm_e idhm_l idhm_r
+##    &lt;int&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+## 1   1991 0.329  0.112  0.617  0.516
+## 2   1991 0.432  0.199  0.684  0.593
+## 3   1991 0.309  0.108  0.636  0.430
+## 4   1991 0.407  0.171  0.667  0.593
+## 5   1991 0.386  0.167  0.629  0.547
+## 6   1991 0.376  0.151  0.658  0.536
+## 7   1991 0.203  0.039  0.572  0.373
+## 8   1991 0.425  0.220  0.629  0.553
+## 9   1991 0.388  0.159  0.653  0.561
+## 10  1991 0.468  0.247  0.662  0.625
+## # ... with 16,676 more rows
+</code></pre>
+
+<hr />
+
+<h2 id="filter"><code>filter</code></h2>
+
+<ul>
+<li>Parecido com <code>subset</code>.</li>
+<li>Condições separadas por vírgulas equivalem a separar por <code>&amp;</code>.</li>
+</ul>
+
+<pre><code class="language-r">pnud_min %&gt;% 
+  select(ano, muni, uf) %&gt;% 
+  filter(uf == 'AC')
+## # A tibble: 66 × 3
+##      ano            muni    uf
+##    &lt;int&gt;           &lt;chr&gt; &lt;chr&gt;
+## 1   1991      ACRELÂNDIA    AC
+## 2   1991    ASSIS BRASIL    AC
+## 3   1991       BRASILÉIA    AC
+## 4   1991          BUJARI    AC
+## 5   1991        CAPIXABA    AC
+## 6   1991 CRUZEIRO DO SUL    AC
+## 7   1991  EPITACIOLÂNDIA    AC
+## 8   1991           FEIJÓ    AC
+## 9   1991          JORDÃO    AC
+## 10  1991     MÂNCIO LIMA    AC
+## # ... with 56 more rows
+</code></pre>
+
+<p>Para fazer várias condições, use os operadores lógicos <code>&amp;</code> e <code>|</code> ou separe filtros entre vírgulas.</p>
+
+<div class='admonition note'>
+<p class='admonition-title'>
+%in%
+</p>
+<p>
+<b>%in%</b> é um operador muito útil para trabalhar com vetores. O resultado da operação é um vetor lógico do tamanho do vetor do elemento da esquerda, identificando quais elementos da esquerda batem com algum elemento da direita.
+</p>
+</div>
+
+<pre><code class="language-r">pnud_min %&gt;% 
+  select(ano, regiao, uf, idhm) %&gt;% 
+  filter(uf %in% c('SP', 'MG') | idhm &gt; .5, ano == 2010)
+## # A tibble: 5,527 × 4
+##      ano regiao    uf  idhm
+##    &lt;int&gt;  &lt;chr&gt; &lt;chr&gt; &lt;dbl&gt;
+## 1   2010  Norte    RO 0.641
+## 2   2010  Norte    RO 0.702
+## 3   2010  Norte    RO 0.650
+## 4   2010  Norte    RO 0.718
+## 5   2010  Norte    RO 0.692
+## 6   2010  Norte    RO 0.685
+## 7   2010  Norte    RO 0.613
+## 8   2010  Norte    RO 0.611
+## 9   2010  Norte    RO 0.672
+## 10  2010  Norte    RO 0.657
+## # ... with 5,517 more rows
+  # é igual a
+  # filter(uf %in% c('SP', 'MG') | idhm &gt; .5 &amp; ano == 2010)
+</code></pre>
+
+<pre><code class="language-r">library(stringr)
+pnud_min %&gt;% 
+  select(muni, ano, uf) %&gt;% 
+  filter(str_detect(muni, '^[HG]|S$'), 
+         ano == 1991)
+## # A tibble: 970 × 3
+##                         muni   ano    uf
+##                        &lt;chr&gt; &lt;int&gt; &lt;chr&gt;
+## 1                  ARIQUEMES  1991    RO
+## 2                 CEREJEIRAS  1991    RO
+## 3              COSTA MARQUES  1991    RO
+## 4              GUAJARÁ-MIRIM  1991    RO
+## 5    ALTO ALEGRE DOS PARECIS  1991    RO
+## 6                    BURITIS  1991    RO
+## 7               CASTANHEIRAS  1991    RO
+## 8  GOVERNADOR JORGE TEIXEIRA  1991    RO
+## 9                    PARECIS  1991    RO
+## 10              SERINGUEIRAS  1991    RO
+## # ... with 960 more rows
+</code></pre>
+
+<hr />
+
+<h2 id="mutate"><code>mutate</code></h2>
+
+<ul>
+<li>Parecido com <code>transform</code>, mas aceita várias novas colunas iterativamente.</li>
+<li>Novas variáveis devem ter o mesmo <code>length</code> que o <code>nrow</code> do bd oridinal ou <code>1</code>.</li>
+</ul>
+
+<pre><code class="language-r">pnud_min %&gt;% 
+  select(muni, rdpc, pop, idhm_l, espvida) %&gt;% 
+  mutate(renda = rdpc * pop, 
+         razao = idhm_l / espvida)
+## # A tibble: 16,686 × 7
+##                     muni   rdpc   pop idhm_l espvida      renda
+##                    &lt;chr&gt;  &lt;dbl&gt; &lt;int&gt;  &lt;dbl&gt;   &lt;dbl&gt;      &lt;dbl&gt;
+## 1  ALTA FLORESTA D'OESTE 198.46 22835  0.617   62.01  4531834.1
+## 2              ARIQUEMES 319.47 55018  0.684   66.02 17576600.5
+## 3                 CABIXI 116.38  5846  0.636   63.16   680357.5
+## 4                 CACOAL 320.24 66534  0.667   65.03 21306848.2
+## 5             CEREJEIRAS 240.10 19030  0.629   62.73  4569103.0
+## 6      COLORADO DO OESTE 224.82 25070  0.658   64.46  5636237.4
+## 7             CORUMBIARA  81.38 10737  0.572   59.32   873777.1
+## 8          COSTA MARQUES 250.08  6902  0.629   62.76  1726052.2
+## 9        ESPIGÃO D'OESTE 263.03 22505  0.653   64.18  5919490.1
+## 10         GUAJARÁ-MIRIM 391.37 31240  0.662   64.71 12226398.8
+## # ... with 16,676 more rows, and 1 more variables: razao &lt;dbl&gt;
+</code></pre>
+
+<hr />
+
+<h2 id="arrange"><code>arrange</code></h2>
+
+<ul>
+<li>Simplesmente ordena de acordo com as opções.</li>
+<li>Utilizar <code>desc</code> para ordem decrescente.</li>
+</ul>
+
+<pre><code class="language-r">pnud_min %&gt;% 
+  filter(ano == 2010) %&gt;% 
+  arrange(desc(espvida))
+## # A tibble: 5,562 × 14
+##      ano               muni    uf regiao  idhm idhm_e idhm_l idhm_r
+##    &lt;int&gt;              &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+## 1   2010           BLUMENAU    SC    Sul 0.806  0.722  0.894  0.812
+## 2   2010            BRUSQUE    SC    Sul 0.795  0.707  0.894  0.794
+## 3   2010 BALNEÁRIO CAMBORIÚ    SC    Sul 0.845  0.789  0.894  0.854
+## 4   2010         RIO DO SUL    SC    Sul 0.802  0.727  0.894  0.793
+## 5   2010    RANCHO QUEIMADO    SC    Sul 0.753  0.644  0.893  0.743
+## 6   2010       RIO DO OESTE    SC    Sul 0.754  0.625  0.892  0.769
+## 7   2010             IOMERÊ    SC    Sul 0.795  0.749  0.891  0.754
+## 8   2010            JOAÇABA    SC    Sul 0.827  0.771  0.891  0.823
+## 9   2010        NOVA TRENTO    SC    Sul 0.748  0.628  0.891  0.749
+## 10  2010        PORTO UNIÃO    SC    Sul 0.786  0.724  0.891  0.752
+## # ... with 5,552 more rows, and 6 more variables: espvida &lt;dbl&gt;,
+## #   rdpc &lt;dbl&gt;, gini &lt;dbl&gt;, pop &lt;int&gt;, lat &lt;dbl&gt;, lon &lt;dbl&gt;
+</code></pre>
+
+<hr />
+
+<h2 id="summarise"><code>summarise</code></h2>
+
+<ul>
+<li>Retorna um vetor de tamanho <code>1</code> a partir de uma conta com as variáveis.</li>
+<li>Geralmente é utilizado em conjunto com <code>group_by</code>.</li>
+<li>Algumas funções importantes: <code>n()</code>, <code>n_distinct()</code>.</li>
+</ul>
+
+<pre><code class="language-r">pnud_min %&gt;% 
+  group_by(regiao, uf) %&gt;% 
+  summarise(n = n(), espvida = mean(espvida)) %&gt;% 
+  arrange(regiao, desc(espvida))
+## Source: local data frame [27 x 4]
+## Groups: regiao [5]
+## 
+##          regiao    uf     n  espvida
+##           &lt;chr&gt; &lt;chr&gt; &lt;int&gt;    &lt;dbl&gt;
+## 1  Centro-Oeste    DF     3 73.36000
+## 2  Centro-Oeste    GO   735 69.95346
+## 3  Centro-Oeste    MS   234 69.94291
+## 4  Centro-Oeste    MT   423 69.42915
+## 5      Nordeste    CE   552 65.60627
+## 6      Nordeste    RN   501 65.11439
+## 7      Nordeste    PE   555 64.92721
+## 8      Nordeste    BA  1251 64.62361
+## 9      Nordeste    SE   225 64.26031
+## 10     Nordeste    PI   672 64.04028
+## # ... with 17 more rows
+</code></pre>
+
+<pre><code class="language-r">pnud_min %&gt;% 
+  filter(ano == 2010) %&gt;% 
+  count(regiao, sort = TRUE) %&gt;% 
+  mutate(prop = n / sum(n), prop = scales::percent(prop))
+## # A tibble: 5 × 3
+##         regiao     n  prop
+##          &lt;chr&gt; &lt;int&gt; &lt;chr&gt;
+## 1     Nordeste  1794 32.3%
+## 2      Sudeste  1667 30.0%
+## 3          Sul  1187 21.3%
+## 4 Centro-Oeste   465  8.4%
+## 5        Norte   449  8.1%
+</code></pre>
+
+<hr />
+
+<h2 id="gather"><code>gather</code></h2>
+
+<ul>
+<li>&ldquo;Empilha&rdquo; o banco de dados</li>
+</ul>
+
+<pre><code class="language-r">pnud_min %&gt;% 
+  select(uf, muni, ano, starts_with('idhm_')) %&gt;% 
+  gather(tipo_idhm, idhm, starts_with('idhm_')) %&gt;% 
+  arrange(desc(idhm))
+## # A tibble: 50,058 × 5
+##       uf               muni   ano tipo_idhm  idhm
+##    &lt;chr&gt;              &lt;chr&gt; &lt;int&gt;     &lt;chr&gt; &lt;dbl&gt;
+## 1     SC BALNEÁRIO CAMBORIÚ  2010    idhm_l 0.894
+## 2     SC           BLUMENAU  2010    idhm_l 0.894
+## 3     SC            BRUSQUE  2010    idhm_l 0.894
+## 4     SC         RIO DO SUL  2010    idhm_l 0.894
+## 5     SC    RANCHO QUEIMADO  2010    idhm_l 0.893
+## 6     SC       RIO DO OESTE  2010    idhm_l 0.892
+## 7     SC             IOMERÊ  2010    idhm_l 0.891
+## 8     SC            JOAÇABA  2010    idhm_l 0.891
+## 9     SC        NOVA TRENTO  2010    idhm_l 0.891
+## 10    SC        PORTO UNIÃO  2010    idhm_l 0.891
+## # ... with 50,048 more rows
+</code></pre>
+
+<hr />
+
+<h2 id="spread"><code>spread</code></h2>
+
+<ul>
+<li>&ldquo;Joga&rdquo; uma variável nas colunas</li>
+<li>É essencialmente a função inversa de <code>gather</code></li>
+</ul>
+
+<pre><code class="language-r">pnud_min %&gt;% 
+  select(muni, uf, ano, starts_with('idhm_')) %&gt;% 
+  gather(tipo_idhm, idhm, starts_with('idhm_')) %&gt;% 
+  spread(ano, idhm)
+## # A tibble: 16,686 × 6
+##                   muni    uf tipo_idhm `1991` `2000` `2010`
+## *                &lt;chr&gt; &lt;chr&gt;     &lt;chr&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+## 1      ABADIA DE GOIÁS    GO    idhm_e  0.183  0.386  0.622
+## 2      ABADIA DE GOIÁS    GO    idhm_l  0.658  0.765  0.830
+## 3      ABADIA DE GOIÁS    GO    idhm_r  0.563  0.623  0.687
+## 4  Abadia dos Dourados    MG    idhm_e  0.225  0.387  0.563
+## 5  Abadia dos Dourados    MG    idhm_l  0.728  0.799  0.839
+## 6  Abadia dos Dourados    MG    idhm_r  0.551  0.616  0.693
+## 7            ABADIÂNIA    GO    idhm_e  0.188  0.292  0.579
+## 8            ABADIÂNIA    GO    idhm_l  0.656  0.730  0.841
+## 9            ABADIÂNIA    GO    idhm_r  0.560  0.598  0.671
+## 10              Abaeté    MG    idhm_e  0.180  0.385  0.556
+## # ... with 16,676 more rows
+</code></pre>
+
+<hr />
+
+<h2 id="funções-auxiliares">Funções auxiliares</h2>
+
+<ul>
+<li><code>unite</code> junta duas ou mais colunas usando algum separador (<code>_</code>, por exemplo).</li>
+<li><code>separate</code> faz o inverso de <code>unite</code>, transforma uma coluna em várias usando um separador.</li>
+</ul>
+
+<pre><code class="language-r">pnud_min %&gt;% 
+  select(muni, uf, ano, starts_with('idhm_')) %&gt;% 
+  gather(tipo_idhm, idhm, starts_with('idhm_')) %&gt;% 
+  separate(tipo_idhm, c('idhm_nm', 'tipo'), sep = '_') %&gt;% 
+  select(-idhm_nm) %&gt;% 
+  filter(ano == 2010) %&gt;% 
+  group_by(tipo) %&gt;% 
+  summarise(maior = muni[which.max(idhm)], idhm = max(idhm)) %&gt;% 
+  arrange(tipo, desc(idhm))
+## # A tibble: 3 × 3
+##    tipo              maior  idhm
+##   &lt;chr&gt;              &lt;chr&gt; &lt;dbl&gt;
+## 1     e ÁGUAS DE SÃO PEDRO 0.825
+## 2     l BALNEÁRIO CAMBORIÚ 0.894
+## 3     r SÃO CAETANO DO SUL 0.891
+</code></pre>
+
+<hr />
+
+<h2 id="um-pouco-mais-de-transformação-de-dados">Um pouco mais de transformação de dados</h2>
+
+<ul>
+<li>Para juntar tabelas, usar <code>inner_join</code>, <code>left_join</code>, <code>anti_join</code> etc.</li>
+<li>Para realizar operações mais gerais, usar <code>do</code>.</li>
+<li>Para retirar duplicatas, utilizar <code>distinct</code>.</li>
+</ul>
+
+<script src="https://cdn.datacamp.com/datacamp-light-latest.min.js"></script>
+
+
+			<hr>
+			
+
+			<aside class="copyright" role="note">
+				
+				&copy; 2017 Disponível sobre Licença MIT &ndash;
+				
+				Site built with
+				<a href="https://www.gohugo.io" target="_blank">Hugo</a>
+				using the
+				<a href="http://github.com/digitalcraftsman/hugo-material-docs" target="_blank">Material</a> theme.
+			</aside>
+		</div>
+	</article>
+
+	<div class="results" role="status" aria-live="polite">
+		<div class="scrollable">
+			<div class="wrapper">
+				<div class="meta"></div>
+				<div class="list"></div>
+			</div>
+		</div>
+	</div>
+</main>
+
+    <script>
+    
+      var base_url = '';
+      var repo_id  = '';
+    
+    </script>
+    
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="../javascripts/application.js"></script>
+    <script src="../javascripts/datacamp.js"></script>
+    
+
+    <script>
+      /* Add headers to scrollspy */
+      var div_h2    = document.getElementsByClassName("section level2")
+      var headers   = document.getElementsByTagName("h2");	
+      var scrollspy = document.getElementById('scrollspy');
+      
+      if(scrollspy) {
+        if(headers.length > 0) {
+          for(var i = 0; i < headers.length; i++) {
+            var li = document.createElement("li");
+            li.setAttribute("class", "anchor");
+
+            var a  = document.createElement("a");
+
+
+	    if(headers[i].id == ""){
+	     a.setAttribute("href", "#" + div_h2[i].id);
+	    } else {
+	     a.setAttribute("href", "#" + headers[i].id);
+	    }
+
+            a.setAttribute("title", headers[i].innerHTML);
+            a.innerHTML = headers[i].innerHTML;
+            
+            li.appendChild(a)
+            scrollspy.appendChild(li);
+          }
+        } else {
+          scrollspy.parentElement.removeChild(scrollspy)
+        }
+      }
+      
+      
+      /* Add permanent link next to the headers */
+      var headers = document.querySelectorAll("h1, h2, h3, h4, h5, h6");
+
+      for(var i = 0; i < headers.length; i++) {
+          var a = document.createElement("a");
+          a.setAttribute("class", "headerlink");
+          a.setAttribute("href", "#" + headers[i].id);
+          a.setAttribute("title", "Permanent link")
+          a.innerHTML = "%\u003e%";
+          headers[i].appendChild(a);
+      }
+    </script>
+
+    
+      <script>
+        (function(i,s,o,g,r,a,m){
+          i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||
+          []).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;
+          m.parentNode.insertBefore(a,m)
+        })(window, document,
+          'script', '//www.google-analytics.com/analytics.js', 'ga');
+         
+        ga('create', 'UA-87272102-1', 'auto');
+        ga('set', 'anonymizeIp', true);
+        ga('send', 'pageview');
+         
+        var buttons = document.querySelectorAll('a');
+        Array.prototype.map.call(buttons, function(item) {
+          if (item.host != document.location.host) {
+            item.addEventListener('click', function() {
+              var action = item.getAttribute('data-action') || 'follow';
+              ga('send', 'event', 'outbound', action, item.href);
+            });
+          }
+        });
+         
+        var query = document.querySelector('.query');
+        query.addEventListener('blur', function() {
+          if (this.value) {
+            var path = document.location.pathname;
+            ga('send', 'pageview', path + '?q=' + this.value);
+          }
+        });
+      </script>
+    
+
+    <script src="//gohugo.io/js/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <script src="../javascripts/prism.js"></script> 
+    
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [['$','$']],
+          displayMath: [['$$','$$']],
+          processEscapes: true,
+          processEnvironments: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+          TeX: { equationNumbers: { autoNumber: "AMS" },
+               extensions: ["AMSmath.js", "AMSsymbols.js"] }
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        // Fix <code> tags after MathJax finishes running. This is a
+        // hack to overcome a shortcoming of Markdown. Discussion at
+        // https://github.com/mojombo/jekyll/issues/199
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i = 0; i &lt; all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+    </script>
+    
+    <script type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+    </script>
+    
+    
+  </body>
+</html>
+

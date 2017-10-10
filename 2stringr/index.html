@@ -1,0 +1,1461 @@
+<!DOCTYPE html>
+  
+  
+  
+  
+   <html class="no-js"> 
+
+  <head lang="pt-br">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=10" />
+    <meta name="google-site-verification" content="3wpHHnuvp_52dDrXvZoNa5_Vs4BWcyVoeM62GbQ7llc" />
+    <title>2stringr - Curso-R</title>
+    <meta name="generator" content="Hugo 0.22" />
+
+    
+    <meta name="description" content="Materiais para cursos de R">
+    
+    <link rel="canonical" href="../2stringr/">
+    
+    <meta name="author" content="Curso-R">
+    
+
+    <meta property="og:url" content="/2stringr/">
+    <meta property="og:title" content="Curso-R">
+    <meta property="og:image" content="/logo-curso-r.png">
+    <meta name="apple-mobile-web-app-title" content="Curso-R">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <link rel="shortcut icon" type="image/x-icon" href="//images/favicon.ico">
+    <link rel="icon" type="image/x-icon" href="//images/favicon.ico">
+    <link href="../stylesheets/prism/prism.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../stylesheets/icons.css">
+    <link rel="stylesheet" href="../stylesheets/application.css">
+    <link rel="stylesheet" href="../stylesheets/temporary.css">
+    <link rel="stylesheet" href="../stylesheets/palettes.css">
+    <link rel="stylesheet" href="../stylesheets/highlight/highlight.css">
+
+    
+    
+    
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ubuntu:400,700|Ubuntu&#43;Mono">
+    <style>
+      body, input {
+        font-family: 'Ubuntu', Helvetica, Arial, sans-serif;
+      }
+      pre, code {
+        font-family: 'Ubuntu Mono', 'Courier New', 'Courier', monospace;
+      }
+    </style>
+
+    
+    <script src="../javascripts/modernizr.js"></script>
+
+    
+    <link href="../2stringr/index.xml" rel="alternate" type="application/rss+xml" title="Curso-R" />
+    <link href="../2stringr/index.xml" rel="feed" type="application/rss+xml" title="Curso-R" />
+    
+
+  </head>
+  <body class="palette-primary-red palette-accent-teal">
+
+
+<div class="backdrop">
+	<div class="backdrop-paper"></div>
+</div>
+
+<input class="toggle" type="checkbox" id="toggle-drawer">
+<input class="toggle" type="checkbox" id="toggle-search">
+<label class="toggle-button overlay" for="toggle-drawer"></label>
+
+<header class="header">
+	<nav aria-label="Header">
+  <div class="bar default">
+    <div class="button button-menu" role="button" aria-label="Menu">
+      <label class="toggle-button icon icon-menu" for="toggle-drawer">
+        <span></span>
+      </label>
+    </div>
+    <div class="stretch">
+      <div class="title">
+        
+        <a href="../2stringr/" class="permalink">2stringr</a>
+        
+      </div>
+    </div>
+
+    
+    <div class="button button-twitter" role="button" aria-label="Twitter">
+       <a href="https://twitter.com/curso_r" title="@curso_r on Twitter" target="_blank" class="toggle-button icon icon-twitter"></a>
+    </div>
+    
+    
+    
+    <div class="button button-github" role="button" aria-label="GitHub">
+      <a href="https://github.com/curso-r" title="@curso-r on GitHub" target="_blank" class="toggle-button icon icon-github"></a>
+    </div>
+    
+    
+        
+  </div>
+  <div class="bar search">
+    <div class="button button-close" role="button" aria-label="Close">
+      <label class="toggle-button icon icon-back" for="toggle-search"></label>
+    </div>
+    <div class="stretch">
+      <div class="field">
+        <input class="query" type="text" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck>
+      </div>
+    </div>
+    <div class="button button-reset" role="button" aria-label="Search">
+      <button class="toggle-button icon icon-close" id="reset-search"></button>
+    </div>
+  </div>
+</nav>
+
+</header>
+
+<main class="main">
+	<div class="drawer">
+		<nav aria-label="Navigation">
+  <a href="../" class="project">
+    <div class="banner">
+      
+        <div class="logo">
+          <img src="../logo-curso-r.png">
+        </div>
+      
+      <div class="name">
+        <strong>Curso-R </strong>
+        
+      </div>
+    </div>
+  </a>
+
+  <div class="scrollable">
+    <div class="wrapper">
+      
+        <ul class="repo">
+          <li class="repo-download">
+            <a href="https://github.com/curso-r/material/archive/master.zip" target="_blank" title="Download" data-action="download">
+              <i class="icon icon-download"></i> Download
+            </a>
+          </li>
+          <li class="repo-stars">
+            <a href="https://github.com/curso-r/material/stargazers" target="_blank" title="Stargazers" data-action="star">
+              <i class="icon icon-star"></i> Stars
+              <span class="count">&ndash;</span>
+            </a>
+          </li>
+        </ul>
+        <hr>
+      
+
+      <div class="toc">
+        
+        <ul>
+          
+
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="Instalação" href="../instalacao/">
+	
+	Instalação
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="R básico" href="../rbase/">
+	
+	R básico
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="Pipe" href="../pipe/">
+	
+	Pipe
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="Importação" href="../import/">
+	
+	Importação
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="Manipulação" href="../manip/">
+	
+	Manipulação
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="Visualizações" href="../ggplot/">
+	
+	Visualizações
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="Strings" href="../stringr/">
+	
+	Strings
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="Datas" href="../lubridate/">
+	
+	Datas
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="Fatores" href="../forcats/">
+	
+	Fatores
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="Modelagem" href="../modelos/">
+	
+	Modelagem
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="Web Scraping" href="../scrape/">
+	
+	Web Scraping
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="APIs" href="../api/">
+	
+	APIs
+</a>
+
+
+
+  
+</li>
+
+
+        </ul>
+        
+
+        
+        <hr>
+        <span class="section">Vamos trocar uma ideia?</span>
+        
+        <ul>
+          
+          <li>
+            <a href="https://twitter.com/curso_r" target="_blank" title="Twitter">
+              Twitter
+            </a>
+          </li>
+          
+          
+          
+          <li>
+            <a href="https://www.facebook.com/cursodeR" target="_blank" title="Facebook">
+              Facebook
+            </a>
+          </li>
+          
+
+          
+          <li>
+            <a href="https://github.com/curso-r" target="_blank" title="GitHub">
+              GitHub
+            </a>
+          </li>
+          
+
+          
+          <li>
+            <a href="mailto:contato@curso-r.com" title="Email of contato@curso-r.com">
+              E-mail
+            </a>
+          </li>
+          
+        </ul>
+        
+      </div>
+    </div>
+  </div>
+</nav>
+
+	</div>
+
+	<article class="article">
+		<div class="wrapper">
+			<h1>2stringr</h1>
+
+			
+
+			
+
+<p>Variáveis de texto são muito comuns nos bancos de dados e, geralmente, dão bastante trabalho para serem manipuladas. É muito comum encontrarmos colunas com categorias não padronizadas, como, por exemplo, uma variável <code>Estado</code> com &ldquo;SP&rdquo;, &ldquo;sp&rdquo;, &ldquo;Sao Paulo&rdquo;, &ldquo;São Paulo&rdquo; etc, todas indicando o mesmo estado.</p>
+
+<p>O R possui várias funções para manipular textos (ou <em>strings</em>). No entanto, as funções do <code>base</code> não possuem uma interface consistente e cada uma tem a sua forma de passar os parâmetros, dificultando a programação durante a análise.</p>
+
+<p>Pensando nisso, Hadley Wickham deu aquela força para a comunidade R e criou o pacote <code>stringr</code>, que possui uma sintaxe consistente, permitindo o usuário manipular textos com muito mais facilidade.</p>
+
+<h3 id="vantagens-do-stringr-em-relação-ao-base">Vantagens do stringr em relação ao base</h3>
+
+<ul>
+<li>Sintaxe unificada, o que auxilia na memorização e leitura do código.</li>
+<li>Todas as funções são vetorizadas.</li>
+<li>Construído sobre a <a href="http://site.icu-project.org/">biblioteca ICU</a>, implementada em <code>C</code> e <code>C++</code>. É uma garantia de resultados mais rápidos e confiáveis.</li>
+</ul>
+
+<h3 id="regras-básicas-do-pacote">Regras básicas do pacote</h3>
+
+<ul>
+<li>As funções de manipulação de texto começam com <code>str_</code>. Caso esqueça o nome de uma função, basta digitar <code>stringr::str_</code> e apertar <code>TAB</code> para ver quais são as opções.</li>
+<li>O primeiro argumento da função é sempre uma <em>string</em> ou um vetor de <em>strings</em>.</li>
+</ul>
+
+<h3 id="curiosidade">Curiosidade</h3>
+
+<p>Inicialmente, o <code>stringr</code> era um <em>wrapper</em> de funções do <code>base</code>. Depois disso,
+surgiu um novo pacote <code>stringi</code>, com sintaxe similar ao <code>stringr</code>, mas funcionando como <em>wrapper</em> da biblioteca ICU. Wickham gostou tanto do pacote <code>stringi</code>
+que decidiu reescrever o <code>stringr</code> como um <em>wrapper</em> do <code>stringi</code>.
+Veja <a href="https://github.com/tidyverse/stringr/blob/master/NEWS.md">essa página</a> para detalhes.</p>
+
+<hr />
+
+<h2 id="conceitos-básicos">Conceitos básicos</h2>
+
+<p>Todas as funções do <code>stringr</code> começam com o prefixo <code>str_</code>. Isso ajuda na hora de
+encontrar a função que você está procurando. No RStudio, digite <code>str_</code> e
+aperte <strong>TAB</strong> para visualizar a lista de funções com esse prefixo. Você pode verificar o que cada função faz até encontrar a que atende às suas necessidades.</p>
+
+<p><img src="figures/str_tab.png" alt="str_tab" /></p>
+
+<p>Nesta seção, vamos utilizar as funções mais simples do <code>stringr</code>. Em seguida, vamos falar um pouco de regex e então veremos funções mais avançadas do pacote.</p>
+
+<p>Antes de mais nada, instale e carregue o pacote <code>stringr</code>.</p>
+
+<pre><code class="language-r">install.packages(&quot;stringr&quot;)
+</code></pre>
+
+<pre><code class="language-r">library(stringr)
+</code></pre>
+
+<h3 id="str-length">str_length</h3>
+
+<p>A função mais simples do <code>stringr()</code> é a função <code>str_length()</code>. Esta função recebe como argumento um vetor de <em>strings</em> e retorna o número de caracteres de cada <em>string</em>. Repare que o espaço <code>&quot; &quot;</code> é considerado um caracter.</p>
+
+<pre><code class="language-r">str_length(&quot;São Paulo&quot;)
+## [1] 9
+str_length(c(&quot;São Paulo&quot;, &quot;Rio de Janeiro&quot;, 
+             &quot;Rio Grande do Norte&quot;, &quot;Acre&quot;))
+## [1]  9 14 19  4
+</code></pre>
+
+<p>Note que <code>str_length()</code> é diferente de <code>length()</code>. O primeiro retorna o número de caracteres e o segundo retorna o comprimento do objeto. Isso fica mais claro no seguinte exemplo:</p>
+
+<pre><code class="language-r">s &lt;- c(&quot;São Paulo&quot;, &quot;Rio de Janeiro&quot;, 
+       &quot;Rio Grande do Norte&quot;, &quot;Acre&quot;)
+
+str_length(s)
+## [1]  9 14 19  4
+length(s)
+## [1] 4
+</code></pre>
+
+<p>A função <code>str_length()</code> retornou um vetor com o número de caracteres de cada elemento do vetor <code>s</code>, enquanto <code>length()</code> retornou o comprimento do vetor <code>s</code>.</p>
+
+<h3 id="str-to-upper-str-to-lower-str-to-title">str_to_upper, str_to_lower, str_to_title</h3>
+
+<p>Essas funções servem para modificar a caixa das letras. Veja alguns exemplos:</p>
+
+<pre><code class="language-r">s &lt;- &quot;Somos a curso-r&quot;
+str_to_lower(s)
+## [1] &quot;somos a curso-r&quot;
+str_to_upper(s)
+## [1] &quot;SOMOS A CURSO-R&quot;
+str_to_title(s)
+## [1] &quot;Somos A Curso-R&quot;
+</code></pre>
+
+<h3 id="str-trim">str_trim</h3>
+
+<p>É muito comum encontrar textos que vêm com espaços a mais, principalmente de dados
+provenientes de formulários em que cada usuário escreve da forma que prefere. Isso é um problema pois cria categorias diferentes para valores que deveriam ser iguais. Espaços antes e após o texto são especialmente chatos, pois pode ser difícil detectá-los.</p>
+
+<pre><code class="language-r">s &lt;- c(&quot;M&quot;, &quot;F&quot;, &quot;F&quot;, &quot; M&quot;, &quot; F &quot;, &quot;M&quot;)
+as.factor(s)
+## [1] M   F   F    M   F  M  
+## Levels:  F   M F M
+</code></pre>
+
+<p>A função <code>str_trim()</code> ajuda removendo os espaços excedentes antes e depois da string.</p>
+
+<pre><code class="language-r">string_aparada &lt;- str_trim(s)
+as.factor(string_aparada)
+## [1] M F F M F M
+## Levels: F M
+</code></pre>
+
+<h3 id="str-sub">str_sub</h3>
+
+<p>Não é raro você precisar obter uma parte fixa de uma <em>string</em>, como, por exemplo, manipular textos da forma:</p>
+
+<pre><code class="language-r">s &lt;- c(&quot;01-Feminino&quot;, &quot;02-Masculino&quot;, &quot;03-Indefinido&quot;)
+</code></pre>
+
+<p>Você pode querer apenas a parte final da string. Neste caso, pode usar a função <code>str_sub()</code>.</p>
+
+<pre><code class="language-r">str_sub(s, start = 4) # pegar do quarto até o último caractere
+## [1] &quot;Feminino&quot;   &quot;Masculino&quot;  &quot;Indefinido&quot;
+</code></pre>
+
+<p>Também é possível obter apenas os números.</p>
+
+<pre><code class="language-r">str_sub(s, end = 2) # pegar apenas os dois primeiros caracteres
+## [1] &quot;01&quot; &quot;02&quot; &quot;03&quot;
+</code></pre>
+
+<p>Em outros casos você precisa obter os últimos 2 caracteres.</p>
+
+<pre><code class="language-r">s &lt;- c(&quot;Feminino-01&quot;, &quot;Masculino-02&quot;, &quot;Indefinido-03&quot;)
+str_sub(s, end = -4)
+## [1] &quot;Feminino&quot;   &quot;Masculino&quot;  &quot;Indefinido&quot;
+str_sub(s, start = -2)
+## [1] &quot;01&quot; &quot;02&quot; &quot;03&quot;
+</code></pre>
+
+<p>É possível usar os argumentos <code>start</code> e <code>end</code> conjuntamente.</p>
+
+<pre><code class="language-r">s &lt;- c(&quot;__SP__&quot;, &quot;__MG__&quot;, &quot;__RJ__&quot;)
+str_sub(s, 3, 4)
+## [1] &quot;SP&quot; &quot;MG&quot; &quot;RJ&quot;
+</code></pre>
+
+<h3 id="str-c">str_c</h3>
+
+<p>Concatena <em>strings</em> em uma única string.</p>
+
+<pre><code class="language-r">
+string1 &lt;- &quot;O valor p é: &quot;
+string2 &lt;- 0.03
+
+str_c(string1, string2)     # Números serão transformados em caracteres.
+## [1] &quot;O valor p é: 0.03&quot;
+
+
+# Pode misturar objetos com strings definidas diretamente na função.
+
+string1 &lt;- &quot;Brigadeiro&quot;
+string2 &lt;- &quot;bom&quot;
+string3 &lt;- &quot;melhor&quot;
+
+str_c(string1, &quot; é a prova de que não existe nada tão &quot;, string2,
+      &quot; que não pode ficar &quot;, string3, &quot;.&quot;)
+## [1] &quot;Brigadeiro é a prova de que não existe nada tão bom que não pode ficar melhor.&quot;
+
+# A função é vetorizada.
+
+string1 &lt;- c(&quot;Brigadeiro&quot;, &quot;A política brasileira&quot;)
+string2 &lt;- c(&quot;bom&quot;, &quot;ruim&quot;)
+string3 &lt;- c(&quot;melhor&quot;, &quot;pior&quot;)
+
+str_c(string1, &quot; é a prova de que não existe nada tão &quot;, string2,
+      &quot; que não pode ficar &quot;, string3, &quot;.&quot;)
+## [1] &quot;Brigadeiro é a prova de que não existe nada tão bom que não pode ficar melhor.&quot;          
+## [2] &quot;A política brasileira é a prova de que não existe nada tão ruim que não pode ficar pior.&quot;
+
+# Pode ser usada para &quot;criar código&quot;. 
+
+variaveis &lt;- names(mtcars)
+variaveis
+##  [1] &quot;mpg&quot;  &quot;cyl&quot;  &quot;disp&quot; &quot;hp&quot;   &quot;drat&quot; &quot;wt&quot;   &quot;qsec&quot; &quot;vs&quot;   &quot;am&quot;   &quot;gear&quot;
+## [11] &quot;carb&quot;
+
+variaveis_explicativas &lt;- str_c(variaveis[-1], collapse = &quot; + &quot;)
+
+formula &lt;- str_c(variaveis[1], &quot; ~ &quot;, variaveis_explicativas)
+formula
+## [1] &quot;mpg ~ cyl + disp + hp + drat + wt + qsec + vs + am + gear + carb&quot;
+as.formula
+## function (object, env = parent.frame()) 
+## {
+##     if (inherits(object, &quot;formula&quot;)) 
+##         object
+##     else {
+##         rval &lt;- formula(object, env = baseenv())
+##         if (identical(environment(rval), baseenv()) || !missing(env)) 
+##             environment(rval) &lt;- env
+##         rval
+##     }
+## }
+## &lt;bytecode: 0x2c5ed20&gt;
+## &lt;environment: namespace:stats&gt;
+
+# Modeloo linear (Off-topic)
+fit &lt;- lm(formula, data = mtcars)
+summary(fit)
+## 
+## Call:
+## lm(formula = formula, data = mtcars)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -3.4506 -1.6044 -0.1196  1.2193  4.6271 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)  
+## (Intercept) 12.30337   18.71788   0.657   0.5181  
+## cyl         -0.11144    1.04502  -0.107   0.9161  
+## disp         0.01334    0.01786   0.747   0.4635  
+## hp          -0.02148    0.02177  -0.987   0.3350  
+## drat         0.78711    1.63537   0.481   0.6353  
+## wt          -3.71530    1.89441  -1.961   0.0633 .
+## qsec         0.82104    0.73084   1.123   0.2739  
+## vs           0.31776    2.10451   0.151   0.8814  
+## am           2.52023    2.05665   1.225   0.2340  
+## gear         0.65541    1.49326   0.439   0.6652  
+## carb        -0.19942    0.82875  -0.241   0.8122  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 2.65 on 21 degrees of freedom
+## Multiple R-squared:  0.869,	Adjusted R-squared:  0.8066 
+## F-statistic: 13.93 on 10 and 21 DF,  p-value: 3.793e-07
+</code></pre>
+
+<p>Essas são as funções mais simples do pacote <code>stringr</code> e não exigem nenhum conhecimento de <strong>expressões regulares</strong>. Note que nenhuma delas possui o parâmetro <code>pattern</code>. Você verá como especificar esse parâmetro nas próximas seções.</p>
+
+<hr />
+
+<h2 id="expressões-regulares">Expressões Regulares</h2>
+
+<p>Trabalhar com textos exige um certo conhecimento de <a href="https://pt.wikipedia.org/wiki/Express%C3%A3o_regular">expressões regulares</a>. As expressões regulares &mdash; ou simplesmente <strong>regex</strong> &mdash; permitem identificar conjuntos de caracteres, palavras e outros padrões por meio de uma sintaxe concisa.</p>
+
+<p>O <code>stringr</code> utiliza regex da forma descrita <a href="http://www.gagolewski.com/software/stringi/manual/?manpage=stringi-search-regex">neste documento</a>. A própria <a href="https://stat.ethz.ch/R-manual/R-devel/library/base/html/regex.html">definição</a> de regex do R é um ótimo manual.</p>
+
+<p>Vamos estudar expressões regulares por meio de exemplos e da função <code>str_detect()</code>. Ela retorna <code>TRUE</code> se uma <em>string</em> atende a uma expressão regular e <code>FALSE</code> caso contrário. Por exemplo:</p>
+
+<pre><code class="language-r">str_detect(&quot;sao paulo&quot;, pattern = &quot;paulo$&quot;)
+## [1] TRUE
+str_detect(&quot;sao paulo sp&quot;, pattern = &quot;paulo$&quot;)
+## [1] FALSE
+</code></pre>
+
+<p>A regex/pattern &ldquo;paulo\$&rdquo; indica que o texto deve ser terminado em &ldquo;paulo&rdquo;. Existem diversos caracteres auxiliares que vão auxiliar na manipulação dos textos, assim como o &ldquo;\$&ldquo;. Importante: o valor passado para o argumento <code>pattern</code> de qualquer função do pacote <code>stringr</code> será entendido como uma regex.</p>
+
+<p>A tabela abaixo mostra a aplicação de cinco regex em seis <em>strings</em> distintas.</p>
+
+<ul>
+<li>&rsquo;^ban&rsquo; reconhece apenas o que começa exatamente com &ldquo;ban&rdquo;.</li>
+<li>&lsquo;b ?an&rsquo; reconhece tudo que tenha &ldquo;ban&rdquo;, com ou sem espaço entre o &ldquo;b&rdquo; e o &ldquo;a&rdquo;.</li>
+<li>&lsquo;ban&rsquo; reconhece tudo que tenha &ldquo;ban&rdquo;, mas não ignora case.</li>
+<li>BAN&rsquo; reconhece tudo que tenha &ldquo;BAN&rdquo;, mas não ignora case.</li>
+<li>&lsquo;ban$&rsquo; reconhece apenas o que termina exatamente em &ldquo;ban&rdquo;</li>
+</ul>
+
+<table>
+<thead>
+<tr>
+<th align="left">strings</th>
+<th align="left">^ban</th>
+<th align="left">b ?an</th>
+<th align="left">ban</th>
+<th align="left">BAN</th>
+<th align="left">ban$</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td align="left">abandonado</td>
+<td align="left">FALSE</td>
+<td align="left">TRUE</td>
+<td align="left">TRUE</td>
+<td align="left">FALSE</td>
+<td align="left">FALSE</td>
+</tr>
+
+<tr>
+<td align="left">ban</td>
+<td align="left">TRUE</td>
+<td align="left">TRUE</td>
+<td align="left">TRUE</td>
+<td align="left">FALSE</td>
+<td align="left">TRUE</td>
+</tr>
+
+<tr>
+<td align="left">banana</td>
+<td align="left">TRUE</td>
+<td align="left">TRUE</td>
+<td align="left">TRUE</td>
+<td align="left">FALSE</td>
+<td align="left">FALSE</td>
+</tr>
+
+<tr>
+<td align="left">BANANA</td>
+<td align="left">FALSE</td>
+<td align="left">FALSE</td>
+<td align="left">FALSE</td>
+<td align="left">TRUE</td>
+<td align="left">FALSE</td>
+</tr>
+
+<tr>
+<td align="left">ele levou ban</td>
+<td align="left">FALSE</td>
+<td align="left">TRUE</td>
+<td align="left">TRUE</td>
+<td align="left">FALSE</td>
+<td align="left">TRUE</td>
+</tr>
+
+<tr>
+<td align="left">pranab anderson</td>
+<td align="left">FALSE</td>
+<td align="left">TRUE</td>
+<td align="left">FALSE</td>
+<td align="left">FALSE</td>
+<td align="left">FALSE</td>
+</tr>
+</tbody>
+</table>
+
+<h3 id="quantificadores">Quantificadores</h3>
+
+<p>Os caracteres <code>+</code>, <code>*</code> e <code>{x,y}</code> indicam quantas vezes um padrão se repete:</p>
+
+<ul>
+<li><code>ey+</code> significa <code>e</code> e depois <code>y</code> &ldquo;<strong>uma vez</strong> ou mais&rdquo;. Por exemplo, reconhece <code>hey</code>, <code>heyy</code>, <code>a eyyy</code>, mas não reconhece <code>e</code>, <code>y</code> nem <code>yy</code>.</li>
+<li><code>ey*</code> significa &ldquo;<strong>nenhuma vez</strong> ou mais&rdquo;. Por exemplo, reconhece <code>hey</code>, <code>heyy</code>, <code>a eyyy</code> e <code>e</code>, mas não reconhece <code>y</code> nem <code>yy</code>.</li>
+<li><code>ey{3}</code> significa &ldquo;exatamente três vezes&rdquo;. Por exemplo, reconhece <code>eyyy</code> e <code>eyyyy</code>, mas não reconhece <code>eyy</code>.</li>
+<li><code>ey{1,3}</code> significa &ldquo;entre uma e três vezes&rdquo;.</li>
+</ul>
+
+<p>Para aplicar um quantificador a um conjunto de caracteres, use parênteses. Por exemplo, <code>(ey )+</code> reconhece <code>ey ey</code>.</p>
+
+<h3 id="conjuntos">Conjuntos</h3>
+
+<p>Colocando caracteres dentro de <code>[]</code>, reconhecemos quaisquer caracteres desse conjunto. Alguns exemplos práticos:</p>
+
+<ul>
+<li><code>[Cc]asa</code> para reconhecer &ldquo;casa&rdquo; em maiúsculo ou minúsculo.</li>
+<li><code>[0-9]</code> para reconhecer somente números. O mesmo vale para letras <code>[a-z]</code>, <code>[A-Z]</code>, <code>[a-zA-Z]</code> etc.</li>
+<li>O símbolo <code>^</code> dentro do colchete significa negação. Por exemplo, <code>[^0-9]</code> significa pegar tudo o que não é número.</li>
+<li>O símbolo <code>.</code> fora do colchete indica &ldquo;qualquer caractere&rdquo;, mas dentro do colchete é apenas ponto.</li>
+<li>Use <code>[[:space:]]+</code> para reconhecer espaços e <code>[[:punct:]]+</code> para reconhecer pontuações.</li>
+</ul>
+
+<h3 id="miscelânea">Miscelânea</h3>
+
+<ul>
+<li>Use <code>abjutils::rm_accent()</code> para retirar os acentos de um texto.</li>
+<li>Use <code>|</code> para opções. Por exemplo, <code>desfavor|desprov</code> reconhece tanto &ldquo;desfavorável&rdquo; quanto &ldquo;desprovido&rdquo;</li>
+<li>O código <code>\n</code> pula linha, <code>\f</code> é final da página, <code>\t</code> é tab. Use <code>\</code> para transformar caracteres especiais em literais.</li>
+<li>Use as funções <code>tolower()</code> e <code>toupper()</code> para mudar o case de uma <em>string</em>.</li>
+</ul>
+
+<p>A lista de possibilidades com expressões regulares é extensa.
+Um bom lugar para testar o funcionamento das regex é o <a href="https://regex101.com/">regex101</a>.</p>
+
+<hr />
+
+<h2 id="funções-avançadas">Funções avançadas</h2>
+
+<p>Agora que já vimos as funções básicas do <code>stringr</code> e aprendemos um pouco de regex, vamos às funções mais avançadas. Basicamente, essas funções buscarão <code>patterns</code> em um vetor de <em>strings</em> e farão alguma coisa quando encontrá-lo.</p>
+
+<p>Como já vimos na sessão sobre regex, a função mais simples que possui o argumento
+<code>pattern=</code> é a <code>str_detect()</code>.</p>
+
+<h3 id="str-detect">str_detect()`</h3>
+
+<p>Retorna <code>TRUE</code> se a regex é compatível com a string e <code>FALSE</code> caso contrário.</p>
+
+<pre><code class="language-r">library(stringr)
+str_detect(&quot;sao paulo&quot;, pattern = &quot;paulo$&quot;)
+## [1] TRUE
+str_detect(&quot;sao paulo sp&quot;, pattern = &quot;paulo$&quot;)
+## [1] FALSE
+</code></pre>
+
+<h3 id="str-replace-e-str-replace-all">str_replace() e str_replace_all()</h3>
+
+<p>Substituem um padrão (ou todos) encontrado para um outro padrão.</p>
+
+<pre><code class="language-r">titulos &lt;- c(&quot;o arqueiro&quot;, &quot;o andarilho&quot;, &quot;o herege&quot;)
+
+# remove a primeira vogal de cada string
+str_replace(titulos, &quot;[aeiou]&quot;, &quot;&quot;) 
+## [1] &quot; arqueiro&quot;  &quot; andarilho&quot; &quot; herege&quot;
+
+# substitui todas as vogais por &quot;-&quot;
+str_replace_all(titulos, &quot;[aeiou]&quot;, &quot;-&quot;) 
+## [1] &quot;- -rq---r-&quot;  &quot;- -nd-r-lh-&quot; &quot;- h-r-g-&quot;
+
+s &lt;- &quot;--    ffffWda, --- unWvers--    e    tud-  maWs&quot;
+
+# substitui o primeiro f (ou f&quot;s) por &quot;v&quot;
+s &lt;- str_replace(s, &quot;f+&quot;, &quot;v&quot;)
+s
+## [1] &quot;--    vWda, --- unWvers--    e    tud-  maWs&quot;
+
+# substitui o primeiro hífen (ou hífens) por &quot;A&quot;
+s &lt;- str_replace(s, &quot;-+&quot;, &quot;A&quot;)
+s
+## [1] &quot;A    vWda, --- unWvers--    e    tud-  maWs&quot;
+
+# substitui todos os hífens (um ou mais) por somente &quot;o&quot;
+s &lt;- str_replace_all(s, &quot;-+&quot;, &quot;o&quot;) 
+s
+## [1] &quot;A    vWda, o unWverso    e    tudo  maWs&quot;
+
+# substitui &quot;W&quot; por &quot;i&quot;
+s &lt;- str_replace_all(s, &quot;W&quot;, &quot;i&quot;) 
+s
+## [1] &quot;A    vida, o universo    e    tudo  mais&quot;
+
+# tirar espaços extras
+
+s &lt;- str_replace_all(s, &quot; +&quot;, &quot; &quot;) 
+s
+## [1] &quot;A vida, o universo e tudo mais&quot;
+</code></pre>
+
+<p>Muitas vezes queremos remover alguns caracteres especiais de um texto, mas esses
+caracteres fazem parte de comandos de regex, por exemplo:</p>
+
+<pre><code class="language-r">s &lt;- &quot;1 + 2 + 5&quot;
+str_replace_all(s, &quot;+&quot;, &quot;-&quot;)
+## Error in stri_replace_all_regex(string, pattern, fix_replacement(replacement), : Syntax error in regexp pattern. (U_REGEX_RULE_SYNTAX)
+</code></pre>
+
+<p>Essa forma retorna um erro, pois a função tenta montar uma regex. Você poderia
+tentar de outras formas, que não retornariam erro, mas também não retornariam o
+resultado esperado.</p>
+
+<pre><code class="language-r">str_replace_all(s, &quot; + &quot;, &quot; - &quot;)
+## [1] &quot;1 + 2 + 5&quot;
+</code></pre>
+
+<p>Nesse caso, use a função <code>fixed()</code> para indicar que o parâmetro não é uma regex.</p>
+
+<pre><code class="language-r">str_replace_all(s, fixed(&quot;+&quot;), &quot;-&quot;)
+## [1] &quot;1 - 2 - 5&quot;
+</code></pre>
+
+<h3 id="str-extract-e-str-extract-all">str_extract() e str_extract_all()</h3>
+
+<p>As funções <code>str_extract()</code> e <code>str_extract_all()</code> extraem padrões de uma <em>string</em>. Por exemplo:</p>
+
+<pre><code class="language-r">r_core_group &lt;- c(
+  'Douglas Bates', 'John Chambers', 'Peter Dalgaard',
+  'Robert Gentleman', 'Kurt Hornik', 'Ross Ihaka', 'Tomas Kalibera',
+  'Michael Lawrence', 'Friedrich Leisch', 'Uwe Ligges', '...'
+)
+
+sobrenomes &lt;- str_extract(r_core_group, '[:alpha:]+$')
+sobrenomes
+##  [1] &quot;Bates&quot;     &quot;Chambers&quot;  &quot;Dalgaard&quot;  &quot;Gentleman&quot; &quot;Hornik&quot;   
+##  [6] &quot;Ihaka&quot;     &quot;Kalibera&quot;  &quot;Lawrence&quot;  &quot;Leisch&quot;    &quot;Ligges&quot;   
+## [11] NA
+</code></pre>
+
+<h3 id="str-match-e-str-match-all">str_match() e str_match_all()</h3>
+
+<p>As funções <code>str_match()</code> e <code>str_match_all()</code> extraem pedaços da <em>string</em> identificados pela regex. Caso queira extrair somente a parte identificada, use parênteses.</p>
+
+<pre><code class="language-r"># Exemplo de pergunta SOPt: http://pt.stackoverflow.com/q/150024/6036
+
+presidentes &lt;- c(&quot;da Fonseca, DeodoroDeodoro da Fonseca&quot;, 
+&quot;Peixoto, FlorianoFloriano Peixoto&quot;, &quot;de Morais, PrudentePrudente de Morais&quot;, 
+&quot;Sales, CamposCampos Sales&quot;)
+
+nomes_presidentes &lt;- str_match(presidentes, '(.*), ([a-zA-Z]{1,})[A-Z]{1}')
+nomes_presidentes
+##      [,1]                   [,2]         [,3]      
+## [1,] &quot;da Fonseca, DeodoroD&quot; &quot;da Fonseca&quot; &quot;Deodoro&quot; 
+## [2,] &quot;Peixoto, FlorianoF&quot;   &quot;Peixoto&quot;    &quot;Floriano&quot;
+## [3,] &quot;de Morais, PrudenteP&quot; &quot;de Morais&quot;  &quot;Prudente&quot;
+## [4,] &quot;Sales, CamposC&quot;       &quot;Sales&quot;      &quot;Campos&quot;
+str_c(nomes_presidentes[,3], nomes_presidentes[,2], sep = ' ')
+## [1] &quot;Deodoro da Fonseca&quot; &quot;Floriano Peixoto&quot;   &quot;Prudente de Morais&quot;
+## [4] &quot;Campos Sales&quot;
+</code></pre>
+
+<h3 id="str-split-e-str-split-fixed">str_split() e str_split_fixed()</h3>
+
+<p>Essas funções separam uma <em>string</em> em várias de acordo com um separador.</p>
+
+<pre><code class="language-r">string &lt;- 'Durante um longo período de tempo o &quot;R&quot; foi escrito &quot;P&quot; como no alfabeto cirílico. O seu nome no alfabeto fenício era &quot;rech&quot;. Seu significado era o de uma cabeça, representada pela adaptação do hieróglifo egípcio de uma cabeça. Transformou-se no &quot;rô&quot; dos gregos. Os romanos modificaram o rô acrescentando um pequeno traço para diferenciá-lo do no nosso P.'
+
+str_split(string, fixed('.'))
+## [[1]]
+## [1] &quot;Durante um longo período de tempo o \&quot;R\&quot; foi escrito \&quot;P\&quot; como no alfabeto cirílico&quot;                
+## [2] &quot; O seu nome no alfabeto fenício era \&quot;rech\&quot;&quot;                                                         
+## [3] &quot; Seu significado era o de uma cabeça, representada pela adaptação do hieróglifo egípcio de uma cabeça&quot;
+## [4] &quot; Transformou-se no \&quot;rô\&quot; dos gregos&quot;                                                                 
+## [5] &quot; Os romanos modificaram o rô acrescentando um pequeno traço para diferenciá-lo do no nosso P&quot;         
+## [6] &quot;&quot;
+</code></pre>
+
+<p>O <code>str_split_fixed</code> faz o mesmo que <code>str_split()</code>, mas separa apenas <code>n</code> vezes.</p>
+
+<pre><code class="language-r">str_split_fixed(string, fixed('.'), 3)
+##      [,1]                                                                                   
+## [1,] &quot;Durante um longo período de tempo o \&quot;R\&quot; foi escrito \&quot;P\&quot; como no alfabeto cirílico&quot;
+##      [,2]                                          
+## [1,] &quot; O seu nome no alfabeto fenício era \&quot;rech\&quot;&quot;
+##      [,3]                                                                                                                                                                                                                                      
+## [1,] &quot; Seu significado era o de uma cabeça, representada pela adaptação do hieróglifo egípcio de uma cabeça. Transformou-se no \&quot;rô\&quot; dos gregos. Os romanos modificaram o rô acrescentando um pequeno traço para diferenciá-lo do no nosso P.&quot;
+</code></pre>
+
+<h3 id="str-subset">str_subset()</h3>
+
+<p>A função <code>str_subset()</code> retorna somente as strings compatíveis com a regex.</p>
+
+<pre><code class="language-r">frases &lt;- c('a roupa do rei', 'de roma', 'o rato roeu')
+str_subset(frases, 'd[eo]')
+## [1] &quot;a roupa do rei&quot; &quot;de roma&quot;
+</code></pre>
+
+<p>É o mesmo que fazer subset usando a função <code>str_detect</code>.</p>
+
+<pre><code class="language-r">frases[str_detect(frases, &quot;d[eo]&quot;)]
+## [1] &quot;a roupa do rei&quot; &quot;de roma&quot;
+</code></pre>
+
+<hr />
+
+<h2 id="exercícios">Exercícios</h2>
+
+<p><strong>1.</strong> O CPF é um número de 11 dígitos, por exemplo: 54491651884. No entanto para facilitar a visualização costumamos mostrá-lo com separadores a cada 3 casas: 544.916.518-84. Crie uma função que transforma um número de 11 dígitos em uma string com as separações, como um CPF.</p>
+
+<hr />
+
+<p><strong>2.</strong> Transforme o vetor de <em>strings</em> abaixo em <code>&quot;01 - Alto&quot; &quot;02 - Médio&quot; &quot;03 - Baixo&quot;</code>.</p>
+
+<pre><code class="language-r">s &lt;- c('Alto', 'Médio', 'Baixo')
+</code></pre>
+
+<hr />
+
+<p><strong>3.</strong> Crie uma regex que capture múltiplas versões da palavra &lsquo;casa&rsquo;. Ela deve funcionar com as palavras &lsquo;Casa&rsquo;, &lsquo;CASA&rsquo;, &lsquo;CaSa&rsquo;, &lsquo;CAsa&rsquo;. Teste-a usando a função <code>str_detect()</code>.</p>
+
+<pre><code class="language-r">s &lt;- c('Casa', 'CASA', 'CaSa', 'CAsa')
+</code></pre>
+
+<hr />
+
+<p><strong>4.</strong> Imagine que a seguinte <em>string</em> é a parte final de uma URL.</p>
+
+<ul>
+<li><code>/ac/rio-branco/xpto-xyz-1-0-1fds2396-5</code></li>
+</ul>
+
+<p>Transforme-a em &ldquo;AC - Rio Branco&rdquo; utilizando a função <code>str_split()</code>.</p>
+
+<pre><code class="language-r">url &lt;- c('/ac/rio-branco/xpto-xyz-1-0-1fds2396-5')
+</code></pre>
+
+<hr />
+
+<p><strong>5.</strong> Crie uma função que retorna <code>TRUE</code> quando a string é um <a href="https://pt.wikipedia.org/wiki/Pal%C3%ADndromo">palíndromo</a> e <code>FALSO</code> caso não seja.</p>
+
+<hr />
+
+<p><strong>6.</strong> De acordo com as regras da língua portuguesa, antes de “p” ou “b” devemos usar a letra “m”. Em outras palavras, com outras consoantes, usamos a letra “N”. Suponha que você tem o seguinte texto com erros gramaticais:</p>
+
+<pre><code class="language-r">texto &lt;- 'Nós chamamos os bonbeiros quando começou o incêmdio.'
+</code></pre>
+
+<p>Crie uma função para corrigi-lo.</p>
+
+<hr />
+
+<p><strong>7.</strong> Considere o seguinte texto</p>
+
+<pre><code class="language-r">txt &lt;- &quot;A função mais importante para leitura de dados no `lubridate` é a `ymd`. Essa função serve para ler qualquer data de uma `string` no formato `YYYY-MM-DD`. Essa função é útil pois funciona com qualquer separador entre os elementos da data e também porque temos uma função para cada formato (`mdy`, `dmy`, `dym`, `myd`, `ydm`).&quot;
+</code></pre>
+
+<p>Extraia todas as combinações da função <code>ymd</code>, sem repetições.</p>
+
+<hr />
+
+<p><strong>8.</strong> Considere as frases abaixo</p>
+
+<pre><code class="language-r">s &lt;- c(
+  'O produto é muito bom.',
+  'O produto não é bom.',
+  'O produto não é muito bom.',
+  'O produto não é ruim.',
+  'O produto não é não bom.'
+)
+</code></pre>
+
+<p>Crie uma regra para identificar se o texto refere-se a um feedback positivo ou negativo sobre o produto (considere não bom = ruim e não ruim = bom). Retorne um vetor lógico que vale <code>TRUE</code> se o feedback é positivo e <code>FALSE</code> caso contrário.</p>
+
+<hr />
+
+<h2 id="respostas">Respostas</h2>
+
+<div class='admonition note'>
+<p class='admonition-title'>
+Nota
+</p>
+<p>
+Não há apenas uma maneira de resolver os exercícios. Você pode encontrar soluções diferentes das nossas, algumas vezes mais eficientes, outras vezes menos. Quando estiver fazendo suas análises, tente buscar o equilíbrio entre eficiência e praticidade. Economizar 1 hora com a execução do código pode não valer a pena se você demorou 2 horas a mais para programá-lo.
+</p>
+</div>
+
+<hr />
+
+<p><strong>1.</strong> O CPF é um número de 11 dígitos, por exemplo: 54491651884. No entanto para facilitar a visualização costumamos mostrá-lo com separadores a cada 3 casas: 544.916.518-84. Crie uma função que transforma um número de 11 dígitos em uma string com as separações, como um CPF.</p>
+
+<pre><code class="language-r">
+# Sem regex
+
+formata_CPF &lt;- function(num) {
+  
+  if(str_count(num) != 11) {
+    stop(&quot;Número inválido!&quot;)
+  }
+  
+  # Concatemos cada parte do número, interpolando
+  # com os pontos e o traço.
+  
+  s &lt;- str_c(
+    str_sub(num, start = 1, end = 3),
+    &quot;.&quot;,
+    str_sub(num, start = 4, end = 6),
+    &quot;.&quot;,
+    str_sub(num, start = 7, end = 9),
+    &quot;-&quot;,
+    str_sub(num, start = 10, end = 11)
+  )
+  
+}
+
+# Com regex
+
+formata_CPF &lt;- function(num) {
+  
+  if(str_count(num) != 11) {
+    stop(&quot;Número inválido!&quot;)
+  }
+  
+  str_replace(string = num, 
+              pattern = &quot;([0-9]{3})([0-9]{3})([0-9]{3})&quot;, 
+              replacement = &quot;\\1.\\2.\\3-&quot;)
+}
+
+</code></pre>
+
+<p>A função <code>str_replace()</code> faz o seguinte:</p>
+
+<ul>
+<li>O <code>pattern=</code> procurará um padrão de 9 números:
+
+<ul>
+<li>O primeiro <code>([0-9]{3})</code> pega os três primeiros números.</li>
+<li>O segundo <code>([0-9]{3})</code> pega os três próximos números (quarto ao sexto).</li>
+<li>O terceiro <code>([0-9]{3})</code> pega os três números seguintes (sétimo ao nono).</li>
+</ul></li>
+<li>O <code>replacement=</code> substituirá esses 9 números pela <em>string</em> formada por:
+
+<ul>
+<li><code>\\1</code>, a expressão dada pelo primeiro parêntese do <code>pattern=</code>, isto é, os três primeiros números.</li>
+<li><code>.</code>, o primeiro ponto.</li>
+<li><code>\\2</code>,  a expressão dada pelo segundo parêntese do <code>pattern=</code>, isto é, os três próximos números (quarto ao sexto).</li>
+<li><code>.</code>, o segundo ponto.</li>
+<li><code>\\3</code>, a expressão dada pelo terceiro parêntese do <code>pattern=</code>, isto é, os três números seguintes (sétimo ao nono).</li>
+<li><code>-</code>, o traço.
+<br /></li>
+</ul></li>
+</ul>
+
+<hr />
+
+<p><strong>2.</strong> Transforme o vetor de <em>strings</em> abaixo em <code>&quot;01 - Alto&quot; &quot;02 - Médio&quot; &quot;03 - Baixo&quot;</code>.</p>
+
+<pre><code class="language-r">s &lt;- c('Alto', 'Médio', 'Baixo')
+
+# Usando str_c()
+
+str_c(&quot;0&quot;, 1:length(s), &quot; - &quot;, s, sep = &quot;&quot;)
+## [1] &quot;01 - Alto&quot;  &quot;02 - Médio&quot; &quot;03 - Baixo&quot;
+
+# Usando o pacote glue
+
+glue(&quot;0{1:length(s)} - {s}&quot;)
+## Error in glue(&quot;0{1:length(s)} - {s}&quot;): could not find function &quot;glue&quot;
+</code></pre>
+
+<p>Para mais informações sobre o pacote <code>glue</code>, confira <a href="http://curso-r.com/blog/2017/04/17/2017-04-08-glue/">este post</a>.</p>
+
+<hr />
+
+<p><strong>3.</strong> Crie uma regex que capture múltiplas versões da palavra &lsquo;casa&rsquo;. Ela deve funcionar com as palavras &lsquo;Casa&rsquo;, &lsquo;CASA&rsquo;, &lsquo;CaSa&rsquo;, &lsquo;CAsa&rsquo;. Teste-a usando a função <code>str_detect()</code>.</p>
+
+<pre><code class="language-r">s &lt;- c('Casa', 'CASA', 'CaSa', 'CAsa')
+
+str_detect(s, &quot;[CcAaSsAa]&quot;)
+## [1] TRUE TRUE TRUE TRUE
+str_detect(s, &quot;[Cc][Aa][Ss][Aa]&quot;)
+## [1] TRUE TRUE TRUE TRUE
+</code></pre>
+
+<hr />
+
+<p><strong>4.</strong> Imagine que a seguinte <em>string</em> é a parte final de uma URL.</p>
+
+<ul>
+<li><code>/ac/rio-branco/xpto-xyz-1-0-1fds2396-5</code></li>
+</ul>
+
+<p>Transforme-a em &ldquo;AC - Rio Branco&rdquo; utilizando a função <code>str_split()</code>.</p>
+
+<pre><code class="language-r">url &lt;- c('/ac/rio-branco/xpto-xyz-1-0-1fds2396-5')
+
+UF &lt;- url %&gt;% 
+  str_sub(start = 2) %&gt;% 
+  str_split(&quot;[/]&quot;, n = 2, simplify = TRUE) %&gt;% 
+  .[1,1] %&gt;% 
+  str_to_upper()
+
+cidade &lt;- url %&gt;% 
+  str_sub(start = 5) %&gt;% 
+  str_split(&quot;[/]&quot;, n = 3, simplify = TRUE) %&gt;% 
+  .[1,1] %&gt;% 
+  str_replace(&quot;-&quot;, &quot; &quot;) %&gt;% 
+  str_to_title()
+
+str_c(UF, &quot; - &quot;, cidade)
+## [1] &quot;AC - Rio Branco&quot;
+</code></pre>
+
+<hr />
+
+<p><strong>5.</strong> Crie uma função que retorna <code>TRUE</code> quando a string é um <a href="https://pt.wikipedia.org/wiki/Pal%C3%ADndromo">palíndromo</a> e <code>FALSO</code> caso não seja.</p>
+
+<pre><code class="language-r"># Solução 1: usando a função rev() para inverter uma string fragmentada
+
+testa_palindromo &lt;- function(s) {
+  
+  s %&gt;%
+    str_split(&quot;&quot;, simplify = T) %&gt;% 
+    rev %&gt;% 
+    str_c(collapse = &quot;&quot;) %&gt;% 
+    str_detect(s)
+  
+}
+
+testa_palindromo(&quot;ana&quot;)
+## [1] TRUE
+testa_palindromo(&quot;bananas&quot;)
+## [1] FALSE
+testa_palindromo(&quot;socorrammesubinoonibusemmarrocos&quot;)
+## [1] TRUE
+
+
+# Solução 2: usando a função str_reverse() do pacote stringi,
+# que já inverte a string diretamente.
+
+testa_palindromo &lt;- function(s) {
+  
+  s %&gt;% 
+    stringi::stri_reverse() %&gt;% 
+    str_detect(s)
+  
+}
+
+testa_palindromo(&quot;ana&quot;)
+## [1] TRUE
+testa_palindromo(&quot;bananas&quot;)
+## [1] FALSE
+testa_palindromo(&quot;socorrammesubinoonibusemmarrocos&quot;)
+## [1] TRUE
+</code></pre>
+
+<hr />
+
+<p><strong>6.</strong> De acordo com as regras da língua portuguesa, antes de “p” ou “b” devemos usar a letra “m”. Em outras palavras, com outras consoantes, usamos a letra “N”. Suponha que você tem o seguinte texto com erros gramaticais:</p>
+
+<pre><code class="language-r">s &lt;- 'Nós chamamos os bonbeiros quando começou o incêmdio.'
+</code></pre>
+
+<p>Crie uma função para corrigi-lo.</p>
+
+<pre><code class="language-r"># Função que funciona para o exemplo
+
+corrige_mn &lt;- function(s) {
+  
+  s %&gt;% 
+    str_replace(&quot;nb&quot;, &quot;mb&quot;) %&gt;% 
+    str_replace(&quot;md&quot;, &quot;nd&quot;)
+  
+}
+
+corrige_mn(s)
+## [1] &quot;Nós chamamos os bombeiros quando começou o incêndio.&quot;
+
+# Função que funciona no caso geral
+
+corrige_mn &lt;- function(s) {
+  
+  s %&gt;% 
+    str_replace_all(&quot;m([^aeioubp[[:space:]]+])&quot;, &quot;n\\1&quot;) %&gt;%  
+    str_replace_all(&quot;n([pb])&quot;, &quot;m\\1&quot;)
+  
+}
+
+corrige_mn(s)
+## [1] &quot;Nós chamamos os bombeiros quando começou o incêndio.&quot;
+</code></pre>
+
+<p>O padrão <code>[^aeioubp[[:space:]]+]</code> significa &ldquo;tudo menos vogais, b, p ou espaços&rdquo;. O <code>\\1</code> devolve o padrão encontrado pelo primeiro parêntese do argumento <code>patern=</code>.</p>
+
+<hr />
+
+<p><strong>7.</strong> Considere o seguinte texto</p>
+
+<pre><code class="language-r">s &lt;- &quot;A função mais importante para leitura de dados no `lubridate` é a `ymd`. Essa função serve para ler qualquer data de uma `string` no formato `YYYY-MM-DD`. Essa função é útil pois funciona com qualquer separador entre os elementos da data e também porque temos uma função para cada formato (`ymd`, `mdy`, `dmy`, `dym`, `myd`, `ydm`).&quot;
+</code></pre>
+
+<p>Extraia todas as combinações da função <code>ymd</code>, sem repetições.</p>
+
+<pre><code class="language-r">str_extract_all(s, &quot;[ymd]{3}&quot;) %&gt;% 
+  as_vector() %&gt;% 
+  unique
+## [1] &quot;ymd&quot; &quot;mdy&quot; &quot;dmy&quot; &quot;dym&quot; &quot;myd&quot; &quot;ydm&quot;
+</code></pre>
+
+<hr />
+
+<p><strong>8.</strong> Considere as frases abaixo</p>
+
+<pre><code class="language-r">s &lt;- c(
+  'O produto é bom.',
+  'O produto não é bom.',
+  'O produto não é muito bom.',
+  'O produto é muito bom',
+  'O produto não é ruim.',
+  'O produto não é não ruim.',
+  'O produto não é não bom.'
+)
+</code></pre>
+
+<p>Crie uma regra para identificar se o texto refere-se a um feedback positivo ou negativo sobre o produto (considere não bom = ruim e não ruim = bom). Retorne um vetor lógico que vale <code>TRUE</code> se o feedback for positivo e <code>FALSE</code> caso contrário.</p>
+
+<pre><code class="language-r">feedback &lt;- function(s) {
+  
+  s %&gt;% 
+    str_replace(&quot;não bom&quot;, &quot;ruim&quot;) %&gt;%
+    str_replace(&quot;não ruim&quot;, &quot;bom&quot;) %&gt;% 
+    str_replace(&quot;muito &quot;, &quot;&quot;) %&gt;% 
+    str_detect(&quot;(.*) produto é bom|(.*) não é ruim&quot;)
+  
+}
+
+feedback(s)
+## [1]  TRUE FALSE FALSE  TRUE  TRUE FALSE  TRUE
+</code></pre>
+
+<hr />
+
+
+			<hr>
+			
+
+			<aside class="copyright" role="note">
+				
+				&copy; 2017 Disponível sobre Licença MIT &ndash;
+				
+				Site built with
+				<a href="https://www.gohugo.io" target="_blank">Hugo</a>
+				using the
+				<a href="http://github.com/digitalcraftsman/hugo-material-docs" target="_blank">Material</a> theme.
+			</aside>
+		</div>
+	</article>
+
+	<div class="results" role="status" aria-live="polite">
+		<div class="scrollable">
+			<div class="wrapper">
+				<div class="meta"></div>
+				<div class="list"></div>
+			</div>
+		</div>
+	</div>
+</main>
+
+    <script>
+    
+      var base_url = '';
+      var repo_id  = '';
+    
+    </script>
+    
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="../javascripts/application.js"></script>
+    <script src="../javascripts/datacamp.js"></script>
+    
+
+    <script>
+      /* Add headers to scrollspy */
+      var div_h2    = document.getElementsByClassName("section level2")
+      var headers   = document.getElementsByTagName("h2");	
+      var scrollspy = document.getElementById('scrollspy');
+      
+      if(scrollspy) {
+        if(headers.length > 0) {
+          for(var i = 0; i < headers.length; i++) {
+            var li = document.createElement("li");
+            li.setAttribute("class", "anchor");
+
+            var a  = document.createElement("a");
+
+
+	    if(headers[i].id == ""){
+	     a.setAttribute("href", "#" + div_h2[i].id);
+	    } else {
+	     a.setAttribute("href", "#" + headers[i].id);
+	    }
+
+            a.setAttribute("title", headers[i].innerHTML);
+            a.innerHTML = headers[i].innerHTML;
+            
+            li.appendChild(a)
+            scrollspy.appendChild(li);
+          }
+        } else {
+          scrollspy.parentElement.removeChild(scrollspy)
+        }
+      }
+      
+      
+      /* Add permanent link next to the headers */
+      var headers = document.querySelectorAll("h1, h2, h3, h4, h5, h6");
+
+      for(var i = 0; i < headers.length; i++) {
+          var a = document.createElement("a");
+          a.setAttribute("class", "headerlink");
+          a.setAttribute("href", "#" + headers[i].id);
+          a.setAttribute("title", "Permanent link")
+          a.innerHTML = "%\u003e%";
+          headers[i].appendChild(a);
+      }
+    </script>
+
+    
+      <script>
+        (function(i,s,o,g,r,a,m){
+          i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||
+          []).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;
+          m.parentNode.insertBefore(a,m)
+        })(window, document,
+          'script', '//www.google-analytics.com/analytics.js', 'ga');
+         
+        ga('create', 'UA-87272102-1', 'auto');
+        ga('set', 'anonymizeIp', true);
+        ga('send', 'pageview');
+         
+        var buttons = document.querySelectorAll('a');
+        Array.prototype.map.call(buttons, function(item) {
+          if (item.host != document.location.host) {
+            item.addEventListener('click', function() {
+              var action = item.getAttribute('data-action') || 'follow';
+              ga('send', 'event', 'outbound', action, item.href);
+            });
+          }
+        });
+         
+        var query = document.querySelector('.query');
+        query.addEventListener('blur', function() {
+          if (this.value) {
+            var path = document.location.pathname;
+            ga('send', 'pageview', path + '?q=' + this.value);
+          }
+        });
+      </script>
+    
+
+    <script src="//gohugo.io/js/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <script src="../javascripts/prism.js"></script> 
+    
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [['$','$']],
+          displayMath: [['$$','$$']],
+          processEscapes: true,
+          processEnvironments: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+          TeX: { equationNumbers: { autoNumber: "AMS" },
+               extensions: ["AMSmath.js", "AMSsymbols.js"] }
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        // Fix <code> tags after MathJax finishes running. This is a
+        // hack to overcome a shortcoming of Markdown. Discussion at
+        // https://github.com/mojombo/jekyll/issues/199
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i = 0; i &lt; all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+    </script>
+    
+    <script type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+    </script>
+    
+    
+  </body>
+</html>
+
