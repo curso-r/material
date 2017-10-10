@@ -49,6 +49,7 @@ pluralizeListTitles = false
 
 [[menu.main]]
   name   = "Instalação"
+  title = "teste"
   url    = "instalacao/"
   weight = 05
   
