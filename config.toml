@@ -98,7 +98,7 @@ pluralizeListTitles = false
   weight = 50
 
 [[menu.main]]
-  name   = "Web Scraping"
+  name   = "Scraping"
   url    = "scrape/"
   weight = 60
 
