@@ -456,7 +456,10 @@
 
 <p>Veja alguns exemplos:</p>
 
-<pre><code class="language-r">dados_txt &lt;- readr::read_table2(file = &quot;data/mtcars.txt&quot;)
+<pre><code class="language-r">library(readr)
+## Error in library(readr): there is no package called 'readr'
+
+dados_txt &lt;- readr::read_table2(file = &quot;data/mtcars.txt&quot;)
 ## Error in loadNamespace(name): there is no package called 'readr'
 dados_csv &lt;- readr::read_csv(file = &quot;data/mtcars.csv&quot;)
 ## Error in loadNamespace(name): there is no package called 'readr'
