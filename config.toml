@@ -90,7 +90,12 @@ pluralizeListTitles = false
 [[menu.main]]
   name   = "Fatores"
   url    = "forcats/"
-  weight = 45  
+  weight = 45
+
+[[menu.main]]
+  name   = "Programação Funcional"
+  url    = "purrr/"
+  weight = 47
 
 [[menu.main]]
   name   = "Modelagem"
