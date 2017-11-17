@@ -7,10 +7,20 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>pt-br</language>
     <copyright>Disponível sobre Licença MIT</copyright>
-    <lastBuildDate>Thu, 19 Oct 2017 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 17 Nov 2017 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Purrr</title>
+      <link>/purrr/</link>
+      <pubDate>Fri, 17 Nov 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/purrr/</guid>
+      <description>Programação funcional (PF) é um paradigma de programação com o qual a maior parte dos estatísticos não está familiarizada. Essa técnica costuma ser ignorada na maioria dos tutoriais de R por não estar diretamente envolvida com manipulação e visualização de dados, mas isso não quer dizer que ela não tenha suas vantagens.
+Usando PF podemos criar códigos mais concisos e &amp;ldquo;pipeávais&amp;rdquo;, características que por tabela também tornam o processo de debug mais simples.</description>
+    </item>
     
     <item>
       <title>Importação de dados</title>
@@ -140,6 +150,15 @@ Quando o aprendizado não for muito intuitivo ou a utilização de uma função 
       <guid>/</guid>
       <description>Introdução O material desta página ajuda a usar o R na execução de tarefas corriqueiras de forma eficiente e concisa. Ao final dos estudos, será possível:
  Importar o banco de dados para o R. Estruturar os dados para a análise. Transformar, agregar e criar variáveis. Visualizar informações escondidas utilizando gráficos e tabelas. Modelar os dados para fazer inferência ou previsão. Comunicar os resultados de forma eficiente.  O conteúdo é baseado no R for Data Science, que, por sua vez, é baseado no tidyverse.</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>/purrr/readme/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/purrr/readme/</guid>
+      <description>pu.purrr Power Up de programação funcional</description>
     </item>
     
   </channel>
