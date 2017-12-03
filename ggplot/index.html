@@ -460,7 +460,7 @@
 
 <p>Agora que já temos em mãos as ferramentas para importar, arrumar e transformar os nossos dados, é hora de começarmos a extrair informações deles. Seguindo o nosso bom e velho ciclo da ciência de dados, o próximo passo é a construção de <em>visualizações</em>.</p>
 
-<p><img src="img/data-science.png" title="plot of chunk unnamed-chunk-6" alt="plot of chunk unnamed-chunk-6" width="40%" height="40%" /></p>
+<p><img src="img/data-science.png" title="plot of chunk unnamed-chunk-9" alt="plot of chunk unnamed-chunk-9" width="40%" height="40%" /></p>
 
 <p>A visualização dos dados é uma etapa importantíssima da análise estatística, pois é a partir dela que criamos a intuição necessária para escolher o teste ou modelo mais adequado para o nosso problema.</p>
 
@@ -504,11 +504,9 @@ library(ggplot2)
 <pre><code class="language-r">ggplot(data = mtcars)
 </code></pre>
 
-<p><img src="figures//unnamed-chunk-9-1.png" title="plot of chunk unnamed-chunk-9" alt="plot of chunk unnamed-chunk-9" width="40%" height="40%" /></p>
+<p><img src="figures//unnamed-chunk-12-1.png" title="plot of chunk unnamed-chunk-12" alt="plot of chunk unnamed-chunk-12" width="40%" height="40%" /></p>
 
-<p>Apesar de termos passados os dados para a função, precisamos especificar como as obsevações serão mapeadas nos aspectos visuais do gráfico e quais formas geométricas serão utilizadas para isso.</p>
-
-<p>Cada camada do gráfico representará um tipo de mapeamento ou personalização. O código abaixo é um exemplo de um gráfico bem simples, construído a partir das duas principais camadas.</p>
+<p>Apesar de termos passados os dados para a função, precisamos especificar como as observações serão mapeadas nos aspectos visuais do gráfico e quais formas geométricas serão utilizadas para isso. Cada camada do gráfico representará um tipo de mapeamento ou personalização. O código abaixo é um exemplo de um gráfico bem simples, construído a partir das duas principais camadas.</p>
 
 <pre><code class="language-r">ggplot(data = mtcars) + 
   geom_point(mapping = aes(x = disp, y = mpg))
@@ -525,16 +523,16 @@ library(ggplot2)
 <li>o mapeamento na função <code>geom_point()</code> recebe a função <code>aes()</code>, responsável por descrever como as variáveis serão mapeadas nos aspectos visuais da forma geométrica escolhida, no caso, pontos.</li>
 </ul>
 
+<p>A combinação da função <code>ggplot()</code> e de uma ou mais funções <code>geom_()</code> definirá o tipo de gráfico gerado.</p>
+
 <div class='admonition note'>
 <p class='admonition-title'>
 Cuidado
 </p>
 <p>
-As camadas dos gráficos são empilhadas utilizando-se o sinal +. Como a estrutura é muito parecida com uma pipe line, é muito comum trocarmos um + por um %>% no meio do código.
+As camadas dos gráficos são empilhadas utilizando-se o sinal +. Como a estrutura é muito parecida com uma pipe line, é comum trocarmos o + por um %>% no meio do código.
 </p>
 </div>
-
-<p>A combinação da função <code>ggplot()</code> e de uma ou mais funções <code>geom_()</code> definirá o tipo de gráfico gerado.</p>
 
 <p>Podemos acrescentar uma terceira camada ao gráfico, agora com uma personalização. Repare como é simples acrescentar labels ao gráfico com a função <code>labs()</code>.</p>
 
@@ -543,28 +541,25 @@ As camadas dos gráficos são empilhadas utilizando-se o sinal +. Como a estrutu
   labs(x = &quot;Cilindradas&quot;, y = &quot;Milhas/galão&quot;)
 </code></pre>
 
-<p><img src="figures//unnamed-chunk-10-1.png" title="plot of chunk unnamed-chunk-10" alt="plot of chunk unnamed-chunk-10" width="40%" height="40%" /></p>
+<p><img src="figures//unnamed-chunk-13-1.png" title="plot of chunk unnamed-chunk-13" alt="plot of chunk unnamed-chunk-13" width="40%" height="40%" /></p>
 
 <p>Agora que você já sabe como a estrutura de camadas do <code>ggplot</code> funciona, vamos estudar com mais atenção para que serve a função <code>aes()</code>.</p>
 
 <h2 id="aesthetics">Aesthetics</h2>
 
-<p>A primeira camada de um gráfico deve indicar a relação entre os dados e cada aspecto
-visual do gráfico, como qual variável será representada no eixo x, qual será
-representada no eixo y, a cor e o tamanho dos componentes geométricos etc. Os aspectos
-que podem ou devem ser mapeados depende do tipo de gráfico que você deseja fazer.</p>
+<p>O papel da função <code>aes()</code> (de aesthetics, estética em inglês) é indicar a relação entre os dados e cada aspecto visual do gráfico, como qual variável será representada no eixo x, qual será representada no eixo y, a cor e o tamnho dos componentes geométricos etc. Os aspectos que podem ou devem ser mapeados depende do tipo de gráfico que você está construindo.</p>
 
-<p>No exemplo acima, atribuímos aspectos de posição: ao eixo y mapeamos a variável <code>mpg</code>
-(milhas por galão) e ao eixo x a variável <code>disp</code> (cilindradas). Outro aspecto que pode
-ser mapeado nesse gráfico é a cor dos pontos</p>
+<p>No exemplo anterior, atribuímos aspectos de posição: ao eixo y mapeamos a variável <code>mpg</code> (milhas por galão) e ao eixo x a variável <code>disp</code> (cilindradas). Note que os valores dos labels não são mapeados por variáveis, mas sim diretamente especificados.</p>
+
+<p>Outro aspecto que pode ser mapeado nesse gráfico é a cor dos pontos:</p>
 
 <pre><code class="language-r">ggplot(data = mtcars) + 
-  geom_point(mapping = aes(x = disp, y = mpg, colour = as.factor(am)))
+  geom_point(mapping = aes(x = disp, y = mpg, color = as.factor(am)))
 </code></pre>
 
 <p><img src="figures//mapear_am-1.png" title="plot of chunk mapear_am" alt="plot of chunk mapear_am" width="40%" height="40%" /></p>
 
-<p>Agora, a variável <code>am</code> (tipo de transmissão) foi mapeada à cor dos pontos, sendo que pontos vermelhos correspondem à transmissão automática (valor 0) e pontos azuis à transmissão manual (valor 1). Observe que inserimos a variável <code>am</code> como um fator, pois temos interesse apenas nos valores &ldquo;0&rdquo; e &ldquo;1&rdquo;. No entanto, também podemos mapear uma variável contínua à cor dos pontos:</p>
+<p>Agora, a variável <code>am</code> (tipo de transmissão) foi mapeada à cor dos pontos, com pontos vermelhos correspondendo à transmissão automática (valor 0) e pontos azuis à transmissão manual (valor 1). Observe que inserimos a variável <code>am</code> como um fator, pois temos interesse apenas nos valores &ldquo;0&rdquo; e &ldquo;1&rdquo;. No entanto, também podemos mapear uma variável contínua à cor dos pontos:</p>
 
 <pre><code class="language-r">ggplot(mtcars) + 
   geom_point(mapping = aes(x = disp, y = mpg, colour = cyl))
@@ -574,18 +569,37 @@ ser mapeado nesse gráfico é a cor dos pontos</p>
 
 <p>Aqui, o número de cilindros, <code>cyl</code>, é representado pela tonalidade da cor azul.</p>
 
-<p><strong>Nota</strong>: por <em>default</em>, a legenda é insirida no gráfico automaticamente.</p>
+<p><strong>Nota</strong>: por <em>default</em>, a legenda é insirida automaticamente ao gráfico.</p>
 
 <p>Também podemos mapear o tamanho dos pontos a uma variável de interesse:</p>
 
 <pre><code class="language-r">ggplot(mtcars) +
-  geom_point(mapping = aes(x = disp, y = mpg, colour = cyl, size = wt))
+  geom_point(mapping = aes(x = disp, y = mpg, color = cyl, size = wt))
 </code></pre>
 
 <p><img src="figures//mapear_tamanaho-1.png" title="plot of chunk mapear_tamanaho" alt="plot of chunk mapear_tamanaho" width="40%" height="40%" /></p>
 
-<p><strong>Exercício</strong>: pesquisar mais aspectos que podem ser alterados no gráfico de dispersão. <a href="http://ggplot2.tidyverse.org/articles/ggplot2-specs.html">Essa</a> é uma
-boa referência.</p>
+<p><strong>Exercício</strong>: pesquisar mais aspectos que podem ser alterados no gráfico de dispersão. <a href="http://ggplot2.tidyverse.org/articles/ggplot2-specs.html">Essa é uma
+boa referência</a>.</p>
+
+<p>Até agora, sempre mapeamos um aspecto estético a uma variável. Muitas vezes
+queremos apenas modificar um aspecto sem mapeá-lo a variáveis.
+Por exemplo, no gráfico a seguir, modificamos a cor de todos os pontos.</p>
+
+<pre><code class="language-r">ggplot(mtcars, aes(y = mpg, x = disp)) + 
+  geom_point(color = &quot;red&quot;)
+</code></pre>
+
+<p><img src="figures//unnamed-chunk-14-1.png" title="plot of chunk unnamed-chunk-14" alt="plot of chunk unnamed-chunk-14" width="40%" height="40%" /></p>
+
+<p>A principal diferença aqui é que especificamos o argumento <code>color=</code> fora da função
+<code>aes()</code>. Dessa forma, podemos controlar todos os aspectos de uma forma geométrica.</p>
+
+<pre><code class="language-r">ggplot(mtcars, aes(y = mpg, x = disp)) + 
+  geom_point(colour = &quot;red&quot;, size = 2, shape = 3, alpha = 0.5)
+</code></pre>
+
+<p><img src="figures//unnamed-chunk-15-1.png" title="plot of chunk unnamed-chunk-15" alt="plot of chunk unnamed-chunk-15" width="40%" height="40%" /></p>
 
 <h2 id="geoms">Geoms</h2>
 
@@ -610,7 +624,7 @@ transformando pares (x,y) em pontos. Veja a seguir outros <em>geoms</em> bastant
   geom_boxplot(aes(x = as.factor(cyl), y = mpg))
 </code></pre>
 
-<p><img src="figures//unnamed-chunk-11-1.png" title="plot of chunk unnamed-chunk-11" alt="plot of chunk unnamed-chunk-11" width="40%" height="40%" /></p>
+<p><img src="figures//unnamed-chunk-16-1.png" title="plot of chunk unnamed-chunk-16" alt="plot of chunk unnamed-chunk-16" width="40%" height="40%" /></p>
 
 <p><strong>Note</strong> que para fazer um boxplot para cada grupo, precisamos passar para o aspecto
 x do gráfico uma variável do tipo <code>factor</code>.</p>
@@ -620,13 +634,13 @@ x do gráfico uma variável do tipo <code>factor</code>.</p>
 ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 </code></pre>
 
-<p><img src="figures//unnamed-chunk-12-1.png" title="plot of chunk unnamed-chunk-12" alt="plot of chunk unnamed-chunk-12" width="40%" height="40%" /></p>
+<p><img src="figures//unnamed-chunk-17-1.png" title="plot of chunk unnamed-chunk-17" alt="plot of chunk unnamed-chunk-17" width="40%" height="40%" /></p>
 
 <pre><code class="language-r">ggplot(mtcars) + 
   geom_bar(aes(x = as.factor(cyl)))
 </code></pre>
 
-<p><img src="figures//unnamed-chunk-13-1.png" title="plot of chunk unnamed-chunk-13" alt="plot of chunk unnamed-chunk-13" width="40%" height="40%" /></p>
+<p><img src="figures//unnamed-chunk-18-1.png" title="plot of chunk unnamed-chunk-18" alt="plot of chunk unnamed-chunk-18" width="40%" height="40%" /></p>
 
 <div class='admonition note'>
 <p class='admonition-title'>
@@ -684,7 +698,7 @@ uma combinação de camadas. Veja o código abaixo.</p>
 ## `geom_smooth()` using method = 'loess'
 </code></pre>
 
-<p><img src="figures//unnamed-chunk-14-1.png" title="plot of chunk unnamed-chunk-14" alt="plot of chunk unnamed-chunk-14" width="40%" height="40%" /></p>
+<p><img src="figures//unnamed-chunk-19-1.png" title="plot of chunk unnamed-chunk-19" alt="plot of chunk unnamed-chunk-19" width="40%" height="40%" /></p>
 
 <p>Desta forma, sobrepusemos os pontos e a linha de suavização. No entanto, duplicamos alguns trechos no nosso código, o que geralmente não é bom. Imagine se você precisar
 mudar a variável do eixo <code>y</code>, você precisará trocar o nome da variável em mais de um
@@ -697,7 +711,7 @@ dentro da declaração do gráfico, conforme o código a seguir.</p>
 ## `geom_smooth()` using method = 'loess'
 </code></pre>
 
-<p><img src="figures//unnamed-chunk-15-1.png" title="plot of chunk unnamed-chunk-15" alt="plot of chunk unnamed-chunk-15" width="40%" height="40%" /></p>
+<p><img src="figures//unnamed-chunk-20-1.png" title="plot of chunk unnamed-chunk-20" alt="plot of chunk unnamed-chunk-20" width="40%" height="40%" /></p>
 
 <p>Veja que isso gera o mesmo gráfico!</p>
 
@@ -710,7 +724,7 @@ a cor, você obterá o seguinte gráfico.</p>
   geom_smooth(method = &quot;lm&quot;)
 </code></pre>
 
-<p><img src="figures//unnamed-chunk-16-1.png" title="plot of chunk unnamed-chunk-16" alt="plot of chunk unnamed-chunk-16" width="40%" height="40%" /></p>
+<p><img src="figures//unnamed-chunk-21-1.png" title="plot of chunk unnamed-chunk-21" alt="plot of chunk unnamed-chunk-21" width="40%" height="40%" /></p>
 
 <p>O <code>ggplot2</code> agora desenhou uma reta para cada um dos grupos de pontos e coloriu
 cada grupo de pontos de uma cor diferente. Em alguns casos, você pode querer mapear
@@ -721,31 +735,9 @@ a cor em apenas uma das camadas do gráfico. Isso pode ser feito da seguinte for
   geom_smooth(method = &quot;lm&quot;)
 </code></pre>
 
-<p><img src="figures//unnamed-chunk-17-1.png" title="plot of chunk unnamed-chunk-17" alt="plot of chunk unnamed-chunk-17" width="40%" height="40%" /></p>
+<p><img src="figures//unnamed-chunk-22-1.png" title="plot of chunk unnamed-chunk-22" alt="plot of chunk unnamed-chunk-22" width="40%" height="40%" /></p>
 
 <p>Agora, cada grupo de pontos tem uma cor, mas a reta é única para todos os pontos.</p>
-
-<h2 id="alterando-os-padrões-do-gráfico">Alterando os padrões do gráfico</h2>
-
-<p>Até agora, sempre <em>mapeamos</em> uma forma estética à uma variável. Muitas vezes
-queremos apenas modificar esta forma estética sem mapeá-la a outra variável.
-Por exemplo, no gráfico a seguir, modificamos a cor de todos os pontos.</p>
-
-<pre><code class="language-r">ggplot(mtcars, aes(y = mpg, x = disp)) + 
-  geom_point(colour = &quot;red&quot;)
-</code></pre>
-
-<p><img src="figures//unnamed-chunk-18-1.png" title="plot of chunk unnamed-chunk-18" alt="plot of chunk unnamed-chunk-18" width="40%" height="40%" /></p>
-
-<p>A principal diferença aqui é que especificamos o argumento <code>colour</code> fora da função
-<code>aes</code>. Dessa forma, podemos controlar todos os parâmetros
-de cada forma geométrica.</p>
-
-<pre><code class="language-r">ggplot(mtcars, aes(y = mpg, x = disp)) + 
-  geom_point(colour = &quot;red&quot;, size = 2, shape = 3, alpha = 0.5)
-</code></pre>
-
-<p><img src="figures//unnamed-chunk-19-1.png" title="plot of chunk unnamed-chunk-19" alt="plot of chunk unnamed-chunk-19" width="40%" height="40%" /></p>
 
 <h2 id="facets">Facets</h2>
 
@@ -760,27 +752,10 @@ do grupo.</p>
   facet_wrap(~am)
 </code></pre>
 
-<p><img src="figures//unnamed-chunk-20-1.png" title="plot of chunk unnamed-chunk-20" alt="plot of chunk unnamed-chunk-20" width="40%" height="40%" /></p>
+<p><img src="figures//unnamed-chunk-23-1.png" title="plot of chunk unnamed-chunk-23" alt="plot of chunk unnamed-chunk-23" width="40%" height="40%" /></p>
 
 <p>No gráfico acima, rapidamente conseguimos visualizar que se o carro não é automático o consumo de combustível é muito menor do que quando o carro é automático. Também conseguimos ver que a inclinação das retas é bem diferente dependendo do carro ser
 automático/manual.</p>
-
-<h3 id="exercício"><strong>Exercício</strong></h3>
-
-<ol>
-<li>O que tem de errado no código abaixo? Por que os pontos não ficaram azuis?</li>
-</ol>
-
-<pre><code class="language-r">ggplot(data = mpg) + 
-  geom_point(mapping = aes(x = displ, y = hwy, color = &quot;blue&quot;))
-</code></pre>
-
-<p><img src="figures//unnamed-chunk-23-1.png" title="plot of chunk unnamed-chunk-23" alt="plot of chunk unnamed-chunk-23" width="40%" height="40%" /></p>
-
-<ol>
-<li>Mapeie uma variável contínua para uma cor, tamanho e forma. Como essas formas
-estéticas se comportam diferente para variáveis categóricas vs. contínuas?</li>
-</ol>
 
 <p>Começando de um simples boxplot feito no <code>ggplot2</code> vamos fazer diversas alterações nas legendas. O gráfico inicial é construido da seguinte forma:</p>
 
@@ -910,6 +885,23 @@ bp + theme(legend.text = element_text(colour=&quot;blue&quot;, size = 16, face =
 </code></pre>
 
 <p><img src="figures//unnamed-chunk-35-1.png" title="plot of chunk unnamed-chunk-35" alt="plot of chunk unnamed-chunk-35" width="40%" height="40%" /></p>
+
+<h3 id="exercício"><strong>Exercício</strong></h3>
+
+<ol>
+<li>O que tem de errado no código abaixo? Por que os pontos não ficaram azuis?</li>
+</ol>
+
+<pre><code class="language-r">ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy, color = &quot;blue&quot;))
+</code></pre>
+
+<p><img src="figures//unnamed-chunk-38-1.png" title="plot of chunk unnamed-chunk-38" alt="plot of chunk unnamed-chunk-38" width="40%" height="40%" /></p>
+
+<ol>
+<li>Mapeie uma variável contínua para uma cor, tamanho e forma. Como essas formas
+estéticas se comportam diferente para variáveis categóricas vs. contínuas?</li>
+</ol>
 
 
 			<aside class="copyright" role="note">
