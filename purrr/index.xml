@@ -7,7 +7,7 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>pt-br</language>
     <copyright>Disponível sobre Licença MIT</copyright>
-    <lastBuildDate>Fri, 17 Nov 2017 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 18 Nov 2017 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/purrr/index.xml" rel="self" type="application/rss+xml" />
     
@@ -15,11 +15,11 @@
     <item>
       <title>Purrr</title>
       <link>/purrr/</link>
-      <pubDate>Fri, 17 Nov 2017 00:00:00 +0000</pubDate>
+      <pubDate>Sat, 18 Nov 2017 00:00:00 +0000</pubDate>
       
       <guid>/purrr/</guid>
       <description>Programação funcional (PF) é um paradigma de programação com o qual a maior parte dos estatísticos não está familiarizada. Essa técnica costuma ser ignorada na maioria dos tutoriais de R por não estar diretamente envolvida com manipulação e visualização de dados, mas isso não quer dizer que ela não tenha suas vantagens.
-Usando PF podemos criar códigos mais concisos e &amp;ldquo;pipeávais&amp;rdquo;, características que por tabela também tornam o processo de debug mais simples.</description>
+Usando PF podemos criar códigos mais concisos e &amp;ldquo;pipeáveis&amp;rdquo;, características que por tabela também tornam o processo de debug mais simples.</description>
     </item>
     
     <item>

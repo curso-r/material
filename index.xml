@@ -7,19 +7,29 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>pt-br</language>
     <copyright>Disponível sobre Licença MIT</copyright>
-    <lastBuildDate>Fri, 17 Nov 2017 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 03 Dec 2017 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
+      <title>Visualizações</title>
+      <link>/ggplot/</link>
+      <pubDate>Sun, 03 Dec 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/ggplot/</guid>
+      <description>Introdução Agora que já temos em mãos as ferramentas para importar, arrumar e transformar os nossos dados, é hora de começarmos a extrair informações deles. Seguindo o nosso bom e velho ciclo da ciência de dados, o próximo passo é a construção de visualizações.
+A visualização dos dados é uma etapa importantíssima da análise estatística, pois é a partir dela que criamos a intuição necessária para escolher o teste ou modelo mais adequado para o nosso problema.</description>
+    </item>
+    
+    <item>
       <title>Purrr</title>
       <link>/purrr/</link>
-      <pubDate>Fri, 17 Nov 2017 00:00:00 +0000</pubDate>
+      <pubDate>Sat, 18 Nov 2017 00:00:00 +0000</pubDate>
       
       <guid>/purrr/</guid>
       <description>Programação funcional (PF) é um paradigma de programação com o qual a maior parte dos estatísticos não está familiarizada. Essa técnica costuma ser ignorada na maioria dos tutoriais de R por não estar diretamente envolvida com manipulação e visualização de dados, mas isso não quer dizer que ela não tenha suas vantagens.
-Usando PF podemos criar códigos mais concisos e &amp;ldquo;pipeávais&amp;rdquo;, características que por tabela também tornam o processo de debug mais simples.</description>
+Usando PF podemos criar códigos mais concisos e &amp;ldquo;pipeáveis&amp;rdquo;, características que por tabela também tornam o processo de debug mais simples.</description>
     </item>
     
     <item>
@@ -113,15 +123,6 @@ install.packages(&amp;quot;magrittr&amp;quot;) library(magrittr)  A ideia do ope
       <guid>/rbase/</guid>
       <description>Introdução A linguagem R é bem intuitiva. É possível fazer bastante coisa à base da tentativa e erro! Além disso, grande parte do conhecimento é escalável, isto é, quando você aprende a utilizar um certo tipo de função, o aprendizado pode ser replicado para funções parecidas. Essa ideia ficará bem clara quando falarmos dos pacotes do tidyverse, como o dplyr e o ggplot2.
 Quando o aprendizado não for muito intuitivo ou a utilização de uma função for muito complicada, demandando às vezes conhecimento de Estatística ou Programação, você pode acabar precisando de uma forcinha.</description>
-    </item>
-    
-    <item>
-      <title>Visualizações</title>
-      <link>/ggplot/</link>
-      <pubDate>Tue, 10 Oct 2017 00:00:00 +0000</pubDate>
-      
-      <guid>/ggplot/</guid>
-      <description>Para este tópico vamos utilizar o ggplot2. O ggplot2 é um pacote do R voltado para a criação de gráficos estatísticos. Ele é baseado na Gramática dos Gráficos (grammar of graphics, em inglês), criado por Leland Wilkinson, que é uma resposta para a pergunta: o que é um gráfico estatístico? Resumidamente, a gramática diz que um gráfico estatístico é um mapeamento dos dados a partir de atributos estéticos (cores, formas, tamanho) em formas geométricas (pontos, linhas, barras).</description>
     </item>
     
     <item>
