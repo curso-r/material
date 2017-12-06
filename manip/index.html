@@ -456,6 +456,8 @@
 
 			
 
+<h2 id="introdução">Introdução</h2>
+
 <blockquote>
 <p>&rdquo;(&hellip;) The fact that data science exists as a field is a colossal failure of statistics. To me, what I do is what statistics is all about. It is gaining insight from data using modelling and visualization. Data munging and manipulation is hard and statistics has just said that’s not our domain.&rdquo;</p>
 
@@ -464,7 +466,11 @@
 
 <p>Esta seção trata do tema <em>transformação de dados</em>. Trata-se de uma tarefa dolorosa e demorada, tomando muitas vezes a maior parte do tempo de uma análise estatística. Essa etapa é essencial em qualquer análise de dados e, apesar de negligenciada pela academia, é decisiva para o sucesso de estudos aplicados.</p>
 
-<p>Usualmente, o cientista de dados parte de uma base &ldquo;crua&rdquo; e a transforma até obter uma base de dados analítica. A base crua pode ser não estruturada, semi-estruturada ou estruturada. Já a base analítica é necessariamente estruturada e está preparada para passar por análises estatísticas a menos de transformações simples.</p>
+<p>Usualmente, o cientista de dados parte de uma base &ldquo;crua&rdquo; e a transforma até obter uma base de dados analítica. A base crua pode ser não estruturada, semi-estruturada ou estruturada. Já a base analítica é necessariamente estruturada e, a menos de transformações simples, está preparada para passar por análises estatísticas.</p>
+
+<p>A figura abaixo mostra a fase de &ldquo;disputa&rdquo; com os dados (<em>data wrangling</em>) para deixá-los no formato analítico.</p>
+
+<p><img src="http://r4ds.had.co.nz/diagrams/data-science-wrangle.png" title="Transformação no ciclo da ciência de dados." alt="Transformação no ciclo da ciência de dados." width="60%" height="60%" /></p>
 
 <p>Um conceito importante para obtenção de uma base analítica é o <em>data tidying</em>, ou arrumação de dados. Uma base é considerada <em>tidy</em> se</p>
 
@@ -474,43 +480,44 @@
 <li><del>Cada tabela considera informações de uma unidade amostral.</del></li>
 </ol>
 
-<p>A base de dados analítica é estruturada de tal forma que pode ser colocada diretamente em sistemas de modelagem estatística ou de visualização. Nem sempre uma base de dados analítica está no formato <em>tidy</em>, mas usualmente são necessários poucos passos para migrar de uma para outra.</p>
+<p>A base de dados analítica é estruturada de tal forma que pode ser colocada diretamente em ambientes de modelagem estatística ou de visualização. Nem sempre uma base de dados analítica está no formato <em>tidy</em>, mas usualmente são necessários poucos passos para migrar de uma para outra. A filosofia <em>tidy</em> é a base do <a href="https://www.tidyverse.org/">tidyverse</a>.</p>
 
-<p>A Figura abaixo mostra a fase de &ldquo;disputa&rdquo; com os dados (<em>data wrangling</em>) para deixá-los no formato analítico.</p>
+<p>Os principais pacotes encarregados da tarefa de estruturar os dados são o <code>dplyr</code> e o <code>tidyr</code>. Eles serão o tema desse tópico. Instale e carregue os pacotes utilizando:</p>
 
-<p><img src="http://r4ds.had.co.nz/diagrams/data-science-wrangle.png" title="Transformação no ciclo da ciência de dados." alt="Transformação no ciclo da ciência de dados." width="60%" height="60%" /></p>
+<pre><code class="language-r">install.packages(&quot;dplyr&quot;)
+## Installing package into '/home/travis/R/Library'
+## (as 'lib' is unspecified)
+install.packages(&quot;tidyr&quot;)
+## Installing package into '/home/travis/R/Library'
+## (as 'lib' is unspecified)
 
-<h2 id="pacotes-dplyr-e-tidyr">Pacotes <code>dplyr</code> e <code>tidyr</code></h2>
-
-<p>O <code>dplyr</code> é o pacote mais útil para realizar transformação de dados, aliando simplicidade e eficiência de uma forma elegante. Os scripts em <code>R</code> que fazem uso inteligente dos verbos <code>dplyr</code> e as facilidades do operador <em>pipe</em> tendem a ficar mais legíveis e organizados sem perder velocidade de execução.</p>
-
-<p>Antes de apresentar as principais funções do <code>dplyr</code> e do <code>tidyr</code>, precisamos trabalhar com o conceito de <code>tibbles</code>.</p>
-
-<h3 id="trabalhando-com-tibble-s">Trabalhando com <code>tibble</code>&rsquo;s</h3>
-
-<p>Uma <code>tibble</code> nada mais é do que um <code>data.frame</code>, mas com um método de impressão mais adequado. Outras diferenças podem ser estudadas <a href="http://r4ds.had.co.nz/tibbles.html">neste link</a>.</p>
-
-<p>Considere a seguinte base de dados.</p>
-
-<pre><code class="language-r">pnud_min
-## # A tibble: 16,686 x 14
-##      ano                  muni    uf regiao  idhm idhm_e idhm_l idhm_r
-##    &lt;int&gt;                 &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
-##  1  1991 ALTA FLORESTA D'OESTE    RO  Norte 0.329  0.112  0.617  0.516
-##  2  1991             ARIQUEMES    RO  Norte 0.432  0.199  0.684  0.593
-##  3  1991                CABIXI    RO  Norte 0.309  0.108  0.636  0.430
-##  4  1991                CACOAL    RO  Norte 0.407  0.171  0.667  0.593
-##  5  1991            CEREJEIRAS    RO  Norte 0.386  0.167  0.629  0.547
-##  6  1991     COLORADO DO OESTE    RO  Norte 0.376  0.151  0.658  0.536
-##  7  1991            CORUMBIARA    RO  Norte 0.203  0.039  0.572  0.373
-##  8  1991         COSTA MARQUES    RO  Norte 0.425  0.220  0.629  0.553
-##  9  1991       ESPIGÃO D'OESTE    RO  Norte 0.388  0.159  0.653  0.561
-## 10  1991         GUAJARÁ-MIRIM    RO  Norte 0.468  0.247  0.662  0.625
-## # ... with 16,676 more rows, and 6 more variables: espvida &lt;dbl&gt;,
-## #   rdpc &lt;dbl&gt;, gini &lt;dbl&gt;, pop &lt;int&gt;, lat &lt;dbl&gt;, lon &lt;dbl&gt;
+library(dplyr)
+## 
+## Attaching package: 'dplyr'
+## The following objects are masked from 'package:stats':
+## 
+##     filter, lag
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+library(tidyr)
 </code></pre>
 
-<h2 id="base-idh-municipal-pnud">Base IDH-Municipal - PNUD</h2>
+<p>Mas antes de apresentar as principais funções do <code>dplyr</code> e do <code>tidyr</code>, precisamos falar sobre o conceito de <code>tibbles</code>.</p>
+
+<hr />
+
+<h2 id="trabalhando-com-tibbles">Trabalhando com tibbles</h2>
+
+<p>Uma <code>tibble</code> nada mais é do que um <code>data.frame</code>, mas com um método de impressão mais adequado.</p>
+
+<p>As <code>tibbles</code> são parte do pacote <code>tibble</code>. Assim, para começar a usá-las, instale e carregue o pacote.</p>
+
+<pre><code class="language-r">install.packages(&quot;tibble&quot;)
+library(tibble)
+</code></pre>
+
+<p>Mais informações sobre <code>tibbles</code> podem ser encontradas <a href="http://r4ds.had.co.nz/tibbles.html">neste link</a>.</p>
 
 <p>Nessa seção, vamos trabalhar com uma base simplificada do <a href="http://www.atlasbrasil.org.br/2013/pt/download/base/">PNUD (Programa das Nações Unidas para o Desenvolvimento)</a>, contendo informações socioeconômicas de todos os municípios do país. Os resultados foram obtidos a partir dos Censos de 1991, 2000 e 2010.</p>
 
@@ -535,19 +542,51 @@
 <li><code>lat</code>, <code>lon</code> - Latitude e longitude do município (ponto médio).</li>
 </ul>
 
-<h2 id="os-cinco-verbos-do-dplyr">Os cinco verbos do <code>dplyr</code></h2>
+<p>Para acessar esta base, instale e carregue o pacote <code>abjData</code> da seguinte maneira:</p>
 
-<p>As funções principais do <code>dplyr</code> são:</p>
+<pre><code class="language-r">devtools::install_github(&quot;abjur/abjData&quot;)
+library(abjData)
+</code></pre>
+
+<p>Assim, utilizaremos o objeto <code>pnud_min</code> para acessar os dados.</p>
+
+<pre><code class="language-r">pnud_min
+## # A tibble: 16,686 x 14
+##      ano                  muni    uf regiao  idhm idhm_e idhm_l idhm_r
+##    &lt;int&gt;                 &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+##  1  1991 ALTA FLORESTA D'OESTE    RO  Norte 0.329  0.112  0.617  0.516
+##  2  1991             ARIQUEMES    RO  Norte 0.432  0.199  0.684  0.593
+##  3  1991                CABIXI    RO  Norte 0.309  0.108  0.636  0.430
+##  4  1991                CACOAL    RO  Norte 0.407  0.171  0.667  0.593
+##  5  1991            CEREJEIRAS    RO  Norte 0.386  0.167  0.629  0.547
+##  6  1991     COLORADO DO OESTE    RO  Norte 0.376  0.151  0.658  0.536
+##  7  1991            CORUMBIARA    RO  Norte 0.203  0.039  0.572  0.373
+##  8  1991         COSTA MARQUES    RO  Norte 0.425  0.220  0.629  0.553
+##  9  1991       ESPIGÃO D'OESTE    RO  Norte 0.388  0.159  0.653  0.561
+## 10  1991         GUAJARÁ-MIRIM    RO  Norte 0.468  0.247  0.662  0.625
+## # ... with 16,676 more rows, and 6 more variables: espvida &lt;dbl&gt;,
+## #   rdpc &lt;dbl&gt;, gini &lt;dbl&gt;, pop &lt;int&gt;, lat &lt;dbl&gt;, lon &lt;dbl&gt;
+</code></pre>
+
+<p>Veja que, por padrão, apenas as dez primeiras linhas da <code>tibble</code> são impressas na tela. Além disso, as colunas que não couberem na largura do console serão omitidas. Também são apresentadas a dimensão da tabela e as classes de cada coluna.</p>
+
+<hr />
+
+<h2 id="o-pacote-dplyr">O pacote <code>dplyr</code></h2>
+
+<p>O <code>dplyr</code> é o pacote mais útil para realizar transformação de dados, aliando simplicidade e eficiência de uma forma elegante. Os scripts em R que fazem uso inteligente dos verbos <code>dplyr</code> e as facilidades do operador <em>pipe</em> tendem a ficar mais legíveis e organizados sem perder velocidade de execução.</p>
+
+<p>As principais funções do <code>dplyr</code> são:</p>
 
 <ul>
-<li><code>filter</code> - filtra linhas</li>
-<li><code>select</code> - seleciona colunas</li>
-<li><code>mutate</code> - cria/modifica colunas</li>
-<li><code>arrange</code> - ordena a base</li>
-<li><code>summarise</code> - sumariza a base</li>
+<li><code>filter()</code> - filtra linhas</li>
+<li><code>select()</code> - seleciona colunas</li>
+<li><code>mutate()</code> - cria/modifica colunas</li>
+<li><code>arrange()</code> - ordena a base</li>
+<li><code>summarise()</code> - sumariza a base</li>
 </ul>
 
-<h3 id="características">Características</h3>
+<p>Todas essas funções seguem as mesmas características:</p>
 
 <ul>
 <li>O <em>input</em>  é sempre uma <code>tibble</code> e o <em>output</em>  é sempre um <code>tibble</code>.</li>
@@ -556,21 +595,22 @@
 <li>O pacote faz uso extensivo de NSE (<em>non standard evaluation</em>).</li>
 </ul>
 
-<h3 id="vantagens">Vantagens</h3>
+<p>As principais vantagens de se usar o <code>dplyr</code> em detrimento das funções do R base são:</p>
 
 <ul>
-<li>Utiliza <code>C</code> e <code>C++</code> por trás da maioria das funções, o que geralmente torna o código mais eficiente.</li>
-<li>Pode trabalhar com diferentes fontes de dados, como bases relacionais (SQL) e <code>data.table</code>.</li>
+<li>Manipular dados se torna uma tarefa muito mais simples.</li>
+<li>O código fica mais intuitivo de ser escrito e mais simples de ser lido.</li>
+<li>O pacote <code>dplyr</code> utiliza <code>C</code> e <code>C++</code> por trás da maioria das funções, o que geralmente torna o código mais eficiente.</li>
+<li>É possível trabalhar com diferentes fontes de dados, como bases relacionais (SQL) e <code>data.table</code>.</li>
 </ul>
+
+<p>Agora, vamos avaliar com mais detalhes os principais verbos do pacote <code>dplyr</code>.</p>
 
 <hr />
 
-<h2 id="select"><code>select</code></h2>
+<h3 id="select"><code>select()</code></h3>
 
-<ul>
-<li>Utilizar as funções <code>starts_with(x)</code>, <code>contains(x)</code>, <code>matches(x)</code>, <code>one_of(x)</code>.</li>
-<li>Possível colocar nomes, índices e intervalos de variáveis com <code>:</code>.</li>
-</ul>
+<p>A função <code>select()</code> seleciona colunas (variáveis). É possível utilizar nomes, índices, intervalos de variáveis ou utilizar as funções <code>starts_with(x)</code>, <code>contains(x)</code>, <code>matches(x)</code>, <code>one_of(x)</code> para selecionar as variáveis.</p>
 
 <pre><code class="language-r">pnud_min %&gt;% 
   select(ano, regiao, muni)
@@ -628,12 +668,9 @@
 
 <hr />
 
-<h2 id="filter"><code>filter</code></h2>
+<h3 id="filter"><code>filter()</code></h3>
 
-<ul>
-<li>Parecido com <code>subset</code>.</li>
-<li>Condições separadas por vírgulas equivalem a separar por <code>&amp;</code>.</li>
-</ul>
+<p>A função <code>filter()</code> filtra linhas. Ela é semelhante à função <code>subset()</code>, do R base.</p>
 
 <pre><code class="language-r">pnud_min %&gt;% 
   select(ano, muni, uf) %&gt;% 
@@ -656,15 +693,6 @@
 
 <p>Para fazer várias condições, use os operadores lógicos <code>&amp;</code> e <code>|</code> ou separe filtros entre vírgulas.</p>
 
-<div class='admonition note'>
-<p class='admonition-title'>
-%in%
-</p>
-<p>
-<b>%in%</b> é um operador muito útil para trabalhar com vetores. O resultado da operação é um vetor lógico do tamanho do vetor do elemento da esquerda, identificando quais elementos da esquerda batem com algum elemento da direita.
-</p>
-</div>
-
 <pre><code class="language-r">pnud_min %&gt;% 
   select(ano, regiao, uf, idhm) %&gt;% 
   filter(uf %in% c('SP', 'MG') | idhm &gt; .5, ano == 2010)
@@ -682,11 +710,14 @@
 ##  9  2010  Norte    RO 0.672
 ## 10  2010  Norte    RO 0.657
 ## # ... with 5,517 more rows
-  # é igual a
-  # filter(uf %in% c('SP', 'MG') | idhm &gt; .5 &amp; ano == 2010)
 </code></pre>
 
+<p>Repare que o operador <code>%in%</code> é muito útil para trabalhar com vetores. O resultado da operação é um vetor lógico o tamanho do vetor do elemento da esquerda, identificando quais elementos da esquerda batem com algum elemento da direita.</p>
+
+<p>Também podemos usar funções que retornam valores lógicos, como a <code>str_detect()</code>.</p>
+
 <pre><code class="language-r">library(stringr)
+
 pnud_min %&gt;% 
   select(muni, ano, uf) %&gt;% 
   filter(str_detect(muni, '^[HG]|S$'), 
@@ -709,12 +740,9 @@ pnud_min %&gt;%
 
 <hr />
 
-<h2 id="mutate"><code>mutate</code></h2>
+<h3 id="mutate"><code>mutate()</code></h3>
 
-<ul>
-<li>Parecido com <code>transform</code>, mas aceita várias novas colunas iterativamente.</li>
-<li>Novas variáveis devem ter o mesmo <code>length</code> que o <code>nrow</code> do bd oridinal ou <code>1</code>.</li>
-</ul>
+<p>A função <code>mutate()</code> cria ou modifica colunas. Ela é equivalente à função <code>transform()</code>, mas aceita várias novas colunas iterativamente. Novas variáveis devem ter o mesmo número de linhas da base original (ou terem comprimento 1).</p>
 
 <pre><code class="language-r">pnud_min %&gt;% 
   select(muni, rdpc, pop, idhm_l, espvida) %&gt;% 
@@ -738,12 +766,9 @@ pnud_min %&gt;%
 
 <hr />
 
-<h2 id="arrange"><code>arrange</code></h2>
+<h3 id="arrange"><code>arrange()</code></h3>
 
-<ul>
-<li>Simplesmente ordena de acordo com as opções.</li>
-<li>Utilizar <code>desc</code> para ordem decrescente.</li>
-</ul>
+<p>A função <code>arrange()</code> ordena a base. O argumento <code>desc=</code> pode ser utilizado para gerar uma ordem decrescente.</p>
 
 <pre><code class="language-r">pnud_min %&gt;% 
   filter(ano == 2010) %&gt;% 
@@ -767,13 +792,9 @@ pnud_min %&gt;%
 
 <hr />
 
-<h2 id="summarise"><code>summarise</code></h2>
+<h3 id="summarise"><code>summarise</code></h3>
 
-<ul>
-<li>Retorna um vetor de tamanho <code>1</code> a partir de uma conta com as variáveis.</li>
-<li>Geralmente é utilizado em conjunto com <code>group_by</code>.</li>
-<li>Algumas funções importantes: <code>n()</code>, <code>n_distinct()</code>.</li>
-</ul>
+<p>A função <code>summarise()</code> sumariza a base. Ela aplica uma função às variáveis, retornando um vetor de tamanho <code>1</code>. Geralmente ela é utilizada em conjunto da função <code>group_by()</code>.</p>
 
 <pre><code class="language-r">pnud_min %&gt;% 
   group_by(regiao, uf) %&gt;% 
@@ -794,7 +815,11 @@ pnud_min %&gt;%
 ##  9     Nordeste    SE   225 64.26031
 ## 10     Nordeste    PI   672 64.04028
 ## # ... with 17 more rows
+
+# A função n() costuma ser bastante utilizada com a função summarise().
 </code></pre>
+
+<p>A função <code>count()</code> também pode ser usada para sumarizar em relação à frequência.</p>
 
 <pre><code class="language-r">pnud_min %&gt;% 
   filter(ano == 2010) %&gt;% 
@@ -810,13 +835,27 @@ pnud_min %&gt;%
 ## 5        Norte   449  8.1%
 </code></pre>
 
-<hr />
-
-<h2 id="gather"><code>gather</code></h2>
+<h3 id="outras-funções-do-dplyr">Outras funções do <code>dplyr</code></h3>
 
 <ul>
-<li>&ldquo;Empilha&rdquo; o banco de dados</li>
+<li>Para retirar duplicatas, utilizar <code>distinct()</code>.</li>
+<li>Para realizar operações mais gerais, usar <code>do</code>.</li>
+<li>Para juntar tabelas, usar <code>inner_join()</code>, <code>left_join()</code>, <code>anti_join()</code> etc.</li>
 </ul>
+
+<p><strong>Exercício</strong>: estudar o <code>help()</code> dessas funções e criar exemplos com elas utilizando a base <code>pnud_min</code>.</p>
+
+<h2 id="o-pacote-tidyr">O pacote <code>tidyr</code></h2>
+
+<p>O pacote <code>tidyr</code> dispõe de funções úteis para deixar os seus dados no formato que você precisa para a análise. Na maioria das vezes, utilizamos para deixá-los <em>tidy</em>. Outras, precisamos &ldquo;bagunçá-los&rdquo; um pouco para poder aplicar alguma função.</p>
+
+<p>Nesse sentido, as principais funções são a <code>gather()</code> e a <code>spread()</code></p>
+
+<hr />
+
+<h3 id="gather"><code>gather()</code></h3>
+
+<p>A função <code>gather()</code> &ldquo;empilha&rdquo; o banco de dados. Ela é utilizada principalmente quando as colunas da base não representam nomes de variáveis, mas sim seus valores.</p>
 
 <pre><code class="language-r">pnud_min %&gt;% 
   select(uf, muni, ano, starts_with('idhm_')) %&gt;% 
@@ -840,12 +879,9 @@ pnud_min %&gt;%
 
 <hr />
 
-<h2 id="spread"><code>spread</code></h2>
+<h3 id="spread"><code>spread()</code></h3>
 
-<ul>
-<li>&ldquo;Joga&rdquo; uma variável nas colunas</li>
-<li>É essencialmente a função inversa de <code>gather</code></li>
-</ul>
+<p>A função <code>spread()</code> é essencialmente o inverso da <code>gather()</code>. Ela espalha uma variável nas colunas.</p>
 
 <pre><code class="language-r">pnud_min %&gt;% 
   select(muni, uf, ano, starts_with('idhm_')) %&gt;% 
@@ -869,11 +905,11 @@ pnud_min %&gt;%
 
 <hr />
 
-<h2 id="funções-auxiliares">Funções auxiliares</h2>
+<h3 id="outras-funções-do-tidyr">Outras funções do <code>tidyr</code></h3>
 
 <ul>
-<li><code>unite</code> junta duas ou mais colunas usando algum separador (<code>_</code>, por exemplo).</li>
-<li><code>separate</code> faz o inverso de <code>unite</code>, transforma uma coluna em várias usando um separador.</li>
+<li>A função <code>unite()</code> junta duas ou mais colunas usando algum separador (<code>_</code>, por exemplo).</li>
+<li>A função <code>separate()</code> faz o inverso de <code>unite()</code>: transforma uma coluna em várias usando um separador.</li>
 </ul>
 
 <pre><code class="language-r">pnud_min %&gt;% 
@@ -893,18 +929,6 @@ pnud_min %&gt;%
 ## 3     r SÃO CAETANO DO SUL 0.891
 </code></pre>
 
-<hr />
-
-<h2 id="um-pouco-mais-de-transformação-de-dados">Um pouco mais de transformação de dados</h2>
-
-<ul>
-<li>Para juntar tabelas, usar <code>inner_join</code>, <code>left_join</code>, <code>anti_join</code> etc.</li>
-<li>Para realizar operações mais gerais, usar <code>do</code>.</li>
-<li>Para retirar duplicatas, utilizar <code>distinct</code>.</li>
-</ul>
-
-<script src="https://cdn.datacamp.com/datacamp-light-latest.min.js"></script>
-
 
 			<aside class="copyright" role="note">
 				
@@ -922,34 +946,18 @@ pnud_min %&gt;%
 <nav class="pagination" aria-label="Footer">
   <div class="previous">
   
-      <a href="../stringr/" title="Manipulando strings">
-        <span class="direction">
-          Previous
-        </span>
-        <div class="page">
-          <div class="button button-previous" role="button" aria-label="Previous">
-            <i class="icon icon-back"></i>
-          </div>
-          <div class="stretch">
-            <div class="title">
-              Manipulando strings
-            </div>
-          </div>
-        </div>
-      </a>
-  
   </div>
 
   <div class="next">
   
-      <a href="../pipe/" title="O operador pipe">
+      <a href="../ggplot/" title="Visualizações">
         <span class="direction">
           Next
         </span>
         <div class="page">
           <div class="stretch">
             <div class="title">
-              O operador pipe
+              Visualizações
             </div>
           </div>
           <div class="button button-next" role="button" aria-label="Next">

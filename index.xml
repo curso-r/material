@@ -7,10 +7,21 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>pt-br</language>
     <copyright>Disponível sobre Licença MIT</copyright>
-    <lastBuildDate>Sun, 03 Dec 2017 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 06 Dec 2017 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Manipulação de dados</title>
+      <link>/manip/</link>
+      <pubDate>Wed, 06 Dec 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/manip/</guid>
+      <description>Introdução  &amp;rdquo;(&amp;hellip;) The fact that data science exists as a field is a colossal failure of statistics. To me, what I do is what statistics is all about. It is gaining insight from data using modelling and visualization. Data munging and manipulation is hard and statistics has just said that’s not our domain.&amp;rdquo;
+Hadley Wickham
+ Esta seção trata do tema transformação de dados. Trata-se de uma tarefa dolorosa e demorada, tomando muitas vezes a maior parte do tempo de uma análise estatística.</description>
+    </item>
     
     <item>
       <title>Visualizações</title>
@@ -91,17 +102,6 @@ Felizmente, depois de aprender a usar o tidyverse você não terá mais esse pro
       <guid>/stringr/</guid>
       <description>Variáveis de texto são muito comuns nos bancos de dados e, geralmente, dão bastante trabalho para serem manipuladas. É muito comum encontrarmos colunas com categorias não padronizadas, como, por exemplo, uma variável Estado com &amp;ldquo;SP&amp;rdquo;, &amp;ldquo;sp&amp;rdquo;, &amp;ldquo;Sao Paulo&amp;rdquo;, &amp;ldquo;São Paulo&amp;rdquo; etc, todas indicando o mesmo estado.
 O R possui várias funções para manipular textos (ou strings). No entanto, as funções do base não possuem uma interface consistente e cada uma tem a sua forma de passar os parâmetros, dificultando a programação durante a análise.</description>
-    </item>
-    
-    <item>
-      <title>Manipulação de dados</title>
-      <link>/manip/</link>
-      <pubDate>Tue, 10 Oct 2017 00:00:00 +0000</pubDate>
-      
-      <guid>/manip/</guid>
-      <description>&amp;rdquo;(&amp;hellip;) The fact that data science exists as a field is a colossal failure of statistics. To me, what I do is what statistics is all about. It is gaining insight from data using modelling and visualization. Data munging and manipulation is hard and statistics has just said that’s not our domain.&amp;rdquo;
-Hadley Wickham
- Esta seção trata do tema transformação de dados. Trata-se de uma tarefa dolorosa e demorada, tomando muitas vezes a maior parte do tempo de uma análise estatística.</description>
     </item>
     
     <item>
