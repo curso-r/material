@@ -508,7 +508,6 @@
 <p>e, em seguida, carregue o pacote</p>
 
 <pre><code class="language-r">library(shiny)
-## Error in library(shiny): there is no package called 'shiny'
 </code></pre>
 
 <h2 id="estrutura-básica">Estrutura básica</h2>
@@ -587,9 +586,6 @@ shinyApp(ui = ui, server = server)
 
 <p>Ao rodar o app, uma nova janela se abrirá e você terá acesso ao aplicativo (veja figura baixo). Ele estará rodando localmente, então você ainda não poderá acessá-lo pela internet.</p>
 
-<pre><code class="language-r">knitr::include_graphics(&quot;figures/app_minimal.png&quot;)
-</code></pre>
-
 <p><img src="figures/app_minimal.png" title="plot of chunk unnamed-chunk-11" alt="plot of chunk unnamed-chunk-11" width="60%" height="60%" /></p>
 
 <p>Minimize a janela e veja no seu console que a sessão do R estará ocupada rodando o aplicativo. Assim, um Shiny app terá sempre uma sessão de R rodando por trás.</p>
@@ -605,8 +601,9 @@ shinyApp(ui = ui, server = server)
 <p>Tudo o que será apresentado ao usuário está guardado no objeto <code>ui</code>, que nada mais é do que um código HTML. Experimente rodar uma função do <em>user side</em> no console. O que você receberá será sempre um código HTML.</p>
 
 <pre><code class="language-r">fluidPage()
-## Error in fluidPage(): could not find function &quot;fluidPage&quot;
 </code></pre>
+
+<p><!--html_preserve--><div class="container-fluid"></div><!--/html_preserve--></p>
 
 <p>A função <code>fluidPage()</code> utilizada como exemplo acima é utilizada pelo Shiny para criar um display que automaticamente ajusta as dimensões da janela do navegador do usuário. Os elementos da interface do usuário são então colocados dentro dessa função. Veja um exemplo:</p>
 
@@ -641,17 +638,19 @@ shinyApp(ui = ui, server = server)
 
 <p>Na prática, inputs são widgets que possibilitam a interação do usuário com o app. Eles recebem um valor escolhido pelo usuário e o envia para o <em>server side</em>. Segue uma lista dos principais inputs utilizados num Shiny app:</p>
 
-<p><code>actionButton()</code> - botão para executar uma ação.
-<code>checkboxGroupInput()</code> -    um grupo de <em>check boxes</em>.
-<code>checkboxInput()</code> - um único <em>check box</em>.
-<code>dateInput()</code> - um calendário para seleção de data.
-<code>dateRangeInput()</code> -    um par de calendários para escolher um intervalo de datas.
-<code>fileInput()</code> - uma ferramenta para auxiliar o upload de arquivos.
-<code>numericInput()</code> -  Um campo para enviar números.
-<code>radioButtons()</code> -  Um conjunto de botões para seleção.
-<code>selectInput()</code> -   Um <em>select box</em> com um conjunto de opções.
-<code>sliderInput()</code> -   Um slider.
-<code>textInput()</code> - Um campo para enviar texto.</p>
+<ul>
+<li><code>actionButton()</code> - botão para executar uma ação.</li>
+<li><code>checkboxGroupInput()</code> -  um grupo de <em>check boxes</em>.</li>
+<li><code>checkboxInput()</code> -   um único <em>check box</em>.</li>
+<li><code>dateInput()</code> -   um calendário para seleção de data.</li>
+<li><code>dateRangeInput()</code> -  um par de calendários para escolher um intervalo de datas.</li>
+<li><code>fileInput()</code> -   uma ferramenta para auxiliar o upload de arquivos.</li>
+<li><code>numericInput()</code> -    Um campo para enviar números.</li>
+<li><code>radioButtons()</code> -    Um conjunto de botões para seleção.</li>
+<li><code>selectInput()</code> - Um <em>select box</em> com um conjunto de opções.</li>
+<li><code>sliderInput()</code> - Um slider.</li>
+<li><code>textInput()</code> -   Um campo para enviar texto.</li>
+</ul>
 
 <p>No nosso primeiro exemplo, no item anterior, nós utilizamos um <code>sliderInput()</code> para interagir com o número de classes do histograma.</p>
 
@@ -694,13 +693,15 @@ shinyApp(ui = ui, server = server)
 
 <p>Da mesma forma que há uma função para cada tipo de input, há uma função para cada tipo de output:</p>
 
-<p><code>dataTableOutput()</code> -   para data frames.
-<code>htmlOutput()</code> ou <code>uiOutput()</code> - para código HTML.
-<code>imageOutput()</code> - para imagens.
-<code>plotOutput()</code> - para gráficos.
-<code>tableOutput()</code> - para tabelas.
-<code>textOutput()</code> - para textos.
-<code>verbatimTextOutput()</code> - para textos não-formatados.</p>
+<ul>
+<li><code>dataTableOutput()</code> - para data frames.</li>
+<li><code>htmlOutput()</code> ou <code>uiOutput()</code> - para código HTML.</li>
+<li><code>imageOutput()</code> - para imagens.</li>
+<li><code>plotOutput()</code> - para gráficos.</li>
+<li><code>tableOutput()</code> - para tabelas.</li>
+<li><code>textOutput()</code> - para textos.</li>
+<li><code>verbatimTextOutput()</code> - para textos não-formatados.</li>
+</ul>
 
 <p>Assim como as funções de input, funções de output recebem um argumento de identificação, o <code>outputId=</code>. Esse argumento recebe uma string que representa o nome utilizado no <em>server side</em> para se referir a esse output. Consulte o <code>help()</code> de cada função para saber mais sobre os argumentos adicionais.</p>
 
@@ -907,9 +908,6 @@ server &lt;- function(input, output) {
 shinyApp(ui, server)
 </code></pre>
 
-<pre><code class="language-r">knitr::include_graphics(&quot;figures/app-tags.png&quot;)
-</code></pre>
-
 <p><img src="figures/app-tags.png" title="plot of chunk unnamed-chunk-22" alt="plot of chunk unnamed-chunk-22" width="60%" height="60%" /></p>
 
 <p>Algumas dessas funções vêm com um <code>wrapper</code> do tipo <code>nome-da-tag()</code>. Por exemplo, as funções <code>tags$h1()</code> e <code>h1()</code> são equivalentes.</p>
@@ -976,9 +974,6 @@ shinyApp(ui, server)
 
 </code></pre>
 
-<pre><code class="language-r">knitr::include_graphics(&quot;figures/app-layout.png&quot;)
-</code></pre>
-
 <p><img src="figures/app-layout.png" title="plot of chunk unnamed-chunk-24" alt="plot of chunk unnamed-chunk-24" width="60%" height="60%" /></p>
 
 <p>A profundidade em um Shiny app é acessada utilizando abas e painéis. As principais funções para trabalhar com essa feature são: <code>wellPanel()</code>, <code>tabPanel()</code>,  <code>tabsetPanel()</code> e <code>navlistPanel()</code>.</p>
@@ -991,11 +986,9 @@ shinyApp(ui, server)
 
 <h2 id="compartilhando">Compartilhando</h2>
 
-<p>Para compartilhar o seu app online, o Shiny oferece duas opções: o Shiny Server e o shinyapps.io.</p>
+<p>Para compartilhar o seu app online, o Shiny oferece duas opções: o Shiny Server e o shinyapps.io. Veja a seguir mais detalhes sobre cada uma dessas opções.</p>
 
 <p><strong>Nota</strong>: independente da opção escolhida, para o compartilhamento online funcionar, o script com o código precisa ter o nome <code>app.R</code>.</p>
-
-<p>Veja a seguir mais detalhes sobre cada uma dessas opções.</p>
 
 <h3 id="shiny-server">Shiny Server</h3>
 
@@ -1019,21 +1012,14 @@ shinyApp(ui, server)
 
 <p>Para começar a usar o shinyapps.io, você precisa:</p>
 
-<ol>
-<li>Instalar o pacote <code>rsconnect</code>.</li>
-</ol>
+<p><strong>1.</strong> Instalar o pacote <code>rsconnect</code>.</p>
 
 <pre><code class="language-r">devtools::install_github(&quot;rstudio/rsconnect&quot;)
 </code></pre>
 
-<ol>
-<li><p>Criar uma conta no <a href="shinyapps.io">shinyapps.io</a>.</p></li>
+<p><strong>2.</strong> Criar uma conta no <a href="shinyapps.io">shinyapps.io</a>.</p>
 
-<li><p>No RStudio, rodar o app e clicar em <em>Publish</em>.</p></li>
-</ol>
-
-<pre><code class="language-r">knitr::include_graphics(&quot;figures/app-publish.png&quot;)
-</code></pre>
+<p><strong>3.</strong> No RStudio, rodar o app e clicar em <em>Publish</em>.</p>
 
 <p><img src="figures/app-publish.png" title="plot of chunk unnamed-chunk-26" alt="plot of chunk unnamed-chunk-26" width="60%" height="60%" /></p>
 
