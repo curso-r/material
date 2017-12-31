@@ -7,10 +7,22 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>pt-br</language>
     <copyright>Disponível sobre Licença MIT</copyright>
-    <lastBuildDate>Wed, 06 Dec 2017 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 31 Dec 2017 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Introdução</title>
+      <link>/shiny/</link>
+      <pubDate>Sun, 31 Dec 2017 00:00:00 +0000</pubDate>
+      
+      <guid>/shiny/</guid>
+      <description>Introdução Até gora, pincelamos os principais elementos de transformação, visualização e modelagem de dados. Para completar nossa análise, precisamos de boas ferramentas de comunicação.
+A maior parte dos trabalhos de análise estatística possui três outputs possíveis:
+ relatórios analíticos; dashboards de visualização; e APIs (Application Programming Interfaces).  O objetivo desta seção é a construção de dashboards utilizando o pacote shiny.
+O Shiny é um sistema para desenvolvimento de aplicações web usando o R, um pacote do R (shiny) e um servidor web (shiny server).</description>
+    </item>
     
     <item>
       <title>Manipulação de dados</title>
