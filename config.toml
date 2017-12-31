@@ -60,32 +60,32 @@ pluralizeListTitles = false
 [[menu.main]]
   name   = "Pipe"
   url    = "pipe/"
-  weight = 23
+  weight = 15
   
 [[menu.main]]
   name   = "Importação"
   url    = "import/"
-  weight = 25
+  weight = 20
 
 [[menu.main]]
   name   = "Manipulação"
   url    = "manip/"
-  weight = 30
+  weight = 25
   
 [[menu.main]]
   name   = "Visualizações"
   url    = "ggplot/"
-  weight = 35
+  weight = 30
 
 [[menu.main]]
   name   = "Strings"
   url    = "stringr/"
-  weight = 41
+  weight = 35
   
 [[menu.main]]
   name   = "Datas"
   url    = "lubridate/"
-  weight = 43
+  weight = 40
   
 [[menu.main]]
   name   = "Fatores"
@@ -95,21 +95,26 @@ pluralizeListTitles = false
 [[menu.main]]
   name   = "Programação Funcional"
   url    = "purrr/"
-  weight = 47
+  weight = 50
 
 [[menu.main]]
   name   = "Modelagem"
   url    = "modelos/"
-  weight = 50
-
+  weight = 55
+  
 [[menu.main]]
-  name   = "Web Scraping"
-  url    = "scrape/"
+  name   = "Shiny"
+  url    = "shiny/"
   weight = 60
 
 [[menu.main]]
   name   = "APIs"
   url    = "api/"
+  weight = 65
+
+[[menu.main]]
+  name   = "Web Scraping"
+  url    = "scrape/"
   weight = 70
 
 [blackfriday]
