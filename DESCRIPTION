@@ -33,7 +33,8 @@ Imports:
     tidyr,
     dplyr,
     ggplot2,
-    lubridate
+    lubridate,
+    shiny
 RoxygenNote: 5.0.1
 PowerUps:
     curso-r/pu.manip,
