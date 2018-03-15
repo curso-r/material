@@ -7,10 +7,23 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>pt-br</language>
     <copyright>Disponível sobre Licença MIT</copyright>
-    <lastBuildDate>Sun, 31 Dec 2017 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 15 Mar 2018 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Importação de dados</title>
+      <link>/import/</link>
+      <pubDate>Thu, 15 Mar 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/import/</guid>
+      <description>Nesta seção, vamos introduzir os principais pacotes para importar dados para o R. Mostraremos como importar dados de arquivos de texto e de planilhas do excel.
+As funções que apresentaremos aqui carregam os dados em tibbles, que diferem dos data.frames em dois pontos importantes:
+ imprime os dados na tela de uma forma muito mais organizada, resumida e legível; e
+ permite a utilização de list-columns.
+  Se você não estiver familiarizado com o conceito de list-columns, não se preocupe.</description>
+    </item>
     
     <item>
       <title>Introdução</title>
@@ -53,17 +66,6 @@ A visualização dos dados é uma etapa importantíssima da análise estatístic
       <guid>/purrr/</guid>
       <description>Programação funcional (PF) é um paradigma de programação com o qual a maior parte dos estatísticos não está familiarizada. Essa técnica costuma ser ignorada na maioria dos tutoriais de R por não estar diretamente envolvida com manipulação e visualização de dados, mas isso não quer dizer que ela não tenha suas vantagens.
 Usando PF podemos criar códigos mais concisos e &amp;ldquo;pipeáveis&amp;rdquo;, características que por tabela também tornam o processo de debug mais simples.</description>
-    </item>
-    
-    <item>
-      <title>Importação de dados</title>
-      <link>/import/</link>
-      <pubDate>Thu, 19 Oct 2017 00:00:00 +0000</pubDate>
-      
-      <guid>/import/</guid>
-      <description>Nesta seção, vamos introduzir os principais pacotes para importar dados para o R. Mostraremos como importar dados de arquivos de texto, de planilhas do excel, de extensões de outros programas estatísticos (SAS e SPSS, por exemplo), e como interagir com o SQL.
-As funções que apresentaremos aqui carregam os dados em tibbles, que diferem dos data.frames em dois pontos importantes:
- imprime os dados na tela de uma forma muito mais organizada, resumida e legível; e</description>
     </item>
     
     <item>

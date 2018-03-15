@@ -474,7 +474,9 @@
 
 			
 
-<p>Nesta seção, vamos introduzir os principais pacotes para importar dados para o R. Mostraremos como importar dados de arquivos de texto, de planilhas do excel, de extensões de outros programas estatísticos (SAS e SPSS, por exemplo), e como interagir com o SQL.</p>
+<p>Nesta seção, vamos introduzir os principais pacotes para importar dados para o R. Mostraremos como importar dados de arquivos de texto e de planilhas do excel.</p>
+
+<!-- , de extensões de outros programas estatísticos (SAS e SPSS, por exemplo), e como interagir com o SQL. -->
 
 <p>As funções que apresentaremos aqui carregam os dados em <code>tibbles</code>, que diferem dos data.frames em dois pontos importantes:</p>
 
@@ -493,12 +495,11 @@
 <p>Veja alguns exemplos:</p>
 
 <pre><code class="language-r">library(readr)
-## Error in library(readr): there is no package called 'readr'
 
 dados_txt &lt;- readr::read_table2(file = &quot;data/mtcars.txt&quot;)
-## Error in loadNamespace(name): there is no package called 'readr'
+## Error: 'data/mtcars.txt' does not exist in current working directory ('/home/travis/build/curso-r/pu.import').
 dados_csv &lt;- readr::read_csv(file = &quot;data/mtcars.csv&quot;)
-## Error in loadNamespace(name): there is no package called 'readr'
+## Error: 'data/mtcars.csv' does not exist in current working directory ('/home/travis/build/curso-r/pu.import').
 </code></pre>
 
 <div class='admonition note'>
@@ -513,9 +514,7 @@ Descubra qual a diferença entre as funções "read_table()" e "read_table2()"; 
 <p>Também é possível salvar objetos, como data.frames em um tipo especial de arquivos, o <code>.rds</code>. A vantagem dessa extensão é guardar a estrutura dos dados salvos, como a classe das colunas de um data.frame. Além disso, é uma boa alternativa para lidar com grandes bancos de dados, já que arquivos <code>.rds</code> serão bem mais compactos do que arquivos Excel.</p>
 
 <pre><code class="language-r">write_rds(mtcars, path = &quot;data/mtcars.rds&quot;)
-## Error in write_rds(mtcars, path = &quot;data/mtcars.rds&quot;): could not find function &quot;write_rds&quot;
 dados &lt;- read_rds(path = &quot;data/mtcars.rds&quot;)
-## Error in read_rds(path = &quot;data/mtcars.rds&quot;): could not find function &quot;read_rds&quot;
 </code></pre>
 
 <h1 id="importando-arquivos-do-excel">Importando arquivos do Excel</h1>
@@ -523,9 +522,9 @@ dados &lt;- read_rds(path = &quot;data/mtcars.rds&quot;)
 <p>O pacote <code>readxl</code> contém funções para ler dados de arquivos do Excel, como <code>.xls</code> e <code>xlsx</code>.</p>
 
 <pre><code class="language-r">readxl::read_xls(path = &quot;data/mtcars.xls&quot;)
-## Error in loadNamespace(name): there is no package called 'readxl'
+## Error in read_fun(path = path, sheet = sheet, limits = limits, shim = shim, : Evaluation error: path[1]=&quot;data/mtcars.xls&quot;: No such file or directory.
 readxl::read_xlsx(path = &quot;data/mtcars.xlsx&quot;)
-## Error in loadNamespace(name): there is no package called 'readxl'
+## Error in read_fun(path = path, sheet = sheet, limits = limits, shim = shim, : Evaluation error: zip file 'data/mtcars.xlsx' cannot be opened.
 </code></pre>
 
 <p>A funçao <code>read_excel()</code> auto detecta a extensão do arquivo.</p>
@@ -539,7 +538,7 @@ read_excel(path = &quot;data/mtcars.xlsx&quot;)
 
 			<aside class="copyright" role="note">
 				
-				&copy; 2017 Disponível sobre Licença MIT &ndash;
+				&copy; 2018 Disponível sobre Licença MIT &ndash;
 				
 				Site built with
 				<a href="https://www.gohugo.io" target="_blank">Hugo</a>
@@ -553,34 +552,18 @@ read_excel(path = &quot;data/mtcars.xlsx&quot;)
 <nav class="pagination" aria-label="Footer">
   <div class="previous">
   
-      <a href="../purrr/" title="Purrr">
-        <span class="direction">
-          Previous
-        </span>
-        <div class="page">
-          <div class="button button-previous" role="button" aria-label="Previous">
-            <i class="icon icon-back"></i>
-          </div>
-          <div class="stretch">
-            <div class="title">
-              Purrr
-            </div>
-          </div>
-        </div>
-      </a>
-  
   </div>
 
   <div class="next">
   
-      <a href="../api/" title="Construindo APIs">
+      <a href="../shiny/" title="Introdução">
         <span class="direction">
           Next
         </span>
         <div class="page">
           <div class="stretch">
             <div class="title">
-              Construindo APIs
+              Introdução
             </div>
           </div>
           <div class="button button-next" role="button" aria-label="Next">
