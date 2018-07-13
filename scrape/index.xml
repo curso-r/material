@@ -7,7 +7,7 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>pt-br</language>
     <copyright>Disponível sobre Licença MIT</copyright>
-    <lastBuildDate>Tue, 10 Oct 2017 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 13 Jul 2018 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/scrape/index.xml" rel="self" type="application/rss+xml" />
     
@@ -15,7 +15,7 @@
     <item>
       <title>Web Scraping</title>
       <link>/scrape/</link>
-      <pubDate>Tue, 10 Oct 2017 00:00:00 +0000</pubDate>
+      <pubDate>Fri, 13 Jul 2018 00:00:00 +0000</pubDate>
       
       <guid>/scrape/</guid>
       <description>Pacotes httr, xml2 e rvest Esses são os três pacotes mais modernos do R utilizados para fazer web scraping. O pacote xml2 tem a finalidade de estruturar arquivos HTML ou XML de forma eficiente, tornando possível a obtenção de tags e seus atributos dentro de um arquivo. Já o pacote httr é responsável por realizar requisições web para obtenção das páginas de interesse, buscando reduzir ao máximo a complexidade da programação.</description>

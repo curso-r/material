@@ -620,7 +620,7 @@ fator_3_sem_sentido &lt;- c(fator_1, fator_2)
 fator_3_sem_sentido
 ## [1] 1 2 3 1 2
 
-fator_3_com_sentido &lt;- forcats::fct_c(list(fator_1, fator_2))
+fator_3_com_sentido &lt;- forcats::fct_c(fator_1, fator_2)
 
 fator_3_com_sentido
 ## [1] a b c d e
@@ -967,34 +967,18 @@ fct_relevel(fator, &quot;b&quot;,&quot;c&quot;)
 <nav class="pagination" aria-label="Footer">
   <div class="previous">
   
-      <a href="../lubridate/" title="Manipulando datas">
-        <span class="direction">
-          Previous
-        </span>
-        <div class="page">
-          <div class="button button-previous" role="button" aria-label="Previous">
-            <i class="icon icon-back"></i>
-          </div>
-          <div class="stretch">
-            <div class="title">
-              Manipulando datas
-            </div>
-          </div>
-        </div>
-      </a>
-  
   </div>
 
   <div class="next">
   
-      <a href="../stringr/" title="Manipulando strings">
+      <a href="../scrape/" title="Web Scraping">
         <span class="direction">
           Next
         </span>
         <div class="page">
           <div class="stretch">
             <div class="title">
-              Manipulando strings
+              Web Scraping
             </div>
           </div>
           <div class="button button-next" role="button" aria-label="Next">

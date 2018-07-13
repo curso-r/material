@@ -7,7 +7,7 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>pt-br</language>
     <copyright>Disponível sobre Licença MIT</copyright>
-    <lastBuildDate>Tue, 10 Oct 2017 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 13 Jul 2018 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/forcats/index.xml" rel="self" type="application/rss+xml" />
     
@@ -15,7 +15,7 @@
     <item>
       <title>Manipulando fatores</title>
       <link>/forcats/</link>
-      <pubDate>Tue, 10 Oct 2017 00:00:00 +0000</pubDate>
+      <pubDate>Fri, 13 Jul 2018 00:00:00 +0000</pubDate>
       
       <guid>/forcats/</guid>
       <description>Introdução Se você já utilizou R anteriormente, provavelmente já escreveu a expressão stringsAsFactors = F quando importava dados usando as funções read.csv ou read.table. É muito frustrante quando uma coluna de strings é lida como um fator, pois fatores não podem ser manipulados do mesmo jeito que manipulamos vetores de strings.

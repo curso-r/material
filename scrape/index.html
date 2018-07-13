@@ -775,18 +775,18 @@ sabesp_conteudo(result)
 </code></pre>
 
 <pre><code>## # A tibble: 24 x 3
-##                                 titulo  info               lugar
-##                                  &lt;chr&gt; &lt;dbl&gt;               &lt;chr&gt;
-##  1                   índice armazenado  62.5   sistemaCantareira
-##  2                 pluviometria do dia   0.0   sistemaCantareira
-##  3       pluviometria acumulada no mês  50.1   sistemaCantareira
-##  4 pluviometria média histórica do mês 203.4   sistemaCantareira
-##  5                   índice armazenado  53.9    sistemaAltoTiete
-##  6                 pluviometria do dia   0.0    sistemaAltoTiete
-##  7       pluviometria acumulada no mês  54.0    sistemaAltoTiete
-##  8 pluviometria média histórica do mês 194.9    sistemaAltoTiete
-##  9                   índice armazenado  78.9 sistemaGuarapiranga
-## 10                 pluviometria do dia   3.4 sistemaGuarapiranga
+##    titulo                               info lugar              
+##    &lt;chr&gt;                               &lt;dbl&gt; &lt;chr&gt;              
+##  1 índice armazenado                    62.5 sistemaCantareira  
+##  2 pluviometria do dia                   0   sistemaCantareira  
+##  3 pluviometria acumulada no mês        50.1 sistemaCantareira  
+##  4 pluviometria média histórica do mês 203.  sistemaCantareira  
+##  5 índice armazenado                    53.9 sistemaAltoTiete   
+##  6 pluviometria do dia                   0   sistemaAltoTiete   
+##  7 pluviometria acumulada no mês        54   sistemaAltoTiete   
+##  8 pluviometria média histórica do mês 195.  sistemaAltoTiete   
+##  9 índice armazenado                    78.9 sistemaGuarapiranga
+## 10 pluviometria do dia                   3.4 sistemaGuarapiranga
 ## # ... with 14 more rows
 </code></pre>
 
@@ -809,18 +809,18 @@ sabesp_dia('2017-02-14')
 </code></pre>
 
 <pre><code>## # A tibble: 24 x 4
-##                                 titulo  info               lugar result
-##                                  &lt;chr&gt; &lt;dbl&gt;               &lt;chr&gt;  &lt;chr&gt;
-##  1                   índice armazenado  62.5   sistemaCantareira     OK
-##  2                 pluviometria do dia   0.0   sistemaCantareira     OK
-##  3       pluviometria acumulada no mês  50.1   sistemaCantareira     OK
-##  4 pluviometria média histórica do mês 203.4   sistemaCantareira     OK
-##  5                   índice armazenado  53.9    sistemaAltoTiete     OK
-##  6                 pluviometria do dia   0.0    sistemaAltoTiete     OK
-##  7       pluviometria acumulada no mês  54.0    sistemaAltoTiete     OK
-##  8 pluviometria média histórica do mês 194.9    sistemaAltoTiete     OK
-##  9                   índice armazenado  78.9 sistemaGuarapiranga     OK
-## 10                 pluviometria do dia   3.4 sistemaGuarapiranga     OK
+##    titulo                               info lugar               result
+##    &lt;chr&gt;                               &lt;dbl&gt; &lt;chr&gt;               &lt;chr&gt; 
+##  1 índice armazenado                    62.5 sistemaCantareira   OK    
+##  2 pluviometria do dia                   0   sistemaCantareira   OK    
+##  3 pluviometria acumulada no mês        50.1 sistemaCantareira   OK    
+##  4 pluviometria média histórica do mês 203.  sistemaCantareira   OK    
+##  5 índice armazenado                    53.9 sistemaAltoTiete    OK    
+##  6 pluviometria do dia                   0   sistemaAltoTiete    OK    
+##  7 pluviometria acumulada no mês        54   sistemaAltoTiete    OK    
+##  8 pluviometria média histórica do mês 195.  sistemaAltoTiete    OK    
+##  9 índice armazenado                    78.9 sistemaGuarapiranga OK    
+## 10 pluviometria do dia                   3.4 sistemaGuarapiranga OK    
 ## # ... with 14 more rows
 </code></pre>
 
@@ -841,14 +841,11 @@ d_sabesp &lt;- sabesp_dias(dts)
 
 <pre><code class="language-r">library(ggplot2)
 d_sabesp %&gt;% 
-  filter(titulo == 'volume armazenado') %&gt;% 
+  filter(titulo == 'índice armazenado') %&gt;%
   mutate(data = ymd(data)) %&gt;% 
   ggplot(aes(x = data, y = info, colour = lugar)) +
   geom_line() +
   theme_bw()
-</code></pre>
-
-<pre><code>## Warning: All formats failed to parse. No formats found.
 </code></pre>
 
 <p><img src="figures//unnamed-chunk-16-1.png" alt="plot of chunk unnamed-chunk-16" /></p>
@@ -938,7 +935,7 @@ Acesse a página do <a href="http://esaj.tjsp.jus.br/cjsg/consultaCompleta.do">e
 digite &ldquo;acordam&rdquo; no campo &ldquo;Pesquisa Livre&rdquo; e clique em &ldquo;Pesquisar&rdquo;,
 para ter uma ideia de como é essa página.</p>
 
-<p>A página (acessada no dia 2017-10-10)
+<p>A página (acessada no dia 2018-07-13)
 é uma ferramenta de busca com vários campos,
 que não permite pesquisa com dados em branco.
 Na parte de baixo o site mostra uma série de documentos,
@@ -1179,20 +1176,19 @@ d_cjsg
 </code></pre>
 
 <pre><code>## # A tibble: 200 x 14
-##                         arq    id cd_acordao                n_processo
-##                       &lt;chr&gt; &lt;chr&gt;      &lt;chr&gt;                     &lt;chr&gt;
-##  1 data-raw/cjsg/00001.html     1   10120659 0053149-48.2006.8.26.0050
-##  2 data-raw/cjsg/00001.html     2   10092189 0011582-56.2009.8.26.0236
-##  3 data-raw/cjsg/00001.html     3   10040923 0035263-74.2015.8.26.0000
-##  4 data-raw/cjsg/00001.html     4   10039029 0019944-66.2015.8.26.0000
-##  5 data-raw/cjsg/00001.html     5   10039023 0041547-98.2015.8.26.0000
-##  6 data-raw/cjsg/00001.html     6   10027377 0003710-93.2014.8.26.0048
-##  7 data-raw/cjsg/00001.html     7    9983410 7004537-07.2015.8.26.0482
-##  8 data-raw/cjsg/00001.html     8    9956156 0004870-37.2014.8.26.0604
-##  9 data-raw/cjsg/00001.html     9    9901809 7007051-30.2015.8.26.0482
-## 10 data-raw/cjsg/00001.html    10    9899013 0087445-23.2011.8.26.0050
-## # ... with 190 more rows, and 10 more variables: comarca &lt;chr&gt;,
-## #   data_julgamento &lt;chr&gt;, data_registro &lt;chr&gt;, ementa &lt;chr&gt;,
+##    arq   id    cd_acordao n_processo comarca data_julgamento data_registro
+##    &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;   &lt;chr&gt;           &lt;chr&gt;        
+##  1 data… 1     10120659   0053149-4… São Pa… 26/02/2015      02/02/2017   
+##  2 data… 2     10092189   0011582-5… Ibitin… 10/06/2015      09/01/2017   
+##  3 data… 3     10040923   0035263-7… Atibaia 25/08/2015      06/12/2016   
+##  4 data… 4     10039029   0019944-6… Soroca… 30/06/2015      06/12/2016   
+##  5 data… 5     10039023   0041547-9… Soroca… 15/09/2015      06/12/2016   
+##  6 data… 6     10027377   0003710-9… Atibaia 15/09/2015      01/12/2016   
+##  7 data… 7     9983410    7004537-0… Presid… 30/07/2015      18/11/2016   
+##  8 data… 8     9956156    0004870-3… Sumaré  19/10/2015      08/11/2016   
+##  9 data… 9     9901809    7007051-3… Araçat… 03/12/2015      19/10/2016   
+## 10 data… 10    9899013    0087445-2… São Pa… 28/10/2015      18/10/2016   
+## # ... with 190 more rows, and 7 more variables: ementa &lt;chr&gt;,
 ## #   orgao_julgador &lt;chr&gt;, relatora &lt;chr&gt;, classe_assunto &lt;chr&gt;,
 ## #   txt_ementa &lt;chr&gt;, result &lt;chr&gt;, outros_numeros &lt;chr&gt;
 </code></pre>
@@ -1300,19 +1296,19 @@ d_partes
 </code></pre>
 
 <pre><code>## # A tibble: 762 x 6
-##                                         arq    id id_tipo     tipo
-##                                       &lt;chr&gt; &lt;int&gt;   &lt;chr&gt;    &lt;chr&gt;
-##  1 data-raw/cposg/00000179520148260050.html     1      01 apteapdo
-##  2 data-raw/cposg/00000179520148260050.html     2      01 apdoapte
-##  3 data-raw/cposg/00000179520148260050.html     2      02 advogado
-##  4 data-raw/cposg/00000179520148260050.html     3      01 apdoapte
-##  5 data-raw/cposg/00000179520148260050.html     3      02 advogado
-##  6 data-raw/cposg/00000201120148260451.html     1      01 apelante
-##  7 data-raw/cposg/00000201120148260451.html     1      02 advogado
-##  8 data-raw/cposg/00000201120148260451.html     2      01  apelado
-##  9 data-raw/cposg/00000636120138260457.html     1      01 apelante
-## 10 data-raw/cposg/00000636120138260457.html     1      02 advogado
-## # ... with 752 more rows, and 2 more variables: nome &lt;chr&gt;, result &lt;chr&gt;
+##    arq                      id id_tipo tipo   nome                  result
+##    &lt;chr&gt;                 &lt;int&gt; &lt;chr&gt;   &lt;chr&gt;  &lt;chr&gt;                 &lt;chr&gt; 
+##  1 data-raw/cposg/00000…     1 01      aptea… Ministério Público d… OK    
+##  2 data-raw/cposg/00000…     2 01      apdoa… Maycon Grolla dos Sa… OK    
+##  3 data-raw/cposg/00000…     2 02      advog… João Ricardo Meira A… OK    
+##  4 data-raw/cposg/00000…     3 01      apdoa… Bruno dos Santos Ara… OK    
+##  5 data-raw/cposg/00000…     3 02      advog… João Ricardo Meira A… OK    
+##  6 data-raw/cposg/00000…     1 01      apela… Lucas Fernando Franc… OK    
+##  7 data-raw/cposg/00000…     1 02      advog… Jose Carlos Santao    OK    
+##  8 data-raw/cposg/00000…     2 01      apela… Ministério Público d… OK    
+##  9 data-raw/cposg/00000…     1 01      apela… Walter Alves de Arau… OK    
+## 10 data-raw/cposg/00000…     1 02      advog… Geraldo Sebastiao Pa… OK    
+## # ... with 752 more rows
 </code></pre>
 
 <p>Extraindo as decisões.</p>
@@ -1344,20 +1340,19 @@ d_decisoes
 </code></pre>
 
 <pre><code>## # A tibble: 361 x 5
-##                                         arq       data
-##                                       &lt;chr&gt;      &lt;chr&gt;
-##  1 data-raw/cposg/00000179520148260050.html 16/12/2015
-##  2 data-raw/cposg/00000201120148260451.html 03/12/2015
-##  3 data-raw/cposg/00000636120138260457.html 08/10/2015
-##  4 data-raw/cposg/00000636120138260457.html 24/09/2015
-##  5 data-raw/cposg/00000636120138260457.html 17/09/2015
-##  6 data-raw/cposg/00000681720138260576.html 16/12/2015
-##  7 data-raw/cposg/00001064420148260495.html 03/12/2015
-##  8 data-raw/cposg/00001241620138260361.html 29/10/2015
-##  9 data-raw/cposg/00001939320158260000.html 12/05/2015
-## 10 data-raw/cposg/00001939320158260000.html 14/04/2015
-## # ... with 351 more rows, and 3 more variables: situacao &lt;chr&gt;,
-## #   decisao &lt;chr&gt;, result &lt;chr&gt;
+##    arq                                      data   situacao decisao result
+##    &lt;chr&gt;                                    &lt;chr&gt;  &lt;chr&gt;    &lt;chr&gt;   &lt;chr&gt; 
+##  1 data-raw/cposg/00000179520148260050.html 16/12… Julgado  Por vo… OK    
+##  2 data-raw/cposg/00000201120148260451.html 03/12… Julgado  Por ma… OK    
+##  3 data-raw/cposg/00000636120138260457.html 08/10… Julgado  Por ma… OK    
+##  4 data-raw/cposg/00000636120138260457.html 24/09… Adiado … Após o… OK    
+##  5 data-raw/cposg/00000636120138260457.html 17/09… Adiado … Após o… OK    
+##  6 data-raw/cposg/00000681720138260576.html 16/12… Julgado  Negara… OK    
+##  7 data-raw/cposg/00001064420148260495.html 03/12… Julgado  por vo… OK    
+##  8 data-raw/cposg/00001241620138260361.html 29/10… Julgado  Por ma… OK    
+##  9 data-raw/cposg/00001939320158260000.html 12/05… Retirad… &quot;&quot;      OK    
+## 10 data-raw/cposg/00001939320158260000.html 14/04… Retific… Por un… OK    
+## # ... with 351 more rows
 </code></pre>
 
 <p>Visualizando!</p>
@@ -1426,7 +1421,7 @@ d_cjsg %&gt;%
 <nav class="pagination" aria-label="Footer">
   <div class="previous">
   
-      <a href="../rbase/" title="R básico">
+      <a href="../forcats/" title="Manipulando fatores">
         <span class="direction">
           Previous
         </span>
@@ -1436,7 +1431,7 @@ d_cjsg %&gt;%
           </div>
           <div class="stretch">
             <div class="title">
-              R básico
+              Manipulando fatores
             </div>
           </div>
         </div>
@@ -1446,14 +1441,14 @@ d_cjsg %&gt;%
 
   <div class="next">
   
-      <a href="../modelos/" title="Modelagem">
+      <a href="../import/" title="Importação de dados">
         <span class="direction">
           Next
         </span>
         <div class="page">
           <div class="stretch">
             <div class="title">
-              Modelagem
+              Importação de dados
             </div>
           </div>
           <div class="button button-next" role="button" aria-label="Next">

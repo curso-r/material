@@ -3,6 +3,16 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>/forcats/</loc>
+    <lastmod>2018-07-13T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/scrape/</loc>
+    <lastmod>2018-07-13T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>/import/</loc>
     <lastmod>2018-03-15T00:00:00+00:00</lastmod>
   </url>
@@ -43,11 +53,6 @@
   </url>
   
   <url>
-    <loc>/forcats/</loc>
-    <lastmod>2017-10-10T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>/stringr/</loc>
     <lastmod>2017-10-10T00:00:00+00:00</lastmod>
   </url>
@@ -59,11 +64,6 @@
   
   <url>
     <loc>/rbase/</loc>
-    <lastmod>2017-10-10T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/scrape/</loc>
     <lastmod>2017-10-10T00:00:00+00:00</lastmod>
   </url>
   
@@ -94,13 +94,13 @@
   
   <url>
     <loc>/</loc>
-    <lastmod>2018-03-15T00:00:00+00:00</lastmod>
+    <lastmod>2018-07-13T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>/forcats/</loc>
-    <lastmod>2017-10-10T00:00:00+00:00</lastmod>
+    <lastmod>2018-07-13T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -160,7 +160,7 @@
   
   <url>
     <loc>/scrape/</loc>
-    <lastmod>2017-10-10T00:00:00+00:00</lastmod>
+    <lastmod>2018-07-13T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   

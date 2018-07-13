@@ -7,10 +7,29 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>pt-br</language>
     <copyright>Disponível sobre Licença MIT</copyright>
-    <lastBuildDate>Thu, 15 Mar 2018 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 13 Jul 2018 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Manipulando fatores</title>
+      <link>/forcats/</link>
+      <pubDate>Fri, 13 Jul 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/forcats/</guid>
+      <description>Introdução Se você já utilizou R anteriormente, provavelmente já escreveu a expressão stringsAsFactors = F quando importava dados usando as funções read.csv ou read.table. É muito frustrante quando uma coluna de strings é lida como um fator, pois fatores não podem ser manipulados do mesmo jeito que manipulamos vetores de strings.
+Felizmente, depois de aprender a usar o tidyverse você não terá mais esse problema, pois o pacote readr não lê colunas de caracteres como fatores por padrão.</description>
+    </item>
+    
+    <item>
+      <title>Web Scraping</title>
+      <link>/scrape/</link>
+      <pubDate>Fri, 13 Jul 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/scrape/</guid>
+      <description>Pacotes httr, xml2 e rvest Esses são os três pacotes mais modernos do R utilizados para fazer web scraping. O pacote xml2 tem a finalidade de estruturar arquivos HTML ou XML de forma eficiente, tornando possível a obtenção de tags e seus atributos dentro de um arquivo. Já o pacote httr é responsável por realizar requisições web para obtenção das páginas de interesse, buscando reduzir ao máximo a complexidade da programação.</description>
+    </item>
     
     <item>
       <title>Importação de dados</title>
@@ -99,16 +118,6 @@ O pacote lubridate, criado por Garrett Grolemund e Hadley Wickham, lida com esse
     </item>
     
     <item>
-      <title>Manipulando fatores</title>
-      <link>/forcats/</link>
-      <pubDate>Tue, 10 Oct 2017 00:00:00 +0000</pubDate>
-      
-      <guid>/forcats/</guid>
-      <description>Introdução Se você já utilizou R anteriormente, provavelmente já escreveu a expressão stringsAsFactors = F quando importava dados usando as funções read.csv ou read.table. É muito frustrante quando uma coluna de strings é lida como um fator, pois fatores não podem ser manipulados do mesmo jeito que manipulamos vetores de strings.
-Felizmente, depois de aprender a usar o tidyverse você não terá mais esse problema, pois o pacote readr não lê colunas de caracteres como fatores por padrão.</description>
-    </item>
-    
-    <item>
       <title>Manipulando strings</title>
       <link>/stringr/</link>
       <pubDate>Tue, 10 Oct 2017 00:00:00 +0000</pubDate>
@@ -137,15 +146,6 @@ install.packages(&amp;quot;magrittr&amp;quot;) library(magrittr)  A ideia do ope
       <guid>/rbase/</guid>
       <description>Introdução A linguagem R é bem intuitiva. É possível fazer bastante coisa à base da tentativa e erro! Além disso, grande parte do conhecimento é escalável, isto é, quando você aprende a utilizar um certo tipo de função, o aprendizado pode ser replicado para funções parecidas. Essa ideia ficará bem clara quando falarmos dos pacotes do tidyverse, como o dplyr e o ggplot2.
 Quando o aprendizado não for muito intuitivo ou a utilização de uma função for muito complicada, demandando às vezes conhecimento de Estatística ou Programação, você pode acabar precisando de uma forcinha.</description>
-    </item>
-    
-    <item>
-      <title>Web Scraping</title>
-      <link>/scrape/</link>
-      <pubDate>Tue, 10 Oct 2017 00:00:00 +0000</pubDate>
-      
-      <guid>/scrape/</guid>
-      <description>Pacotes httr, xml2 e rvest Esses são os três pacotes mais modernos do R utilizados para fazer web scraping. O pacote xml2 tem a finalidade de estruturar arquivos HTML ou XML de forma eficiente, tornando possível a obtenção de tags e seus atributos dentro de um arquivo. Já o pacote httr é responsável por realizar requisições web para obtenção das páginas de interesse, buscando reduzir ao máximo a complexidade da programação.</description>
     </item>
     
     <item>
