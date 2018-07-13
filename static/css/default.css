@@ -1,0 +1,128 @@
+@import url(http://fonts.googleapis.com/css?family=Lato:400,900);  /* <-- Just for the demo, Yes I like pretty fonts... */
+
+.clearfix  h1 {
+    color: black;
+}
+
+.square-container a:any-link {
+    color: white;
+    text-decoration: underline;
+    cursor: auto;
+}
+
+.square {
+    float:left;
+    position: relative;
+    width: 30%;
+    padding-bottom : 30%; /* = width for a 1:1 aspect ratio */
+    margin:1.66%;
+    background-color:#1E1E1E;
+    overflow:hidden;
+}
+
+.content {
+    position:absolute;
+    height:90%; /* = 100% - 2*5% padding */
+    width:90%; /* = 100% - 2*5% padding */
+    padding: 5%;
+    
+}
+.table{
+    display:table;
+    width:100%;
+    height:100%;
+}
+.table-cell{
+    display:table-cell;
+    vertical-align:middle;
+}
+/*  For list */
+ul{
+    text-align:left;
+    margin:5% 0 0;
+    padding:0;
+    list-style-position:inside;
+}
+li{
+    margin: 0 0 0 5%;
+    padding:0;
+}
+
+
+/*  For responsive images */
+
+.content .rs{
+    width:auto;
+    height:auto;
+    max-height:90%;
+    max-width:100%;
+}
+/*  For responsive images as background */
+
+.bg{
+    background-position:center center;
+    background-repeat:no-repeat;
+    background-size:cover; /* you change this to "contain" if you don't want the images to be cropped */
+    color:#fff;
+}
+
+.img1{
+    background-image: url('https://farm3.staticflickr.com/2827/10384422264_d9c7299146.jpg');
+}
+.img2{
+    background-image: url('https://farm7.staticflickr.com/6217/6216951796_e50778255c.jpg');
+}
+.img3{
+    background-image: url('https://farm4.staticflickr.com/3794/13893055574_3df0ab636b.jpg');
+}
+
+/*  following just for the demo */
+
+
+body {
+    font-size:20px;
+    font-family: 'Lato',verdana, sans-serif;
+    color: #fff;
+    text-align:center;
+    background:#ECECEC;
+}
+p{
+    margin:0;
+    padding:0;
+    text-align:left;
+}
+
+.numbers{
+    font-weight:900;
+    font-size:100px;
+}
+
+#bottom {
+    clear:both;
+    margin:0 1.66%;
+    width:89.68%;
+    padding: 3.5%;
+    background-color:#1E1E1E;
+    color: #fff;
+}
+#bottom p{
+    text-align:center;
+    line-height:2em;
+}
+#bottom a{
+    color: #000;
+    text-decoration:none;
+    border:1px solid #000;
+    padding:10px 20px 12px;
+    line-height:70px;
+    background:#ccc;
+    
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+}
+
+#bottom a:hover{
+    background:#ECECEC;
+    border:1px solid #fff;
+}

@@ -1,0 +1,17 @@
+# Site settings
+baseurl = "http://example.org/"
+languageCode = "en-us"
+title = "Material"
+# Enter your tracking code to enable Google Analytics
+googleAnalytics = "UA-XXXXXXXX-Y"
+
+contentdir = "content"
+datadir = "data"
+layoutdir = "layouts"
+publishdir = "public"
+
+[params]
+    # Meta
+    title = "Material"
+    subtitle = "Materias de aula da Curso-R"
+    github = "https://github.com/curso-r"
