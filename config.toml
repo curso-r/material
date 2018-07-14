@@ -13,6 +13,6 @@ publishdir = "public"
 [params]
     # Meta
     title = "Material"
-    subtitle = "Materias de aula da Curso-R"
+    subtitle = "Neste portal disponibilizamos todo o nosso conteúdo e material de aula. Fique a vontade para sugerir edições e contribuir com novos tópicos!"
     github = "https://github.com/curso-r"
     logo = "assets/logocursor.png"
