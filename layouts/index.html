@@ -1,59 +1,23 @@
 <!doctype html5>
 <html>
-  <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{{ .Title }}</title>
-  <link rel="icon" type="image/png" href="assets/favicon.png">
-  <link href="assets/bootstrap.min.css" rel="stylesheet">
-  <link href="assets/bundle.css" rel="stylesheet">
-  <meta charset="utf-8" /> 
-  <meta property="og:title" content="Hexbin is a hexagon sticker repository.">
-  <meta property="og:name" content="Hexbin">
-  <meta property="og:url" content="http://hexb.in">
-  <meta property="og:image" content="/assets/opengraph-1600.png">
-<style type="text/css">
-body {
-  background: url("assets/bg.jpg") no-repeat center center fixed;
-  -webkit-background-size: cover;
-  -moz-background-size: cover;
-  -o-background-size: cover;
-  background-size: cover;
-}
-</style>
-<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+<head>
+  {{ partial "head.html" . }}
 </head>
 
-<body>
-<div class="container">
-  <nav class="navbar" role="navigation">
-    <div class="navbar-header">
-      <a class="navbar-brand selected" href="/">
-        <img src="{{ .Site.Params.logo }}"></img>
-      </a>
+  <body>
+    {{ partial "header.html" . }}
+    
+    <div class="container main-content">
+    
+      <div class="splash text-center">
+        <div class="subtitle">{{ .Site.Params.subtitle }}</div>
+      </div>
+      <div id = "epic">
+      </div>
+      <div id="grid" style="position: relative; margin-bottom: 20px;"></div>
+    
     </div>
-    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-      <ul class="nav navbar-nav navbar-right">
-        <li>
-          <a href="{{ .Site.Params.github }}"><i class="fab fa-github fa-2x"></i></a>
-        </li>
-      </ul>
-    </div>
-  </nav>
-</div>
-
-<div class="navhr"></div>
-
-<div class="container main-content">
-
-  <div class="splash text-center">
-    <div class="subtitle">{{ .Site.Params.subtitle }}</div>
-  </div>
-  <div id = "epic">
-  </div>
-  <div id="grid" style="position: relative; margin-bottom: 20px;"></div>
-
-</div>
-<script src="https://code.jquery.com/jquery-2.2.0.min.js" type="text/javascript"></script>
-<script src="assets/shuffle.js" type="text/javascript"></script>
-<script src="assets/bundle.js"></script>
-</body></html>
+    
+    {{ partial "scripts.html" .}}
+  </body>
+</html>

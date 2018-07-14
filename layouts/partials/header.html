@@ -1,3 +1,18 @@
-			<header class="clearfix">
-				<h1>{{ with .Site.Params.title }}{{ . | markdownify }}{{ end }}<span>{{ with .Site.Params.subtitle }}{{ . | markdownify }}{{ end }}</span></h1>
-			</header>
+<div class="container">
+  <nav class="navbar" role="navigation">
+    <div class="navbar-header">
+      <a class="navbar-brand selected" href="/">
+        <img src="{{ .Site.Params.logo }}"></img>
+      </a>
+    </div>
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+          <a href="{{ .Site.Params.github }}"><i class="fab fa-github fa-2x"></i></a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</div>
+
+<div class="navhr"></div>
