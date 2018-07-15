@@ -9,10 +9,18 @@
     <div class="article-title">
       <h1>{{ .Title }}</h1>
     </div>
+    
     {{ partial "breadcrumb.html" . }}
+    
+    <br>
+    
     <div class="article">
         {{ .Content }}
     </div> 
+    
+    <br>
+    
+    {{ partial "breadcrumb.html" . }}
     
     {{ partial "scripts.html" .}}
     

@@ -1,9 +1,8 @@
 <div class = "breadcrumb-container">
   <span class="breadcrumb">
-    <a href = "{{ .Site.BaseURL }}">Home</a> %>%
+    <a href = "{{ .Site.BaseURL }}">Home</a> >
     {{ template "breadcrumb" dict "currentPage" .Page "id" .UniqueID }}
   </span>
-  <hr>
 </div>
 
 <!-- templates -->
@@ -15,7 +14,7 @@
     {{ if eq .id .currentPage.UniqueID }}
       {{ .currentPage.Title }}
     {{ else }}
-      <a href="{{ .currentPage.URL }}">{{ .currentPage.Title }}</a> %>%
+      <a href="{{ .currentPage.URL }}">{{ .currentPage.Title }}</a> > 
     {{ end }}
 {{ end }}
 {{ end }}

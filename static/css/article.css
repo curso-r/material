@@ -54,7 +54,7 @@
 }
 
 .breadcrumb-container {
-  background-color: white;
+  background-color: transparent;
   margin-left: 20%;
   margin-right: 20%;
   padding-bottom: 5px;
@@ -64,13 +64,13 @@
 }
 
 .breadcrumb {
-  background-color: white;
+  background-color: transparent;
   border-radius: 0px;
   padding-bottom: 5px;
   padding-top: 5px;
   border-radius: 0px;
-  color: black;
-  padding-left: 30px;
+  color: white;
+  padding-left: 0px;
 }
 
 .breadcrumb-container hr {
@@ -78,12 +78,19 @@
   margin-bottom: 5px;
 }
 
+.breadcrumb-container a {
+  color: #da4d4d;
+}
+
 @media screen and (max-width: 800px) {
   .article {
     margin-left: 0;
     margin-right: 0;
-    padding-bottom: 15px;
-    padding-top: 3px;
+  }
+  
+  .breadcrumb-container {
+    margin-left: 0;
+    margin-right: 0;
   }
 }
 
