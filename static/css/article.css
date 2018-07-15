@@ -1,10 +1,49 @@
+.article-title {
+  margin-left: 20%;
+  margin-right: 20%;
+  text-align: center;
+  padding-bottom: 20px;
+  color: white;
+}
+
 .article {
-  background-color: whitesmoke;
-  margin-left: 10%;
-  margin-right: 10%;
+  background-color: white;
+  margin-left: 20%;
+  margin-right: 20%;
+  padding-bottom: 15px;
+  padding-top: 3px;
 }
 
 .article h1 {
   color: black;
-  position: center;
+  text-align: left;
+  padding-left: 30px;
+  font-size: 25px;
+}
+
+.article p {
+  color: black;
+  text-align: left;
+  padding-left: 30px;
+}
+
+.article pre {
+  color: black;
+  text-align: left;
+  margin: 10px 0px 10px;
+  background-color: whitesmoke;
+  border: 0px;
+  border-radius: 0px;
+  padding-left: 30px;
+}
+
+.article img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+}
+
+.article .caption {
+  text-align: center;
 }

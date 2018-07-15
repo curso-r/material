@@ -6,11 +6,12 @@
 
   <body>
     {{ partial "header.html" . }}
+    <div class="article-title">
+      <h1>{{ .Title }}</h1>
+    </div>
     
-    <div class="article text-center">
-        <h1>Título</h1>
-        <p>Essa é uma página de post.</p>
-        <pre>Isso é um código</pre>
+    <div class="article">
+        {{ .Content }}
     </div> 
     
     {{ partial "scripts.html" .}}
