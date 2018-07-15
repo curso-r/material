@@ -3,13 +3,13 @@
 <head>
   {{ partial "head.html" . }}
 </head>
-
   <body>
     {{ partial "header.html" . }}
+    
     <div class="article-title">
       <h1>{{ .Title }}</h1>
     </div>
-    
+    {{ partial "breadcrumb.html" . }}
     <div class="article">
         {{ .Content }}
     </div> 

@@ -53,6 +53,31 @@
   text-align: center;
 }
 
+.breadcrumb-container {
+  background-color: white;
+  margin-left: 20%;
+  margin-right: 20%;
+  padding-bottom: 5px;
+  padding-top: 5px;
+  border-radius: 0px;
+  color: black;
+}
+
+.breadcrumb {
+  background-color: white;
+  border-radius: 0px;
+  padding-bottom: 5px;
+  padding-top: 5px;
+  border-radius: 0px;
+  color: black;
+  padding-left: 30px;
+}
+
+.breadcrumb-container hr {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
 @media screen and (max-width: 800px) {
   .article {
     margin-left: 0;
@@ -61,3 +86,4 @@
     padding-top: 3px;
   }
 }
+
