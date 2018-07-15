@@ -35,7 +35,7 @@
   color: black;
   text-align: left;
   margin: 10px 0px 10px;
-  background-color: whitesmoke;
+  background-color: #f8f8f8;
   border: 0px;
   border-radius: 0px;
   padding-left: 30px;
@@ -51,4 +51,13 @@
 
 .article .caption {
   text-align: center;
+}
+
+@media screen and (max-width: 800px) {
+  .article {
+    margin-left: 0;
+    margin-right: 0;
+    padding-bottom: 15px;
+    padding-top: 3px;
+  }
 }
