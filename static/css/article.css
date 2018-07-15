@@ -14,10 +14,13 @@
   padding-top: 3px;
 }
 
-.article h1 {
-  color: black;
+.article h1, h2, h3, h4 {
+  color: #da4d4d;
   text-align: left;
   padding-left: 30px;
+}
+
+.article h1 {
   font-size: 25px;
 }
 
@@ -25,6 +28,7 @@
   color: black;
   text-align: left;
   padding-left: 30px;
+  padding-right: 30px;
 }
 
 .article pre {
@@ -35,6 +39,7 @@
   border: 0px;
   border-radius: 0px;
   padding-left: 30px;
+  padding-right: 30px;
 }
 
 .article img {
