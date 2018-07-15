@@ -1,0 +1,10 @@
+.article {
+  background-color: whitesmoke;
+  margin-left: 10%;
+  margin-right: 10%;
+}
+
+.article h1 {
+  color: black;
+  position: center;
+}
