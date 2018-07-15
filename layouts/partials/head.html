@@ -1,8 +1,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{{ .Site.Params.title }}</title>
 <link rel="icon" type="image/png" href="assets/favicon.png">
-<link href="assets/bootstrap.min.css" rel="stylesheet">
-<link href="assets/bundle.css" rel="stylesheet">
+<link href="{{.Site.BaseURL}}assets/bootstrap.min.css" rel="stylesheet">
+<link href="{{.Site.BaseURL}}assets/bundle.css" rel="stylesheet">
 <meta charset="utf-8" /> 
 <meta property="og:title" content="Hexbin is a hexagon sticker repository.">
 <meta property="og:name" content="Hexbin">
@@ -10,7 +10,7 @@
 <meta property="og:image" content="/assets/opengraph-1600.png">
 <style type="text/css">
 body {
-background: url("assets/bg.jpg") no-repeat center center fixed;
+background: url("{{.Site.BaseURL}}assets/bg.jpg") no-repeat center center fixed;
 -webkit-background-size: cover;
 -moz-background-size: cover;
 -o-background-size: cover;
