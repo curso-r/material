@@ -12,7 +12,7 @@ $.getJSON('assets/data.json', function (data) {
     })
 
     $('<a />', {
-      'href': "http://hexb.in/" + val.filename,
+      'href': "/" + val.filename,
       'target': '_blank'
     }).append(img).appendTo('#grid')
   })
