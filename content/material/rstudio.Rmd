@@ -1,41 +1,82 @@
 ---
-title: "Hello R Markdown"
-author: "Frida Gomam"
-date: 2015-07-23T21:13:14-05:00
+title: "RStudio"
+author: "Curso-R"
+date: 2018-07-16
 categories: ["R"]
-tags: ["R Markdown", "plot", "regression"]
+tags: ["RStudio"]
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(collapse = TRUE)
 ```
 
-# R Markdown
+# RStudio
 
-## Test
+O RStudio é o melhor ambiente de desenvolvimento de códigos em R disponível. Você pode baixá-lo [neste link](https://www.rstudio.com/products/rstudio/download/preview/).
 
-## Test2
+Muitas das ferramentas são aprendidas conforme o uso, e há bons materiais sobre o RStudio na internet (por exemplo, [esta página](https://csgillespie.github.io/efficientR/set-up.html#rstudio)). Uma funcionalidade importante é a criação de projetos, permitindo dividir o trabalho em múltiplos ambientes, cada um com o seu diretório, documentos e *workspace*. A seguir, apresentamos algumas estruturas para a organização de um projeto.
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+**Estrutura 1**. Por extensão de arquivo.
 
-You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
-fit <- lm(dist ~ speed, data = cars)
-fit
+```{r, engine='bash', eval=FALSE}
+nome_do_projeto/
+  - .Rprofile   # códigos para rodar assim que abrir o projeto
+  - R/          # Código R, organizado com a-carrega.R, b-prepara bd.R, c-vis.R, d-modela, ...
+  - RData/      # Dados em formato .RData
+  - csv/        # Dados em .csv
+  - png/        # gráficos em PNG
+  - nome_do_projeto.Rproj
 ```
 
-# Including Plots 
+**Estrutura 2**. Típico projeto de análise estatística.
 
-You can also embed plots. See Figure \@ref(fig:pie) for example:
-
-```{r pie, fig.cap='A fancy pie chart.', tidy=FALSE}
-par(mar = c(0, 1, 0, 1))
-pie(
-  c(280, 60, 20),
-  c('Sky', 'Sunny side of pyramid', 'Shady side of pyramid'),
-  col = c('#0292D8', '#F7EA39', '#C4B632'),
-  init.angle = -50, border = NA
-)
+```{r, engine='bash', eval = FALSE}
+project/
+  - README.Rmd   # Descrição do pacote
+  - set-up.R     # Pacotes etc
+  - R/           # Código R, organizado com 0-load.R, 1-tidy.R, 2-vis.R, ...
+  - data/        # Dados (estruturados ou não)
+  - figures/     # gráficos (pode ficar dentro de output/)
+  - output/      # Relatórios em .Rmd, .tex etc
+  - project.Rproj
 ```
+
+**Estrutura 3**. Pacote do R (avançado).
+
+```{r, engine='bash', eval = FALSE}
+project/
+  - README.md    # Descrição do pacote
+  - DESCRIPTION  # Metadados estruturados do pacote e dependências
+  - NAMESPACE    # importações e exportações do pacote
+  - vignettes/   # Relatórios em .Rmd
+  - R/           # Funções do R
+  - data/        # Dados estruturados (tidy data)
+  - data-raw/    # Dados não estruturados e arqs 0-load.R, 1-tidy.R, 2-vis.R, ...
+  - project.Rproj
+```
+
+Ao abrir o RStudio, você verá 4 quadrantes. Observe a figura abaixo.
+
+<img src="/material/figures/rstudio/rstudio-editor.png", style="width: 100%;">
+
+Esses quadrantes representam o **editor**, o **console**, o **environment** e o **output**.  Eles vêm nesta ordem, e depois você pode organizá-los da forma que preferir.
+
+Listamos abaixo as funções dos principais painéis:
+
+- **Editor/Scripts**: é onde escrevemos nossos códigos.
+- **Console**: é onde rodamos o código e recebemos as saídas. O R vive aqui!
+- **Environment**: painel com todos os objetos criados na sessão.
+- **Files**: mostra os arquivos no diretório de trabalho. É possível navegar entre diretórios.
+- **Plots**: painel onde os gráficos serão apresentados.
+- **Help**: janela onde a documentação das funções serão apresentadas.
+- **History**: painel com um histórico dos comandos rodados.
+
+Conhecer atalhos ajuda bastante quando estamos programando no RStudio. Veja os principais:
+
+- **CTRL+ENTER**: roda a linha selecionada no script. Os atalhos mais utilizado.
+- **ALT+-**: (<-) sinal de atribuição. Você usará o tempo todo.
+- **CTRL+SHIFT+M**: (%>%) operador *pipe*. Guarde esse atalho, você usará bastante.
+- **CTRL+1**: altera cursor para o script.
+- **CTRL+2**: altera cursor para o console.
+- **CTRL+ALT+I**: cria um chunk no R Markdown.
+- **ALT+SHIFT+K**: janela com todos os atalhos disponíveis.

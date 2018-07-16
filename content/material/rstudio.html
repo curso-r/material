@@ -1,61 +1,70 @@
 ---
-title: "Hello R Markdown"
-author: "Frida Gomam"
-date: 2015-07-23T21:13:14-05:00
+title: "RStudio"
+author: "Curso-R"
+date: 2018-07-16
 categories: ["R"]
-tags: ["R Markdown", "plot", "regression"]
+tags: ["RStudio"]
 ---
 
 
 <div id="TOC">
 <ul>
-<li><a href="#r-markdown">R Markdown</a></li>
-<li><a href="#including-plots">Including Plots</a></li>
+<li><a href="#rstudio">RStudio</a></li>
 </ul>
 </div>
 
-<div id="r-markdown" class="section level1">
-<h1>R Markdown</h1>
-<div id="test" class="section level2">
-<h2>Test</h2>
-</div>
-<div id="test2" class="section level2">
-<h2>Test2</h2>
-<p>This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <a href="http://rmarkdown.rstudio.com" class="uri">http://rmarkdown.rstudio.com</a>.</p>
-<p>You can embed an R code chunk like this:</p>
-<pre class="r"><code>summary(cars)
-##      speed           dist       
-##  Min.   : 4.0   Min.   :  2.00  
-##  1st Qu.:12.0   1st Qu.: 26.00  
-##  Median :15.0   Median : 36.00  
-##  Mean   :15.4   Mean   : 42.98  
-##  3rd Qu.:19.0   3rd Qu.: 56.00  
-##  Max.   :25.0   Max.   :120.00
-fit &lt;- lm(dist ~ speed, data = cars)
-fit
-## 
-## Call:
-## lm(formula = dist ~ speed, data = cars)
-## 
-## Coefficients:
-## (Intercept)        speed  
-##     -17.579        3.932</code></pre>
-</div>
-</div>
-<div id="including-plots" class="section level1">
-<h1>Including Plots</h1>
-<p>You can also embed plots. See Figure <a href="#fig:pie">1</a> for example:</p>
-<pre class="r"><code>par(mar = c(0, 1, 0, 1))
-pie(
-  c(280, 60, 20),
-  c(&#39;Sky&#39;, &#39;Sunny side of pyramid&#39;, &#39;Shady side of pyramid&#39;),
-  col = c(&#39;#0292D8&#39;, &#39;#F7EA39&#39;, &#39;#C4B632&#39;),
-  init.angle = -50, border = NA
-)</code></pre>
-<div class="figure"><span id="fig:pie"></span>
-<img src="/material/rstudio_files/figure-html/pie-1.png" alt="A fancy pie chart." width="672" />
-<p class="caption">
-Figure 1: A fancy pie chart.
-</p>
-</div>
+<div id="rstudio" class="section level1">
+<h1>RStudio</h1>
+<p>O RStudio é o melhor ambiente de desenvolvimento de códigos em R disponível. Você pode baixá-lo <a href="https://www.rstudio.com/products/rstudio/download/preview/">neste link</a>.</p>
+<p>Muitas das ferramentas são aprendidas conforme o uso, e há bons materiais sobre o RStudio na internet (por exemplo, <a href="https://csgillespie.github.io/efficientR/set-up.html#rstudio">esta página</a>). Uma funcionalidade importante é a criação de projetos, permitindo dividir o trabalho em múltiplos ambientes, cada um com o seu diretório, documentos e <em>workspace</em>. A seguir, apresentamos algumas estruturas para a organização de um projeto.</p>
+<p><strong>Estrutura 1</strong>. Por extensão de arquivo.</p>
+<pre class="bash"><code>nome_do_projeto/
+  - .Rprofile   # códigos para rodar assim que abrir o projeto
+  - R/          # Código R, organizado com a-carrega.R, b-prepara bd.R, c-vis.R, d-modela, ...
+  - RData/      # Dados em formato .RData
+  - csv/        # Dados em .csv
+  - png/        # gráficos em PNG
+  - nome_do_projeto.Rproj</code></pre>
+<p><strong>Estrutura 2</strong>. Típico projeto de análise estatística.</p>
+<pre class="bash"><code>project/
+  - README.Rmd   # Descrição do pacote
+  - set-up.R     # Pacotes etc
+  - R/           # Código R, organizado com 0-load.R, 1-tidy.R, 2-vis.R, ...
+  - data/        # Dados (estruturados ou não)
+  - figures/     # gráficos (pode ficar dentro de output/)
+  - output/      # Relatórios em .Rmd, .tex etc
+  - project.Rproj</code></pre>
+<p><strong>Estrutura 3</strong>. Pacote do R (avançado).</p>
+<pre class="bash"><code>project/
+  - README.md    # Descrição do pacote
+  - DESCRIPTION  # Metadados estruturados do pacote e dependências
+  - NAMESPACE    # importações e exportações do pacote
+  - vignettes/   # Relatórios em .Rmd
+  - R/           # Funções do R
+  - data/        # Dados estruturados (tidy data)
+  - data-raw/    # Dados não estruturados e arqs 0-load.R, 1-tidy.R, 2-vis.R, ...
+  - project.Rproj</code></pre>
+<p>Ao abrir o RStudio, você verá 4 quadrantes. Observe a figura abaixo.</p>
+<p>&lt;img src=“/material/figures/rstudio/rstudio-editor.png”, style=“width: 100%;”&gt;</p>
+<p>Esses quadrantes representam o <strong>editor</strong>, o <strong>console</strong>, o <strong>environment</strong> e o <strong>output</strong>. Eles vêm nesta ordem, e depois você pode organizá-los da forma que preferir.</p>
+<p>Listamos abaixo as funções dos principais painéis:</p>
+<ul>
+<li><strong>Editor/Scripts</strong>: é onde escrevemos nossos códigos.</li>
+<li><strong>Console</strong>: é onde rodamos o código e recebemos as saídas. O R vive aqui!</li>
+<li><strong>Environment</strong>: painel com todos os objetos criados na sessão.</li>
+<li><strong>Files</strong>: mostra os arquivos no diretório de trabalho. É possível navegar entre diretórios.</li>
+<li><strong>Plots</strong>: painel onde os gráficos serão apresentados.</li>
+<li><strong>Help</strong>: janela onde a documentação das funções serão apresentadas.</li>
+<li><strong>History</strong>: painel com um histórico dos comandos rodados.</li>
+</ul>
+<p>Conhecer atalhos ajuda bastante quando estamos programando no RStudio. Veja os principais:</p>
+<ul>
+<li><strong>CTRL+ENTER</strong>: roda a linha selecionada no script. Os atalhos mais utilizado.</li>
+<li><strong>ALT+-</strong>: (&lt;-) sinal de atribuição. Você usará o tempo todo.</li>
+<li><strong>CTRL+SHIFT+M</strong>: (%&gt;%) operador <em>pipe</em>. Guarde esse atalho, você usará bastante.</li>
+<li><strong>CTRL+1</strong>: altera cursor para o script.</li>
+<li><strong>CTRL+2</strong>: altera cursor para o console.</li>
+<li><strong>CTRL+ALT+I</strong>: cria um chunk no R Markdown.</li>
+<li><strong>ALT+SHIFT+K</strong>: janela com todos os atalhos disponíveis.</li>
+</ul>
 </div>

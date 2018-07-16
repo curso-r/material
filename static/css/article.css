@@ -24,6 +24,30 @@
   font-size: 25px;
 }
 
+.article h1::before {
+  content: "# ";
+}
+
+.article h2 {
+  font-size: 20px;
+}
+
+.article table {
+  margin: 0 auto;
+}
+
+.article th {
+  text-align: center;
+}
+
+.article th, td {
+    border-bottom: 1px solid #ddd;
+    color: black;
+    text-align: center;
+    padding: 5px;
+    font-size: 14px;
+}
+
 .article p {
   color: black;
   text-align: left;
@@ -46,11 +70,38 @@
   display: block;
   margin-left: auto;
   margin-right: auto;
-  width: 100%;
+}
+
+.article ul, ol {
+  color: black;
+  list-style-position: inside;
+  padding-left: 30px;
+}
+
+.article ol p {
+  padding-left: 0px;
+}
+
+.article ul p {
+  padding-left: 0px;
+}
+
+.article li {
+  padding-left: 10px;
 }
 
 .article .caption {
   text-align: center;
+}
+
+.article p > code {
+  color: #333;
+  background: #f8f8f8;
+}
+
+.article li > code {
+  color: #333;
+  background: #f8f8f8;
 }
 
 .breadcrumb-container {
