@@ -82,6 +82,10 @@
   color: #da4d4d;
 }
 
+.footer-copyright a {
+  color: #da4d4d;
+}
+
 @media screen and (max-width: 800px) {
   .article {
     margin-left: 0;
