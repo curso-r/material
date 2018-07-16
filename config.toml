@@ -1,5 +1,5 @@
 # Site settings
-baseurl = "http://example.org/"
+baseurl = "/"
 languageCode = "en-us"
 title = "Material"
 # Enter your tracking code to enable Google Analytics
