@@ -5,7 +5,7 @@
     "license": "CC0",
     "vector": "http://hexb.in/vector/757rb.svg",
     "description": "757 Ruby UserGroup http://757rb.org/",
-    "raster": "http://hexb.in/hexagons/757rb.png",
+    "raster": "/assets/placeholder.png",
     "filename": "meta/757rb.json",
     "order_online_url": "https://www.stickermule.com/marketplace/3984-757-ruby-meetup-mermaid-sticker"
   },
@@ -1803,7 +1803,7 @@
     "name": "xpose",
     "author": "benjamin guiastrennec",
     "license": "CC0",
-    "raster": "http://hexb.in/hexagons/xpose.png",
+    "raster": "/assets/placeholder.png",
     "vector": "http://hexb.in/vector/xpose.svg",
     "description": "xpose: diagnostics for pharmacometric models",
     "filename": "meta/xpose.json"
