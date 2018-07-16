@@ -12,8 +12,7 @@ $.getJSON('assets/data.json', function (data) {
     })
 
     $('<a />', {
-      'href': "/" + val.filename,
-      'target': '_blank'
+      'href': "/" + val.filename
     }).append(img).appendTo('#grid')
   })
 
