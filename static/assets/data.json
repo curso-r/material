@@ -20,14 +20,9 @@
     "filename": "material/importacao"
   },
   {
-    "name": "dplyr",
+    "name": "Manipulação",
     "raster": "/hex/dplyr.png",
-    "filename": "material/dplyr"
-  },
-  {
-    "name": "tidyr",
-    "raster": "/hex/tidyr.png",
-    "filename": "material/tidyr"
+    "filename": "material/manipulacao"
   },
   {
     "name": "ggplot",
