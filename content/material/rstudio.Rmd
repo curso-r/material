@@ -57,7 +57,7 @@ project/
 
 Ao abrir o RStudio, você verá 4 quadrantes. Observe a figura abaixo.
 
-<img src="/material/figures/rstudio/rstudio-editor.png", style="width: 100%;">
+<img src="/material/figures/rstudio/rstudio-editor.png" style="width: 100%;">
 
 Esses quadrantes representam o **editor**, o **console**, o **environment** e o **output**.  Eles vêm nesta ordem, e depois você pode organizá-los da forma que preferir.
 
