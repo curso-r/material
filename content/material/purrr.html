@@ -1,61 +1,458 @@
 ---
-title: "Hello R Markdown"
-author: "Frida Gomam"
-date: 2015-07-23T21:13:14-05:00
+title: "Programação Funcional"
+author: "Curso-R"
+date: 2018-07-18
 categories: ["R"]
-tags: ["R Markdown", "plot", "regression"]
+tags: ["purrr"]
 ---
 
 
 <div id="TOC">
 <ul>
-<li><a href="#r-markdown">R Markdown</a></li>
-<li><a href="#including-plots">Including Plots</a></li>
+<li><a href="#introducao">Introdução</a></li>
+<li><a href="#iteracoes-basicas">Iterações básicas</a></li>
+<li><a href="#iteracoes-intermediarias">Iterações intermediárias</a></li>
+<li><a href="#iteracoes-avancadas">Iterações avançadas</a></li>
+<li><a href="#miscelanea">Miscelânea</a></li>
 </ul>
 </div>
 
-<div id="r-markdown" class="section level1">
-<h1>R Markdown</h1>
-<div id="test" class="section level2">
-<h2>Test</h2>
+<div id="introducao" class="section level1">
+<h1>Introdução</h1>
+<p>Programação funcional (PF) é um paradigma de programação com o qual a maior parte
+dos estatísticos não está familiarizada. Essa técnica costuma ser ignorada na
+maioria dos tutoriais de R por não estar diretamente envolvida com manipulação e
+visualização de dados, mas isso não quer dizer que ela não tenha suas vantagens.</p>
+<p>Usando PF podemos criar códigos mais concisos e “pipeáveis”, características que
+por tabela também tornam o processo de debug mais simples. Além disso, códigos
+funcionais geralmente são paralelizáveis, permitindo que tratemos problemas muito
+grandes com poucas modificações.</p>
+<p>Apesar de o R <code>base</code> já ter funções que podem ser consideradas elementos de PF, a
+implementação destas não é tão elegante e, portanto, este tutorial abordará
+somente a implementação de PF realizada pelo pacote <code>purrr</code>.</p>
+<p>Para instalar e carregar o <code>purrr</code>, rode o código a seguir. Nas próximas seções
+deste tutorial, assumiremos que você têm esse pacote instalado e carregado.</p>
+<pre class="r"><code>install.packages(&quot;purrr&quot;)
+library(purrr)</code></pre>
 </div>
-<div id="test2" class="section level2">
-<h2>Test2</h2>
-<p>This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <a href="http://rmarkdown.rstudio.com" class="uri">http://rmarkdown.rstudio.com</a>.</p>
-<p>You can embed an R code chunk like this:</p>
-<pre class="r"><code>summary(cars)
-##      speed           dist       
-##  Min.   : 4.0   Min.   :  2.00  
-##  1st Qu.:12.0   1st Qu.: 26.00  
-##  Median :15.0   Median : 36.00  
-##  Mean   :15.4   Mean   : 42.98  
-##  3rd Qu.:19.0   3rd Qu.: 56.00  
-##  Max.   :25.0   Max.   :120.00
-fit &lt;- lm(dist ~ speed, data = cars)
-fit
+<div id="iteracoes-basicas" class="section level1">
+<h1>Iterações básicas</h1>
+<p>A primeira família de funções do <code>purrr</code> que veremos também é a mais útil e
+extensível. As funções <code>map()</code> são quase como substitutas para laços <code>for</code>,
+elas abstraem a iteração em apenas uma linha. Veja esse exemplo de laço usando
+<code>for</code>:</p>
+<pre class="r"><code>soma_um &lt;- function(x) { x + 1 }
+obj &lt;- 10:15
+
+for (i in seq_along(obj)) {
+  obj[i] &lt;- soma_um(obj[i])
+}
+obj
+## [1] 11 12 13 14 15 16</code></pre>
+<p>O que de fato estamos tentando fazer com o laço acima? Temos um vetor (<code>obj</code>) e
+queremos aplicar uma função (<code>soma_um()</code>) em cada elemento dele. A função <code>map()</code>
+remove a necessidade de declaramos um objeto iterador auxiliar (<code>i</code>) e
+simplesmente aplica a função desejada em cada elemento do objeto dado.</p>
+<pre class="r"><code>soma_um &lt;- function(x) { x + 1 }
+obj &lt;- 10:15
+
+obj &lt;- map(obj, soma_um)
+obj
+## [[1]]
+## [1] 11
 ## 
-## Call:
-## lm(formula = dist ~ speed, data = cars)
+## [[2]]
+## [1] 12
 ## 
-## Coefficients:
-## (Intercept)        speed  
-##     -17.579        3.932</code></pre>
-</div>
-</div>
-<div id="including-plots" class="section level1">
-<h1>Including Plots</h1>
-<p>You can also embed plots. See Figure <a href="#fig:pie">1</a> for example:</p>
-<pre class="r"><code>par(mar = c(0, 1, 0, 1))
-pie(
-  c(280, 60, 20),
-  c(&#39;Sky&#39;, &#39;Sunny side of pyramid&#39;, &#39;Shady side of pyramid&#39;),
-  col = c(&#39;#0292D8&#39;, &#39;#F7EA39&#39;, &#39;#C4B632&#39;),
-  init.angle = -50, border = NA
-)</code></pre>
-<div class="figure"><span id="fig:pie"></span>
-<img src="/material/purrr_files/figure-html/pie-1.png" alt="A fancy pie chart." width="672" />
-<p class="caption">
-Figure 1: A fancy pie chart.
+## [[3]]
+## [1] 13
+## 
+## [[4]]
+## [1] 14
+## 
+## [[5]]
+## [1] 15
+## 
+## [[6]]
+## [1] 16</code></pre>
+<div id="achatando-resultados" class="section level2">
+<h2>Achatando resultados</h2>
+<p>Como você deve ter percebido, o resultado da execução acima não é exatamente
+igual ao que tivemos com o laço. Isso acontece porque a <code>map()</code> tenta ser
+extremamente genérica, retornando por padrão uma lista com um elemento para
+cada saída.</p>
+<p>Se quisermos “achatar” o resultado, devemos informar qual será o seu tipo. Isso
+é super simples e pode ser feito com as irmãs da <code>map()</code>: <code>map_chr()</code> (para
+strings), <code>map_dbl()</code> (para números reais), <code>map_int()</code> (para números inteiros) e
+<code>map_lgl()</code> (para booleanos).</p>
+<pre class="r"><code>obj &lt;- 10:15
+
+map_dbl(obj, soma_um)
+## [1] 11 12 13 14 15 16</code></pre>
+<div class="admonition note">
+<p class="admonition-title">
+Outro jeito de achatar
 </p>
+<p>
+O <code>purrr</code> também nos fornece outra ferramenta interessante para
+achatar listas: a família <code>flatten()</code>. No fundo, <code>map_chr()</code>
+é quase um atalho para <code>map() %&gt;% flatten_chr()</code>!
+</p>
+</div>
+</div>
+<div id="formulas-e-reticencias" class="section level2">
+<h2>Fórmulas e reticências</h2>
+<p>Algo bastante útil da família <code>map()</code> é a possibilidade de passar argumentos
+fixos para a função que será aplicada. A primeira forma de fazer isso envolve
+fórmulas:</p>
+<pre class="r"><code>soma_n &lt;- function(x, n = 1) { x + n }
+obj &lt;- 10:15
+
+map_dbl(obj, ~soma_n(.x, 2))
+## [1] 12 13 14 15 16 17</code></pre>
+<p>Como vemos no exemplo acima, para utilizar fórmulas precisamos colocar um til
+(<code>~</code>) antes da função que será chamada. Feito isso, podemos utilizar o
+placeholder <code>.x</code> para indicar onde deve ser colocado cada elemento de <code>obj</code>.</p>
+<p>A outra forma de passar argumentos para a função é através das reticências da
+<code>map()</code>. Desta maneira precisamos apenas dar o nome do argumento e seu valor
+logo após a função <code>soma_n()</code>.</p>
+<pre class="r"><code>soma_n &lt;- function(x, n = 1) { x + n }
+obj &lt;- 10:15
+
+map_dbl(obj, soma_n, n = 2)
+## [1] 12 13 14 15 16 17</code></pre>
+<p>Usando fórmulas temos uma maior flexibilidade (podemos, por exemplo, declarar
+funções anônimas como <code>~.x+2</code>), enquanto com as reticências temos maior
+legibilidade.</p>
+</div>
+</div>
+<div id="iteracoes-intermediarias" class="section level1">
+<h1>Iterações intermediárias</h1>
+<p><strong>Obs.:</strong> Note que quando usarmos o termo “paralelo” daqui para frente, estaremos
+nos referindo a laços em mais de uma estrutura e não a paralelização de
+computações em mais de uma unidade de processamento.</p>
+<p>Agora que já exploramos os básicos da família <code>map()</code> podemos partir para
+iterações um pouco mais complexas. Observe o laço a seguir:</p>
+<pre class="r"><code>soma_ambos &lt;- function(x, y) { x + y }
+obj_1 &lt;- 10:15
+obj_2 &lt;- 20:25
+
+for (i in seq_along(obj_1)) {
+  obj_1[i] &lt;- soma_ambos(obj_1[i], obj_2[i])
+}
+obj_1
+## [1] 30 32 34 36 38 40</code></pre>
+<p>Com a função <code>map2()</code> podemos reproduzir o laço acima em apenas uma linha. Ela
+abstrai a iteração em paralelo, aplica a função em cada par de elementos das
+entradas e, assim como sua prima <code>map()</code>, pode achatar o objeto retornado com os
+sufixos <code>_chr</code>, <code>_dbl</code>, <code>_int</code> e <code>_lgl</code>.</p>
+<pre class="r"><code>soma_ambos &lt;- function(x, y) { x + y }
+obj_1 &lt;- 10:15
+obj_2 &lt;- 20:25
+
+obj_1 &lt;- map2_dbl(obj_1, obj_2, soma_ambos)
+obj_1
+## [1] 30 32 34 36 38 40</code></pre>
+<p>Como o pacote <code>purrr</code> é extremamente consistente, a <code>map2()</code> também funciona com
+reticências e fórmulas. Poderíamos, por exemplo, transformar <code>soma_ambos()</code> em
+uma função anônima:</p>
+<pre class="r"><code>obj_1 &lt;- 10:15
+obj_2 &lt;- 20:25
+
+map2_dbl(obj_1, obj_2, ~.x+.y)
+## [1] 30 32 34 36 38 40</code></pre>
+<p>Desta vez também temos acesso ao placeholder <code>.y</code> para indicar onde os elementos
+de do segundo vetor devem ir.</p>
+<div id="generalizacao-do-paralelismo" class="section level2">
+<h2>Generalização do paralelismo</h2>
+<p>Para não precisar oferecer uma função para cada número de argumentos, o pacote
+<code>purrr</code> fornece a <code>pmap()</code>. Para essa função devemos passar uma lista em que cada
+elemento é um dos objetos a ser iterado:</p>
+<pre class="r"><code>soma_varios &lt;- function(x, y, z) { x + y + z }
+obj_1 &lt;- 10:15
+obj_2 &lt;- 20:25
+obj_3 &lt;- 30:35
+
+obj_1 &lt;- pmap_dbl(list(obj_1, obj_2, obj_3), soma_varios)
+obj_1
+## [1] 60 63 66 69 72 75</code></pre>
+<p>Com a <code>pmap()</code> infelizmente não podemos usar fórmulas. Se quisermos usar uma
+função anônima com ela, precisamos declará-la a função no seu corpo:</p>
+<pre class="r"><code>obj_1 &lt;- 10:15
+obj_2 &lt;- 20:25
+obj_3 &lt;- 30:35
+
+pmap_dbl(list(obj_1, obj_2, obj_3), function(x, y, z) { x + y + z })
+## [1] 60 63 66 69 72 75</code></pre>
+</div>
+<div id="iterando-em-indices" class="section level2">
+<h2>Iterando em índices</h2>
+<p>A última função que veremos nessa seção é a <code>imap()</code>. No fundo ela é um
+atalho para <code>map2(x, names(x), ...)</code> quando <code>x</code> tem nomes e para
+<code>map2(x, seq_along(x), ...)</code> caso contrário:</p>
+<pre class="r"><code>obj &lt;- 10:15
+
+imap_dbl(obj, ~.x+.y)
+## [1] 11 13 15 17 19 21</code></pre>
+<p>Como podemos observar, agora <code>.y</code> é o placeholder para o índice atual (equivalente
+ao <code>i</code> no laço com <code>for</code>). Naturalmente, assim como toda a família <code>map()</code>, a
+<code>imap()</code> também funciona com os sufixos de achatamento.</p>
+</div>
+</div>
+<div id="iteracoes-avancadas" class="section level1">
+<h1>Iterações avançadas</h1>
+<p>Agora que já vimos como substituir iterações de nível básico e de nível
+intermediário com a família <code>map()</code>, podemos passar para os tipos mais obscuros
+de laços. Cada item desta seção será mais denso do que os das passadas, por isso
+encorajamos todos os leitores para que também leiam a documentação de cada função
+aqui abordada.</p>
+<div id="iteracoes-com-condicionais" class="section level2">
+<h2>Iterações com condicionais</h2>
+<p>Imagine que precisamos aplicar uma função somente em alguns elementos de um vetor.
+Com um laço isso é uma tarefa fácil, mas com as funções da família <code>map()</code>
+apresentadas até agora isso seria extremamente difícil. Veja o trecho de código
+a seguir por exemplo:</p>
+<pre class="r"><code>dobra &lt;- function(x) { x*2 }
+obj &lt;- 10:15
+
+for (i in seq_along(obj)) {
+  if (obj[i] %% 2 == 1) { obj[i] &lt;- dobra(obj[i]) }
+  else                  { obj[i] &lt;- obj[i] }
+}
+obj
+## [1] 10 22 12 26 14 30</code></pre>
+<p>No exemplo acima, aplicamos a função <code>dobra()</code> apenas nos elementos ímpares do
+vetor <code>obj</code>. Com o pacote <code>purrr</code> temos duas maneiras de fazer isso: com
+<code>map_if()</code> ou <code>map_at()</code>.</p>
+<p>A primeira dessas funções aplica a função dada apenas quando um predicado é
+<code>TRUE</code>. Esse predicado pode ser uma função ou uma fórmula (que serão aplicadas
+em cada elemento da entrada e devem retornar <code>TRUE</code> ou <code>FALSE</code>). Infelizmente
+a <code>map_if()</code> não funciona com sufixos, então devemos achatar o resultado:</p>
+<pre class="r"><code>eh_impar &lt;- function(x) { x%%2 == 1 }
+dobra &lt;- function(x) { x*2 }
+obj &lt;- 10:15
+
+map_if(obj, eh_impar, dobra) %&gt;% flatten_dbl()
+## [1] 10 22 12 26 14 30</code></pre>
+<p>Com fórmulas poderíamos eliminar completamente a necessidade de funções
+declaradas:</p>
+<pre class="r"><code>obj &lt;- 10:15
+
+map_if(obj, ~.x%%2 == 1, ~.x*2) %&gt;% flatten_dbl()
+## [1] 10 22 12 26 14 30</code></pre>
+<p>A segunda dessas funções é a irmã gêmea de <code>map_if()</code> e funciona de forma muito
+semelhante. Para <code>map_at()</code> devemos passar um vetor de nomes ou índices onde a
+função deve ser aplicada:</p>
+<pre class="r"><code>obj &lt;- 10:15
+
+map_at(obj, c(2, 4, 6), ~.x*2) %&gt;% flatten_dbl()
+## [1] 10 22 12 26 14 30</code></pre>
+</div>
+<div id="iteracoes-com-tabelas-e-funcoes" class="section level2">
+<h2>Iterações com tabelas e funções</h2>
+<p>Duas funções menos utilizadas da família <code>map()</code> são <code>map_dfc()</code> e <code>map_dfr()</code>,
+que equivalem a um <code>map()</code> seguido de um <code>dplyr::bind_cols()</code> ou de um
+<code>dplyr::bind_rows()</code> respectivamente.</p>
+<div class="admonition note">
+<p class="admonition-title">
+Lendo múltiplas tabelas
+</p>
+<p>
+A maior utilidade dessas funções é quando temos uma tabela espalhada em muitos
+arquivos. Se elas estiverem divididas por grupos de colunas, podemos usar algo
+como <code>map_dfc(arquivos, readr::read_csv)</code> e se elas estiverem
+divididas por grupos de linhas, <code>map_dfr(arquivos, readr::read_csv)</code>
+</p>
+</div>
+<p>Outro membro obscuro da família <code>map()</code> é a <code>invoke_map()</code>. Na verdade essa
+função pode ser considerada um membro da família <code>invoke()</code>, mas vamos ver
+que as semelhanças são muitas. Primeiramente, vamos demonstrar o que faz a
+<code>invoke()</code> sozinha:</p>
+<pre class="r"><code>soma_ambos &lt;- function(x, y) { x + y }
+
+invoke(soma_ambos, list(x = 10, y = 15))
+## [1] 25</code></pre>
+<p>É fácil de ver que essa função recebe uma função e uma lista de argumentos para
+usar em uma chamada desta. Agora generalizando esta lógica temos <code>invoke_map()</code>,
+que chama uma mesma função com uma lista de listas de argumentos ou uma lista
+de funções com uma lista de argumentos. A família <code>invoke()</code> também aceita os
+sufixos como veremos a seguir:</p>
+<pre class="r"><code>soma_ambos &lt;- function(x, y) { x + y }
+soma_um &lt;- function(x) { x + 1 }
+soma_dois &lt;- function(x) { x + 2 }
+
+invoke_map_dbl(soma_ambos, list(list(x = 10, y = 15), list(x = 20, y = 25)))
+## [1] 25 45
+
+invoke_map_dbl(list(soma_um, soma_dois), list(x = 10))
+## [1] 11 12</code></pre>
+</div>
+<div id="reducao-e-acumulo" class="section level2">
+<h2>Redução e acúmulo</h2>
+<p>Outras funções simbólicas de programação funcional além da <code>map()</code> são <code>reduce</code>
+e <code>accumulate</code>, que aplicam transformações em valores acumulados. Observe o laço
+a seguir:</p>
+<pre class="r"><code>soma_ambos &lt;- function(x, y) { x + y }
+obj &lt;- 10:15
+
+for (i in 2:length(obj)) {
+  obj[i] &lt;- soma_ambos(obj[i-1], obj[i])
+}
+obj
+## [1] 10 21 33 46 60 75</code></pre>
+<p>Essa soma cumulativa é bastante simples, mas não é difícil imaginar uma situação
+em que um programador desavisado confunde um índice com o outro e o bug acaba
+passando desapercebido. Para evitar esse tipo de situação, podemos utilizar
+<code>accumulate()</code> (tanto com uma função quanto com uma fórmula):</p>
+<pre class="r"><code>soma_ambos &lt;- function(x, y) { x + y }
+obj &lt;- 10:15
+
+accumulate(obj, soma_ambos)
+## [1] 10 21 33 46 60 75
+
+accumulate(obj, ~.x+.y)
+## [1] 10 21 33 46 60 75</code></pre>
+<p><strong>Obs.:</strong> Nesse caso, os placeholders têm significados ligeiramente diferentes.
+Aqui, <code>.x</code> é o valor acumulado e <code>.y</code> é o valor “atual” do objeto sendo iterado.</p>
+<p>Se não quisermos o valor acumulado em cada passo da iteração, podemos usar
+<code>reduce()</code>:</p>
+<pre class="r"><code>obj &lt;- 10:15
+
+reduce(obj, ~.x+.y)
+## [1] 75</code></pre>
+<p>Para a nossa comodidade, essas duas funções também têm variedades paralelas
+(<code>accumulate2()</code> e <code>reduce2()</code>), assim como variedades invertidas
+<code>accumulate_right()</code> e <code>reduce_right()</code>).</p>
+</div>
+</div>
+<div id="miscelanea" class="section level1">
+<h1>Miscelânea</h1>
+<p>Por fim, veremos algumas funções do <code>purrr</code> que nêo têm exatamente a ver com
+laços, mas que acabam sendo bastante úteis quando usando as funções que vimos
+até agora. Elas não serão apresentadas em nenhuma ordem específica, este é apenas
+um apanhado de funções sortidas que achamos úteis enquanto programando com o
+<code>purrr</code>.</p>
+<div id="manter-e-descartar" class="section level2">
+<h2>Manter e descartar</h2>
+<p>Se quisermos filtrar elementos de um vetor ou lista, podemos usar as funções
+<code>keep()</code> e <code>discard()</code>. Elas funcionam com fórmulas e podem ser extremamente úteis
+em situações que <code>dplyr::select()</code> e <code>magrittr::extract()</code> não conseguem cobrir:</p>
+<pre class="r"><code>obj &lt;- list(10:15, 20:25, c(30:34, NA))
+
+keep(obj, ~any(is.na(.x)))
+## [[1]]
+## [1] 30 31 32 33 34 NA
+
+discard(obj, ~!any(is.na(.x)))
+## [[1]]
+## [1] 30 31 32 33 34 NA</code></pre>
+<p>No exemplo acima descartamos todos os vetores da lista que não têm pelo menos um
+elemento omisso (<code>NA</code>).</p>
+</div>
+<div id="a-familia-is" class="section level2">
+<h2>A família <code>is</code></h2>
+<p>Uma outra família do pacote <code>purrr</code> é a <code>is()</code>. Com essa série de funções podemos
+fazer verificações extremamente estritas em objetos dos mais variados tipos. Seguem
+alguns poucos exemplos:</p>
+<pre class="r"><code>is_scalar_integer(10:15)
+## [1] FALSE
+
+is_bare_integer(10:15)
+## [1] TRUE
+
+is_atomic(10:15)
+## [1] TRUE
+
+is_vector(10:15)
+## [1] TRUE</code></pre>
+</div>
+<div id="andar-e-modificar" class="section level2">
+<h2>Andar e modificar</h2>
+<p><code>walk()</code> e <code>modify()</code> são pequenas alterações da família <code>map()</code> que vêm a calhar
+em diversas situações. A primeira destas funciona exatamente igual à <code>map()</code> mas
+não devolve resultado, apenas efeitos colaterais; a segunda, não muda a
+estrutura do objeto sendo iterado, ela substitui os próprios elementos da entrada.</p>
+<div class="admonition note">
+<p class="admonition-title">
+Escrevendo múltiplas tabelas
+</p>
+<p>
+A maior utilidade de <code>walk</code> é quando precisamos salvar múltiplas
+tabelas. Para fazer isso, podemos usar algo como
+<code>walk(tabelas, readr::write_csv)</code>.
+</p>
+</div>
+<p>Um caso de uso interessante da <code>modify()</code> é quando junta do sufixo <code>_if()</code>,
+combinação que nos permite iterar nas colunas de uma tabela e aplicar
+transformações de tipo apenas quando um predicado for verdade (geralmente de
+queremos transformar as colunas de fator para caractere).</p>
+</div>
+<div id="transposicao-e-indexacao-profunda" class="section level2">
+<h2>Transposição e indexação profunda</h2>
+<p>Quando precisarmos lidar com listas complexas e profundas, o <code>purrr</code> nos fornece
+duas funções extremamente úteis: <code>transpose()</code> e <code>pluck()</code>. A primeira transpõe
+uma lista, enquanto a segunda é capaz de acessar elementos profundos de uma lista
+sem a necessidade de colchetes.</p>
+<pre class="r"><code>obj &lt;- list(list(a = 1, b = 2, c = 3), list(a = 4, b = 5, c = 6))
+str(obj)
+## List of 2
+##  $ :List of 3
+##   ..$ a: num 1
+##   ..$ b: num 2
+##   ..$ c: num 3
+##  $ :List of 3
+##   ..$ a: num 4
+##   ..$ b: num 5
+##   ..$ c: num 6
+
+pluck(obj, 2, &quot;b&quot;)
+## [1] 5
+
+str(transpose(obj))
+## List of 3
+##  $ a:List of 2
+##   ..$ : num 1
+##   ..$ : num 4
+##  $ b:List of 2
+##   ..$ : num 2
+##   ..$ : num 5
+##  $ c:List of 2
+##   ..$ : num 3
+##   ..$ : num 6</code></pre>
+<p><strong>Obs.:</strong> Se você estiver com muitos problemas com listas profundas, dê uma olhada
+nas funções relacionadas a <code>depth()</code> pois elas podem ser muito úteis.</p>
+</div>
+<div id="aplicacao-parcial" class="section level2">
+<h2>Aplicação parcial</h2>
+<p>Se quisermos pré-preencher os argumentos de uma função (seja para usá-la em uma
+pipeline ou com alguma função do próprio <code>purrr</code>), temos <code>partial()</code>. Ela funciona
+nos moldes da família <code>invoke()</code> e pode ser bastante útil para tornar suas
+pipelines mais enxutas:</p>
+<pre class="r"><code>soma_varios &lt;- function(x, y, z) { x + y + z }
+
+nova_soma &lt;- partial(soma_varios, x = 1, y = 2)
+nova_soma(3)
+## [1] 6</code></pre>
+</div>
+<div id="execucao-segura" class="section level2">
+<h2>Execução segura</h2>
+<p>Não é incomum executarmos uma função e recebermos um erro de volta. Isso pode ser
+lidado com facilidade em um laço com um condicional, mas essa tarefa já é mais
+complexa quando se trata de programação funcional. Para isso, no <code>purrr</code> temos
+algumas funções que embrulham uma função e, quando esta retornar um erro, o
+silenciam e retornam um valor padrão em seu lugar.</p>
+<p><code>quietly()</code> retorna uma lista com resultado, saída, mensagem e alertas, <code>safely()</code>
+retorna uma lista com resultado e erro (um destes sempre é <code>NULL</code>), e <code>possibly()</code>
+silencia o erro e retorna um valor dado pelo usuário.</p>
+<pre class="r"><code>soma_um &lt;- function(x) { x + 1 }
+s_soma_um &lt;- safely(soma_um, 0)
+obj &lt;- c(10, 11, &quot;a&quot;, 13, 14, 15)
+
+s_soma_um(obj)
+## $result
+## [1] 0
+## 
+## $error
+## &lt;simpleError in x + 1: non-numeric argument to binary operator&gt;</code></pre>
 </div>
 </div>

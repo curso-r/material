@@ -1,41 +1,491 @@
 ---
-title: "Hello R Markdown"
-author: "Frida Gomam"
-date: 2015-07-23T21:13:14-05:00
+title: "Programação Funcional"
+author: "Curso-R"
+date: 2018-07-18
 categories: ["R"]
-tags: ["R Markdown", "plot", "regression"]
+tags: ["purrr"]
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(collapse = TRUE)
 ```
 
-# R Markdown
+# Introdução
 
-## Test
+Programação funcional (PF) é um paradigma de programação com o qual a maior parte
+dos estatísticos não está familiarizada. Essa técnica costuma ser ignorada na
+maioria dos tutoriais de R por não estar diretamente envolvida com manipulação e
+visualização de dados, mas isso não quer dizer que ela não tenha suas vantagens.
 
-## Test2
+Usando PF podemos criar códigos mais concisos e "pipeáveis", características que
+por tabela também tornam o processo de debug mais simples. Além disso, códigos
+funcionais geralmente são paralelizáveis, permitindo que tratemos problemas muito
+grandes com poucas modificações.
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+Apesar de o R `base` já ter funções que podem ser consideradas elementos de PF, a
+implementação destas não é tão elegante e, portanto, este tutorial abordará
+somente a implementação de PF realizada pelo pacote `purrr`.
 
-You can embed an R code chunk like this:
+Para instalar e carregar o `purrr`, rode o código a seguir. Nas próximas seções
+deste tutorial, assumiremos que você têm esse pacote instalado e carregado.
 
-```{r cars}
-summary(cars)
-fit <- lm(dist ~ speed, data = cars)
-fit
+```{r, eval=FALSE}
+install.packages("purrr")
+library(purrr)
 ```
 
-# Including Plots 
+# Iterações básicas
 
-You can also embed plots. See Figure \@ref(fig:pie) for example:
+```{r, message=FALSE, warning=FALSE, include=FALSE}
+library(purrr)
+```
 
-```{r pie, fig.cap='A fancy pie chart.', tidy=FALSE}
-par(mar = c(0, 1, 0, 1))
-pie(
-  c(280, 60, 20),
-  c('Sky', 'Sunny side of pyramid', 'Shady side of pyramid'),
-  col = c('#0292D8', '#F7EA39', '#C4B632'),
-  init.angle = -50, border = NA
-)
+A primeira família de funções do `purrr` que veremos também é a mais útil e
+extensível. As funções `map()` são quase como substitutas para laços `for`,
+elas abstraem a iteração em apenas uma linha. Veja esse exemplo de laço usando
+`for`:
+
+```{r}
+soma_um <- function(x) { x + 1 }
+obj <- 10:15
+
+for (i in seq_along(obj)) {
+  obj[i] <- soma_um(obj[i])
+}
+obj
+```
+
+O que de fato estamos tentando fazer com o laço acima? Temos um vetor (`obj`) e
+queremos aplicar uma função (`soma_um()`) em cada elemento dele. A função `map()`
+remove a necessidade de declaramos um objeto iterador auxiliar (`i`) e
+simplesmente aplica a função desejada em cada elemento do objeto dado.
+
+```{r}
+soma_um <- function(x) { x + 1 }
+obj <- 10:15
+
+obj <- map(obj, soma_um)
+obj
+```
+
+## Achatando resultados
+
+Como você deve ter percebido, o resultado da execução acima não é exatamente
+igual ao que tivemos com o laço. Isso acontece porque a `map()` tenta ser
+extremamente genérica, retornando por padrão uma lista com um elemento para
+cada saída.
+
+Se quisermos "achatar" o resultado, devemos informar qual será o seu tipo. Isso
+é super simples e pode ser feito com as irmãs da `map()`: `map_chr()` (para
+strings), `map_dbl()` (para números reais), `map_int()` (para números inteiros) e
+`map_lgl()` (para booleanos).
+
+```{r}
+obj <- 10:15
+
+map_dbl(obj, soma_um)
+```
+
+<div class='admonition note'>
+<p class='admonition-title'>
+Outro jeito de achatar
+</p>
+<p>
+O <code>purrr</code> também nos fornece outra ferramenta interessante para
+achatar listas: a família <code>flatten()</code>. No fundo, <code>map_chr()</code>
+é quase um atalho para <code>map() %>% flatten_chr()</code>!
+</p>
+</div>
+
+## Fórmulas e reticências
+
+Algo bastante útil da família `map()` é a possibilidade de passar argumentos
+fixos para a função que será aplicada. A primeira forma de fazer isso envolve
+fórmulas:
+
+```{r}
+soma_n <- function(x, n = 1) { x + n }
+obj <- 10:15
+
+map_dbl(obj, ~soma_n(.x, 2))
+```
+
+Como vemos no exemplo acima, para utilizar fórmulas precisamos colocar um til
+(`~`) antes da função que será chamada. Feito isso, podemos utilizar o
+placeholder `.x` para indicar onde deve ser colocado cada elemento de `obj`.
+
+A outra forma de passar argumentos para a função é através das reticências da
+`map()`. Desta maneira precisamos apenas dar o nome do argumento e seu valor
+logo após a função `soma_n()`.
+
+```{r}
+soma_n <- function(x, n = 1) { x + n }
+obj <- 10:15
+
+map_dbl(obj, soma_n, n = 2)
+```
+
+Usando fórmulas temos uma maior flexibilidade (podemos, por exemplo, declarar
+funções anônimas como `~.x+2`), enquanto com as reticências temos maior
+legibilidade.
+
+# Iterações intermediárias
+
+**Obs.:** Note que quando usarmos o termo "paralelo" daqui para frente, estaremos
+nos referindo a laços em mais de uma estrutura e não a paralelização de
+computações em mais de uma unidade de processamento.
+
+Agora que já exploramos os básicos da família `map()` podemos partir para
+iterações um pouco mais complexas. Observe o laço a seguir:
+
+```{r}
+soma_ambos <- function(x, y) { x + y }
+obj_1 <- 10:15
+obj_2 <- 20:25
+
+for (i in seq_along(obj_1)) {
+  obj_1[i] <- soma_ambos(obj_1[i], obj_2[i])
+}
+obj_1
+```
+
+Com a função `map2()` podemos reproduzir o laço acima em apenas uma linha. Ela
+abstrai a iteração em paralelo, aplica a função em cada par de elementos das
+entradas e, assim como sua prima `map()`, pode achatar o objeto retornado com os
+sufixos `_chr`, `_dbl`, `_int` e `_lgl`.
+
+```{r}
+soma_ambos <- function(x, y) { x + y }
+obj_1 <- 10:15
+obj_2 <- 20:25
+
+obj_1 <- map2_dbl(obj_1, obj_2, soma_ambos)
+obj_1
+```
+
+Como o pacote `purrr` é extremamente consistente, a `map2()` também funciona com
+reticências e fórmulas. Poderíamos, por exemplo, transformar `soma_ambos()` em
+uma função anônima:
+
+```{r}
+obj_1 <- 10:15
+obj_2 <- 20:25
+
+map2_dbl(obj_1, obj_2, ~.x+.y)
+```
+
+Desta vez também temos acesso ao placeholder `.y` para indicar onde os elementos
+de do segundo vetor devem ir.
+
+## Generalização do paralelismo
+
+Para não precisar oferecer uma função para cada número de argumentos, o pacote
+`purrr` fornece a `pmap()`. Para essa função devemos passar uma lista em que cada
+elemento é um dos objetos a ser iterado:
+
+```{r}
+soma_varios <- function(x, y, z) { x + y + z }
+obj_1 <- 10:15
+obj_2 <- 20:25
+obj_3 <- 30:35
+
+obj_1 <- pmap_dbl(list(obj_1, obj_2, obj_3), soma_varios)
+obj_1
+```
+
+Com a `pmap()` infelizmente não podemos usar fórmulas. Se quisermos usar uma
+função anônima com ela, precisamos declará-la a função no seu corpo:
+
+```{r}
+obj_1 <- 10:15
+obj_2 <- 20:25
+obj_3 <- 30:35
+
+pmap_dbl(list(obj_1, obj_2, obj_3), function(x, y, z) { x + y + z })
+```
+
+## Iterando em índices
+
+A última função que veremos nessa seção é a `imap()`. No fundo ela é um
+atalho para `map2(x, names(x), ...)` quando `x` tem nomes e para
+`map2(x, seq_along(x), ...)` caso contrário:
+
+```{r}
+obj <- 10:15
+
+imap_dbl(obj, ~.x+.y)
+```
+
+Como podemos observar, agora `.y` é o placeholder para o índice atual (equivalente
+ao `i` no laço com `for`). Naturalmente, assim como toda a família `map()`, a
+`imap()` também funciona com os sufixos de achatamento.
+
+# Iterações avançadas
+
+Agora que já vimos como substituir iterações de nível básico e de nível
+intermediário com a família `map()`, podemos passar para os tipos mais obscuros
+de laços. Cada item desta seção será mais denso do que os das passadas, por isso
+encorajamos todos os leitores para que também leiam a documentação de cada função
+aqui abordada.
+
+## Iterações com condicionais
+
+Imagine que precisamos aplicar uma função somente em alguns elementos de um vetor.
+Com um laço isso é uma tarefa fácil, mas com as funções da família `map()`
+apresentadas até agora isso seria extremamente difícil. Veja o trecho de código
+a seguir por exemplo:
+
+```{r}
+dobra <- function(x) { x*2 }
+obj <- 10:15
+
+for (i in seq_along(obj)) {
+  if (obj[i] %% 2 == 1) { obj[i] <- dobra(obj[i]) }
+  else                  { obj[i] <- obj[i] }
+}
+obj
+```
+
+No exemplo acima, aplicamos a função `dobra()` apenas nos elementos ímpares do
+vetor `obj`. Com o pacote `purrr` temos duas maneiras de fazer isso: com
+`map_if()` ou `map_at()`.
+
+A primeira dessas funções aplica a função dada apenas quando um predicado é
+`TRUE`. Esse predicado pode ser uma função ou uma fórmula (que serão aplicadas
+em cada elemento da entrada e devem retornar `TRUE` ou `FALSE`). Infelizmente
+a `map_if()` não funciona com sufixos, então devemos achatar o resultado:
+
+```{r}
+eh_impar <- function(x) { x%%2 == 1 }
+dobra <- function(x) { x*2 }
+obj <- 10:15
+
+map_if(obj, eh_impar, dobra) %>% flatten_dbl()
+```
+
+Com fórmulas poderíamos eliminar completamente a necessidade de funções
+declaradas:
+
+```{r}
+obj <- 10:15
+
+map_if(obj, ~.x%%2 == 1, ~.x*2) %>% flatten_dbl()
+```
+
+A segunda dessas funções é a irmã gêmea de `map_if()` e funciona de forma muito
+semelhante. Para `map_at()` devemos passar um vetor de nomes ou índices onde a
+função deve ser aplicada:
+
+```{r}
+obj <- 10:15
+
+map_at(obj, c(2, 4, 6), ~.x*2) %>% flatten_dbl()
+```
+
+## Iterações com tabelas e funções
+
+Duas funções menos utilizadas da família `map()` são `map_dfc()` e `map_dfr()`,
+que equivalem a um `map()` seguido de um `dplyr::bind_cols()` ou de um
+`dplyr::bind_rows()` respectivamente.
+
+<div class='admonition note'>
+<p class='admonition-title'>
+Lendo múltiplas tabelas
+</p>
+<p>
+A maior utilidade dessas funções é quando temos uma tabela espalhada em muitos
+arquivos. Se elas estiverem divididas por grupos de colunas, podemos usar algo
+como <code>map_dfc(arquivos, readr::read_csv)</code> e se elas estiverem
+divididas por grupos de linhas, <code>map_dfr(arquivos, readr::read_csv)</code>
+</p>
+</div>
+
+Outro membro obscuro da família `map()` é a `invoke_map()`. Na verdade essa
+função pode ser considerada um membro da família `invoke()`, mas vamos ver
+que as semelhanças são muitas. Primeiramente, vamos demonstrar o que faz a
+`invoke()` sozinha:
+
+```{r}
+soma_ambos <- function(x, y) { x + y }
+
+invoke(soma_ambos, list(x = 10, y = 15))
+```
+
+É fácil de ver que essa função recebe uma função e uma lista de argumentos para
+usar em uma chamada desta. Agora generalizando esta lógica temos `invoke_map()`,
+que chama uma mesma função com uma lista de listas de argumentos ou uma lista
+de funções com uma lista de argumentos. A família `invoke()` também aceita os
+sufixos como veremos a seguir:
+
+```{r}
+soma_ambos <- function(x, y) { x + y }
+soma_um <- function(x) { x + 1 }
+soma_dois <- function(x) { x + 2 }
+
+invoke_map_dbl(soma_ambos, list(list(x = 10, y = 15), list(x = 20, y = 25)))
+
+invoke_map_dbl(list(soma_um, soma_dois), list(x = 10))
+```
+
+## Redução e acúmulo
+
+Outras funções simbólicas de programação funcional além da `map()` são `reduce`
+e `accumulate`, que aplicam transformações em valores acumulados. Observe o laço
+a seguir:
+
+```{r}
+soma_ambos <- function(x, y) { x + y }
+obj <- 10:15
+
+for (i in 2:length(obj)) {
+  obj[i] <- soma_ambos(obj[i-1], obj[i])
+}
+obj
+```
+
+Essa soma cumulativa é bastante simples, mas não é difícil imaginar uma situação
+em que um programador desavisado confunde um índice com o outro e o bug acaba
+passando desapercebido. Para evitar esse tipo de situação, podemos utilizar
+`accumulate()` (tanto com uma função quanto com uma fórmula):
+
+```{r}
+soma_ambos <- function(x, y) { x + y }
+obj <- 10:15
+
+accumulate(obj, soma_ambos)
+
+accumulate(obj, ~.x+.y)
+```
+
+**Obs.:** Nesse caso, os placeholders têm significados ligeiramente diferentes.
+Aqui, `.x` é o valor acumulado e `.y` é o valor "atual" do objeto sendo iterado.
+
+Se não quisermos o valor acumulado em cada passo da iteração, podemos usar
+`reduce()`:
+
+```{r}
+obj <- 10:15
+
+reduce(obj, ~.x+.y)
+```
+
+Para a nossa comodidade, essas duas funções também têm variedades paralelas
+(`accumulate2()` e `reduce2()`), assim como variedades invertidas 
+`accumulate_right()` e `reduce_right()`).
+
+# Miscelânea
+
+Por fim, veremos algumas funções do `purrr` que nêo têm exatamente a ver com
+laços, mas que acabam sendo bastante úteis quando usando as funções que vimos
+até agora. Elas não serão apresentadas em nenhuma ordem específica, este é apenas
+um apanhado de funções sortidas que achamos úteis enquanto programando com o 
+`purrr`.
+
+## Manter e descartar
+
+Se quisermos filtrar elementos de um vetor ou lista, podemos usar as funções
+`keep()` e `discard()`. Elas funcionam com fórmulas e podem ser extremamente úteis
+em situações que `dplyr::select()` e `magrittr::extract()` não conseguem cobrir:
+
+```{r}
+obj <- list(10:15, 20:25, c(30:34, NA))
+
+keep(obj, ~any(is.na(.x)))
+
+discard(obj, ~!any(is.na(.x)))
+```
+
+No exemplo acima descartamos todos os vetores da lista que não têm pelo menos um
+elemento omisso (`NA`).
+
+## A família `is`
+
+Uma outra família do pacote `purrr` é a `is()`. Com essa série de funções podemos
+fazer verificações extremamente estritas em objetos dos mais variados tipos. Seguem
+alguns poucos exemplos:
+
+```{r}
+is_scalar_integer(10:15)
+
+is_bare_integer(10:15)
+
+is_atomic(10:15)
+
+is_vector(10:15)
+```
+
+## Andar e modificar
+
+`walk()` e `modify()` são pequenas alterações da família `map()` que vêm a calhar
+em diversas situações. A primeira destas funciona exatamente igual à `map()` mas
+não devolve resultado, apenas efeitos colaterais; a segunda, não muda a
+estrutura do objeto sendo iterado, ela substitui os próprios elementos da entrada.
+
+<div class='admonition note'>
+<p class='admonition-title'>
+Escrevendo múltiplas tabelas
+</p>
+<p>
+A maior utilidade de <code>walk</code> é quando precisamos salvar múltiplas
+tabelas. Para fazer isso, podemos usar algo como
+<code>walk(tabelas, readr::write_csv)</code>.
+</p>
+</div>
+
+Um caso de uso interessante da `modify()` é quando junta do sufixo `_if()`,
+combinação que nos permite iterar nas colunas de uma tabela e aplicar
+transformações de tipo apenas quando um predicado for verdade (geralmente de
+queremos transformar as colunas de fator para caractere).
+
+## Transposição e indexação profunda
+
+Quando precisarmos lidar com listas complexas e profundas, o `purrr` nos fornece
+duas funções extremamente úteis: `transpose()` e `pluck()`. A primeira transpõe
+uma lista, enquanto a segunda é capaz de acessar elementos profundos de uma lista
+sem a necessidade de colchetes.
+
+```{r}
+obj <- list(list(a = 1, b = 2, c = 3), list(a = 4, b = 5, c = 6))
+str(obj)
+
+pluck(obj, 2, "b")
+
+str(transpose(obj))
+```
+
+**Obs.:** Se você estiver com muitos problemas com listas profundas, dê uma olhada
+nas funções relacionadas a `depth()` pois elas podem ser muito úteis.
+
+## Aplicação parcial
+
+Se quisermos pré-preencher os argumentos de uma função (seja para usá-la em uma
+pipeline ou com alguma função do próprio `purrr`), temos `partial()`. Ela funciona
+nos moldes da família `invoke()` e pode ser bastante útil para tornar suas
+pipelines mais enxutas:
+
+```{r}
+soma_varios <- function(x, y, z) { x + y + z }
+
+nova_soma <- partial(soma_varios, x = 1, y = 2)
+nova_soma(3)
+```
+
+## Execução segura
+
+Não é incomum executarmos uma função e recebermos um erro de volta. Isso pode ser
+lidado com facilidade em um laço com um condicional, mas essa tarefa já é mais
+complexa quando se trata de programação funcional. Para isso, no `purrr` temos
+algumas funções que embrulham uma função e, quando esta retornar um erro, o
+silenciam e retornam um valor padrão em seu lugar.
+
+`quietly()` retorna uma lista com resultado, saída, mensagem e alertas, `safely()`
+retorna uma lista com resultado e erro (um destes sempre é `NULL`), e `possibly()`
+silencia o erro e retorna um valor dado pelo usuário.
+
+```{r}
+soma_um <- function(x) { x + 1 }
+s_soma_um <- safely(soma_um, 0)
+obj <- c(10, 11, "a", 13, 14, 15)
+
+s_soma_um(obj)
 ```
