@@ -60,14 +60,9 @@
     "filename": "material/shiny"
   },
   {
-    "name": "plumber",
-    "raster": "/hex/plumber.png",
-    "filename": "material/plumber"
-  },
-  {
-    "name": "OpenCPU",
+    "name": "API",
     "raster": "/assets/placeholder.png",
-    "filename": "material/opencpu"
+    "filename": "material/api"
   },
   {
     "name": "Web Scraping",
