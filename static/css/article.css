@@ -133,7 +133,12 @@
   color: #da4d4d;
 }
 
-.footer-copyright a {
+.footer-copyright-article {
+  text-align: center;
+  color: rgb(194, 194, 194);
+}
+
+.footer-copyright-article a {
   color: #da4d4d;
 }
 
