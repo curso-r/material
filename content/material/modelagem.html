@@ -1,61 +1,653 @@
 ---
-title: "Hello R Markdown"
-author: "Frida Gomam"
-date: 2015-07-23T21:13:14-05:00
+title: "Modelagem"
+author: "Curso-R"
+date: 2018-07-18
 categories: ["R"]
-tags: ["R Markdown", "plot", "regression"]
+tags: ["Modelagem"]
 ---
 
 
 <div id="TOC">
 <ul>
-<li><a href="#r-markdown">R Markdown</a></li>
-<li><a href="#including-plots">Including Plots</a></li>
+<li><a href="#aprendizado-estatistico">Aprendizado Estatístico</a></li>
+<li><a href="#aprendizado-supervisionado">Aprendizado Supervisionado</a></li>
+<li><a href="#regressao-linear">Regressão Linear</a></li>
+<li><a href="#arvore-de-decisao">Árvore de Decisão</a></li>
+<li><a href="#overfitting">Overfitting</a></li>
 </ul>
 </div>
 
-<div id="r-markdown" class="section level1">
-<h1>R Markdown</h1>
-<div id="test" class="section level2">
-<h2>Test</h2>
+<div id="aprendizado-estatistico" class="section level1">
+<h1>Aprendizado Estatístico</h1>
+<p>O termos <em>Aprendizado Estatístico</em> refere-se a uma vasta quantidade de ferramentas
+que são utilizadas para entender dados. Essas ferramentas são classificadas em
+<strong>supervisionadas</strong> e <strong>não-supervisionadas</strong>. De forma geral, aprendizado
+supervisionado envolve a construção de um modelo estatístico para prever ou estimar
+uma <strong>resposta</strong> de acordo com uma ou mais informações de entrada. No aprendizado
+não-supervisionado existem variáveis de entrada mas não existe uma variável resposta.
+Neste caso, o objetivo é entender a estrutura e a relação entre as variáveis. Existe
+uma terceira classificação para as ferramentas de aprendizado estatístico chamada
+<a href="https://en.wikipedia.org/wiki/Reinforcement_learning">Reinforcement Learning</a>, mas
+não abordaremos este tema neste material.</p>
+<div id="exemplos" class="section level2">
+<h2>Exemplos</h2>
+<ol style="list-style-type: decimal">
+<li><p>Um estudo estatístico cujo objetivo é estimar a probabilidade de uma transação
+ser uma fraude e são fornecidos dados relativos a transações passadas bem como se
+estas foram uma fraude ou não. É considerado um estudo de aprendizado supervisionado.</p></li>
+<li><p>Um estudo em que são fornecidas diversas informações sobre os hábitos de compras
+dos clientes e deseja-se identificar diferentes segmentos, é um
+estudo de aprendizado não-supervisionado.</p></li>
+</ol>
+<p>Neste material vamos abordar inicialmente algumas técnicas de aprendizado supervisionado.
+Em seguida abordaremos superficialmente alguns conceitos de aprendizado
+não-supervisionado. Todos esses conceitos serão apresentados com exemplos práticos
+usando o R.</p>
+<p>Uma introdução bem interessante ao tema pode ser encontrada <a href="http://www.r2d3.us/visual-intro-to-machine-learning-part-1/">aqui</a></p>
+<p>Para se aprofundar mais no assunto os seguintes links são ótimas referências.</p>
+<ul>
+<li><a href="http://www-bcf.usc.edu/~gareth/ISL/ISLR%20Sixth%20Printing.pdf">An Introduction to Statistical Learning</a></li>
+<li><a href="https://www.coursera.org/learn/practical-machine-learning">Coursera - Practical Machine Learning</a></li>
+</ul>
 </div>
-<div id="test2" class="section level2">
-<h2>Test2</h2>
-<p>This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <a href="http://rmarkdown.rstudio.com" class="uri">http://rmarkdown.rstudio.com</a>.</p>
-<p>You can embed an R code chunk like this:</p>
-<pre class="r"><code>summary(cars)
-##      speed           dist       
-##  Min.   : 4.0   Min.   :  2.00  
-##  1st Qu.:12.0   1st Qu.: 26.00  
-##  Median :15.0   Median : 36.00  
-##  Mean   :15.4   Mean   : 42.98  
-##  3rd Qu.:19.0   3rd Qu.: 56.00  
-##  Max.   :25.0   Max.   :120.00
-fit &lt;- lm(dist ~ speed, data = cars)
-fit
+</div>
+<div id="aprendizado-supervisionado" class="section level1">
+<h1>Aprendizado Supervisionado</h1>
+<p>Em aprendizado supervisionado é necessário em primeiro lugar definir qual é a sua variável
+resposta ou variável dependente (Frequentemente chamada de <span class="math inline">\(Y\)</span>). Deve-se tomar muito
+cuidado ao definí-la para que o modelo responda exatamente o que você está
+querendo saber.</p>
+<p>A variável resposta pode ser a quantidade de compras que um cliente fará no
+próximo mês, o preço do aluguel de uma casa, uma variável binária indicando se
+um cliente não pagará a fatura no próximo mês. Existem variáveis resposta que
+não são preditivas também, por exemplo: dada uma imagem de um número escrito a
+mão, qual número está escrito nela.</p>
+<p>Em seguida, definimos quais serão as informações que auxiliarão a prever essa
+variável resposta. Essas variáveis são chamadas de variáveis explicativas, variáveis
+independentes ou simplesmente <span class="math inline">\(X\)</span>.</p>
+<p>Para a quantidade de compras que um cliente fará no próximo mês essas variáveis
+podem ser quantidade de compras que o cliente fez neste mês, o gasto que ele teve neste mês,
+quantas vezes ele frequentou a minha loja no último ano, etc.</p>
+<p>Um vetor da forma <span class="math inline">\((Y, X_1, X_2, ..., X_p)\)</span> representa uma observação. Para usar
+qualquer algoritmo de aprendizado de máquina, você precisará de um número suficiente
+de observações. O número de observações vai depender da complexidade do algoritmo
+que você quiser utilizar, da disponibilidade de observações entre outros motivos.</p>
+<p>De uma forma um pouco mais formal, podemos explciar o Aprendizado Supervisionado
+da seguinte forma. Suponha que você observou uma variável resposta <span class="math inline">\(Y\)</span> e <span class="math inline">\(p\)</span>
+diferentes variáveis explicativas <span class="math inline">\(X_1, X_2, ..., X_p\)</span>. Assumimos que existe alguma
+relação entre <span class="math inline">\(Y\)</span> e <span class="math inline">\(X = (X_1, X_2, ..., X_p)\)</span>. Podemos denotar matematicamente
+esta relação como na seguinte equação:</p>
+<p><span class="math display">\[Y = f(X) + \epsilon\]</span></p>
+<p>O objetivo geral do aprendizado supervisionado é estimar a função <span class="math inline">\(f\)</span>.
+Nessa formulação, <span class="math inline">\(\epsilon\)</span> é um termo de erro aleatório com média 0. <span class="math inline">\(f\)</span> representa
+a informação sistemática que <span class="math inline">\(X\)</span> fornece sobre <span class="math inline">\(Y\)</span>.</p>
+<p>Existem diversas maneiras de estimar essa função. Em alguns casos assumimos uma
+forma paramétrica para ela, em outros não. Alguns exemplos de algoritmos são:</p>
+<ul>
+<li>Regressão Linear</li>
+<li>Regressão Logística</li>
+<li>Árvore de Decisão</li>
+<li>Florestas Aleatórias (<em>Random Forest</em>)</li>
+<li>Gradient Boosting</li>
+<li>Redes Neurais</li>
+<li>Etc.</li>
+</ul>
+<p>Cada um dos algoritmos possui as suas vantagens e desvantagens, e problemas em
+que trazem melhores resultados ou não.</p>
+</div>
+<div id="regressao-linear" class="section level1">
+<h1>Regressão Linear</h1>
+<p>Na introdução ao aprendizado supervisionado, vimos que o objetivo é sempre estimar
+uma função <span class="math inline">\(f\)</span> tal que <span class="math inline">\(y = f(x) + \epsilon\)</span>.</p>
+<p>O modelo linear assume que a função <span class="math inline">\(f\)</span> é uma função linear de modo que a formulação
+do apredizado supervisionado pode ser reescrita da seguinte forma:</p>
+<p><span class="math display">\[Y = \alpha + X\beta + \epsilon\]</span>
+Em que <span class="math inline">\(\alpha\)</span> e <span class="math inline">\(\beta\)</span> são coeficientes que serão estimados. Esses valores são
+calculados de forma a minimizar uma <strong>função de perda</strong> na sua amostra. A função
+mais utilizada é a perda quadrática na sua amostra. Considere <span class="math inline">\((y_1, x_1)\)</span>, <span class="math inline">\((y_2, x_2)\)</span>, …, <span class="math inline">\((y_n, x_n)\)</span> uma amostra de tamanho <span class="math inline">\(n\)</span>.</p>
+<p><span class="math inline">\(\alpha\)</span> e <span class="math inline">\(\beta\)</span> são escolhidos de tal forma que:</p>
+<p><span class="math display">\[\sum_{i = 1}^{n} [y_i - (\alpha + \beta x_i)]^2\]</span>
+seja o menor possível. Isto é, estamos minimizando o <em>erro quadrático</em>.</p>
+<p>Na ótica da estatística, assumimos também que <span class="math inline">\(Y \sim Normal(\alpha + X \beta, \sigma^2)\)</span>,
+escolhemos <span class="math inline">\(\alpha\)</span> e <span class="math inline">\(\beta\)</span> de forma que maximize uma função que chamamos de <a href="https://pt.wikipedia.org/wiki/Fun%C3%A7%C3%A3o_de_verossimilhan%C3%A7a">verossimilhança</a>.
+Essa suposição é útil quando queremos fazer testes de hipóteses e intervalos de
+confiança. Por enquanto, não estamos interessados nisso e portanto vamos
+apresentar uma visão menos complexa.</p>
+<div id="exemplo" class="section level2">
+<h2>Exemplo</h2>
+<p>Considere o banco de dados <em>BodyFat</em> obtido <a href="http://www2.stetson.edu/~jrasp/data.htm">aqui</a>.
+Esses são dados do percentual de gordura corporal em uma amostra de 252 homens junto com
+diversas outras medidas corporais. O percentual de gordura corporal é medido pesando
+a pessoa sob a água, um procedimento trabalhoso. O objetivo é fazer um modelo linear
+que permita obter o percentual de gordura usando medidas do corpo fáceis de serem obtidas.
+Os dados são do site do Journal of Statistics Education.</p>
+<pre class="r"><code>library(readxl)
+library(dplyr)
+library(ggplot2)
+bodyfat &lt;- read_excel(&#39;data/modelagem/BodyFat.xls&#39;)</code></pre>
+<pre class="r"><code>ggplot(bodyfat, aes(x = WEIGHT, y = BODYFAT)) + geom_point()</code></pre>
+<p><img src="/material/modelagem_files/figure-html/unnamed-chunk-2-1.png" width="75%" /></p>
+<p>A partir do gráfico de dispersão, vemos que o peso do indivíduo parece ser <strong>linearmente</strong>
+relacionado ao percentual de gordura corporal. Vamos então ajustar um modelo linear
+usando o R. Para ajustar o modelo, usamos a função <code>lm</code> (de *__l__inear __m__odel*).
+A função <code>lm</code>, assim como muitas outras que ajustam modelo no R, recebe como argumentos
+uma formula e um banco de dados.</p>
+<p><code>formula</code> é um tipo especial de objeto no R que ajuda muito na especificação dos modelos.
+Ela tem a forma <code>y ~ x1 + x2 + ... + xn</code> em que <code>y</code> é o nome da variável resposta e <code>x1</code>,
+<code>x2</code>, …, <code>xn</code> são os nomes das variáveis que serão utilizadas como explicativas.</p>
+<pre class="r"><code>ajuste &lt;- lm(BODYFAT ~ WEIGHT, data = bodyfat)</code></pre>
+<p>Com essa chamada da função criamos o objeto <code>ajuste</code>. Esse objeto abriga informações
+relacionadas ao ajuste do modelo.</p>
+<p><span class="math display">\[bodyfat = \alpha + \beta*weight + \epsilon\]</span>
+As estimativas de <span class="math inline">\(\alpha\)</span> e <span class="math inline">\(\beta\)</span> podem ser encontradas usando a função <code>summary</code>.
+A estimativa de <span class="math inline">\(\alpha\)</span> é o valor da coluna <code>Estimate</code> na linha <code>(Intercept)</code>: -9.99515
+e a estimativa de <span class="math inline">\(\beta\)</span> é o valor logo abaixo: 0.16171.</p>
+<pre class="r"><code>summary(ajuste)
 ## 
 ## Call:
-## lm(formula = dist ~ speed, data = cars)
+## lm(formula = BODYFAT ~ WEIGHT, data = bodyfat)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -16.434  -4.315   0.079   4.540  19.681 
 ## 
 ## Coefficients:
-## (Intercept)        speed  
-##     -17.579        3.932</code></pre>
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -9.99515    2.38906  -4.184 3.97e-05 ***
+## WEIGHT       0.16171    0.01318  12.273  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 6.135 on 250 degrees of freedom
+## Multiple R-squared:  0.376,  Adjusted R-squared:  0.3735 
+## F-statistic: 150.6 on 1 and 250 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>Em R, o ajuste de um modelo estatístico é salvo em um objeto. Esse objeto é uma
+<code>list</code> que armazena diversas informações sobre o ajuste. Você pode ver algumas
+informações disponíveis quando vê a estrutura do objeto <code>ajuste</code> usando a função
+<code>str</code>.</p>
+<pre class="r"><code>str(ajuste, max.level = 1)
+## List of 12
+##  $ coefficients : Named num [1:2] -9.995 0.162
+##   ..- attr(*, &quot;names&quot;)= chr [1:2] &quot;(Intercept)&quot; &quot;WEIGHT&quot;
+##  $ residuals    : Named num [1:252] -2.35 -11.12 9.69 -8.98 8 ...
+##   ..- attr(*, &quot;names&quot;)= chr [1:252] &quot;1&quot; &quot;2&quot; &quot;3&quot; &quot;4&quot; ...
+##  $ effects      : Named num [1:252] -300.64 75.29 10.38 -9.01 7.98 ...
+##   ..- attr(*, &quot;names&quot;)= chr [1:252] &quot;(Intercept)&quot; &quot;WEIGHT&quot; &quot;&quot; &quot;&quot; ...
+##  $ rank         : int 2
+##  $ fitted.values: Named num [1:252] 14.9 18 14.9 19.9 19.8 ...
+##   ..- attr(*, &quot;names&quot;)= chr [1:252] &quot;1&quot; &quot;2&quot; &quot;3&quot; &quot;4&quot; ...
+##  $ assign       : int [1:2] 0 1
+##  $ qr           :List of 5
+##   ..- attr(*, &quot;class&quot;)= chr &quot;qr&quot;
+##  $ df.residual  : int 250
+##  $ xlevels      : Named list()
+##  $ call         : language lm(formula = BODYFAT ~ WEIGHT, data = bodyfat)
+##  $ terms        :Classes &#39;terms&#39;, &#39;formula&#39;  language BODYFAT ~ WEIGHT
+##   .. ..- attr(*, &quot;variables&quot;)= language list(BODYFAT, WEIGHT)
+##   .. ..- attr(*, &quot;factors&quot;)= int [1:2, 1] 0 1
+##   .. .. ..- attr(*, &quot;dimnames&quot;)=List of 2
+##   .. ..- attr(*, &quot;term.labels&quot;)= chr &quot;WEIGHT&quot;
+##   .. ..- attr(*, &quot;order&quot;)= int 1
+##   .. ..- attr(*, &quot;intercept&quot;)= int 1
+##   .. ..- attr(*, &quot;response&quot;)= int 1
+##   .. ..- attr(*, &quot;.Environment&quot;)=&lt;environment: R_GlobalEnv&gt; 
+##   .. ..- attr(*, &quot;predvars&quot;)= language list(BODYFAT, WEIGHT)
+##   .. ..- attr(*, &quot;dataClasses&quot;)= Named chr [1:2] &quot;numeric&quot; &quot;numeric&quot;
+##   .. .. ..- attr(*, &quot;names&quot;)= chr [1:2] &quot;BODYFAT&quot; &quot;WEIGHT&quot;
+##  $ model        :&#39;data.frame&#39;:   252 obs. of  2 variables:
+##   ..- attr(*, &quot;terms&quot;)=Classes &#39;terms&#39;, &#39;formula&#39;  language BODYFAT ~ WEIGHT
+##   .. .. ..- attr(*, &quot;variables&quot;)= language list(BODYFAT, WEIGHT)
+##   .. .. ..- attr(*, &quot;factors&quot;)= int [1:2, 1] 0 1
+##   .. .. .. ..- attr(*, &quot;dimnames&quot;)=List of 2
+##   .. .. ..- attr(*, &quot;term.labels&quot;)= chr &quot;WEIGHT&quot;
+##   .. .. ..- attr(*, &quot;order&quot;)= int 1
+##   .. .. ..- attr(*, &quot;intercept&quot;)= int 1
+##   .. .. ..- attr(*, &quot;response&quot;)= int 1
+##   .. .. ..- attr(*, &quot;.Environment&quot;)=&lt;environment: R_GlobalEnv&gt; 
+##   .. .. ..- attr(*, &quot;predvars&quot;)= language list(BODYFAT, WEIGHT)
+##   .. .. ..- attr(*, &quot;dataClasses&quot;)= Named chr [1:2] &quot;numeric&quot; &quot;numeric&quot;
+##   .. .. .. ..- attr(*, &quot;names&quot;)= chr [1:2] &quot;BODYFAT&quot; &quot;WEIGHT&quot;
+##  - attr(*, &quot;class&quot;)= chr &quot;lm&quot;</code></pre>
+<p>Por exemplo você pode acessar os coeficientes do modelo usando <code>ajuste$coefficients</code>.</p>
+<p>Outra função que existe para a maior parte dos modelos que podem ser ajustados usando o R
+a <code>predict</code>. Usamos a função <code>predict</code> para obter as estimativas do modelo ajustado para
+uma base de dados (nova ou não).</p>
+<pre class="r"><code>bodyfat$predito_modelo1 &lt;- predict(ajuste, newdata = bodyfat)
+bodyfat %&gt;% select(WEIGHT, BODYFAT, predito_modelo1) %&gt;% head() %&gt;% knitr::kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="right">WEIGHT</th>
+<th align="right">BODYFAT</th>
+<th align="right">predito_modelo1</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">154.25</td>
+<td align="right">12.6</td>
+<td align="right">14.94842</td>
+</tr>
+<tr class="even">
+<td align="right">173.25</td>
+<td align="right">6.9</td>
+<td align="right">18.02089</td>
+</tr>
+<tr class="odd">
+<td align="right">154.00</td>
+<td align="right">24.6</td>
+<td align="right">14.90800</td>
+</tr>
+<tr class="even">
+<td align="right">184.75</td>
+<td align="right">10.9</td>
+<td align="right">19.88054</td>
+</tr>
+<tr class="odd">
+<td align="right">184.25</td>
+<td align="right">27.8</td>
+<td align="right">19.79969</td>
+</tr>
+<tr class="even">
+<td align="right">210.25</td>
+<td align="right">20.6</td>
+<td align="right">24.00412</td>
+</tr>
+</tbody>
+</table>
+<p>Nessa tabela, vemos o valor predito pelo modelo para cada observação bem como o
+valor verdadeiro de gordura corporal daquele indivíduo. Nosso modelo não parece
+estar muito bom. Uma possível medida de erro é o MSE (Erro quadrático médio).
+Podemos calculá-lo fazendo contas simples no R.</p>
+<pre class="r"><code>mse &lt;- mean((bodyfat$BODYFAT - bodyfat$predito_modelo1)^2)
+mse
+## [1] 37.34089</code></pre>
+<p>É mais fácil identificar se esse erro é baixo ou não comparando-o com o erro se
+usássemos a média da variável como valor predito para todas as observações e
+tirando a raíz quadrada dos dois.</p>
+<pre class="r"><code>erro_usando_media &lt;- mean((bodyfat$BODYFAT - mean(bodyfat$BODYFAT))^2)
+erro_usando_media
+## [1] 59.83737
+
+sqrt(mse)
+## [1] 6.110719
+sqrt(erro_usando_media)
+## [1] 7.735462</code></pre>
+<p>Agora podemos ter uma ideia de que o nosso erro está alto. Se usássemos apenas a
+média erraríamos em média 7,7 usando o nosso modelo, ficamos com 6,1.</p>
+<p>Felizmente, podemos melhorar o modelo adicionando mais variáveis. No R basta:</p>
+<pre class="r"><code>ajuste2 &lt;- lm(BODYFAT ~ WEIGHT + HEIGHT + CHEST + ABDOMEN + NECK + KNEE, 
+              data = bodyfat)</code></pre>
+<p>O erro pode ser novamente calculado repetindo as operações que fizemos anteriormente.</p>
+<pre class="r"><code>bodyfat$predito_modelo2 &lt;- predict(ajuste2, newdata = bodyfat)
+mse &lt;- mean((bodyfat$BODYFAT - bodyfat$predito_modelo2)^2)
+sqrt(mse)
+## [1] 4.049453</code></pre>
+<p>Agora reduzimos bastante o erro. É muito importante ressaltar que estamos avaliando
+o erro dentro da mesma base de dados que utilizamos para ajustar o modelo. Isso é
+considerado uma má prática, pois podemos facilmente esbarrar em uma situação de
+<em>superajuste</em> ou <em>overfitting</em>.</p>
+</div>
+<div id="recapitulando" class="section level2">
+<h2>Recapitulando</h2>
+<p>Ajustar um modelo de regressão linear no R é muito simples.</p>
+<ul>
+<li>Usamos a função <code>lm</code> que recebe uma fórmula de especificação do modelo e um data.frame.</li>
+<li>A função <code>lm</code> retorna um obejto do tipo <code>lm</code>, que é uma <code>list</code> que armazena diversas informações sobre o ajuste.</li>
+<li>A função <code>summary</code> e a função <code>str</code> ajudam a identificar o conteúdo do objeto do modelo.</li>
+<li>A função <code>predict</code> é usada para aplicar o modelo em um novo banco de dados.</li>
+</ul>
+<p>Essas funções são bem parecidas para qualquer modelo que você ajustar no R futuramente.</p>
 </div>
 </div>
-<div id="including-plots" class="section level1">
-<h1>Including Plots</h1>
-<p>You can also embed plots. See Figure <a href="#fig:pie">1</a> for example:</p>
-<pre class="r"><code>par(mar = c(0, 1, 0, 1))
-pie(
-  c(280, 60, 20),
-  c(&#39;Sky&#39;, &#39;Sunny side of pyramid&#39;, &#39;Shady side of pyramid&#39;),
-  col = c(&#39;#0292D8&#39;, &#39;#F7EA39&#39;, &#39;#C4B632&#39;),
-  init.angle = -50, border = NA
-)</code></pre>
-<div class="figure"><span id="fig:pie"></span>
-<img src="/material/modelagem_files/figure-html/pie-1.png" alt="A fancy pie chart." width="672" />
-<p class="caption">
-Figure 1: A fancy pie chart.
-</p>
+<div id="arvore-de-decisao" class="section level1">
+<h1>Árvore de Decisão</h1>
+<p>Os modelos de árvore de decisão como vamos utilizar são implementados de acordo
+com o livro <em>Classification and Regression Trees</em> de Breiman, Friedman, Olshen e Stone.</p>
+<p>De certa forma, a árvore de decisão é o modelo mais intuitivo que existe, principalmente
+quando o objetivo é classificar uma observação em uma de duas classes. Considere
+que o seu objetivo é separar as observações azuis das observações laranjas no
+gráfico abaixo.</p>
+<p><img src="/material/modelagem_files/figure-html/unnamed-chunk-11-1.png" width="75%" /></p>
+<p>Pelo gráfico acima, podemos ver que a variável <span class="math inline">\(x\)</span> fornece informação que ajuda
+a discriminar se a observação será azul ou laranja. Basta ver que as observações
+de cor laranja estão mais concentradas do lado direito e as azuis, mais para o
+lado esquerdo. O objetivo da árvore de decisão é encontrar o valor de <span class="math inline">\(x\)</span> que
+melhor separa as informações azuis e laranja.</p>
+<p>Para detalhar um pouco mais, imagine que você tem um nó com <span class="math inline">\(N\)</span> observações e que
+<span class="math inline">\(n\)</span> possuem <span class="math inline">\(Resposta = 1\)</span> (Exemplo Cor = ‘Azul’) e <span class="math inline">\(N - n\)</span> possuem <span class="math inline">\(Resposta = 0\)</span>,
+ou seja, temos um problema de classificação binária. Então neste caso <span class="math inline">\(p = \frac{n}{N}\)</span>
+é a proporção de resposta neste nó.</p>
+<p>O objetivo da árvore de decisão dividir este <em>nó</em> (grupo de observações) em 2 de
+forma que a diferença entre a proporção de classes entre os dois nós resultantes
+seja a maior possível. Claro que cada um dos nós precisa ter uma quantidade
+significativa de observações de forma que <span class="math inline">\(p\)</span> seja estimado corretamente.</p>
+<p>No R, o pacote que usamos para fazer este tipo de análise é o <a href="https://CRAN.R-project.org/package=rpart"><code>rpart</code></a>. Uma introdução
+mais formal a esses métodos pode ser encontrada na vignette do pacote <code>rpart</code>.
+Digite <code>vignette('longintro', package = 'rpart')</code> no console para encontrá-la.</p>
+<p>Existem ainda outras alternativas de pacotes como o <a href="https://CRAN.R-project.org/package=tree"><code>tree</code></a>,
+e <a href="https://CRAN.R-project.org/package=party"><code>party</code></a>.</p>
+<div id="exemplo-1" class="section level2">
+<h2>Exemplo</h2>
+<p>Para esse exemplo vamos usar o banco de dados do Titanic. Um banco de dados que
+ficou famoso por causa de uma competição no Kaggle. Esse banco de dados contém
+diversas informações sobre os passageiros do Titanic bem como uma variável que
+indica se o passageiro sobreviveu (1) e se não sobreviveu (0).</p>
+<pre class="r"><code>library(readr)
+titanic &lt;- read_csv(&#39;data/modelagem/titanic-train.csv&#39;)
+## Parsed with column specification:
+## cols(
+##   PassengerId = col_integer(),
+##   Survived = col_integer(),
+##   Pclass = col_integer(),
+##   Name = col_character(),
+##   Sex = col_character(),
+##   Age = col_double(),
+##   SibSp = col_integer(),
+##   Parch = col_integer(),
+##   Ticket = col_character(),
+##   Fare = col_double(),
+##   Cabin = col_character(),
+##   Embarked = col_character()
+## )
+titanic$Survived &lt;- as.factor(titanic$Survived)</code></pre>
+<p>Usaremos o pacote <code>rpart</code> que por sua vez possui uma função chamada <code>rpart</code>.
+A função <code>rpart</code> recebe uma fórmula indicando a variável resposta e as
+variáveis que serão utilizadas no modelo, além de receber um argumento
+<code>data</code> que indica o banco de dados utilizado.</p>
+<pre class="r"><code>library(rpart)
+arvore &lt;- rpart(Survived ~ Sex + Age + Pclass, data = titanic)</code></pre>
+<p>Assim como na regressão linear, podemos ver informações sobre o ajuste
+usando a função <code>summary</code>.</p>
+<pre class="r"><code>summary(arvore)
+## Call:
+## rpart(formula = Survived ~ Sex + Age + Pclass, data = titanic)
+##   n= 891 
+## 
+##           CP nsplit rel error    xerror       xstd
+## 1 0.44444444      0 1.0000000 1.0000000 0.04244576
+## 2 0.02339181      1 0.5555556 0.5555556 0.03574957
+## 3 0.01461988      2 0.5321637 0.5935673 0.03660811
+## 4 0.01169591      4 0.5029240 0.5584795 0.03581795
+## 5 0.01000000      6 0.4795322 0.5350877 0.03525959
+## 
+## Variable importance
+##    Sex Pclass    Age 
+##     70     18     12 
+## 
+## Node number 1: 891 observations,    complexity param=0.4444444
+##   predicted class=0  expected loss=0.3838384  P(node) =1
+##     class counts:   549   342
+##    probabilities: 0.616 0.384 
+##   left son=2 (577 obs) right son=3 (314 obs)
+##   Primary splits:
+##       Sex    splits as  RL,       improve=124.426300, (0 missing)
+##       Pclass &lt; 2.5  to the right, improve= 43.781830, (0 missing)
+##       Age    &lt; 6.5  to the right, improve=  8.814172, (177 missing)
+## 
+## Node number 2: 577 observations,    complexity param=0.02339181
+##   predicted class=0  expected loss=0.1889081  P(node) =0.647587
+##     class counts:   468   109
+##    probabilities: 0.811 0.189 
+##   left son=4 (553 obs) right son=5 (24 obs)
+##   Primary splits:
+##       Age    &lt; 6.5  to the right, improve=10.78893, (124 missing)
+##       Pclass &lt; 1.5  to the right, improve=10.01914, (0 missing)
+## 
+## Node number 3: 314 observations,    complexity param=0.01461988
+##   predicted class=1  expected loss=0.2579618  P(node) =0.352413
+##     class counts:    81   233
+##    probabilities: 0.258 0.742 
+##   left son=6 (144 obs) right son=7 (170 obs)
+##   Primary splits:
+##       Pclass &lt; 2.5  to the right, improve=31.163130, (0 missing)
+##       Age    &lt; 12   to the left,  improve= 1.891684, (53 missing)
+##   Surrogate splits:
+##       Age &lt; 18.5 to the left,  agree=0.564, adj=0.049, (0 split)
+## 
+## Node number 4: 553 observations
+##   predicted class=0  expected loss=0.1681736  P(node) =0.620651
+##     class counts:   460    93
+##    probabilities: 0.832 0.168 
+## 
+## Node number 5: 24 observations
+##   predicted class=1  expected loss=0.3333333  P(node) =0.02693603
+##     class counts:     8    16
+##    probabilities: 0.333 0.667 
+## 
+## Node number 6: 144 observations,    complexity param=0.01461988
+##   predicted class=0  expected loss=0.5  P(node) =0.1616162
+##     class counts:    72    72
+##    probabilities: 0.500 0.500 
+##   left son=12 (12 obs) right son=13 (132 obs)
+##   Primary splits:
+##       Age &lt; 38.5 to the right, improve=3.875163, (42 missing)
+## 
+## Node number 7: 170 observations
+##   predicted class=1  expected loss=0.05294118  P(node) =0.1907969
+##     class counts:     9   161
+##    probabilities: 0.053 0.947 
+## 
+## Node number 12: 12 observations
+##   predicted class=0  expected loss=0.08333333  P(node) =0.01346801
+##     class counts:    11     1
+##    probabilities: 0.917 0.083 
+## 
+## Node number 13: 132 observations,    complexity param=0.01169591
+##   predicted class=1  expected loss=0.4621212  P(node) =0.1481481
+##     class counts:    61    71
+##    probabilities: 0.462 0.538 
+##   left son=26 (117 obs) right son=27 (15 obs)
+##   Primary splits:
+##       Age &lt; 5.5  to the right, improve=1.777778, (42 missing)
+## 
+## Node number 26: 117 observations,    complexity param=0.01169591
+##   predicted class=1  expected loss=0.4871795  P(node) =0.1313131
+##     class counts:    57    60
+##    probabilities: 0.487 0.513 
+##   left son=52 (8 obs) right son=53 (109 obs)
+##   Primary splits:
+##       Age &lt; 12   to the left,  improve=3.900498, (42 missing)
+## 
+## Node number 27: 15 observations
+##   predicted class=1  expected loss=0.2666667  P(node) =0.01683502
+##     class counts:     4    11
+##    probabilities: 0.267 0.733 
+## 
+## Node number 52: 8 observations
+##   predicted class=0  expected loss=0  P(node) =0.008978676
+##     class counts:     8     0
+##    probabilities: 1.000 0.000 
+## 
+## Node number 53: 109 observations
+##   predicted class=1  expected loss=0.4495413  P(node) =0.1223345
+##     class counts:    49    60
+##    probabilities: 0.450 0.550</code></pre>
+<p>Visualizar a árvore de decisão sempre dá bons <em>insights</em>. Um pacote que é interessante
+para visualizar a árvore de decisão construída com o <code>rpart</code> é o <a href="https://CRAN.R-project.org/package=rpart.plot"><code>rpart.plot</code></a>.</p>
+<pre class="r"><code>library(rpart.plot)
+## Warning: package &#39;rpart.plot&#39; was built under R version 3.4.4
+rpart.plot(arvore)</code></pre>
+<p><img src="/material/modelagem_files/figure-html/unnamed-chunk-15-1.png" width="70%" height="70%" /></p>
+<p>A visualização é bem intuitiva. No topo, vemos o primeiro nó em que 38% dos indivíduos
+sobreviveram e que representa o total da base (100%). Em seguida, vemos que a primeira
+variável que discrimina quem sobreviveu ou não é a variável Sexo: Dos homens, que eram 65%
+dos passageiros, apenas 19% sobreviveu enquanto das mulheres, que eram 35%, 74% sobreviveu.
+Dos homens, aqueles que eram menores de 6 anos e meio, sobreviveram em maior proporção
+também. A interpretação pode continuar dessa forma recursivamente.</p>
+<p>Mais uma vez, assim como na regressão linear, podemos utilizar a função <code>predict</code> para
+obter a probabilidade predita de sobrevivência e a classificação predita para cada
+observação. A diferença é que agora temos o parâmetros <code>type</code>, que vai indicar se queremos
+a probabilidade ou a classe predita.</p>
+<pre class="r"><code>probabilidades &lt;- predict(arvore, newdata = titanic, type = &#39;prob&#39;)</code></pre>
+<p>Com <code>type = 'prob'</code> obtemos uma <code>matrix</code> em que cada coluna representa a probabilidade
+predita para cada classe. Quando temos apenas um classe isso pode parecer desnecessário
+já que o valor de uma coluna é a diferença de 1 pelo valor da outra, mas árvores podem
+ser utilizadas em modelos com mais de classificação para mais de duas categorias.</p>
+<pre class="r"><code>classes &lt;- predict(arvore, newdata = titanic, type = &#39;class&#39;)</code></pre>
+<p>Quando você prevê a classe diretamente, o <code>rpart</code> indica como predito quando a
+probabilidade de sobrevivência é maior do que 50%. Isso nem sempre é o que garante
+o maior ganho com o modelo. Principalmente em problemas em que as classes são muito
+desbalanceadas. Além disso, em outros problemas, os custos de classificar uma observação
+como positiva quando ela é negativa, podem ser diferentes de classificá-la como negativa
+quando ela é positiva.</p>
+<p>Para escolher o melhor ponto de corte da probabilidade, podemos usar a curva ROC, e
+uma função de custo. Existem diversos pacotes que ajudam a calcular essas medidas. Vamos fazer aqui sem usá-los para praticar.</p>
+<pre class="r"><code>library(tidyverse)
+## ── Attaching packages ───────────────────────────────────────────────────────────────────── tidyverse 1.2.1.9000 ──
+## ✔ tibble  1.4.2     ✔ stringr 1.3.1
+## ✔ tidyr   0.8.1     ✔ forcats 0.3.0
+## ✔ purrr   0.2.5
+## Warning: package &#39;tidyr&#39; was built under R version 3.4.4
+## Warning: package &#39;purrr&#39; was built under R version 3.4.4
+## Warning: package &#39;stringr&#39; was built under R version 3.4.4
+## ── Conflicts ───────────────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
+## ✖ dplyr::filter() masks stats::filter()
+## ✖ dplyr::lag()    masks stats::lag()
+cortes &lt;- seq(0,1,by = 0.01)
+valores &lt;- map_df(cortes, function(x){
+  tabela &lt;- table(
+    titanic$Survived, 
+    factor(probabilidades[,2] &gt; x, levels = c(&quot;FALSE&quot;, &quot;TRUE&quot;))
+    )
+  data_frame(
+    corte = x,
+    FPR = tabela[1,2]/sum(tabela[1,]),
+    TPR = tabela[2,2]/sum(tabela[2,]),
+    TNR = tabela[1,1]/sum(tabela[1,]),
+    FNR = tabela[2,1]/sum(tabela[2,])
+  )
+})
+
+
+ggplot(valores, aes(x = FPR, y = TPR)) + 
+  geom_step() + 
+  geom_abline(color = &#39;blue&#39;, linetype = &#39;dashed&#39;)</code></pre>
+<p><img src="/material/modelagem_files/figure-html/unnamed-chunk-18-1.png" width="75%" /></p>
+<p>A função de custo pode ser calculada da seguinte forma. Veja que estamos considerando
+pesos iguais para ambos os erros.</p>
+<pre class="r"><code>valores %&gt;%
+  mutate(custo = FPR + FNR) %&gt;%
+  ggplot(aes(x = corte, y = custo)) +
+  geom_line()</code></pre>
+<p><img src="/material/modelagem_files/figure-html/unnamed-chunk-19-1.png" width="75%" /></p>
+<p>Neste caso, o ponto mínimo da função é obtido com qualquer corte entre um pouco menos de 25%
+até um pouco mais de 50%. Isso nem sempre é verdade e deve ser avaliado em cada modelo.</p>
 </div>
+</div>
+<div id="overfitting" class="section level1">
+<h1>Overfitting</h1>
+<p><em>Overfitting</em> ou <em>superajuste</em> acontece quando a função <span class="math inline">\(f\)</span> estimada por algum
+modelo da forma <span class="math inline">\(y = f(x) + \epsilon\)</span> é muito específica sendo assim, quando avaliamos
+o modelo em um outro conjunto de observações percebemos que o erro aumenta muito.</p>
+<p>Isso acontece quando o modelo aprende muitos detalhes e ruidos da base de treino e
+ao aplicar o modelo em novos dados, como esses detalhes/ruídos não se repetem, a
+performance do modelo é impactada de forma negativa.</p>
+<p>Para visualizar o que é overfitting, considere o seguinte banco de dados.</p>
+<pre class="r"><code>library(ggplot2)
+library(dplyr)
+set.seed(7)
+dados &lt;- data_frame(
+  x = runif(10),
+  y = 2*x + rnorm(10, 0, 0.1)
+)
+ggplot(dados, aes(x = x, y = y)) + geom_point()</code></pre>
+<p><img src="/material/modelagem_files/figure-html/unnamed-chunk-20-1.png" width="75%" /></p>
+<p>Esse banco de dados foi gerado usando exatamente as suposições de um modelo de regressão.
+Temos uma variável <span class="math inline">\(x\)</span> e uma variável <span class="math inline">\(y\)</span> que é calculada com <span class="math inline">\(2*x + \epsilon\)</span> em que
+<span class="math inline">\(\epsilon\)</span> é uma variável aleatória com distribuição Normal de média zero e desvio padrão <span class="math inline">\(0.1\)</span>.</p>
+<p>Portanto, o melhor modelo para explicar esses dados, seria um modelo linear bem simples,
+que poderia ser ajsutado no R usando:</p>
+<pre class="r"><code>modelo &lt;- lm(y ~ x, data = dados)
+summary(modelo)
+## 
+## Call:
+## lm(formula = y ~ x, data = dados)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.18459 -0.08062 -0.03914  0.11382  0.17434 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  0.10125    0.07015   1.443    0.187    
+## x            1.98848    0.12519  15.884 2.47e-07 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.1298 on 8 degrees of freedom
+## Multiple R-squared:  0.9693, Adjusted R-squared:  0.9654 
+## F-statistic: 252.3 on 1 and 8 DF,  p-value: 2.471e-07</code></pre>
+<p>Note que mesmo com 10 observações o modelo acertou precisamente os parâmetros que
+utilizamos para simular os dados. Mas existe uma aleatoriedade inerente ao método
+que utilizamos para construir o banco de dados.</p>
+<p>Imagine se, ao invés de ajustar esse modelo, tivessemos ajustado o modelo:</p>
+<p><span class="math display">\[y = \alpha + \beta_1x + \beta_2x^2 + ... + \beta_9x^9 + \epsilon\]</span>
+No R:</p>
+<pre class="r"><code>modelo2 &lt;- lm(y ~ poly(x, 9), data = dados)
+summary(modelo2)
+## 
+## Call:
+## lm(formula = y ~ poly(x, 9), data = dados)
+## 
+## Residuals:
+## ALL 10 residuals are 0: no residual degrees of freedom!
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)
+## (Intercept)  1.00501         NA      NA       NA
+## poly(x, 9)1  2.06100         NA      NA       NA
+## poly(x, 9)2 -0.18881         NA      NA       NA
+## poly(x, 9)3  0.10846         NA      NA       NA
+## poly(x, 9)4 -0.02527         NA      NA       NA
+## poly(x, 9)5 -0.20073         NA      NA       NA
+## poly(x, 9)6 -0.11473         NA      NA       NA
+## poly(x, 9)7 -0.12387         NA      NA       NA
+## poly(x, 9)8 -0.11701         NA      NA       NA
+## poly(x, 9)9 -0.06445         NA      NA       NA
+## 
+## Residual standard error: NaN on 0 degrees of freedom
+## Multiple R-squared:      1,  Adjusted R-squared:    NaN 
+## F-statistic:   NaN on 9 and 0 DF,  p-value: NA</code></pre>
+<p>Veja agora o gráfico dos modelos ajsutados:</p>
+<pre class="r"><code>ggplot(dados, aes(x = x, y = y)) + geom_point() + 
+  geom_smooth(formula = y ~ x, colour = &quot;red&quot;, se = FALSE, method = &#39;lm&#39;) +
+  geom_smooth(formula = y ~ poly(x, 9), se = FALSE, method = &#39;lm&#39;)</code></pre>
+<p><img src="/material/modelagem_files/figure-html/unnamed-chunk-23-1.png" width="75%" /></p>
+<p>O linha em vermelho, é a reta ajustada pelo primeiro modelo, ou seja, o modelo que
+utilizamos para gerar os dados. A linha azul, é a curva ajustada pelo polinômio do
+nono grau. O modelo azul acerta todos os pontos enquanto o vermelho (que é o modelo
+correto não). Se calcularmos o erro médio quadrático de cada um dos modelos, chegaríamos
+a conclusão de que o modelo azul é melhor.</p>
+<pre class="r"><code>erro_modelo1 &lt;- mean((dados$y - predict(modelo, newdata = dados))^2)
+erro_modelo2 &lt;- mean((dados$y - predict(modelo2, newdata = dados))^2)
+erro_modelo1 %&gt;% round(3)
+## [1] 0.013
+erro_modelo2 %&gt;% round(3)
+## [1] 0</code></pre>
+<p>Mas e gerarmos mais dados de acordo com o nosso modelo inicial? Qual modelo terá melhor
+performance?</p>
+<pre class="r"><code>dados2 &lt;- data_frame(
+  x = runif(100),
+  y = 2*x + rnorm(100, 0, 0.1)
+)
+ggplot(dados2, aes(x = x, y = y)) + geom_point() +
+  geom_smooth(data = dados, formula = y ~ x, colour = &quot;red&quot;, se = FALSE, method = &#39;lm&#39;) +
+  geom_smooth(data = dados, formula = y ~ poly(x, 9), se = FALSE, method = &#39;lm&#39;)</code></pre>
+<p><img src="/material/modelagem_files/figure-html/unnamed-chunk-25-1.png" width="75%" /></p>
+<pre class="r"><code>erro_modelo1 &lt;- mean((dados2$y - predict(modelo, newdata = dados2))^2)
+erro_modelo2 &lt;- mean((dados2$y - predict(modelo2, newdata = dados2))^2)
+erro_modelo1 %&gt;% round(3)
+## [1] 0.015
+erro_modelo2 %&gt;% round(3)
+## [1] 6.772</code></pre>
+<p>O modelo que acertava todas as observações na base que usamos para treinar, passou
+a errar mais quando testado em novos dados.</p>
+<p>Isso é o que chamamos de <em>overfitting</em>. O modelo azul ajustou ruidos aleatórios que
+eram inerentes à forma com que os dados foram gerados e dessa forma, não foi capaz
+de prever bem em dados que tinham ruidos aleatorios diferentes.</p>
+<p>Claro, esse exemplo é ilustrativo. Desde o começo sabíamos a forma com que os dados
+eram gerados. Isso raramente acontece. Na prática, estamos tentando criar um modelo
+para explicar como os dados são gerados, por isso temos que tomar bastante cuidado
+para não assumir relações desta forma e criar modelos que explicam apenas aquela amostra.</p>
 </div>
