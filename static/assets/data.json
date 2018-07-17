@@ -15,14 +15,9 @@
     "filename": "material/pipe"
   },
   {
-    "name": "readr",
+    "name": "Importacao",
     "raster": "/hex/readr.png",
-    "filename": "material/readr"
-  },
-   {
-    "name": "Haven",
-    "raster": "/hex/haven.png",
-    "filename": "material/haven"
+    "filename": "material/importacao"
   },
   {
     "name": "dplyr",
