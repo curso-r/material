@@ -1,0 +1,299 @@
+---
+title: "API"
+author: "Curso-R"
+date: 2018-07-18
+categories: ["R"]
+tags: ["API"]
+---
+
+
+<div id="TOC">
+<ul>
+<li><a href="#introducao">Introdução</a></li>
+<li><a href="#o-que-e-uma-api">O que é uma API?</a></li>
+<li><a href="#plumber">Plumber</a></li>
+<li><a href="#opencpu">OpenCPU</a></li>
+<li><a href="#plumber-em-producao">Plumber em produção</a></li>
+<li><a href="#fazendo-mais-com-o-plumber">Fazendo mais com o plumber</a></li>
+</ul>
+</div>
+
+<div id="introducao" class="section level1">
+<h1>Introdução</h1>
+<p>O fluxo da ciência de dados se encerra na parte de comunicação. Essa parte é responsável por transferir todo o conhecimento gerado durante a análise de dados. E isso não é nada fácil!!</p>
+<p><img src="/material/api/figures/data-science-communicate.png"></p>
+<p>A forma de construir a comunicação depende muito do interlocutor. Por exemplo, se a pessoa que vai receber a comunicação é um técnico como você, é importante elaborar um documento que deixe claro o que você fez e como você chegou nos resultados. Por outro lado, se a pessoa que vai receber seus trabalhos for um tomador de decisão, o desafio é passar os resultados de uma forma intuitiva e impactante.</p>
+<p>Mas, e se o interlocutor for um robô? Qual a melhor forma de se comunicar com uma máquina?</p>
+<p>Nesse material trabalhamos o conceito e aplicação de <em>Application Programming Interfaces</em>, ou APIs. Essa é a forma que as máquinas se comunicam nos dias de hoje.</p>
+<div id="pre-requisitos" class="section level2">
+<h2>Pré-requisitos</h2>
+<p>Esse material assume que você sabe usar <code>dplyr</code> e o <code>%&gt;%</code>, que sabe o que é o <code>RStudio</code> e <code>rmarkdown</code>. Se você não sabe usar essas coisas, veja os materiais em <a href="http://material.curso-r.com/pipe" class="uri">http://material.curso-r.com/pipe</a> e <a href="http://material.curso-r.com/manip" class="uri">http://material.curso-r.com/manip</a>.</p>
+<p>Também seria interessante ter uma noção de pacotes em R e a utilização do <code>curl</code> (via terminal).</p>
+</div>
+</div>
+<div id="o-que-e-uma-api" class="section level1">
+<h1>O que é uma API?</h1>
+<p>Para explicar APIs, podemos utilizar a analogia do Matrix. Tem aquela cena:</p>
+<p><img src="/material/api/figures/kungfu.gif"></p>
+<p>O que o Neo fez aqui? Ele conectou com uma máquina, setou no computador o que ele queria aprender, e puxou um curso de Kung Fu.</p>
+<p>Agora, imagine que ao invés de um curso de Kung Fu, você queira saber o resultado de um modelo preditivo. Você faz o upload de uma base de dados, e recebe um score, por exemplo, um score de crédito. Ou então você recebe um dado de um servidor de banco de dados. Ou, ainda, você quebra um CAPTCHA. Melhor do que aprender Kung Fu 😄😄😄.</p>
+<p>Hoje em dia, a maioria das grandes empresas disponibilizam APIs para análise de dados. Twitter, Facebook, Spotify, Uber e Instagram são apenas algumas delas. Num mundo dinâmico como conhecemos hoje, não faz sentido construir do zero um lugar centralizador capaz de fornecer todos os serviços; os serviços precisam ser conectados, e a conexão é feita através de APIs.</p>
+<p>Uma vantagem de usar APIs é que ela não depende de linguagens. Na verdade, só depende de uma linguagem: as requisições web. Em particularmente, é importante saber usar as requisições <code>GET</code> e <code>POST</code>.</p>
+<p>Colocando numa casca de noz, usamos <code>GET</code> quando pedimos dados para da máquina e <code>POST</code> quando enviamos dados para a máquina. Na prática, é possível enviar dados para a máquina usando <code>GET</code>, e recebemos algo de volta quando usamos <code>POST</code>. A diferença é que o <code>POST</code> é mais especializado, permitindo que você passe os dados para o servidor de diversas maneiras diferentes. Além disso, o <code>POST</code> permite a transferência de dados de forma <em>segura</em>.</p>
+<p>Nossa tarefa será montar códigos que abrem um link para uma pessoa poder chamar usando requisições <code>GET</code> ou <code>POST</code>.</p>
+<p>No R, existem duas soluções principais para trabalhar com APIs: <code>opencpu</code> e <code>plumber</code>. A diferença entre os dois é que o <code>opencpu</code> é um framework mais geral e apresenta diversas formas de resolver problemas de segurança e escalabilidade. Enquanto isso, o <code>plumber</code> foi montado para ser simples.</p>
+<p>Nesse tutorial, vamos primeiro trabalhar com o <code>plumber</code>, depois com o <code>opencpu</code>. No final, voltaremos ao <code>plumber</code> para uma aplicação mais prática.</p>
+<p>Para contextualizar nossa aplicação, utilizaremos um preditor de notas dos filmes do IMDb. Para isso, utilizaremos a base de dados <code>movies</code> do pacote <code>ggplot2movies</code>. Essa base contém informações das notas e outras características de 58.788 filmes. Para mais detalhes sobre a base, rode <code>?movies</code>.</p>
+<p>Se não tiver esse pacote, rode <code>install.packages(&quot;ggplot2movies&quot;)</code>.</p>
+<pre class="r"><code>library(tidyverse)
+## ── Attaching packages ───────────────────────────────────────────────────────────────────── tidyverse 1.2.1.9000 ──
+## ✔ ggplot2 2.2.1.9000     ✔ purrr   0.2.5     
+## ✔ tibble  1.4.2          ✔ dplyr   0.7.5     
+## ✔ tidyr   0.8.1          ✔ stringr 1.3.1     
+## ✔ readr   1.1.1          ✔ forcats 0.3.0
+## Warning: package &#39;tidyr&#39; was built under R version 3.4.4
+## Warning: package &#39;purrr&#39; was built under R version 3.4.4
+## Warning: package &#39;dplyr&#39; was built under R version 3.4.4
+## Warning: package &#39;stringr&#39; was built under R version 3.4.4
+## ── Conflicts ───────────────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
+## ✖ dplyr::filter() masks stats::filter()
+## ✖ dplyr::lag()    masks stats::lag()
+dados &lt;- ggplot2movies::movies %&gt;% 
+  filter(!is.na(budget), budget &gt; 0) %&gt;% 
+  select(title, year, budget, rating) %&gt;% 
+  arrange(desc(year))
+## Warning: package &#39;bindrcpp&#39; was built under R version 3.4.4
+
+dados
+## # A tibble: 5,183 x 4
+##    title                         year   budget rating
+##    &lt;chr&gt;                        &lt;int&gt;    &lt;int&gt;  &lt;dbl&gt;
+##  1 90                            2005     4000    9.1
+##  2 Alien Abduction               2005   600000    1.9
+##  3 All the Stage Is a World      2005    12000    7  
+##  4 Alone in the Dark             2005 20000000    2.1
+##  5 Amityville Horror, The        2005 18000000    5.8
+##  6 And I Lived                   2005    20000    9.4
+##  7 Are We There Yet?             2005 32000000    3.5
+##  8 Ash Wednesday                 2005     4999    8.6
+##  9 Assault on Precinct 13        2005 20000000    6.3
+## 10 Ballad of Jack and Rose, The  2005  1500000    6.2
+## # ... with 5,173 more rows</code></pre>
+<p>Nosso modelo tentará prever <code>rating</code> utilizando as seguintes variáveis:</p>
+<ul>
+<li><code>budget</code>: orçamento do filme em dólares</li>
+<li><code>year</code>: ano do filme (considerado como número inteiro)</li>
+</ul>
+<p>O modelo é dado por</p>
+<pre class="r"><code>modelo &lt;- lm(rating ~ budget + year, data = dados)
+summary(modelo)
+## 
+## Call:
+## lm(formula = rating ~ budget + year, data = dados)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -5.2325 -0.9537  0.1408  1.0482  3.9507 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  1.501e+01  2.040e+00   7.355 2.20e-13 ***
+## budget       3.645e-10  9.570e-10   0.381    0.703    
+## year        -4.469e-03  1.029e-03  -4.342 1.44e-05 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1.541 on 5180 degrees of freedom
+## Multiple R-squared:  0.003793,   Adjusted R-squared:  0.003408 
+## F-statistic: 9.861 on 2 and 5180 DF,  p-value: 5.318e-05</code></pre>
+<p>R^2 de 0.003, nada mal (risos). Agora, vamos montar uma função que prevê a nota de um filme com base no seu orçamento e ano.</p>
+<pre class="r"><code>funcao_que_preve &lt;- function(orcamento, ano) {
+  predict(modelo, newdata = data.frame(budget = orcamento, year = ano))
+}</code></pre>
+<p>Também faremos uma função que retorna uma amostra aleatória de dez casos da base de dados</p>
+<pre class="r"><code>solta_10 &lt;- function() {
+  dados %&gt;% 
+    sample_n(10)
+}</code></pre>
+</div>
+<div id="plumber" class="section level1">
+<h1>Plumber</h1>
+<p>Para criar uma API com o <code>plumber</code>, você precisa de três coisas:</p>
+<ul>
+<li>Uma função que executa uma ação</li>
+<li>Uma documentação da função</li>
+<li>Selecionar uma porta para disponibilizar sua api</li>
+</ul>
+<p>Por exemplo, para a função <code>solta_10()</code>, bastaria criar um script <code>R/meuscript.R</code> com o conteúdo abaixo</p>
+<pre class="r"><code>#* @get /solta
+solta_10 &lt;- function() {
+  dados %&gt;% 
+    sample_n(10)
+}</code></pre>
+<p>Após criar esse <code>R/meuscript.R</code>, basta rodar</p>
+<pre class="r"><code>p &lt;- plumber::plumb(&#39;R/meuscript.R&#39;)
+p$run(port = 8888)</code></pre>
+<pre><code>Starting server to listen on port 8888</code></pre>
+<p>No momento que você rodou <code>p$run()</code>, a sua sessão do R ficou ocupada. O que esse código está fazendo é <em>servir</em> a sua função! Ela será acessível pelo seu próprio computador, através de <a href="http://localhost:8888" class="uri">http://localhost:8888</a>. Para testar, abra uma aba de terminal no RStudio e rode</p>
+<pre><code>curl &quot;http://localhost:8888/solta&quot;</code></pre>
+<p>No lugar do <code>curl</code> (terminal), você poderia abrir uma outra sessão do R e rodar:</p>
+<pre class="r"><code>httr::GET(&quot;http://localhost:8888/solta&quot;)</code></pre>
+<p>Note que chamamos a função pelo nome que está escrito em <code>#* @get ...</code>.</p>
+<p>Você também pode testar a solução copiando o IP do seu servidor e substituir no lugar do <code>localhost</code>. Pronto! você fez uma API.</p>
+<p>Agora, vamos fazer uma API que aceita uma requisição <code>POST</code>. Basta usar a mesma abordagem:</p>
+<pre class="r"><code>#* @post /prever
+funcao_que_preve &lt;- function(orcamento, ano) {
+  d &lt;- data.frame(budget = as.numeric(orcamento), year = as.numeric(ano))
+  predict(modelo, newdata = d)
+}</code></pre>
+<p>Novamente, basta adicionar o código no script <code>R/meuscript.R</code> e rodar com <code>plumb</code>.</p>
+<pre class="r"><code>p &lt;- plumber::plumb(&#39;R/meuscript.R&#39;)
+p$run(port = 8888)</code></pre>
+<p>Agora, você pode prever a nota do IMDb rodando:</p>
+<pre><code>curl --data &quot;orcamento=10000&amp;ano=1991&quot; &quot;http://localhost:8888/prever&quot;</code></pre>
+<div id="exercicios" class="section level2">
+<h2>Exercícios</h2>
+<p>Entre na documentação do plumber em <a href="https://www.rplumber.io/" class="uri">https://www.rplumber.io/</a> e leia.</p>
+<ol style="list-style-type: decimal">
+<li>Lembre que também é possível chamar uma função com parâmetros usando <code>GET</code>! Descubra como.</li>
+<li>Crie com o <code>plumber</code> uma função <code>plotar</code> que retorna um gráfico de dispersão de <code>budget</code> (eixo x) e <code>rating</code> (eixo y). Salve a imagem rodando</li>
+</ol>
+<pre><code>curl &quot;http://localhost:8888/plotar&quot; &gt; meu_plot.png</code></pre>
+</div>
+</div>
+<div id="opencpu" class="section level1">
+<h1>OpenCPU</h1>
+<p>O pacote <code>opencpu</code> usa uma lógica um pouco diferente do <code>plumber</code>. Para o <code>opencpu</code>,</p>
+<ul>
+<li>todas as funções estão dentro de um <strong>pacote</strong> em R</li>
+<li>chamamos as funções como se o pacote fosse um site.</li>
+<li>usamos <code>GET</code> para obter informações sobre o pacote e suas funções</li>
+<li>usamos <code>POST</code> para de fato rodar as funções</li>
+</ul>
+<p>Para utilizar o <code>opencpu</code>, primeiro teremos de criar um pacote em R. Se tiver interesse em como criar novos pacotes muito rápido, <a href="http://curso-r.com/blog/2017/09/07/2017-09-07-pacote-miojo/">leia esse artigo</a>, Aqui, utilizaremos o código</p>
+<pre class="r"><code>devtools::create(&#39;preditorIMDb&#39;)</code></pre>
+<p>Dentro da pasta <code>R</code> do pacote <code>preditorIMDb</code>, criaremos um arquivo <code>funs.R</code> com as funções definidas anteriormente em <code>R/meuscript.R</code>, mas com uma documentação de pacote no lugar da documentação do <code>plumber</code>:</p>
+<pre class="r"><code>#&#39; Solta dez observações
+#&#39;
+#&#39; A partir de uma base de dados, solta 10 observações aleatórias
+#&#39;
+#&#39; @export
+solta_10 &lt;- function() {
+  dplyr::sample_n(dados, 10)
+}
+
+#&#39; Prevê o score do filme
+#&#39;
+#&#39; Com base no orçamento e no ano, solta o rating médio de um filme
+#&#39; 
+#&#39; @param orcamento Orçamento do filme
+#&#39; @param ano Ano do filme
+#&#39;
+#&#39; @export
+funcao_que_preve &lt;- function(orcamento, ano) {
+  predict(modelo, newdata = data.frame(budget = orcamento, year = ano))
+}</code></pre>
+<p>Agora precisamos carregar a documentação e instalar o pacote:</p>
+<pre class="r"><code># adiciona dependencias de pacotes externos
+devtools::use_package(&#39;tidyverse&#39;, pkg = &#39;preditorIMDb&#39;)
+devtools::use_package(&#39;ggplot2movies&#39;, pkg = &#39;preditorIMDb&#39;)
+# dados
+devtools::use_data(modelo, pkg = &#39;preditorIMDb&#39;)
+devtools::use_data(dados, pkg = &#39;preditorIMDb&#39;)
+# documenta o pacote
+devtools::document(&#39;preditorIMDb&#39;)
+# instala o pacote na máquina
+devtools::install(&#39;preditorIMDb&#39;)</code></pre>
+<p>Agora podemos rodar nossa API com base no pacote, fazendo</p>
+<pre class="r"><code>opencpu::ocpu_start_app(&#39;preditorIMDb&#39;)</code></pre>
+<p>Para ver o código da função, basta rodar</p>
+<pre><code>curl http://localhost:5656/ocpu/library/preditorIMDb/R/solta_10/print</code></pre>
+<p>Para de fato rodar o a função, se sua função não tiver parâmetros, rode</p>
+<pre><code>curl http://localhost:5656/ocpu/library/preditorIMDb/R/solta_10/json -X POST</code></pre>
+<p><strong>Exercícios</strong>:</p>
+<p>Entre na documentação do OpenCPU em <a href="https://www.opencpu.org/api.html" class="uri">https://www.opencpu.org/api.html</a></p>
+<ol style="list-style-type: decimal">
+<li>O que acontece quando você roda</li>
+</ol>
+<pre><code>curl http://localhost:5656/ocpu/library/preditorIMDb/R/solta_10 -X POST</code></pre>
+<p>? Explique cada uma dessas saídas</p>
+<pre><code>/ocpu/tmp/x0ed707c4a1/R/solta_10
+/ocpu/tmp/x0ed707c4a1/R/.val
+/ocpu/tmp/x0ed707c4a1/source
+/ocpu/tmp/x0ed707c4a1/console
+/ocpu/tmp/x0ed707c4a1/info
+/ocpu/tmp/x0ed707c4a1/files/DESCRIPTION</code></pre>
+<ol start="2" style="list-style-type: decimal">
+<li>Descubra como rodar uma requisição POST com parâmetros e rode <code>funcao_que_preve(10000, 2004)</code>.</li>
+</ol>
+<div id="opencpu-gratuito" class="section level2">
+<h2>OpenCPU gratuito!</h2>
+<p>O <code>opencpu</code> é mais do que um pacote em R! Se você olhar no site do produto, verá que um esforço enorme foi envidado por seu autor, <a href="https://github.com/jeroen">Jeroen Ooms</a> para desenvolver não só o pacote como também um software para servir vários aplicativos feitos em R. Com o <strong>software</strong> <code>opencpu</code>, basta você criar vários pacotes com soluções para que elas sejam imediatamente utilizáveis na forma de APIs.</p>
+<p>Já pensou se existisse algum ser generoso que criasse um servidor com todos os pacotes do CRAN e disponibilizasse esse recurso online e de graça para todos? Muito bem, essa pessoa existe, e trata-se do próprio Jeroen!</p>
+<p>Assim, basta acessar <a href="http://cran.ocpu.io" class="uri">http://cran.ocpu.io</a> para ter todos os pacotes do R em suas mãos. Por exemplo, podemos rodar</p>
+<pre class="r"><code>r &lt;- httr::POST(&quot;http://cran.ocpu.io/praise/R/praise/json&quot;)
+httr::content(r)
+## [[1]]
+## [1] &quot;You are wondrous!&quot;</code></pre>
+<p>(o pacote <code>praise</code> é um gerador de elogios aleatório)</p>
+<p>E tem mais! Com o serviço do <code>ocpu.io</code> você pode vincular sua conta ao GitHub e deixar todos os seus pacotes funcionarem como APIs automaticamente. Veja em <a href="https://www.opencpu.org/cloud.html" class="uri">https://www.opencpu.org/cloud.html</a> como fazer isso.</p>
+<p>Por exemplo, o post da Curso-R chamado <a href="http://curso-r.com/blog/2017/08/28/2017-08-27-safadao/">Aquele 1% é deep learning</a> foi montado usando OpenCPU como gerador dos textos do Wesley Safadão.</p>
+<pre class="r"><code>r &lt;- httr::POST(&quot;http://jtrecenti.ocpu.io/safadao/R/gen/json&quot;)
+cat(httr::content(r)[[1]])
+## como um olhar aflito
+## como ver o sol sem |você morreato
+## esse cheiri
+## 
+## tem sua vidinha e pra bobar tirar roubambora lá ensender</code></pre>
+</div>
+</div>
+<div id="plumber-em-producao" class="section level1">
+<h1>Plumber em produção</h1>
+<p>Agora vamos mostrar um exemplo que utilizamos em produção para quebrar captchas. Vamos estudar o repositório <code>api</code> da página do github <a href="https://github.com/decryptr" class="uri">https://github.com/decryptr</a>. Trata-se de um código que carrega os modelos dos quebradores de CAPTCHA e cria funções do tipo <code>predict_*</code> que recebem uma imagem de CAPTCHA e retornam um texto contendo o resultado da classificação.</p>
+<p>Por exemplo, o código abaixo, salvo em <code>R/captcha.R</code> serve para carregar o modelo para quebrar o CAPTCHA da receita federal.</p>
+<pre class="r"><code>library(magrittr)
+library(decryptr)
+
+reticulate::py_available(TRUE)
+suppressMessages(suppressWarnings({
+  rfb_model &lt;- decryptrModels::read_model(&#39;rfb&#39;)
+  trt_model &lt;- decryptrModels::read_model(&#39;trt&#39;)
+  tjmg_model &lt;- decryptrModels::read_model(&#39;tjmg&#39;)
+  esaj_model &lt;- decryptrModels::read_model(&#39;esaj&#39;)
+}))
+
+#* @post /predict_tjmg
+predict_tjmg &lt;- function(img) {
+  img_decoded &lt;- base64enc::base64decode(img)
+  predict(tjmg_model, newdata = decryptr::prepare(img_decoded))
+}</code></pre>
+<p>Como vimos anteriormente, basta rodar</p>
+<pre class="r"><code>p &lt;- plumber::plumb(&#39;R/captcha.R&#39;)
+p$run(port = 8888)</code></pre>
+<pre class="r"><code>library(decryptr)
+arq &lt;- captcha_download_tjmg()</code></pre>
+<pre class="r"><code>library(decryptr)
+arq &lt;- &quot;figures/captcha5fdb51a0b41b.jpg&quot;
+arq %&gt;% 
+  read_captcha() %&gt;%
+  `[[`(1) %&gt;%
+  plot()</code></pre>
+<p><img src="/material/api/tutorial_files/figure-html/unnamed-chunk-19-1.png" width="30%" /></p>
+<pre class="bash"><code>(echo -n &#39;{&quot;img&quot;: &quot;&#39;; base64 &quot;captcha5fdb51a0b41b.jpeg&quot;; echo &#39;&quot;}&#39;) |
+(curl -s -H &quot;Content-Type: application/json&quot; -d @- http://localhost:8888/predict_tjmg) |
+sed &#39;s/[^[:alnum:]]//g&#39;</code></pre>
+<pre><code>73563</code></pre>
+<p>Ou, em outra sessão do R</p>
+<pre class="r"><code>path &lt;- &#39;captcha5fdb51a0b41b.jpeg&#39;
+base64 &lt;- base64enc::base64encode(readr::read_file_raw(path))
+r &lt;- httr::POST(&#39;http://localhost:8888/predict_tjmg&#39;, 
+                body = list(img = base64), 
+                encode = &#39;json&#39;)
+httr::content(r, &#39;text&#39;)</code></pre>
+</div>
+<div id="fazendo-mais-com-o-plumber" class="section level1">
+<h1>Fazendo mais com o plumber</h1>
+<p>O <code>plumber</code> também pode ser utilizado numa solução Docker. O Docker é um serviço de containers, e um container é uma espécie de máquina virtual que roda somente a sua aplicação.</p>
+<p>A vantagem de usar Docker é que você seria capaz de instalar sua API em qualquer servidor, sem precisar configurar muitas coisas na máquina.</p>
+<p>Para ver como usar plumber com Docker, siga a documentação deste link: <a href="https://www.rplumber.io/docs/hosting.html#docker" class="uri">https://www.rplumber.io/docs/hosting.html#docker</a>.</p>
+</div>
