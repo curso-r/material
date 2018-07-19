@@ -6,14 +6,18 @@
   <body>
     {{ partial "header.html" . }}
     
-    <div class="article-title">
-      <img src="/hex/{{.Page.Params.slug}}.png">
-    </div>
-    
     <div class="article">
         
-        <div class="article-summary">
-          {{ .Page.Params.desc }} <a href="/material/{{.Page.Params.slug}}/tutorial">Leia mais...</a>
+        <div class="row">
+          <div style="float: left; padding-left: 45px; padding-top: 15px; width: 20%;">
+            <img src="/hex/{{.Page.Params.slug}}.png" style="width: 100%;">
+          </div>
+          <div class="article-summary" style="float: left; width: 80%">
+            {{ .Page.Params.desc }}
+            <br>
+            <a href="/material/{{.Page.Params.slug}}/tutorial">Leia mais...</a>
+          </div>  
+          
         </div>
         
         
