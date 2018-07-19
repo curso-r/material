@@ -22,11 +22,13 @@
           <h1>Requisitos</h1>
           <p>Este conteúdo exige alguns conhecimentos prévios que estão listados abaixo:</p>
           
-            <span>
+          <div class="row"> 
             {{ range .Page.Params.requisitos }}
-              <a href="/material/{{.}}"><img src="/hex/{{.}}.png"></a>
+              <div class="column">
+                <a href="/material/{{.}}"><img src="/hex/{{.}}.png"></a>
+              </div>
             {{ end }}  
-            </span>
+          </div>
             
           
           <h1>Continue aprendendo</h1>
