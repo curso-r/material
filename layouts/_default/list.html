@@ -1,0 +1,49 @@
+<!doctype html5>
+<html>
+<head>
+  {{ partial "head.html" . }}
+</head>
+  <body>
+    {{ partial "header.html" . }}
+    
+    <div class="article-title">
+      <img src="/hex/{{.Page.Params.slug}}.png">
+    </div>
+    
+    <div class="article">
+        
+        <div class="article-summary">
+          {{ .Page.Params.desc }} <a href="/material/{{.Page.Params.slug}}/tutorial">Leia mais...</a>
+        </div>
+        
+        
+        <div class="article-refs">
+          
+          <h1>Requisitos</h1>
+          <p>Este conteúdo exige alguns conhecimentos prévios que estão listados abaixo:</p>
+          
+            <span>
+            {{ range .Page.Params.requisitos }}
+              <a href="/material/{{.}}"><img src="/hex/{{.}}.png"></a>
+            {{ end }}  
+            </span>
+            
+          
+          <h1>Continue aprendendo</h1>
+          <p>Além do <a href="/material/{{.Page.Params.slug}}/tutorial">artigo principal</a> disponibilizamos links e outros materiais que podem ajudar a se aprofundar no tema. Confira a lista abaixo:</p>
+        
+        {{ .Content }}
+          
+        </div>
+        
+    </div>
+    
+    <br>
+    
+  </body>
+  
+  <footer>{{ partial "footer.html" . }}</footer>
+  
+  {{ partial "scripts.html" .}}
+  
+</html>

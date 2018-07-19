@@ -104,6 +104,35 @@
   background: #f8f8f8;
 }
 
+.article-summary {
+  color: black;
+  padding-left: 30px;
+  padding-right: 30px;
+  margin: 10px 0 10px;
+}
+
+.article-summary a {
+  color: #da4d4d;
+}
+
+.article-refs a {
+  color: #da4d4d;
+}
+
+.article-refs h1 {
+  color: #da4d4d;
+  font-size: 20px;
+}
+
+.article-refs h1::before {
+  content: "";
+}
+
+.article-refs img {
+  margin-left: 30px;
+  width: 8%;
+}
+
 .breadcrumb-container {
   background-color: transparent;
   margin-left: 20%;
