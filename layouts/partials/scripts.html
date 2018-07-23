@@ -1,3 +1,26 @@
 <script src="{{.Site.BaseURL}}js/jquery-2.1.4.min.js" type="text/javascript"></script>
 <script src="{{.Site.BaseURL}}assets/bundle.js"></script>
 <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/latest.js?config=TeX-MML-AM_CHTML' async></script>
+<script>
+      
+      var add_id_to_headers = function(level) {
+      
+        /* Add headers to scrollspy */
+        var div = $(".section.level" + level);
+        var h = $(".section.level" + level + " h" + level);
+        
+        for(var i = 0; i < div.length; i++) {
+        
+            var a = h[i];
+            var b = div[i];
+            
+            a.setAttribute("id", "header-" + b.getAttribute("id"))
+        }
+        
+      }
+      
+      add_id_to_headers(1);
+      add_id_to_headers(2);
+      add_id_to_headers(3);
+      
+</script>
