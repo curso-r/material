@@ -9,9 +9,13 @@
 .article {
   background-color: white;
   margin-left: 20%;
-  margin-right: 20%;
+  margin-right: 5%;
   padding-bottom: 15px;
   padding-top: 3px;
+}
+
+.article.intermediario {
+  margin-right: 20%;
 }
 
 .article h1, h2, h3, h4 {
