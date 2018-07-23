@@ -1,5 +1,10 @@
 [
   {
+    "name": "Instalação",
+    "raster": "/hex/instalacao.png",
+    "filename": "material/instalacao"
+  },
+  {
     "name": "R-Básico",
     "raster": "/hex/r-base.png",
     "filename": "material/r-base"
