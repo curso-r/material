@@ -6,23 +6,33 @@
   <body>
     {{ partial "header.html" . }}
     
-    <div id="toc"></div>
-    
-    <div class="article-title">
-      <h1>{{ .Title }}</h1>
+    <div class="row">
+      <div class="article-title col-md-12">
+        <h1>{{ .Title }}</h1>
+      </div>  
     </div>
     
-    <div class="article">
-      <h1>Índice</h1>
-      {{ .Content }}
-    </div> 
+    <div class="row">
+      <div id="toc" class="col-md-3"></div>
+    
+      <div class="article col-md-9">
+        <h1>Índice</h1>
+        {{ .Content }}
+      </div> 
+      
+    </div>
     
     <br>
     
-    {{ partial "scripts.html" .}}
+    <div class="row">
+      <div class="col-md-12">
+        <footer>{{ partial "footer.html" . }}</footer>
+      </div>
+    </div>
     
   </body>
   
-  <footer>{{ partial "footer.html" . }}</footer>
+  {{ partial "scripts.html" .}}
+  {{ partial "toc.html" . }}
   
 </html>
