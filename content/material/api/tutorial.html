@@ -7,16 +7,6 @@ tags: ["API"]
 ---
 
 
-<div id="TOC">
-<ul>
-<li><a href="#introducao">Introdução</a></li>
-<li><a href="#o-que-e-uma-api">O que é uma API?</a></li>
-<li><a href="#plumber">Plumber</a></li>
-<li><a href="#opencpu">OpenCPU</a></li>
-<li><a href="#plumber-em-producao">Plumber em produção</a></li>
-<li><a href="#fazendo-mais-com-o-plumber">Fazendo mais com o plumber</a></li>
-</ul>
-</div>
 
 <div id="introducao" class="section level1">
 <h1>Introdução</h1>
@@ -47,10 +37,11 @@ tags: ["API"]
 <p>Se não tiver esse pacote, rode <code>install.packages(&quot;ggplot2movies&quot;)</code>.</p>
 <pre class="r"><code>library(tidyverse)
 ## ── Attaching packages ───────────────────────────────────────────────────────────────────── tidyverse 1.2.1.9000 ──
-## ✔ ggplot2 2.2.1.9000     ✔ purrr   0.2.5     
-## ✔ tibble  1.4.2          ✔ dplyr   0.7.5     
-## ✔ tidyr   0.8.1          ✔ stringr 1.3.1     
-## ✔ readr   1.1.1          ✔ forcats 0.3.0
+## ✔ ggplot2 3.0.0     ✔ purrr   0.2.5
+## ✔ tibble  1.4.2     ✔ dplyr   0.7.6
+## ✔ tidyr   0.8.1     ✔ stringr 1.3.1
+## ✔ readr   1.1.1     ✔ forcats 0.3.0
+## Warning: package &#39;ggplot2&#39; was built under R version 3.4.4
 ## Warning: package &#39;tidyr&#39; was built under R version 3.4.4
 ## Warning: package &#39;purrr&#39; was built under R version 3.4.4
 ## Warning: package &#39;dplyr&#39; was built under R version 3.4.4
@@ -234,17 +225,30 @@ devtools::install(&#39;preditorIMDb&#39;)</code></pre>
 <pre class="r"><code>r &lt;- httr::POST(&quot;http://cran.ocpu.io/praise/R/praise/json&quot;)
 httr::content(r)
 ## [[1]]
-## [1] &quot;You are wondrous!&quot;</code></pre>
+## [1] &quot;You are brilliant!&quot;</code></pre>
 <p>(o pacote <code>praise</code> é um gerador de elogios aleatório)</p>
 <p>E tem mais! Com o serviço do <code>ocpu.io</code> você pode vincular sua conta ao GitHub e deixar todos os seus pacotes funcionarem como APIs automaticamente. Veja em <a href="https://www.opencpu.org/cloud.html" class="uri">https://www.opencpu.org/cloud.html</a> como fazer isso.</p>
 <p>Por exemplo, o post da Curso-R chamado <a href="http://curso-r.com/blog/2017/08/28/2017-08-27-safadao/">Aquele 1% é deep learning</a> foi montado usando OpenCPU como gerador dos textos do Wesley Safadão.</p>
 <pre class="r"><code>r &lt;- httr::POST(&quot;http://jtrecenti.ocpu.io/safadao/R/gen/json&quot;)
 cat(httr::content(r)[[1]])
-## como um olhar aflito
-## como ver o sol sem |você morreato
-## esse cheiri
+## e o tempo passa e a gente,
+## vê as coisas |se eu sargar
+## quebre eu vi o mar aqui
+## me ligo
+## mais a minha môga minha um bem
 ## 
-## tem sua vidinha e pra bobar tirar roubambora lá ensender</code></pre>
+## 
+## melhor chor!
+## me dor
+## que eu sou coonco,
+## mudou pra descansar você vai no medo
+## que ela já chaca
+## com tudo somer o que você estou que não te foi
+## 
+## vou volrar pra mim pra não lei da ruanda
+## quando a funda da sua boca quer dançar
+## 
+## &lt;truncated&gt;</code></pre>
 </div>
 </div>
 <div id="plumber-em-producao" class="section level1">

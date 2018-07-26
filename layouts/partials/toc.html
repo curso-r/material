@@ -1,5 +1,5 @@
-<script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.1.1/tocbot.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.1.1/tocbot.css">
+<script src="{{.Site.BaseURL}}js/tocbot.min.js"></script>
+<link rel="stylesheet" href="{{.Site.BaseURL}}css/tocbot.css">
 <script>
       
       var add_id_to_headers = function(level) {
@@ -29,6 +29,9 @@
         contentSelector: '.article',
         // Which headings to grab inside of the contentSelector element.
         headingSelector: 'h1, h2, h3',
+        positionFixedSelector: "#toc",
+        positionFixedClass: 'is-position-fixed',
+        fixedSidebarOffset: "175"
       });
       
 </script>

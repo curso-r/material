@@ -1,3 +1,7 @@
 ---
 site: blogdown:::blogdown_site
+output:
+  blogdown::html_page:
+    toc: false
+    toc_depth: 2
 ---

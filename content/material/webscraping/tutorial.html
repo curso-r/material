@@ -7,14 +7,6 @@ tags: ["webscraping"]
 ---
 
 
-<div id="TOC">
-<ul>
-<li><a href="#pacotes-httr-xml2-e-rvest">Pacotes <code>httr</code>, <code>xml2</code> e <code>rvest</code></a></li>
-<li><a href="#exemplo-1-chance-de-gol">Exemplo 1: chance de gol</a></li>
-<li><a href="#exemplo-2-sabesp">Exemplo 2: Sabesp</a></li>
-<li><a href="#case-study-camaras-tjsp-jurimetria">Case study: câmaras TJSP (jurimetria)</a></li>
-</ul>
-</div>
 
 <div id="pacotes-httr-xml2-e-rvest" class="section level1">
 <h1>Pacotes <code>httr</code>, <code>xml2</code> e <code>rvest</code></h1>
@@ -423,7 +415,7 @@ Dependendo do site, será necessário realizar:</p>
 Acesse a página do <a href="http://esaj.tjsp.jus.br/cjsg/consultaCompleta.do">e-SAJ</a>,
 digite “acordam” no campo “Pesquisa Livre” e clique em “Pesquisar”,
 para ter uma ideia de como é essa página.</p>
-<p>A página (acessada no dia 2018-07-18)
+<p>A página (acessada no dia 2018-07-26)
 é uma ferramenta de busca com vários campos,
 que não permite pesquisa com dados em branco.
 Na parte de baixo o site mostra uma série de documentos,
@@ -768,18 +760,18 @@ d_decisoes &lt;- decisoes_cposg(arqs)
 saveRDS(d_decisoes, &#39;data/d_decisoes.rds&#39;)
 d_decisoes</code></pre>
 <pre><code>## # A tibble: 361 x 5
-##    arq                                      data   situacao decisao result
-##    &lt;chr&gt;                                    &lt;chr&gt;  &lt;chr&gt;    &lt;chr&gt;   &lt;chr&gt; 
-##  1 data-raw/cposg/00000179520148260050.html 16/12… Julgado  Por vo… OK    
-##  2 data-raw/cposg/00000201120148260451.html 03/12… Julgado  Por ma… OK    
-##  3 data-raw/cposg/00000636120138260457.html 08/10… Julgado  Por ma… OK    
-##  4 data-raw/cposg/00000636120138260457.html 24/09… Adiado … Após o… OK    
-##  5 data-raw/cposg/00000636120138260457.html 17/09… Adiado … Após o… OK    
-##  6 data-raw/cposg/00000681720138260576.html 16/12… Julgado  Negara… OK    
-##  7 data-raw/cposg/00001064420148260495.html 03/12… Julgado  por vo… OK    
-##  8 data-raw/cposg/00001241620138260361.html 29/10… Julgado  Por ma… OK    
-##  9 data-raw/cposg/00001939320158260000.html 12/05… Retirad… &quot;&quot;      OK    
-## 10 data-raw/cposg/00001939320158260000.html 14/04… Retific… Por un… OK    
+##    arq             data    situacao       decisao                   result
+##    &lt;chr&gt;           &lt;chr&gt;   &lt;chr&gt;          &lt;chr&gt;                     &lt;chr&gt; 
+##  1 data-raw/cposg… 16/12/… Julgado        Por votação unanime,  de… OK    
+##  2 data-raw/cposg… 03/12/… Julgado        Por maioria de votos, DE… OK    
+##  3 data-raw/cposg… 08/10/… Julgado        Por maioria de votos, de… OK    
+##  4 data-raw/cposg… 24/09/… Adiado a pedi… Após os votos do Relator… OK    
+##  5 data-raw/cposg… 17/09/… Adiado a pedi… Após o voto do Relator, … OK    
+##  6 data-raw/cposg… 16/12/… Julgado        Negaram provimento ao re… OK    
+##  7 data-raw/cposg… 03/12/… Julgado        por votação unânime,  de… OK    
+##  8 data-raw/cposg… 29/10/… Julgado        Por maioria de votos, de… OK    
+##  9 data-raw/cposg… 12/05/… Retirado de P… &quot;&quot;                        OK    
+## 10 data-raw/cposg… 14/04/… Retificação d… Por unanimidade, julgara… OK    
 ## # ... with 351 more rows</code></pre>
 <p>Visualizando!</p>
 <pre class="r"><code>tipos_decisao &lt;- function(decisoes) {

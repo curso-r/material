@@ -7,15 +7,6 @@ tags: ["Modelagem"]
 ---
 
 
-<div id="TOC">
-<ul>
-<li><a href="#aprendizado-estatistico">Aprendizado Estatístico</a></li>
-<li><a href="#aprendizado-supervisionado">Aprendizado Supervisionado</a></li>
-<li><a href="#regressao-linear">Regressão Linear</a></li>
-<li><a href="#arvore-de-decisao">Árvore de Decisão</a></li>
-<li><a href="#overfitting">Overfitting</a></li>
-</ul>
-</div>
 
 <div id="aprendizado-estatistico" class="section level1">
 <h1>Aprendizado Estatístico</h1>
@@ -367,9 +358,9 @@ usando a função <code>summary</code>.</p>
 ##           CP nsplit rel error    xerror       xstd
 ## 1 0.44444444      0 1.0000000 1.0000000 0.04244576
 ## 2 0.02339181      1 0.5555556 0.5555556 0.03574957
-## 3 0.01461988      2 0.5321637 0.5672515 0.03602071
-## 4 0.01169591      4 0.5029240 0.5526316 0.03568079
-## 5 0.01000000      6 0.4795322 0.5263158 0.03504339
+## 3 0.01461988      2 0.5321637 0.5877193 0.03648023
+## 4 0.01169591      4 0.5029240 0.5906433 0.03654436
+## 5 0.01000000      6 0.4795322 0.5380117 0.03533082
 ## 
 ## Variable importance
 ##    Sex Pclass    Age 
@@ -466,7 +457,6 @@ usando a função <code>summary</code>.</p>
 <p>Visualizar a árvore de decisão sempre dá bons <em>insights</em>. Um pacote que é interessante
 para visualizar a árvore de decisão construída com o <code>rpart</code> é o <a href="https://CRAN.R-project.org/package=rpart.plot"><code>rpart.plot</code></a>.</p>
 <pre class="r"><code>library(rpart.plot)
-## Warning: package &#39;rpart.plot&#39; was built under R version 3.4.4
 rpart.plot(arvore)</code></pre>
 <p><img src="/material/modelagem/tutorial_files/figure-html/unnamed-chunk-15-1.png" width="70%" height="70%" /></p>
 <p>A visualização é bem intuitiva. No topo, vemos o primeiro nó em que 38% dos indivíduos

@@ -7,27 +7,6 @@ tags: ["R-Básico"]
 ---
 
 
-<div id="TOC">
-<ul>
-<li><a href="#introducao">Introdução</a></li>
-<li><a href="#pedindo-ajuda">Pedindo Ajuda</a></li>
-<li><a href="#documentacao-do-r">Documentação do R</a></li>
-<li><a href="#google">Google</a></li>
-<li><a href="#stack-overflow">Stack Overflow</a></li>
-<li><a href="#r-markdown">R Markdown</a></li>
-<li><a href="#instalar-pacotes">Instalar pacotes</a></li>
-<li><a href="#via-cran">Via CRAN</a></li>
-<li><a href="#via-github">Via Github</a></li>
-<li><a href="#via-arquivo-.zip.tar.gz">Via arquivo .zip/.tar.gz</a></li>
-<li><a href="#r-como-calculadora">R como calculadora</a></li>
-<li><a href="#objetos">Objetos</a></li>
-<li><a href="#controles-de-fluxo">Controles de Fluxo</a></li>
-<li><a href="#formulas">Fórmulas</a></li>
-<li><a href="#graficos-base">Gráficos (base)</a></li>
-<li><a href="#exercicios">Exercícios</a></li>
-<li><a href="#respostas">Respostas</a></li>
-</ul>
-</div>
 
 <div id="introducao" class="section level1">
 <h1>Introdução</h1>
@@ -512,7 +491,7 @@ if(x == 1) {
 if(x == 1) {
   Sys.time()
 }
-## [1] &quot;2018-07-18 11:56:49 -03&quot;</code></pre>
+## [1] &quot;2018-07-26 18:45:40 -03&quot;</code></pre>
 <p>O R só vai executar o que está na expressão dentro das chaves <code>{}</code> se o que estiver dentro dos parênteses <code>()</code> retornar <code>TRUE</code>.</p>
 <p>A sintaxe com o <code>else</code> e o <code>if else</code> é</p>
 <pre class="r"><code>if(x &lt; 0) {
@@ -896,7 +875,7 @@ media(1:3)
 }
 
 alea()
-## [1] 5</code></pre>
+## [1] 8</code></pre>
 <p>Veja que construímos uma função sem argumentos. Podemos generalizá-la incluindo os argumentos da função <code>runif()</code>.</p>
 <pre class="r"><code>alea &lt;- function(n, min, max) {
   
@@ -907,9 +886,9 @@ alea()
 }
 
 alea(2, 2, 5)
-## [1] 5 4
+## [1] 5 2
 alea(5, 100, 105)
-## [1] 105 104 103 105 101</code></pre>
+## [1] 104 103 102 101 101</code></pre>
 <p>Observe que não há problema em usar os mesmos nomes para os argumentos. Isso se deve aos <em>environments</em>. Para saber mais, confira <a href="http://curso-r.com/blog/2017/06/19/2017-06-19-environments/">este post</a>.</p>
 <hr />
 <p><strong>10.</strong> Rode <code>help(sample)</code> para descobrir o que a função <code>sample()</code> faz. Em seguida, use-a para escrever uma função que escolha uma linha aleatoriamente de uma matriz e devolva os seus valores.</p>
@@ -926,14 +905,14 @@ linha_alea &lt;- function(matriz) {
 }
 
 matriz
-##           [,1]       [,2]       [,3]       [,4]
-## [1,] 0.5672798 0.04624894 0.63748176 0.20384252
-## [2,] 0.8172616 0.10694403 0.87443365 0.09955552
-## [3,] 0.2889753 0.07252386 0.56712762 0.08816335
-## [4,] 0.2803993 0.28991294 0.39260267 0.64917930
-## [5,] 0.7998062 0.60286313 0.02900687 0.42976933
+##            [,1]       [,2]       [,3]        [,4]
+## [1,] 0.59213727 0.89746498 0.36180392 0.837416224
+## [2,] 0.09722919 0.01287857 0.45443483 0.340057611
+## [3,] 0.35587206 0.81178073 0.01856438 0.003427685
+## [4,] 0.93150319 0.66087424 0.63632061 0.605157861
+## [5,] 0.66776219 0.68424682 0.91049566 0.320624274
 linha_alea(matriz)
-## [1] 0.81726158 0.10694403 0.87443365 0.09955552</code></pre>
+## [1] 0.09722919 0.01287857 0.45443483 0.34005761</code></pre>
 <hr />
 <p><strong>11.</strong> Rode <code>help(paste)</code> e <code>help(names)</code> para descobrir o que as funções <code>paste()</code> e <code>names()</code> fazem. Em seguida, use-as para escrever um código para gerar a fórmula <code>mpg ~ cyl + disp + hp + drat + wt + qsec + vs + am + gear + carb</code> a partir do data frame <code>mtcars</code>.</p>
 <p><strong>Resposta:</strong></p>

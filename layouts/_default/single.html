@@ -13,10 +13,13 @@
     </div>
     
     <div class="row">
-      <div id="toc" class="col-md-3"></div>
-    
+      
+      <div class = "col-md-3" id = "toc-container">
+        <nav id="toc" class="toc toc-left js-toc relative z-1 transition--300 absolute pa4"></nav>
+        <br>
+      </div>
+      
       <div class="article col-md-9">
-        <h1>Índice</h1>
         {{ .Content }}
       </div> 
       
