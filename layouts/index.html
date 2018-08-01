@@ -1,25 +1,33 @@
-<!doctype html5>
-<html>
-<head>
-  {{ partial "head.html" . }}
-</head>
-
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    {{ partial "head.html" . }}
+  </head>
   <body>
     {{ partial "header.html" . }}
-    
-    <div class="container main-content">
-    
-      <div class="splash text-center">
-        <div class="subtitle">{{ .Site.Params.subtitle }}</div>
-      </div>
-      <div id = "epic">
-      </div>
-      <div id="grid" style="position: relative; margin-bottom: 20px;"></div>
+
+    <div id="grid">
+      
+      <ul id="hexGrid">
+        {{ range .Site.Pages }}
+        {{ if and (eq (substr .Dir 0 8) "material") (in .Kind "section")}}
+        <li class="hex">
+          <div class="hexIn">
+            <a class="hexLink" href="{{.Dir}}">
+              <img src='/hex/{{ replace (replace .Dir "material" "") "/" ""}}.png' alt="" />
+              <h1>This is a title</h1>
+              <p>Some sample text about the article this hexagon leads to</p>
+            </a>
+          </div>
+        </li>
+        {{ end }}
+        {{ end }}
+      </ul>
     
     </div>
     
+    {{ partial "footer.html" . }}
+    {{ partial "scripts.html" .}}
+  
   </body>
-  
-  {{ partial "scripts.html" .}}
-  
 </html>

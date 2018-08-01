@@ -57,7 +57,7 @@ Exemplo (repare no 'r' adicionado na busca, isso ajuda bastante):
 log("5")
 ```
 
-<img src="/material/r-base/figures/ajuda_google.png", style="width: 100%;">
+<img src="/material/r-base/figures/ajuda_google.png" style="width: 100%;"></img>
 
 # Stack Overflow
 

@@ -6,11 +6,6 @@ categories: ["R"]
 tags: ["Shiny"]
 ---
 
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<link href="/rmarkdown-libs/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
-<script src="/rmarkdown-libs/bootstrap/js/bootstrap.min.js"></script>
-<script src="/rmarkdown-libs/bootstrap/shim/html5shiv.min.js"></script>
-<script src="/rmarkdown-libs/bootstrap/shim/respond.min.js"></script>
 
 
 <div id="introducao" class="section level1">
@@ -109,9 +104,8 @@ shinyApp(ui = ui, server = server)</code></pre>
 <div id="user-side" class="section level1">
 <h1>User side</h1>
 <p>Tudo o que será apresentado ao usuário está guardado no objeto <code>ui</code>, que nada mais é do que um código HTML. Experimente rodar uma função do <em>user side</em> no console. O que você receberá será sempre um código HTML.</p>
-<pre class="r"><code>fluidPage()</code></pre>
-<div class="container-fluid"></div>
-<pre class="r"><code>
+<pre class="r"><code>fluidPage()
+
 # &lt;div class=&quot;container-fluid&quot;&gt;&lt;/div&gt;</code></pre>
 <p>A função <code>fluidPage()</code> utilizada como exemplo acima é utilizada pelo Shiny para criar um display que automaticamente ajusta as dimensões da janela do navegador do usuário. Os elementos da interface do usuário são então colocados dentro dessa função. Veja um exemplo:</p>
 <pre class="r"><code>ui &lt;- fluidPage(

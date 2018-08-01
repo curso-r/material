@@ -225,30 +225,13 @@ devtools::install(&#39;preditorIMDb&#39;)</code></pre>
 <pre class="r"><code>r &lt;- httr::POST(&quot;http://cran.ocpu.io/praise/R/praise/json&quot;)
 httr::content(r)
 ## [[1]]
-## [1] &quot;You are brilliant!&quot;</code></pre>
+## [1] &quot;You are grand!&quot;</code></pre>
 <p>(o pacote <code>praise</code> é um gerador de elogios aleatório)</p>
 <p>E tem mais! Com o serviço do <code>ocpu.io</code> você pode vincular sua conta ao GitHub e deixar todos os seus pacotes funcionarem como APIs automaticamente. Veja em <a href="https://www.opencpu.org/cloud.html" class="uri">https://www.opencpu.org/cloud.html</a> como fazer isso.</p>
 <p>Por exemplo, o post da Curso-R chamado <a href="http://curso-r.com/blog/2017/08/28/2017-08-27-safadao/">Aquele 1% é deep learning</a> foi montado usando OpenCPU como gerador dos textos do Wesley Safadão.</p>
 <pre class="r"><code>r &lt;- httr::POST(&quot;http://jtrecenti.ocpu.io/safadao/R/gen/json&quot;)
 cat(httr::content(r)[[1]])
-## e o tempo passa e a gente,
-## vê as coisas |se eu sargar
-## quebre eu vi o mar aqui
-## me ligo
-## mais a minha môga minha um bem
-## 
-## 
-## melhor chor!
-## me dor
-## que eu sou coonco,
-## mudou pra descansar você vai no medo
-## que ela já chaca
-## com tudo somer o que você estou que não te foi
-## 
-## vou volrar pra mim pra não lei da ruanda
-## quando a funda da sua boca quer dançar
-## 
-## &lt;truncated&gt;</code></pre>
+## e desce com um copo de red e uma garrafa| o meu assim quem faz carrente</code></pre>
 </div>
 </div>
 <div id="plumber-em-producao" class="section level1">

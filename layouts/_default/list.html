@@ -6,45 +6,52 @@
   <body>
     {{ partial "header.html" . }}
     
-    <div class="article intermediario">
+    <div class="row">
+      
+      <div class="col-md-2"></div>
+    
+      <div class="col-md-8 article intermediario">
         
-        <div class="row">
-          <div style="float: left; padding-left: 45px; padding-top: 15px; width: 20%;">
-            <img src="/hex/{{.Page.Params.slug}}.png" style="width: 100%;">
+          <div style="padding-top: 15px;">
+            <div class="col-md-3">
+              <img src="/hex/{{.Page.Params.slug}}.png">
+            </div>
+            <div class="col-md-9 article-summary">
+              {{ .Page.Params.desc }}
+              <br>
+              <a href="/material/{{.Page.Params.slug}}/tutorial">Leia mais...</a>
+            </div>  
           </div>
-          <div class="article-summary" style="float: left; width: 80%">
-            {{ .Page.Params.desc }}
-            <br>
-            <a href="/material/{{.Page.Params.slug}}/tutorial">Leia mais...</a>
-          </div>  
-          
-        </div>
         
         
-        <div class="article-refs">
-          
+        <div class="col-md-12 article-refs">
+  
           <h1>Requisitos</h1>
           <p>Este conteúdo exige alguns conhecimentos prévios que estão listados abaixo:</p>
           
-          <div class="row"> 
+          <div class="col-md-12">
             {{ range .Page.Params.requisitos }}
-              <div class="column">
+              <div class="col-md-2">
                 <a href="/material/{{.}}"><img src="/hex/{{.}}.png"></a>
               </div>
             {{ end }}  
           </div>
             
-          
+            
           <h1>Continue aprendendo</h1>
           <p>Além do <a href="/material/{{.Page.Params.slug}}/tutorial">artigo principal</a> disponibilizamos links e outros materiais que podem ajudar a se aprofundar no tema. Confira a lista abaixo:</p>
         
-        {{ .Content }}
+          {{ .Content }}
+            
           
         </div>
         
     </div>
     
-    <br>
+    <div class="col-md-2"></div>
+      
+    </div>
+      
     
   </body>
   
