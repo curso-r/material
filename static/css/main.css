@@ -17,6 +17,20 @@
 
 #article {
   background-color: white;
+  padding-left: 30px;
+  padding-right: 30px;
+}
+
+#article pre {
+  padding-left: 0px;
+  padding-right: 0px;
+  margin-left: -30px;
+  margin-right: -30px;
+}
+
+#article pre > code {
+  padding-left: 30px;
+  padding-right: 30px;
 }
 
 /********  CSS DO NAVBAR  ********/
