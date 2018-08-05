@@ -3,34 +3,29 @@
 <head>
   {{ partial "head.html" . }}
 </head>
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     {{ partial "header.html" . }}
     
-    <div class="row">
-      <div class="article-title col-md-12">
+    <div class="container">
+      
+      <div class="row justify-content-md-center" id="article-title">
         <h1>{{ .Title }}</h1>
       </div>  
-    </div>
-    
-    <div class="row">
       
-      <div class = "col-md-3" id = "toc-container">
-        <nav id="toc" class="toc toc-left js-toc relative z-1 transition--300 absolute pa4"></nav>
-        <br>
+      <div class="row">
+        
+        <div class="col-sm-3">
+          <nav id="toc" data-toggle="toc" class="sticky-top"></nav>
+        </div>
+        
+        <div class="col-sm-9" id="article">
+          {{.Content}}
+        </div>  
+        
       </div>
       
-      <div class="article col-md-9">
-        {{ .Content }}
-      </div> 
+      {{ partial "footer.html" . }}
       
-    </div>
-    
-    <br>
-    
-    <div class="row">
-      <div class="col-md-12">
-        <footer>{{ partial "footer.html" . }}</footer>
-      </div>
     </div>
     
   </body>
