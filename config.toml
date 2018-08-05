@@ -15,6 +15,8 @@ publishdir = "public"
     title = "Material"
     subtitle = "Neste portal disponibilizamos todo o nosso conteúdo e material de aula. Fique a vontade para sugerir edições e contribuir com novos tópicos!"
     github = "https://github.com/curso-r"
+    facebook = "https://www.facebook.com/cursodeR/"
+    twitter = "https://twitter.com/curso_r"
     logo = "assets/logocursor.png"
     
 ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
