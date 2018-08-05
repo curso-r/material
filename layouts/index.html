@@ -6,24 +6,26 @@
   <body>
     {{ partial "header.html" . }}
     
-    <div id="grid">
-      
-      <ul id="hexGrid">
-        {{ range .Site.Pages }}
-        {{ if and (eq (substr .Dir 0 8) "material") (in .Kind "section")}}
-        <li class="hex">
-          <div class="hexIn">
-            <a class="hexLink" href="{{.Dir}}">
-              <img src='/hex/{{ replace (replace .Dir "material" "") "/" ""}}.png' alt="" />
-              <h1>This is a title</h1>
-              <p>Some sample text about the article this hexagon leads to</p>
-            </a>
-          </div>
-        </li>
-        {{ end }}
-        {{ end }}
-      </ul>
-    
+    <div id="grid" class="container-fluid">
+      <div class="row">
+        <div class="col-md-12">
+          <ul id="hexGrid">
+            {{ range .Site.Pages }}
+            {{ if and (eq (substr .Dir 0 8) "material") (in .Kind "section")}}
+            <li class="hex">
+              <div class="hexIn">
+                <a class="hexLink" href="{{.Dir}}">
+                  <img src='/hex/{{ replace (replace .Dir "material" "") "/" ""}}.png' alt="" />
+                  <h1>This is a title</h1>
+                  <p>Some sample text about the article this hexagon leads to</p>
+                </a>
+              </div>
+            </li>
+            {{ end }}
+            {{ end }}
+          </ul>
+        </div>
+      </div>
     </div>
     
     {{ partial "footer.html" . }}

@@ -13,12 +13,47 @@
 
 #article-title {
   color: white;
+  margin-top: 30px;
+  margin-bottom: 25px;
 }
 
 #article {
   background-color: white;
   padding-left: 30px;
   padding-right: 30px;
+  padding-top: 15px;
+}
+
+#article h1 {
+  font-size: 32px;
+}
+
+#article h1::before {
+  content: "# ";
+}
+
+#article h2 {
+  font-size: 25px;
+}
+
+#article h2::before {
+  content: "# ";
+}
+
+#article h3 {
+  font-size: 20px;
+}
+
+#article h3::before {
+  content: "# ";
+}
+
+#article h4 {
+  font-size: 18px;
+}
+
+#article h4::before {
+  content: "# ";
 }
 
 #article pre {
@@ -37,6 +72,14 @@
 
 nav[data-toggle='toc'] {
   top: 42px;
+}
+
+nav[data-toggle=toc] .nav>li>a {
+ color: #777777; 
+}
+
+nav[data-toggle=toc] .nav-link.active, nav[data-toggle=toc] .nav-link.active:focus, nav[data-toggle=toc] .nav-link.active:hover {
+  color: #8d66ca;
 }
 
 /* small screens */
