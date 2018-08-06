@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    {{ partial "head.html" . }}
+  </head>
+  <body>
+    {{ partial "header.html" . }}
+    
+    
+    <div class="container">
+      
+      <div class="com-md-9" id = "post-list">
+        
+        {{ range .Paginator.Pages.ByDate }}
+          <div class="row">
+            
+            <div class="col-md-4">
+              <a href="{{.URL}}">
+                <img src="/{{.Params.banner}}" class="img-fluid"></img>
+              </a>
+            </div>
+            
+            <div class="col-md-8">
+              
+              <h2>{{.Title}}</h2>
+              <p>{{.Summary}}</p>
+              <a href="{{.URL}}">
+                <button type="button" class="btn btn-primary">Continue lendo</button>
+              </a>
+              
+              
+            </div>
+            
+          </div>
+        {{end}}
+        
+      </div>
+      
+    </div>
+    
+    <div class="container" id="paginator">
+      <div class="row">
+          {{ template "_internal/pagination.html" . }}
+      </div>  
+    </div>
+        
+    {{ partial "footer.html" . }}
+    {{ partial "scripts.html" .}}
+  
+  </body>
+</html>

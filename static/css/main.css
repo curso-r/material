@@ -2,6 +2,27 @@ body {
   font-family: "Source Sans Pro";
 }
 
+/** CSS DA LISTA DE POSTS **/
+
+#post-list {
+  padding-top: 15px;
+  font-family: "Source Sans Pro";
+}
+
+#post-list > .row {
+  background-color: white;
+  padding-top: 25px;
+  padding-bottom: 25px;
+  padding-left: 30px;
+  padding-right: 30px;
+  margin-bottom: 30px;
+  border-radius: 5px;
+}
+
+#paginator ul {
+  background-color: white;
+}
+
 /*** CSS DA HOMEPAGE   ***/
 #footer {
   margin-top: 10px;
