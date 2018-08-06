@@ -1,3 +1,7 @@
+body {
+  font-family: "Source Sans Pro";
+}
+
 /*** CSS DA HOMEPAGE   ***/
 #footer {
   margin-top: 10px;
@@ -15,6 +19,7 @@
   color: white;
   margin-top: 30px;
   margin-bottom: 25px;
+  font-family: "Source Sans Pro";
 }
 
 #article {
@@ -22,6 +27,7 @@
   padding-left: 30px;
   padding-right: 30px;
   padding-top: 15px;
+  font-family: "Source Sans Pro";
 }
 
 #article h1 {
