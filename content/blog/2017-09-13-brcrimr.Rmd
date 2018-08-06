@@ -1,0 +1,89 @@
+---
+title: "brcrimR"
+date: "2017-09-13T10:12:00+03:00"
+tags: ["web-scraping", "tidyverse", "r", "data.frames", "bds", "dados-abertos", "api"]
+categories: ["tutoriais", "r"]
+banner: "img/banners/ssp.jpg"
+author: ["Fernando"]
+summary: "brcrimR é um pacote para baixar e processar informações divulgadas pelas secretarias de segurança pública do Brasil. Neste post, apresentamos as funcionalidades do pacote aplicadas ao estado de São Paulo."
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = F, 
+                      comment = FALSE, cache = TRUE)
+
+library(tidyverse)
+```
+
+Em maio deste ano, escrevi um [post](http://curso-r.com/blog/2017/05/19/2017-05-19-scrapper-ssp/) sobre _web scraping_ dos dados da secretaria de segurança pública de São Paulo. Como o título indica, o foco do texto é mostrar como se raspa a página de estatísticas da SSP, mas, mais do que isso, o texto também sugere um roteiro de construção de _web scrapers_.
+
+Neste post, venho divulgar uma expansão do conteúdo do post passado. Agora é possível acessar os dados da SSP diretamente no R usando o pacote `brcrimR`, mas a ideia é que no futuro todas as informações divulgadas por alguma Secretaria de Segurança fiquem disponíveis diretamente no R!
+
+```{r, eval = FALSE}
+devtools::install_github("abjur/brcrimR")
+```
+
+
+O `brmcrimR` se propõe a resolver três problemas:
+
+1. **Obter informações criminais brasileiras diretamente no R** - Muitas análises interessantes seriam viabilizadas se fosse fácil e rápido carregar informações criminais históricas num `data_frame`. Fazer isso é a motivação principal do `brmcrimR`.
+1. **Consolidar tabelas em bases históricas** - Assim como em São Paulo, muitas Secretarias de Segurança disponibilizam as informações filtradas por mês ou localidade. A segunda motivação principal do `brcrimR` é iterar por essas páginas.
+1. **Padronização** - O objetivo menos direto do `brcrimR` é padronizar as informações disponibilizadas. Esse não é um problema simplesmente computacional, mas algumas rotinas de pré-processamento podem ajudar no processo.
+
+Para ilustrar o funcionamento do `brcrimR`, vamos olhar o que já está implementado em São Paulo. 
+
+## Informações agregadas
+
+As tabelas de informações agregadas podem ser obtidas seguindo os passos que descrevi [aqui](http://curso-r.com/blog/2017/05/19/2017-05-19-scrapper-ssp/), mas a função `brmcrimR::get_summarized_table_sp` faz todo o trabalho por nós.
+
+```{r}
+brcrimR::get_summarized_table_sp(year = '2016', city = '1') %>% 
+  knitr::kable(caption = "Contagem de boletins de ocorrência na cidade de Amparo.")
+```
+
+Para obter os dados históricos, basta usar a função `brcrimR::get_historical_summarized_table_sp`. Ela funciona da mesma maneira que `brcrimR::get_summarized_table_sp`, mas pode receber vetores como input. Nesse caso, ela organiza os parâmetros num _grid_ e retorna uma tabela com todas as requisições empilhadas.
+
+```{r, fig.caption = "Lesões corporais culposas em acidentes de trânsito ao longo do tempo na cidade de Amparo."}
+brcrimR::get_historical_summarized_table_sp(
+  y = c('2016', '2017'), c = '1', ty = 'ctl00$conteudo$btnMensal') %>% 
+  filter(Natureza == "LESÃO CORPORAL CULPOSA POR ACIDENTE DE TRÂNSITO") %>% 
+  set_names(c('Natureza', 1:12, "Total", "municipio", "ano")) %>% 
+  gather(mes, valor, -municipio, -ano, -Natureza, -Total) %>% 
+  filter(!is.na(valor)) %>% 
+  mutate(data_bo = lubridate::dmy(paste("01", mes, ano, sep = "-"))) %>% 
+  ggplot(aes(x = data_bo, y = valor)) +
+  geom_bar(stat = 'identity', fill = 'royalblue') +
+  theme_minimal(15) +
+  labs(x = 'Mês', y = "Número de BO's")
+```
+
+## Informações desagregadas
+
+Além dos dados agregados, a partir do ano passado a SSP de São Paulo também passou a divulgar informações detalhadas sobre os BO's da capital no [portal da trasparência](http://www.ssp.sp.gov.br/transparenciassp/). O [José de Jesus](https://github.com/jjesusfilho) começou o [_scraping_ desses conteúdos](https://gist.github.com/jjesusfilho/3b0f99f80a0bce019bda3fce54486b9d) e eu só encapsulei tudo dentro de um pacote. Vejam só:
+
+```{r}
+brcrimR::get_detailed_table_sp(folder = 'btnHomicicio', year = '2017', month = '1', department = '0') %>%
+  select(NUM_BO, BO_INICIADO, DATAOCORRENCIA, BO_AUTORIA, FLAGRANTE, LATITUDE, LONGITUDE) %>% 
+  distinct(NUM_BO, .keep_all = T) %>% 
+  head(10) %>% 
+  knitr::kable(caption = "Algumas colunas de dez BO's da tabela de boletins de ocorrência de homicídio de janeiro de 2017.")
+```
+
+É fantástico que a gente tenha acesso a informações tão detalhadas como latitude e longitude de um crime, mas o formato não é lá essas coisas. Como os dados da SSP provavelmente estão armazenados em um banco de dados relacional, a tabela que baixamos parece ser um `inner_join` de várias tabelas do banco, pois existem repetições da chave primária `NUM_BO`. É claro que quem tem um pouco de experiência com esse tipo de coisa vai tirar de letra, mas esse certamente não é o melhor formato para a população em geral.
+
+De toda forma, mesmo nesse formato, é interessante loopar por todas as páginas rapidamente. Por isso, também implementamos a função `get_detailed_table_sp`, que funciona mais ou menos da mesma forma que a `get_historical_summarized_table_sp`. 
+
+```{r, eval = FALSE}
+brcrimR::get_historical_detailed_table_sp(f = 'btnHomicicio', y = '2017', m = 1:8, d = '0')
+```
+
+
+## Próximos passos
+
+Encerro aqui a apresentação do pacote, com os seus objetivos e funcionalidades básicas. Ele está longe de ser ideal e tem uma listinha de coisas que queremos implementar no futuro, mas como se trata de dados abertos, não vejo porque não contar com a comunidade para isso! Seguem abaixo algumas ideias:
+
+- _Helper functions_ para os parâmetros das funções de _get_ de São Paulo. Precisa existir uma função que pegue uma especificação de parâmetro do tipo "Homicídio" e transforme em "btnHomicicio", que é o parâmetro que precisamos passar pro site do tribunal.
+- Um "desacoplador" de tabelas do portal da transparência.
+- Implementações de funções parecidas para outros estados.
+
+Por hoje é isso, pessoal. Happy coding!

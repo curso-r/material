@@ -1,0 +1,301 @@
+---
+title: "A poluição do ar durante a greve dos caminhoneiros"
+date: "2018-06-18T00:00:00+00:00"
+tags: ["web-scraping", "dados-abertos"]  
+categories: ["análises", "r"]
+banner: "img/banners/truck.png"
+author: ["William"]
+summary: "Neste post, vamos avaliar descritivamente as concentrações de alguns poluentes durante a greve dos caminhoneiros"
+draft: false
+---
+
+<script src="/rmarkdown-libs/htmlwidgets/htmlwidgets.js"></script>
+<script src="/rmarkdown-libs/jquery/jquery.min.js"></script>
+<link href="/rmarkdown-libs/leaflet/leaflet.css" rel="stylesheet" />
+<script src="/rmarkdown-libs/leaflet/leaflet.js"></script>
+<link href="/rmarkdown-libs/leafletfix/leafletfix.css" rel="stylesheet" />
+<script src="/rmarkdown-libs/Proj4Leaflet/proj4-compressed.js"></script>
+<script src="/rmarkdown-libs/Proj4Leaflet/proj4leaflet.js"></script>
+<link href="/rmarkdown-libs/rstudio_leaflet/rstudio_leaflet.css" rel="stylesheet" />
+<script src="/rmarkdown-libs/leaflet-binding/leaflet.js"></script>
+
+
+<p>Com a greve dos caminhoneiros no final do mês de maio, muitas cidades tiveram uma redução atípica no tráfego de caminhões e, posteriormente, com a falta de combustível, de veículos em geral.</p>
+<p>Como as emissões veiculares são a principal fonte de diversos poluentes em centros urbanos, faz todo o sentido analisarmos o impacto das paralisações nos níveis de poluição.</p>
+<p>Neste post, vamos analisar descritivamente as concentrações de alguns poluentes um pouco antes, durante e um pouco depois da greve dos caminhoneiros.</p>
+<p>Como aperitivo, veja a variação dos poluentes durante as paralisações:</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">pollutant</th>
+<th align="center">Ibirapuera</th>
+<th align="center">Osasco</th>
+<th align="center">Parque D.Pedro II</th>
+<th align="center">Pinheiros</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">CO (manhã)</td>
+<td align="center">-48.02%</td>
+<td align="center">-32.78%</td>
+<td align="center">-51.16%</td>
+<td align="center">-65.9%</td>
+</tr>
+<tr class="even">
+<td align="left">CO (noite)</td>
+<td align="center">-61.18%</td>
+<td align="center">-50.81%</td>
+<td align="center">-60.77%</td>
+<td align="center">-62.96%</td>
+</tr>
+<tr class="odd">
+<td align="left">MP10</td>
+<td align="center">NaN%</td>
+<td align="center">-19.1%</td>
+<td align="center">-19.06%</td>
+<td align="center">-20.06%</td>
+</tr>
+<tr class="even">
+<td align="left">MP2.5</td>
+<td align="center">-10.26%</td>
+<td align="center">-21.08%</td>
+<td align="center">-20.98%</td>
+<td align="center">-21.13%</td>
+</tr>
+<tr class="odd">
+<td align="left">NO</td>
+<td align="center">-89.66%</td>
+<td align="center">-50.9%</td>
+<td align="center">-75.38%</td>
+<td align="center">-83.09%</td>
+</tr>
+<tr class="even">
+<td align="left">NO2</td>
+<td align="center">-42.49%</td>
+<td align="center">-13.24%</td>
+<td align="center">-38.73%</td>
+<td align="center">-39.45%</td>
+</tr>
+<tr class="odd">
+<td align="left">O3</td>
+<td align="center">53.7%</td>
+<td align="center">NaN%</td>
+<td align="center">68.43%</td>
+<td align="center">126%</td>
+</tr>
+</tbody>
+</table>
+<div id="contextualizando" class="section level2">
+<h2>Contextualizando</h2>
+<p>A greve dos caminhoneiros foi como ficou conhecida a paralisação de caminhoneiros autônomos em todo o território nacional em maio de 2018. As manifestações começaram no dia 21 de maio e duraram até o início de junho. Nesse período, muitas cidades sofreram com desabastecimento, principalmente de combustível.</p>
+<p>Nesta análise, eu foquei a observação entre o dias 23 e 30 de maio, período em que as consequências da greve foram mais intensos. Os poluentes considerados foram:</p>
+<ul>
+<li><p><a href="https://en.wikipedia.org/wiki/Carbon_monoxide">Monóxido de carbono</a> (CO), gás tóxico que pode causar dor de cabeça, tontura, náusea e, em altas concentrações, desorientação e morte por asfixia. Segundo a CETESB, 97% do CO liberado em São Paulo vem de emissões veiculares.</p></li>
+<li><p><a href="https://en.wikipedia.org/wiki/Ozone#Ozone_air_pollution">Ozônio</a> (O3), na estratosfera, faz papel de herói, filtrando parte da radiação solar (camada de ozônio). Na troposfera, camada mais baixa da atmosfera, faz papel de vilão, sendo associado a diversas doenças respiratórias e cardiovasculares. Não é gerado diretamente pela queima de combustíveis, mas sim por reações químicas atmosféricas que envolvem diversos compostos e radiação solar.</p></li>
+<li><p><a href="https://en.wikipedia.org/wiki/Nitric_oxide">Monóxido de nitrogênio</a> (NO) e <a href="https://en.wikipedia.org/wiki/Nitrogen_dioxide">dióxido de nitrogênio</a> (NO2), gases tóxicos que contribuem para a formação de chuva ácida e do ozônio troposférico. Estão associados a diversos problemas respiratórios, como enfisema pulmonar e bronquite.</p></li>
+<li><p><a href="https://en.wikipedia.org/wiki/Particulates">Material particulado</a> 2.5 (MP2.5) e <a href="https://en.wikipedia.org/wiki/Particulates">material particulado 10</a> (MP10), partículas suspensas no ar com diâmetro menor que 2.5 <span class="math inline">\(\mu\)</span>m (MP2.5) ou entre 2.5 e 10 <span class="math inline">\(\mu\)</span>m (MP10). Estão associadas a diversas doenças respiratórias e câncer de pulmão.</p></li>
+</ul>
+<p>As concentrações de cada poluente foram medidas em estações de monitoramento da CETESB. Considerei quatro estações na Grande São Paulo: Osasco, Pinheiros, Parque Dom Pedro II e Ibirapuera. O critério para a escolha foi a disponibilidade de dados para os poluentes escolhidos e o perfil do tráfego de veículos na região das estações. As estações Parque Dom Pedro II e Pinheiros ficam em regiões de tráfego intenso, a primeira no centro da cidade e a segunda próxima à marginal Pinheiros. A estação de Osasco também fica numa região de tráfego intenso e relativamente próxima a duas rodovias. A estação Ibirapuera não é muito afetada pelo tráfego pois fica dentro do Parque Ibirapuera e será utilizada como comparação.</p>
+<p>A localização de cada uma delas está representada no mapa a seguir:</p>
+<div id="htmlwidget-1" style="width:672px;height:480px;" class="leaflet html-widget"></div>
+<script type="application/json" data-for="htmlwidget-1">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"http://openstreetmap.org\">OpenStreetMap<\/a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA<\/a>"}]},{"method":"addCircleMarkers","args":[[-23.591838,-23.526757,-23.544841,-23.561441],[-46.660682,-46.792086,-46.627672,-46.70202],10,null,null,{"interactive":true,"className":"","stroke":true,"color":"#03F","weight":5,"opacity":0.5,"fill":true,"fillColor":"#03F","fillOpacity":0.2},null,null,["Ibirapuera","Osasco","Parque D.Pedro II","Pinheiros"],null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]}],"limits":{"lat":[-23.591838,-23.526757],"lng":[-46.792086,-46.627672]}},"evals":[],"jsHooks":[]}</script>
+<p><br></p>
+<p>Como são muitos gráficos e tabelas, vou apresentar apenas alguns resultados aqui no post. O restante está disponível <a href="/flexdashboards/greve-caminhoneiros/flexdash-greve-caminhoneiros.html">nesse flexdashboard</a>.</p>
+</div>
+<div id="dados" class="section level2">
+<h2>Dados</h2>
+<p>Os dados desta análise foram extraídos do sistema Qualar, como discutido <a href="http://curso-r.com/blog/2018/03/19/2018-03-19-scraper-cetesb/">neste post</a>. O período considerado foi 01/05/2018 a 14/06/2018. Também considerei esse mesmo período nos anos de 2016 e 2017 para pode comparar o comportamento dos poluentes com e sem a greve de caminhoneiros.</p>
+<p>O código utilizado pode ser acessado <a href="https://github.com/williamorim/tese/blob/master/data/cetesb-greve-caminhoneiros/manip.R">aqui</a>. Repare que, para facilitar o acompanhamento do processo, as requisições foram feitas separadamente para cada estação/ano, pois requisições com um volume muito grande de dados demoravam muito para serem concluídas. Após todos os arquivos serem baixados, os dados foram consolidados em uma única base, que pode ser acessada <a href="https://github.com/williamorim/tese/blob/master/data/cetesb-greve-caminhoneiros/data-greve-caminhoneiros.rds">neste link</a>.</p>
+</div>
+<div id="funcoes-usadas-para-gerar-os-graficos" class="section level2">
+<h2>Funções usadas para gerar os gráficos</h2>
+<p>Dado um poluente, um ano e um conjunto de horas, a função abaixo devolve um plot com os gráficos da série temporal das quatro estações, utilizando a média diária do poluente nas horas especificadas.</p>
+<pre class="r"><code>make_series_plot &lt;- function(df, pollutant, year_, hours) {
+  
+  if(year_ == 2018) {
+    p_lab &lt;- labs(x = &quot;Dia&quot;, y = pollutant)
+  } else {
+    p_lab &lt;- labs(x = &quot;&quot;, y = pollutant)
+  }
+  
+  df %&gt;% 
+    filter(
+      hour %in% hours
+    ) %&gt;% 
+    group_by(date, stationname) %&gt;%
+    select(y = pollutant, everything()) %&gt;% 
+    summarise(conc = mean(y, na.rm = TRUE)) %&gt;% 
+    ungroup() %&gt;% 
+    mutate(year = lubridate::year(date)) %&gt;%
+    filter(year == year_) %&gt;% 
+    ggplot(aes(x = date, y = conc)) +
+    geom_line() +
+    geom_vline(
+      xintercept = lubridate::dmy(paste0(&quot;23-05-&quot;, year_)),
+      linetype = 2,
+      color = &quot;red&quot;
+    ) +
+    geom_vline(
+      xintercept = lubridate::dmy(paste0(&quot;30-05-&quot;, year_)),
+      linetype = 2,
+      color = &quot;red&quot;
+    ) +
+    facet_grid(year ~ stationname, scales = &quot;free_y&quot;) +
+    theme_bw() +
+    scale_x_date(
+      labels = scales::date_format(&quot;%d-%m&quot;),
+      breaks = c(
+        lubridate::dmy(paste0(&quot;01-05-&quot;, year_)), 
+        lubridate::dmy(paste0(&quot;01-06-&quot;, year_))
+      ),
+      date_breaks = &quot;1 month&quot;
+    ) +
+    p_lab
+  
+}</code></pre>
+<p>A função <code>make_grid_plot()</code> aplica a função acima e junta os gráficos dos três anos considerados.</p>
+<pre class="r"><code>make_grid_plot &lt;- function(df, pollutant, hours) {
+  
+  map(
+    2016:2018, 
+    make_series_plot,
+    df = df,
+    pollutant = pollutant,
+    hours = hours
+  ) %&gt;% 
+    patchwork::wrap_plots(nrow = 3) %&gt;% 
+    print()
+  
+}</code></pre>
+<p>A <code>função make_bar_plot()</code> faz um gráfico de barras para a média dos poluentes para cada estação em diferentes períodos (antes, durante e após a greve).</p>
+<pre class="r"><code>make_bar_plot &lt;- function(df, pollutant_, hours) {
+  
+  df %&gt;% 
+    mutate(period = case_when(
+      date &gt; dmy(&quot;09-05-2018&quot;) &amp; date &lt; dmy(&quot;16-05-2018&quot;) ~ 1,
+      date &gt; dmy(&quot;23-05-2018&quot;) &amp; date &lt; dmy(&quot;30-05-2018&quot;) ~ 2,
+      date &gt; dmy(&quot;06-06-2018&quot;) &amp; date &lt; dmy(&quot;14-06-2018&quot;) ~ 3,
+      TRUE ~ 0
+    )) %&gt;%
+    filter(period != 0) %&gt;% 
+    gather(pollutant, conc, CO:O3) %&gt;% 
+    group_by(pollutant, stationname, period) %&gt;%
+    filter(hour %in% hours, pollutant == pollutant_) %&gt;% 
+    summarise(conc = mean(conc, na.rm = TRUE)) %&gt;%
+    ggplot(aes(x = stationname, y = conc, fill = as.factor(period))) +
+    geom_bar(stat = &quot;identity&quot;, position = &quot;dodge&quot;) +
+    labs(y = pollutant_, fill = &quot;Período&quot;, x = &quot;Estação&quot;) +
+    scale_fill_discrete(
+      labels = c(&quot;09/05 a 16/05&quot;, &quot;23/05 a 30/05&quot;,  &quot;06/06 a 14/06&quot;)
+    ) +
+    theme(legend.position = &quot;bottom&quot;)
+}</code></pre>
+</div>
+<div id="resultados" class="section level2">
+<h2>Resultados</h2>
+<p>Para construir as séries, eu usei o gráfico abaixo para avaliar a média horária de cada poluente em cada dia da semana. Assim, em vez de usar as séries horárias, que, em geral, apresentam sazonalidade diária, eu usei contruí as séries da média diária nos horários de pico. O gráfico mostra, por exemplo, que os picos de CO acontecem de manhã e no começo da noite e que os níveis desse poluente são bem menores nos fins de semana.</p>
+<pre class="r"><code>df %&gt;%
+  group_by(dayofweek, hour) %&gt;% 
+  summarise_at(vars(CO:O3), funs(mean), na.rm = TRUE) %&gt;%
+  gather(polluent, conc, CO:O3) %&gt;% 
+  ggplot(aes(x = hour, y = conc)) +
+  geom_line() +
+  facet_grid(polluent ~ dayofweek, scales = &quot;free_y&quot;) +
+  theme_bw() +
+  labs(x = &quot;Hora&quot;, y = &quot;Concentração&quot;)</code></pre>
+<p><img src="/blog/2018-06-18-poluicao-greve-caminhoneiros_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p>Usando então a função <code>make_grid_plot()</code> e as informações do gráfico acima, podemos construir e analisar as séries de cada poluente. Nos gráficos abaixo, o intervalo entre as retas pontilhadas representa o período de greve.</p>
+<p>O gráfico abaixo mostra as séries do monóxido de carbono (CO), utilizando a média diária das 7 às 11 horas. Os fins de semana foram retirados da amostra.</p>
+<pre class="r"><code>df %&gt;% 
+  filter(!dayofweek %in% c(&quot;sáb&quot;,&quot;dom&quot;)) %&gt;% 
+  make_grid_plot(&quot;CO&quot;, 7:11)</code></pre>
+<p><img src="/blog/2018-06-18-poluicao-greve-caminhoneiros_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<p>Agora, o gráfico do monóxido de nitrogênio (NO), também com média diária das 7 às 11 horas. Os domingos foram retirados da amostra.</p>
+<pre class="r"><code>df %&gt;% 
+  filter(!dayofweek %in% c(&quot;dom&quot;)) %&gt;% 
+  make_grid_plot(&quot;NO&quot;, 7:11)</code></pre>
+<p><img src="/blog/2018-06-18-poluicao-greve-caminhoneiros_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p>E o gráfico do ozônio, com média diária das 12 às 17 horas. Osasco foi retirada pois não há dados de ozônio nessa estação.</p>
+<pre class="r"><code>df %&gt;%
+  filter(!stationname == &quot;Osasco&quot;) %&gt;% 
+  make_grid_plot(&quot;O3&quot;, 12:17)</code></pre>
+<p><img src="/blog/2018-06-18-poluicao-greve-caminhoneiros_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<p>O gráfico abaixo apresenta a média das médias diárias de CO (das 7h às 11h) em um período anterior (09/05 a 16/05), durante (23/05 a 30/05) e em um período posterior à greve (06/06 a 14/06). Os três períodos têm o mesmo número de dias da semana e fins de semana.</p>
+<pre class="r"><code>make_bar_plot(df, &quot;CO&quot;, 7:11)</code></pre>
+<p><img src="/blog/2018-06-18-poluicao-greve-caminhoneiros_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<p>Como comentei anteriormente, os gráficos restantes podem ser visualizados <a href="/flexdashboards/greve-caminhoneiros/flexdash-greve-caminhoneiros.html">neste dashboard</a>.</p>
+<p>Por fim, eu juntei os períodos anterior (09/05 a 16/05) e posterior (06/06 a 14/06), calculei a média dos poluentes nesses dias e comparei com a média durante o período de greve. A variação dos poluentes para cada estação está apresentada na tabela abaixo. O CO pela manhã, por exemplo, diminuiu 58.62% em Pinheiros durante a greve, enquanto o ozônio aumentou 111.75%.</p>
+<pre class="r"><code>tab</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">pollutant</th>
+<th align="center">Ibirapuera</th>
+<th align="center">Osasco</th>
+<th align="center">Parque D.Pedro II</th>
+<th align="center">Pinheiros</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">CO (manhã)</td>
+<td align="center">-48.02%</td>
+<td align="center">-32.78%</td>
+<td align="center">-51.16%</td>
+<td align="center">-65.9%</td>
+</tr>
+<tr class="even">
+<td align="left">CO (noite)</td>
+<td align="center">-61.18%</td>
+<td align="center">-50.81%</td>
+<td align="center">-60.77%</td>
+<td align="center">-62.96%</td>
+</tr>
+<tr class="odd">
+<td align="left">MP10</td>
+<td align="center">NaN%</td>
+<td align="center">-19.1%</td>
+<td align="center">-19.06%</td>
+<td align="center">-20.06%</td>
+</tr>
+<tr class="even">
+<td align="left">MP2.5</td>
+<td align="center">-10.26%</td>
+<td align="center">-21.08%</td>
+<td align="center">-20.98%</td>
+<td align="center">-21.13%</td>
+</tr>
+<tr class="odd">
+<td align="left">NO</td>
+<td align="center">-89.66%</td>
+<td align="center">-50.9%</td>
+<td align="center">-75.38%</td>
+<td align="center">-83.09%</td>
+</tr>
+<tr class="even">
+<td align="left">NO2</td>
+<td align="center">-42.49%</td>
+<td align="center">-13.24%</td>
+<td align="center">-38.73%</td>
+<td align="center">-39.45%</td>
+</tr>
+<tr class="odd">
+<td align="left">O3</td>
+<td align="center">53.7%</td>
+<td align="center">NaN%</td>
+<td align="center">68.43%</td>
+<td align="center">126%</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="comentarios" class="section level2">
+<h2>Comentários</h2>
+<ul>
+<li><p>Com exceção do ozônio, a concentração média dos poluentes durante o período de paralisação diminuiu. A maior redução foi a de NO, que é diretamente produzido pela queima de combustíveis, principalmente gasolina e diesel. A greve não parece ter influenciado muito nos níveis de MP2.5.</p></li>
+<li><p>O ozônio não é produzido diretamente pela combustão de combustíveis. Ele é produto de um complexo processo químico que ocorre ao longo do dia, envolvendo diversos compostos e a radiação solar. O aumento da concentração de ozônio durante a greve era esperada, pois o NO emitido pela queima de diesel e gasolina reage com o O3 troposférico, diminuindo a sua concentração ao longo da tarde. Como o NO diminuiu por causa do menor tráfego de veículos, o nível de ozônio foi maior durante a greve. Para mais detalhes sobre esse fenômeno, veja <a href="https://www.rpollution.com/blog/o-ciclo-do-ozonio/">este post</a>.</p></li>
+<li><p>Esta análise só considera o período de greve e variáveis de calendário para explicar a variação da concentração dos poluentes. Uma análise mais completa deveria considerar também os efeitos climáticos (temperatura, precipitação, vento, radiação, entre outros). As conclusões aqui supõem que esses fatores se mantiveram homogêneos durante o período analisado, o que pode não ser razoável.</p></li>
+</ul>
+<p>Tem sugestões? Alguma crítica? Está carente? Deixe seu comentário abaixo. :)</p>
+</div>

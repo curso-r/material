@@ -1,0 +1,134 @@
+---
+title: "WoE em R com tidywoe"
+date: "2017-07-06T10:12:00+03:00"
+tags: ["woe"]
+categories: ["tutoriais", "r"]
+banner: "img/banners/tidywoe_hex2.png"
+author: ["Athos"]
+summary: "WoE (weight of evidence) é uma ferramenta bastante usada em aplicações de regressão logística, principalmente na área de score de crédito. O pacote tidywoe oferece uma interface simples para facilitar essa tarefa."
+---
+
+```{r include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, cache = TRUE)
+```
+
+WoE (weight of evidence) é uma ferramenta bastante usada em aplicações de regressão logística, principalmente na área de score de crédito. Simploriamente falando, ele transforma categorias em números que refletem a diferença entre elas pelo critério de separação do **Y = 1** e **Y = 0**.
+
+Se você ainda não sabe o que é ou quer ler mais sobre o assunto, um texto que eu gostei de ler:
+
+- [Data Exploration with Weight of Evidence and Information Value in R](http://multithreaded.stitchfix.com/blog/2015/08/13/weight-of-evidence/)
+
+O autor desse texto é o Kim Larsen, criador do pacote [Information](https://cran.r-project.org/web/packages/Information/index.html) que é completo e cheio de ferramentas sofisticadas em torno do WoE. Porém, no dia a dia do meu trabalho volta e meia eu tinha que construir rotinas próprias para fazer as versões em WoE das minhas variáveis, mesmo com vários pacotes completos disponíveis. A principal motivação era que eles não eram muito práticos e não se encaixavam na filosofia do tidyverse. Daí acabei juntando essas rotinas num pacote chamado `tidywoe` e deixando no ar. A ideia é que ela faça o analista ganhar em tempo, legibilidade e reprodutibilidade. Abaixo segue como usar.
+
+## Instalação
+
+Para instalar, basta rodar abaixo.
+
+```{r, eval = FALSE, echo=TRUE}
+# install.packages("devtools")
+devtools::install_github("athospd/tidywoe")
+```
+
+## Dados e pacotes para os exemplos
+
+```{r, message=FALSE, warning=FALSE}
+library(forcats)
+library(ggplot2)
+library(dplyr)
+library(tidywoe)
+
+# install.packages("FactoMineR")
+data(tea, package = "FactoMineR")
+tea_mini <- tea %>% select(breakfast, how, where, price)
+```
+
+## Como usar
+
+Tem duas funções que importam:
+- `add_woe()` - adiciona os woe's num data frame.
+- `woe_dictionary()` - cria dicionário que mapeia as categorias com os woe's.
+
+### add_woe()
+
+A função `add_woe()` serve para adicionar as versões WoE's das variáveis em sua amostra de dados.
+
+```{r, warning=FALSE, eval = FALSE, message=FALSE, echo = TRUE}
+tea_mini %>% add_woe(breakfast)
+```
+
+```{r, warning=FALSE, eval = TRUE, message=FALSE, echo = FALSE}
+tea_mini %>% add_woe(breakfast) %>% head(4) %>% knitr::kable()
+```
+
+Você pode selecionar as variáveis que vc quiser selecionando-as como se fosse no `dplyr::select()`.
+
+```{r, warning=FALSE, eval = FALSE, message=FALSE, echo = TRUE}
+tea_mini %>% add_woe(breakfast, where:price)
+```
+
+```{r, warning=FALSE, eval = FALSE, message=FALSE, echo = FALSE}
+tea_mini %>% add_woe(breakfast, where:price) %>% head(4) %>% knitr::kable()
+```
+
+
+
+### woe_dictionary()
+
+A função `woe_dictionary()` é uma das duas partes necessárias para fazer o `add_woe()` funcionar (a outra parte são os dados). Ele constrói o dicionário de categorias e seus respectivos woe's.
+
+```{r, message=FALSE, warning=FALSE, echo = TRUE, eval=FALSE}
+tea_mini %>% woe_dictionary(breakfast)
+```
+
+```{r, message=FALSE, warning=FALSE, echo = FALSE, eval=TRUE}
+tea_mini %>% woe_dictionary(breakfast) %>% head(4) %>% knitr::kable()
+```
+
+
+### Usando um dicionário customizado
+
+Muitas vezes há o interesse em ajustar na mão alguns valores de woe para consertar a ordem dos efeitos de uma dada variável ordinal. Esse é o motivo de o `add_woe()` poder receber um dicionário passado pelo usuário. Isso se faz por meio do argumento `.woe_dictionary`.
+
+A maneira mais fácil de se fazer isso é montar um dicionário inicial com o `woe_dictionary()` e depois alterar os valores nele para alcançar os ajustes desejados. Exemplo:
+
+```{r, warning=FALSE, message=FALSE, echo = TRUE, eval=FALSE}
+# Construa um dicionário inicial
+tea_mini_woe_dic <- tea_mini %>% woe_dictionary(breakfast)
+
+# Mexa um pouquinho nos woes
+tea_mini_woe_dic_arrumado <- tea_mini_woe_dic %>% mutate(woe = if_else(explanatory == "p_unknown", 0, woe))
+
+# Passe esse dicionário para o add_woe()
+tea_mini %>% add_woe(breakfast, .woe_dictionary = tea_mini_woe_dic_arrumado)
+```
+
+
+```{r, warning=FALSE, message=FALSE, echo = FALSE, eval=TRUE}
+# Construa um dicionário inicial
+tea_mini_woe_dic <- tea_mini %>% woe_dictionary(breakfast)
+
+# Mexa um pouquinho nos woes
+tea_mini_woe_dic_arrumado <- tea_mini_woe_dic %>% mutate(woe = if_else(explanatory == "p_unknown", 0, woe))
+
+# Passe esse dicionário para o add_woe()
+tea_mini %>% add_woe(breakfast, .woe_dictionary = tea_mini_woe_dic_arrumado) %>% head(4) %>% knitr::kable()
+```
+
+## Exemplo de exploração
+
+O `woe_dictionary()` devolve uma tabela arrumada, bem conveniente para explorar mais. Por exemplo, a tabela está pronta para o ggplot.
+
+```{r}
+tea_mini_woe_dic_arrumado %>%
+  mutate(explanatory = explanatory %>% as.factor %>% fct_reorder(woe)) %>%
+  filter(variable %in% c("price", "how")) %>%
+  ggplot() +
+    geom_bar(aes(x = explanatory, y = woe), stat = "identity") +
+    facet_wrap(~variable, scales = "free_x") +
+  theme(axis.text.x = element_text(angle = 30))
+```
+
+
+Aqui está o [github do pacote](https://github.com/Athospd/tidywoe) para contribuições. Pretendo colocar bastante coisa nova no pacote ainda.
+
+Abs

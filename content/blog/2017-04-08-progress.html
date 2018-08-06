@@ -1,0 +1,228 @@
+---
+title: "As barras do progresso"
+date: "2017-04-10T13:07:31+02:00"
+tags: ["coding", "pacotes", "progress"]
+categories: ["tutoriais", "r"]
+banner: "img/banners/progress.png"
+author: ["Julio"]
+draft: false
+summary: "Na jornada da ciência de dados, muitas vezes precisamos rodar um mesmo algoritmo em vários objetos distintos. Quando o algoritmo é pesado ou a lista de objetos é longa, é importante saber em que passo estamos e quanto vai demorar para terminar."
+---
+
+
+
+<p>Na jornada da ciência de dados, muitas vezes precisamos rodar um mesmo algoritmo em vários objetos distintos. Quando o algoritmo é pesado ou a lista de objetos é longa, é importante saber em que passo estamos e quanto vai demorar para terminar.</p>
+<p>Uma forma de resolver esse problema é usando o pacote <code>progress</code>. O objeto <code>progress_bar</code> desse pacote é do tipo <a href="https://cran.r-project.org/web/packages/R6/vignettes/Introduction.html"><code>R6</code></a> e tem um método <code>new()</code> para criar objetos do tipo “barra”. Uma barra criada também é do tipo <code>R6</code> e possui o método <code>tick()</code> para imprimir uma barra de progresso no console.</p>
+<p>No exemplo abaixo, nosso interesse é aplicar a função <code>funcao_demorada</code> nos números <code>1:5</code> (um de cada vez, sem usar vetorização) e guardá-los numa lista.</p>
+<pre class="r"><code>funcao_demorada &lt;- function(x) {
+  Sys.sleep(0.5)
+  x ^ 2
+}
+nums &lt;- 1:5</code></pre>
+<p>Podemos fazer isso usando o pacote <code>progress</code>:</p>
+<pre class="r"><code>barra &lt;- progress::progress_bar$new(total = length(nums)) # cria a barra
+
+resultados &lt;- list()
+for (x in nums) {
+  barra$tick() # dá um passo
+  resultados[[x]] &lt;- funcao_demorada(x)
+}</code></pre>
+<pre><code>TRUE 
+[==========================----------------------------------------]  40%
+[========================================--------------------------]  60%
+[=====================================================-------------]  80%
+[==================================================================] 100%
+                                                                         </code></pre>
+<p>Como resultados, temos:</p>
+<pre class="r"><code>resultados
+## [[1]]
+## [1] 1
+## 
+## [[2]]
+## [1] 4
+## 
+## [[3]]
+## [1] 9
+## 
+## [[4]]
+## [1] 16
+## 
+## [[5]]
+## [1] 25</code></pre>
+<p>No entanto, sabemos que os laços <code>for</code> e <code>while</code> do <code>R</code> <a href="http://stackoverflow.com/questions/7142767/why-are-loops-slow-in-r">são problemáticos</a>. A melhor e mais estilosa forma de fazer esse tipo de operação no <code>R</code> é usando <em>funcionais</em>.</p>
+<p>Funcionais são funções de funções. Usamos esses caras sempre que queremos aplicar uma função a diversos objetos. Eles são alternativas mais concisas, elegantes e muitas vezes mais eficientes do que os conhecidos <code>for</code> e <code>while</code>.</p>
+<p>Exemplos de funcionais são os objetos da família <code>**ply</code> (<code>lapply</code>, <code>apply</code>, <code>sapply</code> etc.) Os funcionais do R básico foram generalizados no pacote <code>plyr</code>, que apresenta uma sintaxe organizada e intuitiva.</p>
+<p>Uma vantagem do <code>plyr</code> é a possibilidade de adicionar barras de progresso como um parâmetro dos funcionais.</p>
+<pre class="r"><code>resultados &lt;- plyr::llply(nums, funcao_demorada, .progress = &#39;text&#39;)
+## 
+  |                                                                       
+  |                                                                 |   0%
+  |                                                                       
+  |=============                                                    |  20%
+  |                                                                       
+  |==========================                                       |  40%
+  |                                                                       
+  |=======================================                          |  60%
+  |                                                                       
+  |====================================================             |  80%
+  |                                                                       
+  |=================================================================| 100%</code></pre>
+<p>Os resultados são idênticos e foram omitidos. Bem mais simples, não?</p>
+<div id="usando-purrmap-no-lugar-de-plyrllply" class="section level2">
+<h2>Usando <code>purr::map</code> no lugar de <code>plyr::llply</code></h2>
+<p>Recentemente, boa parte das funções do <code>plyr</code> foram substituídas por alternativas nos pacotes <code>dplyr</code> (operações envolvendo <code>data.frame</code>s) e <code>purrr</code> (operações envolvendo vetores e listas). Esses pacotes apresentam uma sintaxe mais próxima da <a href="http://curso-r.com/blog/2017/02/15/2017-02-16-manifesto-tidy/">filosofia <code>tidy</code></a> e portanto faz sentido estudá-los!</p>
+<p>Infelizmente, as funções do <code>purrr</code> ainda<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a> não têm um parâmetro para barras de progresso. Enquanto isso, podemos utilizar o <code>progress::progress_bar</code> mesmo.</p>
+<pre class="r"><code>barra &lt;- progress::progress_bar$new(total = length(nums))
+resultados &lt;- purrr::map(nums, ~{
+  barra$tick()
+  funcao_demorada(.x)
+})</code></pre>
+<pre><code>TRUE 
+[==========================----------------------------------------]  40%
+[========================================--------------------------]  60%
+[=====================================================-------------]  80%
+[==================================================================] 100%
+                                                                         </code></pre>
+<p>O código fica parecido com solução usando <code>for()</code>, mas pelo menos estamos usando os pacotes mais recentes ;)</p>
+</div>
+<div id="eficiencia" class="section level2">
+<h2>Eficiência</h2>
+<p>As soluções que mostrei acima apresentam diferenças importantes de eficiência. Abaixo, encapsulei os códigos em funções e mudei levemente a operação que queremos fazer:</p>
+<pre class="r"><code>nums &lt;- 1:100
+funcao_rapida &lt;- function(x) {
+  x ^ 2
+}</code></pre>
+<p><code>for()</code>, com e sem progresso:</p>
+<pre class="r"><code>for_com &lt;- function(nums) {
+  barra &lt;- progress::progress_bar$new(total = length(nums))
+  resultados &lt;- list()
+  for(x in nums) {
+    barra$tick()
+    resultados[[x]] &lt;- funcao_rapida(x)
+  }
+  resultados
+}
+for_sem &lt;- function(nums) {
+  resultados &lt;- list()
+  for(x in nums) resultados[[x]] &lt;- funcao_rapida(x)
+  resultados
+}</code></pre>
+<p><code>plyr::llply()</code>, com e sem progresso:</p>
+<pre class="r"><code>plyr_com &lt;- function(nums) {
+  plyr::llply(nums, funcao_rapida, .progress = &#39;text&#39;)
+}
+plyr_sem &lt;- function(nums) {
+  plyr::llply(nums, funcao_rapida)
+}</code></pre>
+<p><code>purrr::map()</code>, com e sem progresso:</p>
+<pre class="r"><code>purrr_com &lt;- function(nums) {
+  barra &lt;- progress::progress_bar$new(total = length(nums))
+  purrr::map(nums, ~{
+    barra$tick()
+    funcao_rapida(.x)
+  })
+}
+purrr_sem &lt;- function(nums) {
+  purrr::map(nums, funcao_rapida)
+}</code></pre>
+<p>Para testar a eficiência dos algoritmos, utilizamos a função <code>microbenchmark::microbenchmark()</code>. Essa função calcula o tempo de execução do algoritmo cem vezes e obtém algumas estatísticas básicas dos tempos obtidos.</p>
+<pre class="r"><code>benchmark &lt;- microbenchmark::microbenchmark(
+  for_com(nums), for_sem(nums),
+  plyr_com(nums), plyr_sem(nums),
+  purrr_com(nums), purrr_sem(nums)
+)</code></pre>
+<p>Os resultados da Tabela <a href="#tab:eficiencia">1</a> são surpreendentes. Primeiro, as funções que não usam barras de progresso são muito mais rápidas, chegando a quase 10 vezes em alguns casos. A função do <code>plyr</code> é mais lenta que o <code>for()</code> quando usamos barras de progresso, mas é mais rápida quando não usamos. O <code>purrr</code> é o mais rápido nos dois casos.</p>
+<table>
+<caption><span id="tab:eficiencia">Table 1: </span>Resultados do benchmark. Os tempos estão em milisegundos.</caption>
+<thead>
+<tr class="header">
+<th align="left">expr</th>
+<th align="right">min</th>
+<th align="right">mean</th>
+<th align="right">median</th>
+<th align="right">max</th>
+<th align="left">cld</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">for_com(nums)</td>
+<td align="right">8.666</td>
+<td align="right">10.367</td>
+<td align="right">9.952</td>
+<td align="right">17.155</td>
+<td align="left">b</td>
+</tr>
+<tr class="even">
+<td align="left">for_sem(nums)</td>
+<td align="right">0.161</td>
+<td align="right">0.219</td>
+<td align="right">0.196</td>
+<td align="right">2.211</td>
+<td align="left">a</td>
+</tr>
+<tr class="odd">
+<td align="left">plyr_com(nums)</td>
+<td align="right">9.193</td>
+<td align="right">10.754</td>
+<td align="right">10.511</td>
+<td align="right">18.386</td>
+<td align="left">c</td>
+</tr>
+<tr class="even">
+<td align="left">plyr_sem(nums)</td>
+<td align="right">0.116</td>
+<td align="right">0.155</td>
+<td align="right">0.156</td>
+<td align="right">0.271</td>
+<td align="left">a</td>
+</tr>
+<tr class="odd">
+<td align="left">purrr_com(nums)</td>
+<td align="right">8.776</td>
+<td align="right">10.376</td>
+<td align="right">9.982</td>
+<td align="right">14.424</td>
+<td align="left">b</td>
+</tr>
+<tr class="even">
+<td align="left">purrr_sem(nums)</td>
+<td align="right">0.092</td>
+<td align="right">0.131</td>
+<td align="right">0.124</td>
+<td align="right">0.538</td>
+<td align="left">a</td>
+</tr>
+</tbody>
+</table>
+<p>Mas não leve esses resultados tão a sério. Na prática, a parte mais demorada fica na função aplicada e não no funcional utilizado, implicando que essas diferenças sejam ignoráveis. Só recomendo mesmo abandonar o <code>for()</code> para operações desse tipo, pois o tempo de execução não cresce <strong>linearmente</strong> com o tamanho dos objetos, como é possível ver na Figura <a href="#fig:for">1</a>.</p>
+<div class="figure"><span id="fig:for"></span>
+<img src="/blog/2017-04-08-progress_files/figure-html/for-1.png" alt="Tempo do for em função do número de inputs" width="768" />
+<p class="caption">
+Figure 1: Tempo do for em função do número de inputs
+</p>
+</div>
+</div>
+<div id="resumo" class="section level2">
+<h2>Resumo</h2>
+<ul>
+<li>Use o objeto <code>progress::progress_bar</code> sempre que quiser fazer barras de progresso.</li>
+<li>Use o método <code>$new(total = n)</code> para criar uma barra.</li>
+<li>Use o método <code>$tick()</code> dentro do loop para mostrar que andou um passo do algoritmo.</li>
+<li>Tome cuidado com a eficiência do algoritmo quando usa barras de progresso.</li>
+</ul>
+</div>
+<div id="outros-links" class="section level2">
+<h2>Outros links</h2>
+<ul>
+<li>Veja <code>?dplyr::progress_estimated</code>.</li>
+<li><a href="https://github.com/gaborcsardi/progress">Pacote <code>progress</code></a>.</li>
+<li><a href="http://adv-r.had.co.nz/Functional-programming.html">Programação funcional</a>.</li>
+</ul>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>É provável que o <code>purrr</code> ganhe essa funcionalidade num futuro próximo. <a href="https://github.com/tidyverse/purrr/issues/149">Veja essa discussão</a>.<a href="#fnref1">↩</a></p></li>
+</ol>
+</div>

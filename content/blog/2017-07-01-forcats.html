@@ -1,0 +1,195 @@
+---
+title: "Forcats"
+date: "2017-07-01T23:26:00+03:00"
+tags: ["pacotes", "fatores", "forcats"]
+categories: ["tutoriais", "r"]
+banner: "img/banners/forcats.jpg"
+author: ["William"]
+summary: "Neste post, falaremos sobre o forcats, um pacote recheado de excelentes funções para manipular fatores."
+---
+
+
+
+<p>Se você ainda não é adepta ou adepto do <a href="http://tidyverse.org/">tidyverse</a>, provavelmente precisa setar <code>stringsAsFactors = FALSE</code> em algum momento ou sempre trabalha com fatores em vez de <em>strings</em>.</p>
+<p><em>Strings</em> são sequências de caracteres que podem ser acessados pela sua posição. Assim, podemos usar <a href="https://stat.ethz.ch/R-manual/R-devel/library/base/html/regex.html">expressões regulares</a> para modificar partes da sequência que correspondam a um determinado padrão. Fatores são inteiros com categorias (ou <em>labels</em>) formadas por <em>strings</em> guardadas apenas uma vez no atributo <code>levels</code>. Por facilitarem a ordenação de valores de texto, eles são importantes para a criação de variáveis <em>dummies</em> e a definição de contrastes em funções de modelagem estatística, como a <code>lm()</code>, e a organização de atributos gráficos, como no pacote <code>ggplot2</code>.</p>
+<p>Há motivos históricos para funções como <code>read.table()</code> e <code>data.frame()</code> fazerem, por default, a coerção de caracteres para fatores. Você pode ler sobre isso nos posts <a href="https://simplystatistics.org/2015/07/24/stringsasfactors-an-unauthorized-biography/">stringsAsFactors: An unauthorized biography</a>, do Roger Peng, e <a href="http://notstatschat.tumblr.com/post/124987394001/stringsasfactors-sigh">stringsAsFactors = <sigh></a>, do Thomas Lumley. O que mudou é que, de um tempo para cá, nem toda variável não-numérica é, de fato, uma variável categórica. E, quando este é o caso, queremos trabalhá-las como <em>strings</em>.</p>
+<p>Além de não transformar <em>strings</em> em fatores, o <code>tidyverse</code> também dispõe de um pacote só para manipular fatores: o <code>forcats</code> (<em>for</em> <em>cat</em>egorial variable<em>s</em>). Para começar a usá-lo, instale e carregue o pacote.</p>
+<pre class="r"><code>install.packages(&quot;forcats&quot;)</code></pre>
+<pre class="r"><code>library(forcats)
+library(tidyverse)</code></pre>
+<p>O <code>forcats</code> é um pacote bastante simples. Basicamente, ele é composto por funções de apenas dois tipos:</p>
+<ul>
+<li>Funções que começam com <code>fct_</code>, que recebem uma lista de fatores e devolvem um fator.</li>
+<li>Funções que começam com <code>lvl_</code>, que modificam os níveis de um fator.</li>
+</ul>
+<p>Veja a seguir exemplos de como utilizar as principais funções.</p>
+<section id="fct_recode" class="level2">
+<h2>fct_recode</h2>
+<p>Altera categorias específicas de um fator.</p>
+<pre class="r"><code>fator &lt;- factor(c(&quot;Scorsese&quot;, &quot;DiCaprio&quot;, &quot;Patty Jenkins&quot;, &quot;Gal Gadot&quot;))
+
+# Alterando apenas uma
+fct_recode(fator, direcao = &quot;Scorsese&quot;)
+## [1] direcao       DiCaprio      Patty Jenkins Gal Gadot    
+## Levels: DiCaprio Gal Gadot Patty Jenkins direcao
+
+# Alterando todas
+fct_recode(fator,
+           direcao = &quot;Scorsese&quot;, 
+           direcao = &quot;Patty Jenkins&quot;,    
+           elenco = &quot;DiCaprio&quot;,
+           elenco = &quot;Gal Gadot&quot;)
+## [1] direcao elenco  direcao elenco 
+## Levels: elenco direcao</code></pre>
+</section>
+<section id="fct_collapse" class="level2">
+<h2>fct_collapse</h2>
+<p>Junta categorias em grupos manualmente definidos.</p>
+<pre class="r"><code># Objeto simulando uma amostra do personagem 
+# de série favorito de 100 pessoas
+nomes &lt;- c(&quot;Sheldon&quot;, &quot;Leonard&quot;, &quot;Penny&quot;, &quot;Howard&quot;, &quot;Rajesh&quot;,
+           &quot;Ted&quot;, &quot;Marshall&quot;, &quot;Robin&quot;, &quot;Lily&quot;, &quot;Barney&quot;,
+           &quot;Michael&quot;, &quot;Jim&quot;, &quot;Pam&quot;, &quot;Dwight&quot;, &quot;Andy&quot;)
+
+per_fav&lt;- sample(x = nomes, size = 100, replace = T) %&gt;%
+  as.factor
+
+head(per_fav)           
+## [1] Sheldon Michael Barney  Ted     Sheldon Ted    
+## 15 Levels: Andy Barney Dwight Howard Jim Leonard Lily Marshall ... Ted
+
+# Conta o número de observações em cada categoria
+fct_count(per_fav)        
+## # A tibble: 15 x 2
+##    f            n
+##    &lt;fct&gt;    &lt;int&gt;
+##  1 Andy         5
+##  2 Barney       8
+##  3 Dwight       7
+##  4 Howard       1
+##  5 Jim          7
+##  6 Leonard      7
+##  7 Lily         8
+##  8 Marshall     9
+##  9 Michael      7
+## 10 Pam          3
+## 11 Penny        7
+## 12 Rajesh       3
+## 13 Robin        6
+## 14 Sheldon     12
+## 15 Ted         10
+
+# Junta as categorias
+per_fav2 &lt;- fct_collapse(per_fav,
+             TBBT = c(&quot;Sheldon&quot;, &quot;Leonard&quot;, &quot;Penny&quot;, &quot;Howard&quot;, &quot;Rajesh&quot;),
+             HIMYM = c(&quot;Ted&quot;, &quot;Marshall&quot;, &quot;Robin&quot;, &quot;Lily&quot;, &quot;Barney&quot;),
+             TheOffice = c(&quot;Michael&quot;, &quot;Jim&quot;, &quot;Pam&quot;, &quot;Dwight&quot;, &quot;Andy&quot;))
+
+head(per_fav2)
+## [1] TBBT      TheOffice HIMYM     HIMYM     TBBT      HIMYM    
+## Levels: TheOffice HIMYM TBBT
+fct_count(per_fav2)
+## # A tibble: 3 x 2
+##   f             n
+##   &lt;fct&gt;     &lt;int&gt;
+## 1 TheOffice    29
+## 2 HIMYM        41
+## 3 TBBT         30</code></pre>
+</section>
+<section id="fct_reorder" class="level2">
+<h2>fct_reorder</h2>
+<p>Ordena as categorias de um fator segundo uma função. No exemplo abaixo, ordenamos os fatores da variável <code>carb</code> (número de carburadores) segundo a mediana da variável <code>mpg</code> (milhas por galão de combustível).</p>
+<pre class="r"><code>mtcars %&gt;% 
+  ggplot(aes(x = as.factor(carb), y = mpg)) +
+  geom_boxplot()</code></pre>
+<p><img src="/blog/2017-07-01-forcats_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<pre class="r"><code>mtcars %&gt;% 
+  mutate(carb = fct_reorder(f = as.factor(carb), 
+                            x = mpg,
+                            fun = median)) %&gt;% 
+  ggplot(aes(x = carb, y = mpg)) +
+  geom_boxplot()</code></pre>
+<p><img src="/blog/2017-07-01-forcats_files/figure-html/unnamed-chunk-5-2.png" width="672" /></p>
+</section>
+<section id="fct_lump" class="level2">
+<h2>fct_lump</h2>
+<p>Agrupa as categorias menos (ou mais) comuns.</p>
+<pre class="r"><code>letras &lt;- factor(letters[rpois(100, 5)])
+fct_count(letras)
+## # A tibble: 11 x 2
+##    f         n
+##    &lt;fct&gt; &lt;int&gt;
+##  1 a         5
+##  2 b         8
+##  3 c        18
+##  4 d        20
+##  5 e        21
+##  6 f         7
+##  7 g        13
+##  8 h         3
+##  9 i         2
+## 10 j         1
+## 11 k         2
+
+# Por default, a categoria &quot;Other&quot; sempre será menor
+# que as outras categorias.
+letras %&gt;%                  
+  fct_lump(other_level = &quot;Outros&quot;) %&gt;%       
+  fct_count
+## # A tibble: 11 x 2
+##    f          n
+##    &lt;fct&gt;  &lt;int&gt;
+##  1 a          5
+##  2 b          8
+##  3 c         18
+##  4 d         20
+##  5 e         21
+##  6 f          7
+##  7 g         13
+##  8 h          3
+##  9 i          2
+## 10 k          2
+## 11 Outros     1
+
+# Espeficicando o argumento &quot;n = 4&quot;, preservamos os
+# 4 valores mais comuns
+letras %&gt;% 
+  fct_lump(n = 4, other_level = &quot;Outros&quot;) %&gt;% 
+  fct_count
+## # A tibble: 5 x 2
+##   f          n
+##   &lt;fct&gt;  &lt;int&gt;
+## 1 c         18
+## 2 d         20
+## 3 e         21
+## 4 g         13
+## 5 Outros    28
+
+# Espeficicando o argumento &quot;n = -4&quot;, preservamos
+# apenas os 4 valores que menos aparecem
+letras %&gt;% 
+  fct_lump(n = -4, other_level = &quot;Principais&quot;) %&gt;% 
+  fct_count
+## # A tibble: 5 x 2
+##   f              n
+##   &lt;fct&gt;      &lt;int&gt;
+## 1 h              3
+## 2 i              2
+## 3 j              1
+## 4 k              2
+## 5 Principais    92</code></pre>
+</section>
+<section id="lvls_reorder" class="level2">
+<h2>lvls_reorder</h2>
+<p>Troca a ordem das categorias de um fator.</p>
+<pre class="r"><code>fator &lt;- factor(c(&quot;casado&quot;, &quot;viuvo&quot;, &quot;solteiro&quot;, &quot;divorciado&quot;))
+fator
+## [1] casado     viuvo      solteiro   divorciado
+## Levels: casado divorciado solteiro viuvo
+
+lvls_reorder(fator, c(3, 1, 2, 4))
+## [1] casado     viuvo      solteiro   divorciado
+## Levels: solteiro casado divorciado viuvo</code></pre>
+<p>O pacote <code>forcats</code> ainda tem outras funções úteis para tratar com fatores, como <code>fct_expand()</code>, <code>fct_explicit_na()</code>, <code>fct_infreq()</code>, <code>fct_reorder2()</code>, <code>lvls_revalue()</code>, entre outras. No RStudio, é sempre útil navegar entre as funções de um pacote digitando, por exemplo, <code>forcats::</code> e pressionando TAB.</p>
+<p>Dúvidas, críticas ou sugestões, deixe um comentário ou nos envie uma mensagem. :)</p>
+</section>

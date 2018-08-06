@@ -1,0 +1,117 @@
+---
+title: "Por que usar o %>%"
+date: "2018-07-03T20:13:00+03:00"
+tags: ["pipe"]
+categories: ["tutoriais", "r", "tidyverse"]
+banner: "img/banners/pipe.jpg"
+author: ["Caio"]
+summary: "De onde vem e como funciona o operador pipe."
+---
+
+
+
+<p>Provavelmente você já ouviu falar do operador pipe (<code>%&gt;%</code>). Muita gente acha que ele é uma sequência mágica de símbolos que muda completamente o visual do seu código, mas na verdade ele não passa de uma função como outra qualquer.</p>
+<p>Nesse post vou explorar um pouco da história do pipe, como ele funciona e por que utilizá-lo.</p>
+<div id="origem" class="section level2">
+<h2>Origem</h2>
+<p>O conceito de pipe existe pelo menos desde os anos 1970. De acordo com seu criador, o operador foi concebido em “uma noite febril” e tinha o objetivo de simplificar comandos cujos resultados deveriam ser passados para outros comandos.</p>
+<pre class="sh"><code>ls | cat
+#&gt; Desktop
+#&gt; Documents
+#&gt; Downloads
+#&gt; Music
+#&gt; Pictures
+#&gt; Public
+#&gt; Templates
+#&gt; Videos</code></pre>
+<p>Por essa descrição já conseguimos ter uma ideia de onde vem o seu nome: <em>pipe</em> em inglês significa “cano”, referindo-se ao transporte das saídas dos comandos. Em portugês o termo é traduzido como “canalização” ou “encadeamento”, mas no dia-a-dia é mais comum usar o termo em inglês.</p>
+<p>A partir daí o pipe tem aparecido nas mais diversas aplicações, desde HTML até o nosso tão querido R. Ele pode ter múltiplos disfarces, mas o seu objetivo é sempre o mesmo: transportar resultados.</p>
+</div>
+<div id="como-funciona" class="section level2">
+<h2>Como funciona</h2>
+<p>Em R o pipe tem uma cara meio estranha (<code>%&gt;%</code>), mas no fundo ele não passa de uma função infixa, ou seja, uma função que aparece entre os seus argumentos (como <code>a + b</code> ou <code>a %in% b</code>). Na verdade é por isso mesmo que ele tem porcentagens antes e depois: porque no R uma função infixa só pode ser declarada assim.</p>
+<p>Vamos começar demonstrando sua funcionalidade básica. Carregue o pacote <code>magrittr</code> e declare o pipe usando <em>Ctrl + Shift + M</em>.</p>
+<pre class="r"><code>library(magrittr)
+
+`%&gt;%`(&quot;oi&quot;, print)
+#&gt; [1] &quot;oi&quot;</code></pre>
+<p>Não ligue para os acentos graves em volta do pipe, o comando acima só serve para demonstrar que ele não é nada mais que uma função; perceba que o seu primeiro argumento (<code>&quot;oi&quot;</code>) virou a entrada do seu segundo argumento (<code>print</code>).</p>
+<pre class="r"><code>&quot;oi&quot; %&gt;% print()
+#&gt; [1] &quot;oi&quot;</code></pre>
+<p>Observe agora o comando abaixo. Queremos primeiro somar 3 a uma sequência de números e depois dividí-los por 2:</p>
+<pre class="r"><code>mais_tres &lt;- function(x) { x + 3 }
+sobre_dois &lt;- function(x) { x / 2 }
+
+x &lt;- 1:3
+
+sobre_dois(mais_tres(x))
+#&gt; [1] 2.0 2.5 3.0</code></pre>
+<p>Perceba como fica difícil de entender o que está acontecendo primeiro? A linha relevante começa com a divisão por 2, depois vem a soma com 3 e, por fim, os valores de entrada.</p>
+<p>Nesse tipo de situação é mais legível usar a notação de <a href="https://pt.wikipedia.org/wiki/Composi%C3%A7%C3%A3o_de_fun%C3%A7%C3%B5es">composição de funções</a>, com as funções sendo exibidas na ordem em que serão aplicadas: <span class="math inline">\(f \circ g\)</span>.</p>
+<p>Isso pode ser realizado se tivermos uma função que passa o resultado do que está à sua esquerda para a função que está à sua direita…</p>
+<pre class="r"><code>x %&gt;% mais_tres() %&gt;% sobre_dois()
+#&gt; [1] 2.0 2.5 3.0</code></pre>
+<p>No comando acima fica evidente que pegamos o objeto <code>x</code>, somamos 3 e dividimos por 2.</p>
+<p>Você pode já ter notado isso, mas a entrada (esquerda) de um pipe sempre é passada como o <em>primeiro</em> argumento agumento da sua saída (direita). Isso não impede que as funções utilizadas em uma sequência de pipes tenham outros argumentos.</p>
+<pre class="r"><code>mais_n &lt;- function(x, n) { x + n }
+
+x %&gt;% mais_n(4) %&gt;% sobre_dois()
+#&gt; [1] 2.5 3.0 3.5</code></pre>
+</div>
+<div id="vantagens" class="section level2">
+<h2>Vantagens</h2>
+<p>A grande vantagem do pipe não é só enxergar quais funções são aplicadas primeiro, mas sim nos ajudar a programar pipelines (“encanamento” em inglês) de tratamentos de dados.</p>
+<pre class="r"><code>library(dplyr)
+
+starwars %&gt;% 
+  mutate(bmi = mass/((height/100)^2)) %&gt;%
+  select(name, bmi, species) %&gt;%
+  group_by(species) %&gt;%
+  summarise(bmi = mean(bmi))
+#&gt; # A tibble: 38 x 2
+#&gt;    species     bmi
+#&gt;    &lt;chr&gt;     &lt;dbl&gt;
+#&gt;  1 Aleena     24.0
+#&gt;  2 Besalisk   26.0
+#&gt;  3 Cerean     20.9
+#&gt;  4 Chagrian   NA  
+#&gt;  5 Clawdite   19.5
+#&gt;  6 Droid      NA  
+#&gt;  7 Dug        31.9
+#&gt;  8 Ewok       25.8
+#&gt;  9 Geonosian  23.9
+#&gt; 10 Gungan     NA  
+#&gt; # ... with 28 more rows</code></pre>
+<p>Acima fica extremamente claro o que está acontecendo em cada passo da pipeline. Partindo da base <code>starwars</code>, primeiro transformamos, depois selecionamos, agrupamos e resumimos; em cada linha temos uma operação e elas são executadas em sequência.</p>
+<p>Isso não melhora só a legibilidade do código, mas também a sua <em>debugabilidade</em>! Se tivermos encontrado um bug na pipeline, basta executar linha a linha do encadeamento até que encontremos a linha problemática. Com o pipe podemos programar de forma mais compacta, legível e correta.</p>
+<p>Todos os exemplos acima envolvem passar a entrada do pipe como o primeiro argumento da função à direita, mas não é uma obrigatoriedade. Com um operador placeholder <code>.</code> podemos indicar exatamente onde deve ser colocado o valor que chega no pipe:</p>
+<pre class="r"><code>y_menos_x &lt;- function(x, y) { y - x }
+
+x %&gt;%
+  mais_tres() %&gt;%
+  purrr::map2(4:6, ., y_menos_x)
+# [[1]]
+# [1] 0
+# 
+# [[2]]
+# [1] 0
+# 
+# [[3]]
+# [1] 0</code></pre>
+</div>
+<div id="bonus" class="section level2">
+<h2>Bônus</h2>
+<p>Agora que você já sabe dos usos mais comuns do pipe, aqui está uma outra funcionalidade interessante: funções unárias. Se você estiver familiarizado com o <a href="http://ctlente.com/pt/purrr-magic/">pacote <code>purrr</code></a>, esse é um jeito bastante simples de criar funções descartáveis.</p>
+<pre class="r"><code>m3_s2 &lt;- . %&gt;%
+  mais_tres() %&gt;%
+  sobre_dois()
+
+m3_s2(x)
+#&gt; [1] 2.0 2.5 3.0</code></pre>
+<p>Usando novamente o <code>.</code> definimos uma função que recebe apenas um argumento com uma sequência de aplicações de outras funções.</p>
+</div>
+<div id="conclusao" class="section level2">
+<h2>Conclusão</h2>
+<p>O pipe não é apenas algo que deve ser usado pelos fãs do <a href="https://www.tidyverse.org/">tidyverse</a>. Ele é uma função extremamente útil que ajuda na legibilidade e programação de código, independentemente de quais pacotes utilizamos.</p>
+<p>Se quiser saber mais sobre o mundo do pipe, leia <a href="http://curso-r.com/blog/2017/02/15/2017-02-16-manifesto-tidy/">este post</a> do Daniel sobre o Manifesto Tidy e o <a href="http://material.curso-r.com/pipe/">nosso tutorial</a> mais aprofundado sobre o próprio pipe.</p>
+</div>

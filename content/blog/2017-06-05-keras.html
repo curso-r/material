@@ -1,0 +1,39 @@
+---
+title: "Keras: colocando deep learning no pipeline"
+date: "2017-06-05T13:07:31+02:00"
+tags: ["r", "deep learning", "keras"]
+categories: ["divulgação", "r"]
+banner: "img/banners/keras.jpg"
+author: ["Julio"]
+draft: false
+summary: "O keras é um novo pacote do R feito para ajustar modelos de redes neurais profundas. Esse é o primeiro de uma série de posts sobre o assunto. Primeiro, vamos falar dos autores desse pacote..."
+---
+
+
+
+<p>Esse é o <a href="http://curso-r.com/author/daniel/">Daniel Falbel</a>, um dos sócios da Curso-R e autor de diversos posts no nosso blog. Boa pinta, não?</p>
+<p><img src="/img/blog/keras/dfalbel.jpg" /></p>
+<p>Mas esse não é só um rostinho bonito. Recente, o Dani fez uma contribuição PROFUNDA para a comunidade R: ele é um dos responsáveis pelo pacote <a href="https://github.com/rstudio/keras">keras</a>, que faz uma interface com a <a href="https://keras.io/">biblioteca de mesmo nome</a> utilizada para ajustar modelos de <em>deep learning</em> usando <a href="https://www.tensorflow.org/">TensorFlow</a>.</p>
+<p>Veja o arquivo DESCRIPTION (metadados) desse pacote:</p>
+<pre><code>Package: keras
+Type: Package
+Title: R Interface to Keras
+Version: 0.3.6
+Authors@R: c(
+  person(&quot;JJ&quot;, &quot;Allaire&quot;, role = c(&quot;aut&quot;, &quot;cre&quot;), email = &quot;jj@rstudio.com&quot;),
+  person(&quot;François&quot;, &quot;Chollet&quot;, role = c(&quot;aut&quot;, &quot;cph&quot;)),
+  person(&quot;RStudio&quot;, role = c(&quot;cph&quot;, &quot;fnd&quot;)),
+  person(family = &quot;Google&quot;, role = c(&quot;ctb&quot;, &quot;cph&quot;, &quot;fnd&quot;)),
+  person(&quot;Yuan&quot;, &quot;Tang&quot;, role = c(&quot;ctb&quot;, &quot;cph&quot;)),
+  person(&quot;Daniel&quot;, &quot;Falbel&quot;, role = c(&quot;ctb&quot;, &quot;cph&quot;))
+  )
+Description: Interface to &#39;Keras&#39;, a high-level neural networks API which 
+  runs on top of TensorFlow. &#39;Keras&#39; was developed with a focus on enabling
+  fast experimentation, supports both convolutional networks and recurrent
+  networks (as well as combinations of the two), and seamlessly on both CPUs
+  and GPUs.
+...</code></pre>
+<p>Além do Daniel, temos como autores desse pacote nada menos que <a href="https://en.wikipedia.org/wiki/Joseph_J._Allaire">JJ Allaire (CEO do RStudio)</a>, <a href="https://github.com/tensorflow/tensorflow/graphs/contributors">Yuan Tang (um dos principais desenvolvedores do TensorFlow)</a> e <a href="http://www.esade.edu/faculty/francois.collet">François Chollet</a>, o próprio <a href="https://rstudio.com">RStudio</a> e a Google (essa não precisa de link).</p>
+<p>Muito orgulho de ter esse cara como amigo e sócio na Curso-R. Parabéns!</p>
+<p>No futuro, postaremos tutoriais sobre o <code>keras</code> e mostraremos como estamos utilizando o pacote para quebrar CAPTCHAs usando métodos bastante inovadores. Enquanto isso, você pode olhar um <a href="https://rstudio.github.io/keras/">tutorial para o pacote <code>keras</code> nesse link</a>.</p>
+<p>É isso. Happy coding ;)</p>

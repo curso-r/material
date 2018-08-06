@@ -1,0 +1,212 @@
+---
+title: "As barras do progresso"
+date: "2017-04-10T13:07:31+02:00"
+tags: ["coding", "pacotes", "progress"]
+categories: ["tutoriais", "r"]
+banner: "img/banners/progress.png"
+author: ["Julio"]
+draft: false
+summary: "Na jornada da ciência de dados, muitas vezes precisamos rodar um mesmo algoritmo em vários objetos distintos. Quando o algoritmo é pesado ou a lista de objetos é longa, é importante saber em que passo estamos e quanto vai demorar para terminar."
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, cache = TRUE)
+```
+
+Na jornada da ciência de dados, muitas vezes precisamos rodar um mesmo algoritmo em vários objetos distintos. Quando o algoritmo é pesado ou a lista de objetos é longa, é importante saber em que passo estamos e quanto vai demorar para terminar.
+
+Uma forma de resolver esse problema é usando o pacote `progress`. O objeto `progress_bar` desse pacote é do tipo [`R6`](https://cran.r-project.org/web/packages/R6/vignettes/Introduction.html) e tem um método `new()` para criar objetos do tipo "barra". Uma barra criada também é do tipo `R6` e possui o método `tick()` para imprimir uma barra de progresso no console. 
+
+No exemplo abaixo, nosso interesse é aplicar a função `funcao_demorada` nos números `1:5` (um de cada vez, sem usar vetorização) e guardá-los numa lista.
+
+```{r}
+funcao_demorada <- function(x) {
+  Sys.sleep(0.5)
+  x ^ 2
+}
+nums <- 1:5
+```
+
+Podemos fazer isso usando o pacote `progress`:
+
+```{r eval=FALSE}
+barra <- progress::progress_bar$new(total = length(nums)) # cria a barra
+
+resultados <- list()
+for (x in nums) {
+  barra$tick() # dá um passo
+  resultados[[x]] <- funcao_demorada(x)
+}
+```
+
+```{r echo=FALSE, comment=T}
+resultados <- list()
+barra <- progress::progress_bar$new(total = length(nums), force = TRUE)
+for(x in nums) {
+  resultados[[x]] <- funcao_demorada(x)
+  barra$tick()
+}
+```
+
+Como resultados, temos:
+
+```{r}
+resultados
+```
+
+No entanto, sabemos que os laços `for` e `while` do `R` [são problemáticos](http://stackoverflow.com/questions/7142767/why-are-loops-slow-in-r). A melhor e mais estilosa forma de fazer esse tipo de operação no `R` é usando *funcionais*. 
+
+Funcionais são funções de funções. Usamos esses caras sempre que queremos aplicar uma função a diversos objetos. Eles são alternativas mais concisas, elegantes e muitas vezes mais eficientes do que os conhecidos `for` e `while`.
+
+Exemplos de funcionais são os objetos da família `**ply` (`lapply`, `apply`, `sapply` etc.) Os funcionais do R básico foram generalizados no pacote `plyr`, que apresenta uma sintaxe organizada e intuitiva.
+
+Uma vantagem do `plyr` é a possibilidade de adicionar barras de progresso como um parâmetro dos funcionais.
+
+```{r}
+resultados <- plyr::llply(nums, funcao_demorada, .progress = 'text')
+```
+
+Os resultados são idênticos e foram omitidos. Bem mais simples, não? 
+
+## Usando `purr::map` no lugar de `plyr::llply`
+
+Recentemente, boa parte das funções do `plyr` foram substituídas por alternativas nos pacotes `dplyr` (operações envolvendo `data.frame`s) e `purrr` (operações envolvendo vetores e listas). Esses pacotes apresentam uma sintaxe mais próxima da [filosofia `tidy`](http://curso-r.com/blog/2017/02/15/2017-02-16-manifesto-tidy/) e portanto faz sentido estudá-los!
+
+Infelizmente, as funções do `purrr` ainda[^1] não têm um parâmetro para barras de progresso. Enquanto isso, podemos utilizar o `progress::progress_bar` mesmo.
+
+[^1]: É provável que o `purrr` ganhe essa funcionalidade num futuro próximo. [Veja essa discussão](https://github.com/tidyverse/purrr/issues/149).
+
+```{r eval=FALSE}
+barra <- progress::progress_bar$new(total = length(nums))
+resultados <- purrr::map(nums, ~{
+  barra$tick()
+  funcao_demorada(.x)
+})
+```
+
+```{r echo=FALSE, comment=T}
+barra <- progress::progress_bar$new(total = length(nums), force = TRUE)
+resultados <- purrr::map(nums, ~{
+  barra$tick()
+  funcao_demorada(.x)
+})
+```
+
+O código fica parecido com solução usando `for()`, mas pelo menos estamos usando os pacotes mais recentes ;)
+
+## Eficiência
+
+As soluções que mostrei acima apresentam diferenças importantes de eficiência. Abaixo, encapsulei os códigos em funções e mudei levemente a operação que queremos fazer:
+
+```{r results="hide", comment=F}
+nums <- 1:100
+funcao_rapida <- function(x) {
+  x ^ 2
+}
+```
+
+`for()`, com e sem progresso:
+
+```{r}
+for_com <- function(nums) {
+  barra <- progress::progress_bar$new(total = length(nums))
+  resultados <- list()
+  for(x in nums) {
+    barra$tick()
+    resultados[[x]] <- funcao_rapida(x)
+  }
+  resultados
+}
+for_sem <- function(nums) {
+  resultados <- list()
+  for(x in nums) resultados[[x]] <- funcao_rapida(x)
+  resultados
+}
+```
+
+`plyr::llply()`, com e sem progresso:
+
+```{r}
+plyr_com <- function(nums) {
+  plyr::llply(nums, funcao_rapida, .progress = 'text')
+}
+plyr_sem <- function(nums) {
+  plyr::llply(nums, funcao_rapida)
+}
+```
+
+`purrr::map()`, com e sem progresso:
+
+```{r}
+purrr_com <- function(nums) {
+  barra <- progress::progress_bar$new(total = length(nums))
+  purrr::map(nums, ~{
+    barra$tick()
+    funcao_rapida(.x)
+  })
+}
+purrr_sem <- function(nums) {
+  purrr::map(nums, funcao_rapida)
+}
+```
+
+Para testar a eficiência dos algoritmos, utilizamos a função `microbenchmark::microbenchmark()`. Essa função calcula o tempo de execução do algoritmo cem vezes e obtém algumas estatísticas básicas dos tempos obtidos.
+
+```{r eval = FALSE, results='hide', comment=FALSE}
+benchmark <- microbenchmark::microbenchmark(
+  for_com(nums), for_sem(nums),
+  plyr_com(nums), plyr_sem(nums),
+  purrr_com(nums), purrr_sem(nums)
+)
+```
+
+Os resultados da Tabela \@ref(tab:eficiencia) são surpreendentes. Primeiro, as funções que não usam barras de progresso são muito mais rápidas, chegando a quase 10 vezes em alguns casos. A função do `plyr` é mais lenta que o `for()` quando usamos barras de progresso, mas é mais rápida quando não usamos. O `purrr` é o mais rápido nos dois casos.
+
+```{r eficiencia, echo=FALSE, message=FALSE, warning=FALSE}
+library(magrittr)
+library(tidyverse)
+benchmark <- readRDS('../../static/data/progress/benchmark_progress.rds')
+benchmark %>% 
+  microbenchmark:::summary.microbenchmark() %>% 
+  as_tibble() %>% 
+  dplyr::select(-lq, -uq, -neval) %>% 
+  dplyr::mutate_if(is.numeric, dplyr::funs(round(./1e3, 3))) %>% 
+  #purrr::set_names(c('Função', 'Min', 'Média', 'Mediana', 'Máximo')) %>% 
+  knitr::kable(caption = 'Resultados do benchmark. Os tempos estão em milisegundos.')
+```
+
+Mas não leve esses resultados tão a sério. Na prática, a parte mais demorada fica na função aplicada e não no funcional utilizado, implicando que essas diferenças sejam ignoráveis. Só recomendo mesmo abandonar o `for()` para operações desse tipo, pois o tempo de execução não cresce **linearmente** com o tamanho dos objetos, como é possível ver na Figura \@ref(fig:for).
+
+```{r for, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='Tempo do for em função do número de inputs', fig.width=8, fig.height=4}
+library(tidyverse)
+# m <- microbenchmark::microbenchmark(
+#   for_sem(1:100), for_sem(1:1000), for_sem(1:3000), for_sem(1:5000),
+#   for_sem(1:7000), for_sem(1:9000), for_sem(1:15000), times = 10
+# )
+## saveRDS(m, 'for_microbenchmark.rds')
+m <- readRDS('../../static/data/progress/for_microbenchmark.rds')
+xises <- as.numeric(stringr::str_match(m$expr, ':([0-9]+)')[,2])
+tibble(itens = xises, y = m$time) %>% 
+  group_by(itens) %>% 
+  ungroup() %>% 
+  ggplot(aes(x = itens, y = y / 1e6)) +
+  geom_point() +
+  geom_smooth(method = 'loess') +
+  labs(x = 'Número de itens', y = 'milisegundos') +
+  scale_x_continuous(breaks = unique(xises)) +
+  theme_bw()
+```
+
+## Resumo
+
+- Use o objeto `progress::progress_bar` sempre que quiser fazer barras de progresso. 
+- Use o método `$new(total = n)` para criar uma barra. 
+- Use o método `$tick()` dentro do loop para mostrar que andou um passo do algoritmo.
+- Tome cuidado com a eficiência do algoritmo quando usa barras de progresso.
+
+## Outros links
+
+- Veja `?dplyr::progress_estimated`.
+- [Pacote `progress`](https://github.com/gaborcsardi/progress).
+- [Programação funcional](http://adv-r.had.co.nz/Functional-programming.html).
+

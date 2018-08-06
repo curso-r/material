@@ -1,0 +1,93 @@
+---
+title: "Top 10 pacotes para data science"
+date: "2017-02-21"
+tags: ["pacotes"]
+categories: ["top 10", "r"]
+author: ["Athos"]
+banner: "img/banners/podio-pacotes.png"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, cache = TRUE)
+```
+
+O R mudou muito nos últimos 5 anos graças a criações de novos pacotes focados nas questões mais práticas do dia a dia de um cientista de dados. Abaixo coloquei meu top 10 de pacotes que revolucionaram o jeito de programar em R e fizeram meu trabalho mais ágil e prazeroso:
+
+### [10. purrr](https://jennybc.github.io/purrr-tutorial) (manipulação de vetores e listas)
+
+Nosso décimo lugar colocou o `for` em perigo de extinção. Com ele, aplicar funções em vetores, listas ou combinações dos dois é uma tarefa de poucas linhas e sem a necessidade de índices i, j, k's confusos. E ainda, com o advento das [tibbles](https://cran.r-project.org/web/packages/tibble/tibble.pdf), seus data.frames ganharam potencial de guardar muito mais do que meros números e strings e o purrr é seu mais forte aliado na hora de criar as chamadas [*list-columns*](https://jennybc.github.io/purrr-tutorial/ls13_list-columns.html).
+
+### [9. caret](http://caret.r-forge.r-project.org/) (modelagem estatística)
+
+Se você procura modelagem estatística (ferramenta básica do cientista de dados), dê chance ao [caret](http://caret.r-forge.r-project.org/). Esse pacote compilou os mais consagrados algoritmos de modelos preditivos (vulgo *machine learning*) já feitos no R e ainda implementou ferramentas típicas de um processo de construção de modelos, por exemplo, cross-validation, ajuste de hiperparâmetros, bases treino/teste, pré-processamentos e até paralelização. Além das diferentes técnicas de ajuste de modelos, os seus respectivos diagnósticos e visualizações também foram convenientemente compiladas, tudo num mesmo lugar, fazendo a procura de peças no gigantesco balde do R ser menos custosa.
+
+### [8. knitr/rmarkdown](https://yihui.name/knitr/) (relatórios)
+
+A dupla [knitr](https://yihui.name/knitr/) e [rmarkdown](http://rmarkdown.rstudio.com/) fizeram do R de patinho feio para o rei dos holofotes. Depois deles, relatórios no R são fáceis, bonitos e flexíveis. Escrever em RMarkdown é como escrever um rascunho, que depois é transformado em um arquivo decente em qualquer formato: pdf, word e html são os mais comuns. A ideologia por trás do RMarkdown é trazer o foco para a análise e deixar as perfumarias para segundo plano o máximo possível.
+
+OBS: todos os posts desse blog são feitos em RMarkdown!
+
+### [7. stringr](https://cran.r-project.org/web/packages/stringr/vignettes/stringr.html) (manipulação de strings)
+
+Stringr te dá tudo para extrair, criar e transformar strings. As funções aceitam [regex](https://stat.ethz.ch/R-manual/R-devel/library/base/html/regex.html) extremamente versáril e eficiente. Mineração de texto vira brincadeira.
+
+### [6. lubridate](https://cran.r-project.org/web/packages/lubridate/vignettes/lubridate.html) (manipulação de datas)
+
+Se tem uma coisa que dá para dar dor de cabeça infinita são datas. Por isso inventaram o [lubridate](https://cran.r-project.org/web/packages/lubridate/vignettes/lubridate.html). Tudo o que você gostaria de fazer com datas e horas esse pacote fornece, desde soma e subtração até comparações lógicas e arredondamentos. É a ferramenta ideal para lidar com tempo.
+
+### [5. shiny](https://shiny.rstudio.com/) (criação de aplicativos web)
+
+[Shiny](https://shiny.rstudio.com/) dá o poder de fazer aplicações na web a um analista de dados sem nenhum conhecimento prévio de html, css e javascript. Acredite se quiser, agora, fazer sites interativos e orientados por dados não é mais exclusividade dos desenvolvedores web. Com uma curva de aprendizagem ligeiramente alongada, pode-se criar de dashboards estáticos a mapas personalizados a lá google maps! É uma ótima maneira de apresentar resultados e serve muito bem como produto final de ferramentas de gestão.
+
+### [4. tidyr](https://blog.rstudio.org/2014/07/22/introducing-tidyr/) (transformação de data.frames)
+
+As principais funções são `gather()` e `spread()`. Elas pivotam/despivotam data.frames, ou derretem/condensam data.frames. Ela merece nosso quarto lugar porque possui uma grande sinergia com os terceiro e segundo lugares. Não raramente precisamos rearranjar conjunto de colunas em um par de colunas chave/valor ou vice-versa. Pivotar/despivotar é particularmente muito chato de fazer em SQL e o [tidyr](https://blog.rstudio.org/2014/07/22/introducing-tidyr/) faz isso parecer trivial. Ele também possui outras funções úteis que recomendo dar uma olhada (ex: `unite()`, `separete()`).
+
+### [3. dplyr](https://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html) (manipulação de data.frames)
+
+Nossa medalha de bronze vai para [dplyr](https://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html) porque ele trouxe os verbos de manipulação de base de dados para o nível mais simples e intuitivo. São eles:
+
+- `filter()` filtra linhas
+- `arrange()` ordena linhas
+- `select()` seleciona colunas
+- `distinct()` retira linhas duplicadas
+- `mutate()` constrói novas colunas
+- `group_by()` + `summarise()` sumariza valores por um ou mais fatores
+
+E o pacote vai muito além desses verbos. Vale a pena explorar suas funções se você precisa deixar sua base pronta para analisar.
+
+OBS: foi feito para funcionar com o *"pipe"* (%>%).
+
+### [2. ggplot2](http://docs.ggplot2.org/current/) (visualização)
+
+A medalha de prata eu acho que é o pacote mais famoso do R. 
+
+O R é conhecido pela sua rica capacidade gráfica, mas foi o [ggplot2](http://docs.ggplot2.org/current/) que trouxe a alegria de viver para os usuários minimamente preocupados com a boa aparência de suas visualizações. O [ggplot2](http://docs.ggplot2.org/current/) permite usar a "gramática de gráficos" ([*grammar of graphics*](http://vita.had.co.nz/papers/layered-grammar.pdf)) para construir gráficos em camadas e customizáveis. Há uma pequena curva de aprendizado, mas o tempo investido se paga no primeiro gráfico gerado. Gráficos que seriam veradeiras obras da engenharia se feitas no R-base não passariam de 5 linhas de [ggplot2](http://docs.ggplot2.org/current/) e ainda ficariam mais bonitos!
+
+Indispensável na caixa de ferramentas de qualquer cientista de dados.
+
+### [1. magrittr](https://cran.r-project.org/web/packages/magrittr/vignettes/magrittr.html) (pipe!)
+
+A medalha de ouro nos fornece o tal do *pipe* (%>%). Em vez de `h(g(f(x)))`, escreva `x %>% f %>% g %>% h`. Pronto! É tudo o que o *pipe* faz. Você pode se perguntar por que raios isso merece o nosso primeiro lugar, mas acredite: o *pipe* é revolucionário. Ele mudou o jeito de se programar em R. Com ele o ganho em legibilidade dos códigos e agilidade na programação é inimaginável. E ainda abriu portas para desenvolvimento de pacotes que sem ele não seriam viáveis, incluindo o dplyr e tidyr.
+
+E por isso que ele merece estar no primeiro lugar na nossa lista e no logo da nossa página.
+
+### Menções honrosas
+
+Outros pacotes também merecem destaque! As medálhas de honra ao mérito vão para:
+
+- **forcats** (utilidades para fatores)
+- **Rcpp** (R para C++)
+- **FactoMiner** (análise multivariada)
+- **RODBC** (conexão com banco de dados)
+- **httr/xml2/rvest** (ferramentas para web)
+- **flexdashboard** (rmarkdown para formato de dashboard)
+- **janitor** (limpeza de dados para modelagem)
+- **plyr** (manipulação de vetores, listas e data.frames)
+- **roxygen2** (criação de pacotes de R)
+- **devtools** (ferramentas diversas)
+- **htmlwidgets** (integração entre R e bibliotecas JavaScript)
+- **leaflet** (mapas interativos)
+
+E você, concorda? Coloque nos comentários os pacotes que moram em seu coração! =)

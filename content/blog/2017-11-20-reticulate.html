@@ -1,0 +1,78 @@
+---
+title: "Pacote reticulate"
+date: "2017-11-20T14:25:00+03:00"
+tags: ["reticulate", "python"]
+categories: ["tutoriais", "r"]
+banner: "img/banners/reticulate.png"
+author: ["Gabriela Lima Borges (convidada)"]
+summary: "Imagine se você pudesse aproveitar da quantidade e da variedade enorme de módulos e bibliotecas do Python no ambiente amigável do RStudio? Graças ao pacote..."
+draft: false
+---
+
+
+
+<blockquote>
+<p>Se você também quiser escrever um post como convidada, entre em contato a gente em <a href="mailto:contato@curso-r.com">contato@curso-r.com</a>!</p>
+</blockquote>
+<section id="pacote-reticulate" class="level2">
+<h2>Pacote Reticulate</h2>
+<p>Imagine se você pudesse aproveitar da quantidade e da variedade enorme de módulos e bibliotecas do Python no ambiente amigável do RStudio? Graças ao pacote <a href="https://rstudio.github.io/reticulate/"><code>reticulate</code></a> isso é possível de uma maneira familiar para quem quem já é usuário do R.</p>
+<p>O <code>reticulate</code> é um pacote que proporciona a integração Python &amp; R via R e pode ser bastante útil se você quiser fazer todas as análises no ambiente do Rstudio. Os módulos, classes e funções do Python importados podem ser utilizados como se fossem funções nativas do R.</p>
+<p>Para utilizar o pacote são necessárias a instalação do Python com versão superior a 2.7, a instalação dos módulos do Python que serão utilizados durante a análise e a instalação do pacote via <code>install.packages()</code>.</p>
+<pre class="r"><code># install.packages(&quot;reticulate&quot;)
+library(reticulate)</code></pre>
+<p>Quando for utilizada uma função do Python em um objeto do R, ele será convertido para seu formato equivalente do Python e vice-versa. Os tipos de conversões de objetos são explicitadas <a href="https://rstudio.github.io/reticulate/articles/introduction.html">neste link</a>.</p>
+<pre class="r"><code>## Data frame do R é convertido em Dict do Python
+a &lt;- r_to_py(mtcars)
+class(a)
+## [1] &quot;python.builtin.dict&quot;   &quot;python.builtin.object&quot;
+
+## Dict do Python é convertido em List do R
+class(py_to_r(a))
+## [1] &quot;list&quot;</code></pre>
+</section>
+<section id="importando-modulos" class="level2">
+<h2>Importando módulos</h2>
+<p>A importação de módulos do Python para o R é bem simples. Basta usar a função <code>import()</code> do pacote <code>reticulate</code> e o nome do módulo que você quer importar, em seguida guardar isso em um objeto no R.</p>
+<pre class="r"><code>np &lt;- import(&quot;numpy&quot;)
+pandas &lt;- import(&quot;pandas&quot;)
+os &lt;- import(&quot;os&quot;)</code></pre>
+<p>Use a função <code>py_module_available()</code> pra checar se um módulo do Python está disponível no seu computador.</p>
+<pre class="r"><code>py_module_available(&quot;matplotlib&quot;)
+## [1] TRUE</code></pre>
+<p>As funções que estão dentro de módulos ou classes do Python podem ser acessadas utilizando o operador <code>$</code>:</p>
+<pre class="r"><code>os$getcwd()
+## [1] &quot;/Users/dfalbel/Documents/site/content/blog&quot;
+np$abs(-1)
+## [1] 1</code></pre>
+<p>E podemos misturar funções do R e do python:</p>
+<pre class="r"><code>library(magrittr)
+
+rnorm(10) %&gt;% 
+  np$abs() %&gt;% 
+  np$cumproduct() %&gt;% 
+  plot()</code></pre>
+<p><img src="/blog/2017-11-20-reticulate_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+</section>
+<section id="exemplo" class="level1">
+<h1>Exemplo</h1>
+<p>Para ilustrar a integração Python &amp; R via R, vamos usar o Astropy, que é uma biblioteca do Python desenvolvida para a astronomia. Vamos tentar reproduzir <a href="http://docs.astropy.org/en/stable/generated/examples/io/plot_fits-image.html#sphx-glr-generated-examples-io-plot-fits-image-py">esse exemplo que foi implementado no python</a>. Primeiro, precisamos instalar o módulo:</p>
+<pre><code>pip install astropy</code></pre>
+<p>No ambiente do RStudio, vamos importar os módulos do Astropy que usaremos.</p>
+<pre class="r"><code>down &lt;- import(&quot;astropy.utils.data&quot;)
+fits &lt;- import(&quot;astropy.io.fits&quot;)</code></pre>
+<p>Em seguida, vamos baixar a imagem em arquivo FITS e verificar se está tudo ok usando a função info do Python que está no pacote Astropy.io.fits.</p>
+<pre class="r"><code>url &lt;- &quot;https://astropy.stsci.edu/data/tutorials/FITS-images/HorseHead.fits&quot;
+im.file &lt;- down$download_file(url, cache=TRUE)
+fits$info(im.file)</code></pre>
+<pre><code>Filename: ~/.astropy/cache/download/py2/2c9202ae878ecfcb60878ceb63837f5f
+No.    Name      Ver    Type      Cards   Dimensions   Format
+  0  PRIMARY       1 PrimaryHDU     161   (891, 893)   int16   
+  1  er.mask       1 TableHDU        25   1600R x 4C   [F6.2, F6.2, F6.2, F6.2]</code></pre>
+<p>Agora vamos transformar nossa imagem em uma matriz de pixels e plotar com a função image do R.</p>
+<pre class="r"><code>im.data &lt;- fits$getdata(im.file)
+im.data %&gt;% 
+  t() %&gt;% 
+  image(col = gray(seq(0, 1, length = 256)))</code></pre>
+<p><img src="/img/blog/reticulate/Rplot.png" /></p>
+</section>

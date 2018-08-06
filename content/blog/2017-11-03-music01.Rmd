@@ -1,0 +1,188 @@
+---
+title: "Estatística e Música"
+date: "2017-11-03T23:26:00+03:00"
+tags: ["musica"]
+categories: ["análises", "r"]
+banner: "img/banners/music01.jpg"
+author: ["Julio"]
+summary: "Já pensou em juntar estatística e música? Nessa série de posts mostro como estou pensando em fazer isso e os pacotes que vou criar nessa jornada..."
+draft: false
+---
+
+```{r echo=FALSE, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, cache = TRUE)
+```
+
+
+```{r eval=FALSE, echo=FALSE}
+library(tidyverse)
+library(magick)
+im1 <- image_read("img/Music.jpg") %>% 
+  image_scale("280x280")
+im2 <- image_read("img/Rlogo.png") %>% 
+  image_scale("300x300") %>% 
+  image_background("white")
+image_join(im1, im2) %>% 
+  image_append() %>% 
+  image_border('white', 'x75') %>%
+  image_scale("400x297") %>% 
+  image_write('../../static/img/banners/music01.jpg')
+```
+
+> Para quem está esperando posts sobre captchas, esperem mais um pouquinho `r emo::ji("happy")`. Em novembro voltarei a postar sobre esse assunto.
+
+Em setembro de 2017, participei do [16th Symposium on Computer Music](http://compmus.ime.usp.br/sbcm/2017), organizado pelo prof. Marcelo Queiroz do IME-USP. O evento foi muito legal! Estou estudando música nos últimos meses e acho que farei meu doutorado em soluções que ligam estatística e música. É uma área realmente apaixonante.
+
+Uma das formas que usarei para aprender os métodos e estudar os conceitos será esse blog! Assim vocês poderão acompanhar meus avanços e propor ideias para colaborar com meus trabalhos. Pretendo desenvolver tanto modelos estatísticos e programação quanto teoria musical.
+
+Até o momento, tenho três posts planejados ou prontos:
+
+- pacote `music21`: esse post! Veja abaixo.
+- pacote `chordgen`: pacote que criei para gerar sequências aleatórias de acordes com o R
+- artigo `deepbach`: um modelo de redes neurais capaz de imitar corais de Bach.
+
+## Computação musical numa casca de noz
+
+Apesar da minha falta de conhecimento sobre o tema, acredito que a área de computação musical pode ser resumida em três frentes:
+
+**Leitura**: extrair dados estruturados dos áudios. Envolve *Music Information Retrieval* - MIR
+
+```{r, echo=FALSE, out.width='40%', fig.align='center'}
+knitr::include_graphics('/img/blog/music01/music-download.png')
+```
+
+
+**Composição**: Criar ou completar músicas automaticamente
+
+```{r, echo=FALSE, out.width='40%', fig.align='center'}
+knitr::include_graphics('/img/blog/music01/music-generate.png')
+```
+
+
+**Edição**: Adicionar efeitos na música para produção
+
+```{r, echo=FALSE, out.width='40%', fig.align='center'}
+knitr::include_graphics('/img/blog/music01/music-transform.png')
+```
+
+Meu foco será na parte de composição, com foco em harmonização, que significa criar e completar harmonias das músicas dado algum estilo (e.g. Bach ou Beatles). Também tentarei criar soluções de improviso, apesar de não garantir nada.
+
+# music21
+
+O objetivo do pacote `music21` é funcionar como um port pipeável (`%>%`-able) da [biblioteca music21, em python](http://web.mit.edu/music21/doc/index.html). Ele usa o excelente pacote [`reticulate`](https://github.com/rstudio/reticulate) do RStudio como backend.
+
+Atualmente, o `music21` é mais limitado que a bibloteca em python. No entanto, graças ao `reticulate` é fácil rodar qualquer função do `music21` no R.
+
+## Instalação
+
+Como o `music21` utiliza bibliotecas python, é necessário instalar algumas dependências antes. No Ubuntu, basta rodar
+
+```{bash pip, eval=FALSE}
+sudo apt-get install python-pip
+sudo pip install pip --upgrade
+sudo pip install music21
+```
+
+Em outros sistemas opetacionais, veja a [documentação oficial](http://web.mit.edu/music21/) da biblioteca.
+
+Eu tenho o péssimo hábito de não subir meus pacotes para o CRAN. Mas prometo que esse vou subir e manter. Por enquanto, para instalar o pacote `music21` é necessário rodar
+
+```{r eval=FALSE}
+devtools::install_github("jtrecenti/music21")
+```
+
+Você pode carregar o pacote rodando
+
+```{r}
+library(music21)
+```
+
+Para usar a função de plotar uma partitura, você também precisara do [lilypond](http://lilypond.org/):
+
+```{bash lily, eval=FALSE}
+sudo apt-get install lilypond
+```
+
+
+## O objeto `music21`
+
+```{r}
+library(music21)
+music21
+```
+
+
+O objeto `music21` é um módulo do python. Com ele é possível rodar qualquer função do pacote usando `$`, tratando o objeto como uma [Reference Class](http://adv-r.had.co.nz/R5.html).
+
+```{r}
+note <- music21$note$Note("C#")
+note
+```
+
+```{r note, fig.width=2, fig.height=1.5, message=FALSE, warning=FALSE, eval = FALSE}
+note %>% 
+  plot()
+```
+
+![](/img/blog/music01/note-1.png)
+
+## Exemplo
+
+### Corais do Bach
+
+```{r message=FALSE}
+get_composer("bach") %>% 
+  head()
+```
+
+Vamos pegar uma delas e guardar numa variável
+
+```{r}
+bach_music <- get_composer("bach")[61] %>% 
+  read_music()
+```
+
+### Plotando a música *bwv165.6*
+
+Basta rodar `plot()`!!
+
+```{r bach, fig.width=6, fig.height=5, eval = FALSE}
+bach_music %>% 
+  plot()
+```
+
+![](/img/blog/music01/bach-1.png)
+
+No RStudio, você pode usar a função `view()` para visualizar a música em melhor resolução no Viewer Pane.
+
+### Imprimindo *bwv165.6* (só o soprano)
+
+Para visualizar as notas de uma música basta rodar o objeto no console. A música é organizada por Measures (compassos) e cada compasso vai mostrar seus componentes. No primeiro compasso, podemos ver a clave de sol (TrebleClef), as definições do tom (sol maior) e do tempo (4/4). Nos demais, observamos as notas e os temos associados a cada nota. Por exemplo, temos uma nota F# no primeiro tempo.
+
+```{r}
+bach_music[[1]]
+```
+
+Você pode tratar esse objeto como uma lista. Se você entrar numa nota, você poderá ver algumas características dela
+
+```{r}
+# Nota F#
+bach_music[[1]][[2]][[3]]
+
+# duração da nota
+bach_music[[1]][[2]][[3]]$duration
+
+# som exato
+bach_music[[1]][[2]][[3]]$pitch
+```
+
+Por enquanto vou acabar por aqui. Convido vocês a usarem o `music21` e experimentar suas funcionalidades. Adicionem issues em https://github.com/jtrecenti/music21/issues e mandem pergundas nos comentários.
+
+É isso! Happy coding ;)
+
+
+
+
+
+
+

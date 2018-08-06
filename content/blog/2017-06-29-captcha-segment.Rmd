@@ -1,0 +1,328 @@
+---
+title: "Quebrando CAPTCHAs - Parte III: Segmentação de imagens"
+date: "2017-07-22T13:07:31+02:00"
+tags: ["r", "captcha"]
+categories: ["r"]
+banner: "img/banners/captcha_03.png"
+author: ["Julio"]
+draft: false
+summary: "Digamos que você tenha uma base de dados de treino composta por N imagens com os textos classificados. Nossa resposta nesse caso é uma palavra de k caracteres, com p valores possíveis cada. O problema de modelar o CAPTCHA diretamente é que a variável resposta tem um..."
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, 
+                      collapse = TRUE, cache = TRUE)
+```
+
+
+Nesse post vamos discutir um pouco sobre modelar CAPTCHAs. Vou assumir que você já viu o post de introdução e o post sobre download, leitura e classificação manual de CAPTCHAs.
+
+Digamos que você tenha uma base de dados de treino composta por $N$ imagens com os textos classificados. Nossa resposta nesse caso é uma *palavra* de $k$ caracteres (vamos considerar $k$ fixado), sendo que cada caractere $c$ pode ter $p$ valores.
+
+O problema de modelar o CAPTCHA diretamente é que a variável resposta tem um número exponencial de combinações de acordo com o número de caracteres:
+
+$$
+\Omega = p^k.
+$$
+
+Por exemplo, um CAPTCHA com $k=6$ e $p=36$ (26 letras e 10 números), que é muito comum, possui um total de 2.176.782.336 (> 2 bilhões) combinações! E não preciso dizer que é completamente inviável baixar e modelar tudo isso de CAPTCHAs.
+
+A alternativa imediata que aparece é tentar separar a imagem em um pedaço para cada caractere e fazer um modelo para prever caracteres. Assim nossa resposta é reduzida para $p$ categorias, que é bem mais fácil de tratar.
+
+Vamos usar como exemplo o CAPTCHA dos TRTs. Primeiro, o download:
+
+```{r dlimg1, eval=FALSE}
+library(decryptr)
+library(tidyverse)
+arq_captcha <- decryptr::download_trt(dest = 'img', n = 1)
+```
+
+```{r dlimg2, echo=FALSE}
+library(decryptr)
+library(tidyverse)
+arq_captcha <- '../../static/data/captcha-segment/captcha705f7bad4a3d.jpeg'
+```
+
+Visualizando a imagem:
+
+```{r plotimg1}
+"../../static/data/captcha-segment/captcha705f7bad4a3d.jpeg"  %>% 
+  read_captcha() %>% 
+  plot()
+```
+
+Infelizmente, segmentar a imagem nos lugares corretos é [uma tarefa difícil](https://www.usenix.org/node/185129). Pior até do que predizer as letras. Para simplificar, vamos fazer um corte fixado das letras:
+
+```{r imglines}
+arq_captcha %>% read_captcha() %>% plot()
+abline(v = 30 + 15 * 0:5, col = 'red')
+```
+
+Podemos também limitar os eixos `x` (tirar os espaços vazios à esquerda e à direita) e `y` (superiores e inferiores).
+
+```{r imglines2}
+"../../static/data/captcha-segment/captcha705f7bad4a3d.jpeg" %>% 
+  load_image() %>% 
+  magrittr::extract(-c(1:9, 31:dim(.)[1]), -c(1:15, 106:dim(.)[2]), TRUE) %>% 
+  grDevices::as.raster() %>% 
+  graphics::plot()
+abline(v = 15 * 1:5, col = 'red')
+abline(v = 15 * c(0, 6), col = 'black')
+abline(h = c(0, 21), col = 'blue')
+```
+
+Agora temos uma imagem de tamanho dimensões `21x15` por caractere. Nosso próximo desafio é transformar isso em algo tratável por modelos de regressão. Para isso, colocamos cada pixel em uma coluna da nossa base de dados. 
+
+No caso do TRT, cada CAPTCHA gerará uma tabela de 6 linhas e 315 (`21 * 15`) colunas. Podemos usar esse código para montar:
+
+
+```{r imgsep}
+arq_captcha %>% 
+  load_image() %>% 
+  magrittr::extract(-c(1:9, 31:dim(.)[1]), -c(1:15, 106:dim(.)[2]), 1) %>% 
+  as_tibble() %>% 
+  rownames_to_column('y') %>% 
+  gather(x, value, -y) %>% 
+  mutate_at(vars(x, y), funs(parse_number)) %>% 
+  mutate(letra = (x - 1) %/% 15 + 1,
+         x = x - (letra - 1) * 15) %>% 
+  mutate_at(vars(x, y), funs(sprintf('%02d', .))) %>% 
+  unite(xy, x, y) %>% 
+  spread(xy, value, sep = '') %>% 
+  mutate(y = c('a', 'f', '3', 'd', 'w', 'x')) %>% 
+  select(y, everything(), -letra)
+```
+
+```{r rds, echo=FALSE, eval=FALSE}
+p <- progress::progress_bar$new(total = 2300)
+dados <- '~/data-raw/decryptr/trt' %>% 
+  dir(full.names = TRUE, pattern = '_') %>% 
+  head(2300) %>% 
+  map_df(~{
+    p$tick()
+    words <- .x %>% 
+      basename() %>% 
+      tools::file_path_sans_ext() %>% 
+      stringr::str_match("_([a-zA-Z0-9]+)$") %>% 
+      magrittr::extract(TRUE, 2) %>% 
+      stringr::str_split('', simplify = TRUE) %>% 
+      as.character()
+    .x %>% 
+      load_image() %>% 
+      magrittr::extract(-c(1:9, 31:dim(.)[1]), -c(1:15, 106:dim(.)[2]), 1) %>% 
+      as_tibble() %>% 
+      rownames_to_column('y') %>% 
+      gather(x, value, -y) %>% 
+      mutate_at(vars(x, y), funs(parse_number)) %>% 
+      mutate(letra = (x - 1) %/% 15 + 1,
+             x = x - (letra - 1) * 15) %>% 
+      mutate_at(vars(x, y), funs(sprintf('%02d', .))) %>% 
+      unite(xy, x, y) %>% 
+      spread(xy, value, sep = '') %>% 
+      mutate(y = words) %>% 
+      select(y, everything(), -letra)
+  }, .id = 'captcha_id')
+saveRDS(dados, 'd_segment_captcha.rds', compress = 'bzip2')
+```
+
+Muito bem! Agora basta rodar o mesmo para toda a base de treino e rodar um modelo. Para esse post, vamos usar uma base de 2300 CAPTCHAs classificados. Essa base fica com 13800 linhas e 315 colunas. Vamos usar 11000 linhas para treino e as 2800 restantes para teste. O modelo utilizado será um `randomForest` padrão.
+
+```{r carregabd, message=FALSE, warning=FALSE, eval=FALSE}
+library(randomForest)
+dados <- readRDS('../../static/data/captcha-segment/d_segment_captcha.rds') %>% 
+  mutate(y = factor(y))
+
+# monta bases de treino e teste
+set.seed(4747) # reprodutibilidade
+ids_treino <- sample(seq_len(nrow(dados)), 11000, replace = FALSE)
+d_train <- dados[ids_treino, ]
+d_test <- dados[-ids_treino, ]
+```
+
+```{r rodamodelo, eval=FALSE}
+model <- randomForest(y ~ . - captcha_id, data = d_train) 
+```
+
+```{r salvamodelo, echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
+# saveRDS(model, 'model_segment_rf.rds', compress = 'bzip2')
+model <- readRDS('../../static/data/captcha-segment/model_segment_rf.rds')
+```
+
+O resultado do modelo pode ser verificado na tabela de observados *versus* preditos na base de teste. O acerto foi de 99.4% em cada caractere! O maior erro ocorreu no confundimento da letra `n` com a letra `h`. Assumindo que o erro não depende da posição do caractere no CAPTCHA, teremos um acerto de aproximadamente 96.7% para a imagem.
+
+```{r errosTRT, eval=FALSE}
+d_test %>% 
+  mutate(pred = predict(model, newdata = .)) %>% 
+  count(y, pred) %>% 
+  spread(pred, n, fill = '.') %>% 
+  remove_rownames() %>% 
+  knitr::kable(caption = 'Tabela de acertos e erros.')
+```
+
+|y  |2   |3   |4   |5  |6   |7   |8   |9  |a  |b   |d   |e   |f   |h   |j   |k   |m   |n   |r  |s   |t   |u  |v  |w   |x   |y   |
+|:--|:---|:---|:---|:--|:---|:---|:---|:--|:--|:---|:---|:---|:---|:---|:---|:---|:---|:---|:--|:---|:---|:--|:--|:---|:---|:---|
+|2  |109 |1   |.   |.  |.   |.   |.   |.  |.  |.   |.   |.   |.   |.   |.   |.   |.   |.   |.  |.   |.   |.  |.  |.   |.   |.   |
+|3  |.   |105 |.   |.  |.   |.   |1   |.  |.  |.   |.   |.   |.   |.   |.   |.   |.   |.   |.  |.   |.   |.  |.  |.   |.   |.   |
+|4  |.   |.   |116 |.  |.   |.   |.   |.  |.  |.   |.   |.   |.   |.   |.   |.   |.   |.   |.  |.   |.   |.  |.  |.   |.   |.   |
+|5  |.   |.   |.   |97 |.   |.   |.   |.  |.  |.   |.   |.   |.   |.   |.   |.   |.   |.   |.  |.   |.   |.  |.  |.   |.   |.   |
+|6  |.   |.   |.   |.  |108 |.   |.   |.  |.  |.   |.   |.   |.   |.   |.   |.   |.   |.   |.  |.   |.   |.  |.  |.   |.   |.   |
+|7  |.   |.   |.   |.  |.   |111 |.   |.  |.  |.   |.   |.   |.   |.   |.   |.   |.   |.   |.  |.   |.   |.  |.  |.   |.   |.   |
+|8  |.   |.   |.   |.  |.   |.   |120 |.  |.  |.   |.   |.   |.   |.   |.   |.   |.   |.   |.  |.   |.   |.  |.  |.   |.   |.   |
+|9  |.   |.   |.   |.  |.   |.   |.   |51 |.  |.   |.   |.   |.   |.   |.   |.   |.   |.   |.  |.   |.   |.  |.  |.   |.   |.   |
+|a  |.   |.   |.   |.  |.   |.   |.   |.  |63 |.   |.   |.   |.   |.   |.   |.   |.   |.   |.  |.   |.   |.  |.  |.   |.   |.   |
+|b  |.   |.   |.   |.  |.   |.   |.   |.  |.  |110 |.   |.   |.   |.   |.   |.   |.   |.   |.  |.   |.   |.  |.  |.   |.   |.   |
+|d  |.   |.   |.   |.  |.   |.   |.   |.  |.  |.   |108 |.   |.   |.   |.   |.   |.   |.   |.  |1   |.   |.  |.  |.   |.   |.   |
+|e  |.   |.   |.   |.  |.   |.   |.   |.  |.  |.   |.   |110 |.   |.   |.   |.   |.   |.   |.  |.   |.   |.  |.  |.   |.   |.   |
+|f  |.   |.   |.   |.  |.   |.   |.   |.  |.  |.   |.   |.   |116 |.   |.   |.   |.   |.   |.  |.   |.   |.  |.  |.   |.   |.   |
+|h  |.   |.   |.   |.  |.   |.   |.   |.  |.  |1   |.   |.   |.   |116 |.   |.   |.   |1   |.  |.   |.   |.  |.  |.   |.   |.   |
+|j  |.   |.   |.   |.  |.   |.   |.   |.  |.  |.   |.   |.   |.   |.   |115 |.   |.   |.   |.  |.   |.   |.  |.  |.   |.   |.   |
+|k  |.   |.   |.   |.  |.   |.   |.   |.  |.  |.   |.   |.   |.   |.   |.   |126 |.   |.   |.  |.   |.   |.  |.  |.   |.   |.   |
+|m  |.   |.   |.   |.  |.   |.   |.   |.  |.  |.   |.   |.   |.   |.   |.   |.   |122 |2   |.  |.   |.   |.  |.  |.   |.   |.   |
+|n  |.   |.   |.   |.  |.   |.   |.   |.  |.  |1   |.   |.   |.   |3   |.   |.   |1   |132 |.  |.   |.   |.  |.  |.   |.   |.   |
+|r  |.   |.   |.   |.  |.   |.   |.   |.  |.  |.   |.   |.   |1   |.   |.   |.   |.   |.   |91 |.   |.   |.  |.  |.   |.   |.   |
+|s  |.   |.   |.   |.  |.   |.   |.   |.  |.  |.   |.   |.   |.   |.   |.   |.   |.   |.   |.  |113 |.   |.  |.  |.   |.   |.   |
+|t  |.   |.   |.   |.  |.   |.   |.   |.  |.  |.   |.   |.   |.   |.   |.   |.   |.   |.   |.  |.   |106 |.  |.  |.   |.   |.   |
+|u  |.   |.   |.   |.  |.   |.   |.   |.  |.  |.   |1   |.   |.   |.   |.   |.   |.   |.   |.  |.   |.   |99 |.  |.   |.   |.   |
+|v  |.   |.   |.   |.  |.   |.   |.   |.  |.  |.   |.   |.   |.   |.   |.   |.   |.   |.   |.  |.   |.   |.  |99 |.   |.   |2   |
+|w  |.   |.   |.   |.  |.   |.   |.   |.  |.  |.   |.   |.   |.   |.   |.   |.   |.   |.   |.  |.   |.   |.  |.  |107 |.   |.   |
+|x  |.   |.   |.   |.  |.   |.   |.   |.  |.  |.   |.   |.   |.   |.   |.   |.   |.   |.   |.  |.   |.   |.  |.  |.   |132 |.   |
+|y  |.   |.   |.   |.  |.   |.   |.   |.  |.  |.   |.   |.   |.   |.   |.   |.   |.   |.   |.  |.   |.   |.  |.  |.   |.   |102 |
+
+## Nem tudo são rosas
+
+O resultado para o CAPTCHA do TRT é bastante satisfatório, mas infelizmente não generaliza para outros CAPTCHAs. Tome por exemplo o CAPTCHA da Receita Federal abaixo. Nesse caso, a posição dos caracteres muda significativamente de imagem para imagem, e assim fica difícil cortar em pedaços.
+
+```{r generalize, echo=FALSE, out.width = '12%'}
+dir('img/receita', full.names = TRUE) %>% 
+  plyr::l_ply(function(x) plot(magick::image_read(x)))
+```
+
+O mesmo modelo aplicado ao CAPTCHA da Receita possui acerto de 78.8% do caractere, o que equivale a apenas 23.8% de acerto para toda a imagem. Veja os resultados na tabela abaixo.
+
+```{r receita, echo=FALSE, eval=FALSE}
+# arq_captcha <- 'img/receita/1aux8c.png'
+# arq_captcha %>% 
+#   load_image() %>%
+#   magrittr::extract(-c(1:12, 38:dim(.)[1]), -c(1:12), TRUE) %>%
+#   grDevices::as.raster() %>% 
+#   graphics::plot()
+# abline(v = 28 * 1:5, col = 'red')
+# abline(v = 28 * c(0, 6), col = 'black')
+# abline(h = c(0, 25), col = 'blue')
+p <- progress::progress_bar$new(total = 2300)
+dados <- '~/decryptr/captchaReceitaData/inst/img' %>% 
+  dir(full.names = TRUE, pattern = '_') %>% 
+  str_subset('png$') %>% 
+  # head(10) %>% 
+  # c('aff') %>% 
+  head(2300) %>%
+  map_df(possibly(~{
+    p$tick()
+    words <- .x %>% 
+      basename() %>% 
+      tools::file_path_sans_ext() %>% 
+      stringr::str_match("_([a-zA-Z0-9]+)$") %>% 
+      magrittr::extract(TRUE, 2) %>% 
+      stringr::str_split('', simplify = TRUE) %>% 
+      as.character() %>% 
+      tolower()
+    .x %>% 
+      load_image() %>% 
+      magrittr::extract(-c(1:12, 38:dim(.)[1]), -c(1:12), 1) %>%
+      as_tibble() %>% 
+      rownames_to_column('y') %>% 
+      gather(x, value, -y) %>% 
+      mutate_at(vars(x, y), funs(parse_number)) %>% 
+      mutate(letra = (x - 1) %/% 28 + 1,
+             x = x - (letra - 1) * 28) %>% 
+      mutate_at(vars(x, y), funs(sprintf('%02d', .))) %>% 
+      unite(xy, x, y) %>% 
+      spread(xy, value, sep = '') %>% 
+      mutate(y = words) %>% 
+      select(y, everything(), -letra)
+  }, tibble(y = NA_character_)), .id = 'captcha_id')
+saveRDS(dados, 'd_segment_captcha_receita.rds', compress = 'bzip2')
+```
+
+```{r receitarf, message=FALSE, warning=FALSE, echo=FALSE, eval=FALSE}
+library(randomForest)
+dados <- readRDS('../../static/data/captcha-segment/d_segment_captcha_receita.rds') %>% 
+  mutate(y = factor(y))
+
+# monta bases de treino e teste
+set.seed(4747) # reprodutibilidade
+ids_treino <- sample(seq_len(nrow(dados)), 11000, replace = FALSE)
+d_train <- dados[ids_treino, ]
+d_test <- dados[-ids_treino, ]
+```
+
+```{r modelrf1, eval=FALSE}
+model <- randomForest(y ~ . - captcha_id, data = d_train) 
+```
+
+```{r modelrf2, echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
+# saveRDS(model, 'model_segment_receita_rf.rds', compress = 'bzip2')
+model <- readRDS('../../static/data/captcha-segment/model_segment_receita_rf.rds')
+```
+
+```{r errosReceita, echo=FALSE, eval=FALSE}
+d_test %>% 
+  mutate(pred = predict(model, newdata = .)) %>% 
+  count(y, pred) %>% 
+  spread(pred, n, fill = '.') %>% 
+  remove_rownames() %>% 
+  knitr::kable(caption = 'Tabela de acertos e erros para o CAPTCHA da Receita.')
+```
+
+|y  |1  |2  |3  |4  |5  |6  |7  |8  |9  |a  |b  |c  |d  |e  |f  |g  |h  |i  |j  |k  |l  |m   |n  |o  |p  |q  |r  |s  |t  |u  |v  |w   |x  |y  |z  |
+|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|:---|:--|:--|:--|:--|:--|:--|:--|:--|:--|:---|:--|:--|:--|
+|1  |28 |.  |.  |.  |.  |.  |.  |.  |.  |.  |.  |.  |.  |.  |2  |.  |.  |2  |4  |.  |3  |.   |.  |.  |.  |.  |.  |.  |10 |.  |.  |.   |.  |.  |.  |
+|2  |.  |28 |.  |.  |.  |.  |.  |.  |.  |.  |.  |2  |.  |1  |1  |.  |.  |.  |2  |.  |.  |.   |.  |.  |.  |.  |.  |.  |.  |.  |.  |.   |1  |.  |8  |
+|3  |1  |.  |29 |.  |3  |.  |.  |1  |1  |.  |.  |.  |.  |.  |.  |.  |.  |.  |6  |1  |.  |.   |.  |.  |.  |.  |.  |.  |.  |.  |.  |.   |.  |.  |.  |
+|4  |.  |.  |.  |35 |.  |.  |.  |.  |1  |.  |.  |.  |.  |.  |.  |.  |.  |.  |1  |.  |.  |1   |.  |.  |.  |.  |1  |.  |.  |.  |.  |1   |.  |.  |.  |
+|5  |.  |.  |.  |.  |30 |.  |.  |.  |.  |.  |1  |.  |.  |1  |.  |.  |.  |.  |1  |.  |.  |.   |.  |.  |.  |2  |.  |1  |.  |.  |.  |.   |.  |.  |.  |
+|6  |.  |.  |.  |1  |.  |38 |.  |.  |.  |.  |3  |.  |.  |2  |.  |.  |1  |.  |.  |.  |.  |.   |.  |.  |.  |.  |.  |.  |1  |.  |1  |1   |.  |1  |.  |
+|7  |1  |.  |.  |.  |.  |.  |38 |.  |.  |.  |.  |.  |1  |.  |.  |.  |.  |.  |2  |.  |.  |.   |.  |.  |.  |.  |.  |1  |.  |.  |2  |.   |.  |.  |.  |
+|8  |.  |.  |.  |.  |.  |2  |.  |31 |.  |.  |3  |.  |.  |.  |.  |.  |5  |1  |.  |2  |.  |.   |.  |.  |.  |.  |.  |1  |.  |.  |.  |.   |1  |.  |.  |
+|9  |.  |.  |.  |1  |.  |.  |1  |.  |41 |.  |.  |.  |.  |.  |1  |.  |.  |.  |.  |.  |.  |.   |.  |.  |.  |.  |.  |.  |1  |.  |1  |.   |1  |.  |2  |
+|a  |.  |1  |.  |.  |.  |.  |.  |.  |.  |79 |.  |.  |.  |.  |.  |.  |.  |.  |.  |.  |.  |.   |.  |.  |1  |.  |.  |1  |.  |.  |.  |.   |1  |.  |1  |
+|b  |.  |.  |.  |.  |.  |.  |.  |1  |.  |1  |60 |.  |.  |1  |.  |.  |4  |.  |.  |1  |.  |.   |.  |3  |2  |2  |2  |2  |1  |.  |.  |.   |1  |.  |.  |
+|c  |.  |1  |.  |.  |.  |.  |.  |.  |.  |.  |2  |62 |1  |5  |1  |2  |.  |.  |1  |.  |.  |.   |.  |6  |1  |1  |.  |1  |1  |.  |1  |.   |.  |.  |.  |
+|d  |.  |.  |1  |.  |.  |.  |.  |.  |.  |3  |3  |.  |35 |3  |.  |4  |1  |.  |1  |1  |2  |1   |1  |8  |2  |2  |.  |.  |.  |12 |.  |1   |1  |.  |.  |
+|e  |.  |.  |.  |1  |.  |1  |.  |.  |.  |4  |1  |1  |.  |83 |2  |.  |.  |.  |.  |.  |.  |.   |.  |.  |2  |.  |1  |1  |.  |.  |.  |3   |.  |.  |.  |
+|f  |.  |.  |.  |.  |.  |.  |.  |.  |.  |1  |.  |.  |.  |3  |79 |.  |.  |.  |.  |1  |.  |1   |.  |.  |2  |.  |.  |.  |4  |.  |.  |.   |.  |1  |.  |
+|g  |.  |.  |.  |.  |.  |.  |.  |.  |2  |1  |.  |1  |.  |.  |.  |64 |.  |.  |2  |.  |.  |.   |.  |3  |.  |17 |.  |2  |1  |.  |.  |.   |.  |.  |.  |
+|h  |.  |.  |.  |.  |.  |.  |.  |1  |.  |.  |3  |.  |.  |1  |.  |.  |87 |.  |.  |2  |1  |2   |2  |.  |.  |.  |3  |.  |2  |.  |.  |.   |.  |.  |.  |
+|i  |2  |.  |.  |.  |.  |.  |.  |.  |.  |2  |.  |.  |.  |.  |1  |.  |.  |36 |2  |.  |1  |.   |.  |.  |.  |.  |1  |.  |4  |.  |.  |1   |2  |2  |.  |
+|j  |.  |.  |.  |.  |.  |.  |.  |.  |2  |.  |1  |.  |1  |.  |.  |.  |.  |4  |70 |.  |.  |.   |.  |1  |.  |1  |.  |1  |1  |1  |2  |.   |.  |.  |.  |
+|k  |.  |.  |.  |.  |.  |.  |.  |1  |.  |.  |1  |.  |.  |.  |.  |.  |.  |.  |.  |79 |.  |.   |1  |.  |.  |.  |1  |.  |1  |.  |1  |1   |1  |.  |.  |
+|l  |3  |.  |.  |.  |.  |.  |.  |.  |.  |.  |1  |.  |.  |2  |1  |.  |1  |.  |.  |.  |38 |.   |.  |.  |.  |.  |.  |.  |12 |.  |.  |1   |.  |.  |.  |
+|m  |.  |.  |.  |.  |.  |.  |.  |.  |.  |.  |.  |.  |.  |.  |.  |.  |2  |.  |.  |.  |.  |101 |3  |.  |1  |.  |2  |.  |.  |.  |1  |.   |1  |.  |.  |
+|n  |.  |.  |.  |.  |.  |.  |.  |.  |.  |.  |1  |.  |1  |1  |1  |.  |8  |.  |.  |.  |.  |2   |67 |.  |.  |.  |4  |.  |.  |2  |.  |2   |1  |.  |.  |
+|o  |.  |.  |1  |.  |1  |.  |.  |.  |.  |2  |1  |15 |4  |3  |.  |1  |.  |.  |2  |.  |.  |.   |.  |62 |2  |9  |.  |2  |.  |1  |1  |.   |.  |.  |.  |
+|p  |2  |.  |.  |1  |.  |.  |.  |.  |.  |.  |2  |.  |.  |2  |2  |3  |1  |.  |.  |.  |.  |.   |1  |1  |75 |.  |4  |.  |3  |.  |.  |2   |.  |.  |.  |
+|q  |.  |.  |.  |.  |.  |.  |.  |.  |.  |1  |.  |1  |.  |3  |.  |7  |.  |.  |.  |.  |.  |1   |.  |2  |1  |79 |.  |.  |.  |.  |1  |.   |.  |.  |1  |
+|r  |.  |.  |.  |.  |.  |.  |.  |.  |.  |.  |2  |.  |.  |.  |4  |.  |.  |.  |.  |8  |.  |.   |1  |.  |3  |.  |65 |.  |4  |.  |1  |.   |1  |.  |1  |
+|s  |.  |.  |.  |.  |.  |.  |.  |1  |.  |3  |2  |1  |.  |2  |.  |.  |.  |.  |2  |.  |.  |.   |.  |.  |.  |.  |1  |87 |.  |.  |1  |2   |.  |.  |.  |
+|t  |.  |.  |.  |1  |.  |.  |.  |.  |.  |.  |2  |1  |.  |1  |2  |2  |.  |.  |1  |1  |.  |.   |.  |.  |.  |1  |1  |1  |78 |.  |1  |1   |1  |.  |1  |
+|u  |.  |.  |.  |.  |.  |.  |.  |.  |1  |2  |1  |.  |2  |.  |1  |.  |1  |1  |3  |.  |.  |.   |1  |.  |.  |1  |.  |.  |.  |80 |2  |2   |.  |.  |.  |
+|v  |.  |1  |.  |.  |.  |.  |.  |.  |.  |.  |.  |.  |.  |.  |.  |.  |.  |.  |.  |.  |.  |.   |.  |.  |.  |.  |.  |.  |.  |2  |93 |3   |.  |5  |.  |
+|w  |.  |.  |.  |.  |.  |.  |.  |.  |.  |.  |.  |.  |.  |.  |.  |.  |.  |.  |1  |.  |.  |.   |1  |.  |.  |.  |.  |.  |.  |.  |1  |100 |.  |.  |.  |
+|x  |.  |.  |.  |.  |.  |2  |.  |.  |.  |1  |.  |.  |.  |.  |.  |.  |.  |.  |.  |1  |.  |.   |.  |.  |.  |.  |.  |.  |.  |.  |.  |3   |91 |1  |.  |
+|y  |.  |.  |1  |1  |1  |.  |.  |.  |.  |2  |.  |.  |.  |.  |1  |1  |.  |.  |2  |.  |.  |1   |.  |2  |1  |.  |.  |.  |2  |1  |15 |1   |1  |75 |.  |
+|z  |.  |.  |.  |.  |.  |.  |.  |.  |1  |1  |.  |.  |.  |2  |.  |.  |1  |.  |.  |.  |.  |.   |.  |.  |.  |.  |.  |.  |.  |.  |.  |.   |.  |.  |85 |
+
+Claro que seria possível melhorar o poder preditivo com uma modelagem mais cuidadosa: nós usamos todos os parâmetros padrão da `randomForest` e não consideramos outros possíveis modelos. Mas acreditamos que o problema essencial está na segmentação, e não na modelagem após a segmentação. 
+
+Nos próximos posts, vamos mostrar como resolver o CAPTCHA da Receita com maior acurácia utilizando técnicas de Deep Learning que consideram a etapa de segmentação dentro da modelagem.
+
+## Wrap-up
+
+- Não dá para considerar todas as combinações de valores de um CAPTCHA diretamente num modelo de regressão.
+- Uma forma de resolver um CAPTCHA é segmentando a imagem em pedaços de mesma largura.
+- Para montar a base de treino, criamos uma coluna para cada pixel. Um CAPTCHA corresponde a uma base com $k$ linhas e número de colunas igual ao número de pixels.
+- No CAPTCHA do TRT os resultados são satisfatórios.
+- Já para CAPTCHA da Receita essa estratégia pode ser ineficaz.
+- Vamos evoluir essa análise para técnicas que consideram a etapa de segmentação dentro da modelagem.
+
+É isso. Happy coding ;)

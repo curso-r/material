@@ -1,0 +1,156 @@
+---
+title: "É possível rodar python no RStudio?"
+date: "2018-03-11T14:25:00+03:00"
+tags: ["python", "rstudio", "reticulate"]
+categories: ["tutoriais", "r"]
+banner: "img/banners/py.png"
+author: ["Julio"]
+summary: "RStudio é a melhor IDE para fazer ciência de dados. R e python são, no momento, as melhores linguagens para fazer ciência de dados. O RStudio foi criado para rodar R. Será que também serve para rodar python? Nesse post curtinho eu respondo que sim e explico como..."
+draft: false
+---
+
+```{r, echo=FALSE, eval=FALSE, incluse = FALSE}
+library(magick)
+im1 <- image_read("~/Downloads/python-versus-R.png") %>% 
+  image_crop("200x180+30+40")
+im2 <- image_read("~/Downloads/python-versus-R.png") %>% 
+  image_crop("200x180+413+40")
+im3 <- "~/Downloads/hearts.png" %>% 
+  image_read() %>% 
+  image_resize("400x500") %>% 
+  image_strip()
+image_join(im1, im2) %>% 
+  image_append(stack = TRUE) %>% 
+  image_join(im3) %>% 
+  image_append() %>% 
+  image_write("../../static/img/banners/py.png")
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, 
+                      cache = TRUE, 
+                      eval = FALSE)
+```
+
+RStudio é a melhor IDE para fazer ciência de dados. R e python são, no momento, as melhores linguagens para fazer ciência de dados. O RStudio foi criado para rodar R. 
+
+Mas será que o RStudio é bom para rodar python? 
+
+```{r fig.width=5, eval=TRUE, echo=FALSE, fig.height=3, fig.align='center'}
+meme::meme(system.file("success.jpg", package = "meme"), 
+           "", "SIM!!!", font = "Helvetica", r = 0.2, size = 5)
+```
+
+Nesse post curtinho eu mostro que **sim** e explico como.
+
+### Rodando R e python no RMarkdown
+
+Primeiro, certifique-se de que você tem a versão `1.1.x` ou maior do RStudio instalado na sua máquina. Abra um arquivo RMarkdown em 
+
+```
+File > New file > R Markdown...
+```
+
+Talvez seja necessário instalar alguns pacotes (por exemplo, o próprio `rmarkdown`) para abrir a telinha.
+
+> Se você não sabe o que é RMarkdown, dê uma olhada na [documentação oficial do RStudio](https://rmarkdown.rstudio.com/lesson-1.html). Em poucas palavras, o RMarkdown é uma forma escrever textos e códigos dentro de um mesmo arquivo. Fazer análises com RMarkdown no RStudio é uma das coisas que torna essa IDE tão poderosa.
+
+Com o RMarkdown aberto, você pode inserir um *chunk* com `Ctrl + Alt + I`. Vai aparecer isso aqui: 
+
+```
+'''{r}
+
+'''
+```
+
+Se você escrever um código em R aí dentro e mandar rodar, ele vai rodar. 
+
+```
+'''{r}
+eu_gosto_de_R <- "nossa, como você é legal!"
+eu_gosto_de_R
+'''
+
+[1] "nossa, como você é legal!"
+
+```
+
+Se você trocar `r` por `python`, você poderá rodar python. Só isso!
+
+```
+'''{python}
+eu_gosto_de_python = "tudo bem, vida que segue"
+print eu_gosto_de_python
+'''
+
+tudo bem, vida que segue
+
+```
+
+### É possível preservar a sessão entre chunks?
+
+Até o RStudio `1.1.x`, não. Mas a partir da [versão `1.2.x`](https://dailies.rstudio.com/), que ainda não foi lançada oficialmente, isso já funciona. Então, isso aqui funciona:
+
+```
+'''{python}
+eu_gosto_de_python += "!!!" 
+print eu_gosto_de_python
+'''
+
+tudo bem, vida que segue!!!
+
+```
+
+Com essa atualização, você também pode pegar os objetos rodados em python direto para o R, e vice-versa
+
+
+Ler objetos do python no R, carregando o pacote `reticulate`:
+
+```
+'''{r}
+library(reticulate)
+
+veio_do_python <- py$eu_gosto_de_python
+paste(veio_do_python, " Segue no R.")
+'''
+
+[1] "tudo bem, vida que segue!!! Segue no R."
+
+```
+
+Ler objetos do R no python usando o objeto `r.`:
+
+```
+'''{python}
+print r.eu_gosto_de_R + " Também no python."
+'''
+
+nossa, como você é legal! Também no python
+
+```
+
+> As versões `1.2.x` ainda não foram lançadas oficialmente. Ou seja, elas podem ter problemas de funcinamento. Muito cuidado ao usar as daily builds do RStudio!
+
+### Um pouco de explicação
+
+Tudo isso é possível graças ao pacote [`reticulate`](http://curso-r.com/blog/2017/11/20/2017-11-20-reticulate/) do RStudio, que é responsável por criar uma sessão do python dentro do R. A versão mais atualizada desse pacote utiliza a função `reticulate::eng_python`, que é adicionada como uma opção `knitr::knit_engines$set()` do pacote `knitr`.  
+
+Na versão `1.2.x` do RStudio, a utilização dessa engine vem integrada ao editor do RMarkdown, permitindo que você rode os códigos em python e em R diretamente. Nas versões anteriores, você só conseguirá obter os resultados após compilar o documento para algum formato de saída (HTML, PDF, Word, etc).
+
+Atualmente, o `reticulate` já sabe transferir vários objetos entre as linguagens: 
+- Objetos atômicos como números, strings etc funcionam sem nenhuma dor. 
+- Com um pouquinho de esforço, também podemos transferir `data.frame`s entre R e `Pandas`, matrizes e arrays entre R e `NumPy`. 
+- Objetos complexos do python são tratados como [environments](http://curso-r.com/blog/2017/06/19/2017-06-19-environments/) no R.
+- Para mais detalhes, veja [esse link](https://rstudio.github.io/reticulate/index.html#type-conversions).
+
+O pacote `reticulate` também permite que você abra uma sessão interativa do python dentro do console do R, usando a função `py_repl()`. Veja [essa parte da documentação do reticulate](https://rstudio.github.io/reticulate/index.html#python-repl) para detalhes.
+
+### Wrap-up
+
+- Você pode rodar R e python no RMarkdown dentro do RStudio.
+- Para obter todas as funcionalidades, baixe a [daily build, versão 1.2.x](https://dailies.rstudio.com/). Mas tome cuidado.
+- O objeto `reticulate::py` guarda objetos carregados no python dentro do R.
+- O objeto `r.` guarda objetos carregados no R dentro do python.
+- Fique atualizada e obtenha mais informações no [pacote reticulate](https://rstudio.github.io/reticulate/index.html).
+
+É isso pessoal. Happy coding ;)

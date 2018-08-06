@@ -1,0 +1,251 @@
+---
+title: "Multas em São Paulo"
+date: "2017-04-01T13:07:31+02:00"
+tags: ["sptrans"]
+categories: ["análises", "r"]
+banner: "img/banners/banner-multas-sp.jpg"
+author: ["Daniel"]
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, cache = TRUE)
+```
+
+Há bastante tempo tenho vontade de fazer análises usando dados de multas de São Paulo. 
+O problema é: estes dados estão disponíveis? Na teoria, sim. Os dados de multas, como
+quantidade de multas por tipo de infração, dia e horário, e outros são divulgados no
+[portal da Mobilidade Segura](http://mobilidadesegura.prefeitura.sp.gov.br/QvAJAXZfc/opendoc.htm?document=Painel_Mobilidade_Segura.qvw&host=QVS%40c65v27i&anonymous=true) da Prefeitura de São Paulo. Na prática, é um pouco
+diferente. Apesar do site fornecer uma opção de exportação, a tabela 
+exportada não é completa e muitas informações ficam faltando. Dá bastante trabalho
+para exportar todas as informações.
+
+Para não ter o trabalho de exportar tabela por tabela, fiz uma requisição para a
+prefeitura, por meio da Lei de Acesso à Informação, pedindo acesso direto ao banco de 
+dados que fornece as informações para o Portal. A resposta foi a seguinte:
+
+> Prezado Senhor Daniel, Agradecemos o contato e informamos que o seu pedido foi indeferido com fundamento no art. 16, inciso III, do Decreto nº 53.623/2012, pois a base de dados contém informações pessoais que não podem ser disponibilizadas a terceiros. Os demais dados encontram-se inseridos no Painel Mobilidade Segura para consulta pelos interessados com a possibilidade de exportar arquivos. Informamos ainda que na época da sua solicitação, os painéis se encontravam atualizados, visto que a atualização mensal ocorre após os 70 dias da data da infração 
+
+A resposta ao meu ver é totalmente contraditória: ao mesmo tempo que eu não posso 
+receber os dados porque eles são confidenciais, eu posso obtê-los pelo site, que
+"oferece possibilidade de exportação de arquivos". (???)
+
+Antes mesmo de pedir acesso ao banco de dados tinha pensado em desenvolver um 
+webscrapper para fazer o download automático das planilhas, mas a tecnologia com 
+a qual o portal foi desenvolvido (QlikView) dificulta muito o desenvolviento.
+
+Sobrou fazer o download manual mesmo. Até agora fiz o download de todos as planilhas
+de 2014 a 2016 contendo infrações capturadas tanto eletrônica quanto manualmente 
+de carros (ainda faltam ônibus, utilitários, etc.) por hora do dia. Isso quer dizer
+que já temos planilhas suficientes para criar uma tabela:
+
+* tipo de veículo (sempre seria carro)
+* data (2014 a 2016)
+* hora do dia
+* eletronica/manual
+* motivo da multa
+* localizacao da multa (quando for um radar)
+* quantidade de multas
+
+Disponibilizei esses dados [neste repositório](https://github.com/dfalbel/spmultas)
+do Github. 
+
+Agora com as análises a seguir, espero criar curiosidade e interesse para que mais
+pessoas possam ajudar no download completo dos dados. Na página inicial do 
+repositório, adicionei, um mini-tutorial de como você pode ajudar fazendo os 
+downloads.
+
+Vamos às análises.
+
+## Obter os dados
+
+```{r eval=FALSE}
+download.file("https://github.com/dfalbel/spmultas/raw/master/data/carros_eletronicas.rda", "carros_eletronicas.rda")
+load("carros_eletronicas.rda")
+```
+
+```{r echo=FALSE}
+# save(carros_summary, carros_summary_enquad, carros_summary_hora,
+#      carros_depara_enquad, carros_depara_enquad_wday, depara,
+#      top10_locais, top10_motivos, file = "multas_data.rda")
+load("../../static/data/multas-em-sp/multas_data.rda")
+```
+
+
+A partir de agora, você possui carregado um `data.frame` chamado `carros_eletronicas`
+que possui as informações das multas para carros de forma eletrônica.
+
+Em primeiro lugar, vamos analisar a quantidade de multas por dia em São Paulo desde
+2014.
+
+## Visualizar a série
+
+```{r, message=FALSE, warning=FALSE, include=FALSE}
+library(ggplot2)
+library(dplyr)
+library(lubridate)
+library(tidyr)
+```
+
+```{r eval=FALSE}
+carros_summary <- carros_eletronicas %>%
+  group_by(data) %>%
+  summarise(qtd = sum(qtd))
+```
+
+```{r}
+carros_summary %>% 
+  ggplot(aes(data, qtd)) +
+  geom_line()
+```
+
+Vemos nesse gráfico que o número de multas (por radar) era sempre por volta de 10.000
+durante 2014, em 2015 foi aumentando bastante durante o ano e em 2016 se estabilizou.
+Vamos ver agora, por tipo de enquadramento, isto é, por motivo da multa.
+
+Existem 11 tipos de enquadramentos eletrônicos. Para a visualização ficar mais fácil,
+vamos primeiro agrupar em grandes temas:
+
+* Avançar o sinal vermelho
+* Executar conversão proibida
+* Parar sobre faixa de pedestres
+* Rodízio
+* Velocidade
+* Transitar em faixa de ônibus ou exclusiva p/ determinado veículo
+
+O agrupamento final ficou assim:
+
+```{r eval=FALSE}
+depara <- carros_eletronicas %>%
+  group_by(enquadramento) %>%
+  summarise(qtd = sum(qtd)) %>% 
+  arrange(qtd) %>%
+  select(-qtd)
+```
+
+
+```{r, results='asis'}
+depara$agrup_enquadramento <- c(
+  "Conversão proibida", "Velocidade", "Faixa de Pedestres", 
+  "Faixa de ônibus", "Sinal vermelho", "Faixa de ônibus",
+  "Conversão proibida", "Faixa de ônibus", "Velocidade",
+  "Rodízio", "Velocidade")
+
+depara %>% 
+  knitr::kable()
+```
+
+
+```{r eval=FALSE}
+carros_summary_enquad <- carros_eletronicas %>%
+  left_join(depara, by = "enquadramento") %>%
+  group_by(data, agrup_enquadramento) %>%
+  summarise(qtd = sum(qtd))
+```
+
+```{r}
+carros_summary_enquad %>% 
+  ggplot(aes(data, qtd, color = agrup_enquadramento)) +
+  geom_line()
+```
+
+No gráfico, vemos que em 2015, o tipo de multa que mais aumentou em quantidade foi
+velocidade e rodízio. 
+
+## Curiosidades
+
+Anteriormente vimos como se comportou o número de multas de maneira geral na cidade.
+Vamos agora matar algumas curiosidades.
+
+1. Quais são os horários com mais multas em SP?
+
+```{r eval=FALSE}
+carros_summary_hora <- carros_eletronicas %>% 
+  group_by(hora) %>%
+  summarise(qtd = sum(qtd))
+```
+
+```{r}
+carros_summary_hora %>%
+  ggplot(aes(x = hora, y = qtd)) +
+  geom_bar(stat = "identity")
+```
+
+Notamos que o maior número de multas ocorre justamente na hora do rush. Isto é,
+entre 7 e 10 da manhã e 17h e 19h. Isso até faz sentido, mas nessas horas o trânsito
+da cidade está todo parado. Será que a distribuição fica diferente por tipo de multa?
+Principalmente as de velocidade.
+
+```{r eval=FALSE}
+carros_depara_enquad <- carros_eletronicas %>% 
+  left_join(depara, by = "enquadramento") %>%
+  group_by(hora, agrup_enquadramento) %>%
+  summarise(qtd = sum(qtd))
+```
+
+```{r}
+carros_depara_enquad %>%
+  ggplot(aes(x = hora, y = qtd, fill = agrup_enquadramento)) +
+  geom_bar(stat = "identity")
+```
+
+Veja que interessante! O grande responsável pelo pico da hora do rush é o rodízio.
+(Essa é justamente a hora em que ele está valendo.) As multas de velocidade diminuem 
+um pouco durante o trânsito e acontecem mais durante o dia e não durante a noite
+como poderíamos imaginar. Vemos também que as multas de farol vermelho acontecem mais
+durante a madrugada.
+
+2. Qual é o dia da semana com mais multas?
+
+```{r eval=FALSE}
+carros_depara_enquad_wday <- carros_eletronicas %>% 
+  left_join(depara, by = "enquadramento") %>%
+  group_by(dia_da_semana = wday(data), agrup_enquadramento) %>%
+  summarise(qtd = sum(qtd))
+```
+
+```{r}
+carros_depara_enquad_wday %>%
+  ggplot(aes(x = dia_da_semana, y = qtd, fill = agrup_enquadramento)) +
+  geom_bar(stat = "identity")
+```
+
+O dia da semana com mais multas é quinta feira. Nos finais de semana, aumenta muito
+o número de multas por excesso de velocidade (claro, as ruas estão mais vazias).
+
+3. Quais são os radares que mais multam em SP? E porque?
+
+```{r eval=FALSE}
+top10_locais <- carros_eletronicas %>%
+  group_by(local) %>%
+  summarise(n = sum(qtd)) %>%
+  arrange(desc(n)) %>%
+  slice(1:10)
+```
+
+```{r, results='asis'}
+knitr::kable(top10_locais)
+```
+
+Agora vamos ver os motivos, em cada um desses lugares.
+
+```{r eval=FALSE}
+top10_motivos <- top10_locais %>%
+  left_join(carros_eletronicas, by = "local") %>%
+  left_join(depara, by = "enquadramento") %>%
+  mutate(local = stringr::str_wrap(local, width = 20) %>% 
+           forcats::fct_reorder(-n)) %>%
+  group_by(local, agrup_enquadramento) %>%
+  summarise(qtd = sum(qtd))
+```
+
+```{r, fig.width=14, fig.height=7, out.width = "1000px"}
+top10_motivos %>%
+  ggplot(aes(x = local, y = qtd, fill = agrup_enquadramento)) +
+  geom_bar(stat = "identity")
+```
+
+Por incrível que pareça, nos dois radares com mais multas, o motivo da multa é conversão proibida.
+A foto de onde fica esse radar saiu em uma [notícia sobre o mesmo tema](http://www1.folha.uol.com.br/cotidiano/2015/07/1660793-radar-campeao-aplica-375-mil-multas-em-um-ano-na-ponte-das-bandeiras.shtml) na Folha de
+São Paulo.
+
+![](/img/blog/multas-em-sp/radar-chateubriant.jpeg)

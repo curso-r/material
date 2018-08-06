@@ -1,0 +1,135 @@
+---
+title: "Pacote ggalt"
+date: "2017-02-18T13:07:31+02:00"
+tags: ["gráficos", "pacotes", "survival"]
+categories: ["tutoriais", "r"]
+banner: "img/banners/ggalt.png"
+author: ["Julio"]
+summary: "O pacote `ggalt` é uma extensão ao `ggplot2` que permite fazer algumas coisas muito úteis. Uma delas é a possibilidade de fazer faixas de confiança para gráficos do tipo escada. Isso permite adicionar intervalos de confiança para modelos Kaplan-Meier, muito utilizados em Análise de Sobrevivência."
+---
+
+
+
+<p>O pacote <code>ggalt</code> é uma extensão ao <code>ggplot2</code> que permite fazer algumas coisas muito úteis. Uma delas é a possibilidade de fazer faixas de confiança para gráficos do tipo escada. Isso permite adicionar intervalos de confiança para modelos Kaplan-Meier, muito utilizados em Análise de Sobrevivência.</p>
+<p>É possível instalar o pacote <code>ggalt</code> usando a função <code>install.packages()</code>:</p>
+<pre class="r"><code>install.packages(&#39;ggalt&#39;)</code></pre>
+<p>Para exemplificar a utilização do <code>ggalt</code>, vamos utilizar os pacotes abaixo.</p>
+<pre class="r"><code>library(dplyr)
+library(ggplot2)
+library(ggalt)
+library(broom)
+library(survival)</code></pre>
+<p>Nesse exemplo, utilizaremos a base de dados <code>lung</code> que vem com o pacote <code>survival</code>. Primeiramente, ajustamos um modelo Kaplan-Meier simples, usando a função <code>survfit()</code>. Esse modelo tenta explicar a sobrevivência de pacientes com câncer de pulmão para cada sexo.</p>
+<pre class="r"><code># modelo kaplan-meier simples
+km &lt;- survfit(Surv(time, status) ~ sex, data = lung)</code></pre>
+<p>A função <code>tidy()</code> do pacote <code>broom</code> transforma o resultado do modelo numa tabela, já preparada para gerar gráficos.</p>
+<pre class="r"><code>d_km &lt;- tidy(km)
+
+knitr::kable(head(d_km))</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="right">time</th>
+<th align="right">n.risk</th>
+<th align="right">n.event</th>
+<th align="right">n.censor</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">conf.high</th>
+<th align="right">conf.low</th>
+<th align="left">strata</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">11</td>
+<td align="right">138</td>
+<td align="right">3</td>
+<td align="right">0</td>
+<td align="right">0.9782609</td>
+<td align="right">0.0126898</td>
+<td align="right">1.0000000</td>
+<td align="right">0.9542301</td>
+<td align="left">sex=1</td>
+</tr>
+<tr class="even">
+<td align="right">12</td>
+<td align="right">135</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0.9710145</td>
+<td align="right">0.0147075</td>
+<td align="right">0.9994124</td>
+<td align="right">0.9434235</td>
+<td align="left">sex=1</td>
+</tr>
+<tr class="odd">
+<td align="right">13</td>
+<td align="right">134</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">0.9565217</td>
+<td align="right">0.0181489</td>
+<td align="right">0.9911586</td>
+<td align="right">0.9230952</td>
+<td align="left">sex=1</td>
+</tr>
+<tr class="even">
+<td align="right">15</td>
+<td align="right">132</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0.9492754</td>
+<td align="right">0.0196777</td>
+<td align="right">0.9866017</td>
+<td align="right">0.9133612</td>
+<td align="left">sex=1</td>
+</tr>
+<tr class="odd">
+<td align="right">26</td>
+<td align="right">131</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0.9420290</td>
+<td align="right">0.0211171</td>
+<td align="right">0.9818365</td>
+<td align="right">0.9038355</td>
+<td align="left">sex=1</td>
+</tr>
+<tr class="even">
+<td align="right">30</td>
+<td align="right">130</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0.9347826</td>
+<td align="right">0.0224847</td>
+<td align="right">0.9768989</td>
+<td align="right">0.8944820</td>
+<td align="left">sex=1</td>
+</tr>
+</tbody>
+</table>
+<p>O gráfico da Figura <a href="#fig:ruim">1</a> usa a função <code>geom_ribbon()</code> para gerar os intervalos de confiança. Essa função liga os pontos da faixa diretamente, o que é inadequado do ponto de vista estatístico.</p>
+<pre class="r"><code>ggplot(d_km, aes(x = time, y = estimate, colour = strata)) +
+  geom_ribbon(aes(ymin = conf.low, ymax = conf.high, fill = strata), 
+              alpha = .1, size = .1) +
+  geom_step() +
+  theme_bw(16)</code></pre>
+<div class="figure"><span id="fig:ruim"></span>
+<img src="/blog/2017-02-18-ggalt_files/figure-html/ruim-1.png" alt="Intervalos de confiança usando apenas `ggplot2` e `geom_ribbon()`." width="672" />
+<p class="caption">
+Figure 1: Intervalos de confiança usando apenas <code>ggplot2</code> e <code>geom_ribbon()</code>.
+</p>
+</div>
+<p>Na Figura <a href="#fig:bom">2</a>, adicionamos o parâmetro <code>stat = &quot;stepribbon&quot;</code>, que faz com que o <code>ggplot</code> utilize a função <code>stat_stepribbon()</code> do <code>ggalt</code> para o cálculo da faixa. Isso faz com que os intervalos tenham comportamento de escada, como queríamos.</p>
+<pre class="r"><code>ggplot(d_km, aes(x = time, y = estimate, colour = strata)) +
+  geom_ribbon(aes(ymin = conf.low, ymax = conf.high, fill = strata), 
+              stat = &#39;stepribbon&#39;, alpha = .1, size = .1) +
+  geom_step() +
+  theme_bw(16)</code></pre>
+<div class="figure"><span id="fig:bom"></span>
+<img src="/blog/2017-02-18-ggalt_files/figure-html/bom-1.png" alt="Intervalos de confiança usando `stat = 'stepribbon'." width="672" />
+<p class="caption">
+Figure 2: Intervalos de confiança usando `stat = ‘stepribbon’.
+</p>
+</div>

@@ -1,0 +1,54 @@
+---
+title: "O que é um gráfico estatístico?"
+pubdate: "2017-03-02T23:26:00+03:00"
+date: "2017-02-20T23:26:00+03:00"
+tags: ["gráficos","ggplot2"]
+categories: ["conceitos", "r"]
+banner: "img/banners/grafico-interrogacao.png"
+author: ["William"]
+summary: "Os gráficos são técnicas estatísticas para visualização de dados amplamente utilizados em todas as áreas da pesquisa. A sua popularidade se deve à maneira como elucidam informações que estavam escondidas nas colunas do banco de dados, sendo que muitos deles podem ser compreendidos até mesmo por leigos no assunto em questão. Mas será que podemos definir formalmente o que é um gráfico estatístico?"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, cache = TRUE)
+```
+
+Os gráficos são técnicas de visualização de dados amplamente utilizadas em todas as áreas da pesquisa. A sua popularidade se deve à maneira como elucidam informações que estavam escondidas nas colunas do banco de dados, sendo que muitos deles podem ser compreendidos até mesmo por leigos no assunto que está sendo discutido. 
+
+Mas será que podemos definir formalmente o que é um gráfico estatístico?
+
+```{r, echo = F}
+library(ggplot2)
+
+ggplot(mtcars) +
+  geom_text(aes(x = disp, y = mpg, label = '?')) +
+  labs(x = '???', y = '???')
+```
+
+Graças ao estatístico norte-americano Leland Wilkinson, a resposta é sim.
+
+Em 2005, Leland publicou o livro *The Grammar of Graphics*, uma fonte de princípios fundamentais para a construção de gráficos estatísticos. No livro, ele defende que um gráfico é o mapeamento dos dados a partir de atributos estéticos (posição, cor, forma, tamanho) de objetos geométricos (pontos, linhas, barras, caixas). Simples assim.
+
+Além de responder a pergunta levantada nesse post, os conceitos de Leland tiveram outra grande importância para a visualização de dados. Alguns anos mais tarde, o seu trabalho inspirou Hadley Wickham a criar o pacote `ggplot2`, que enterrou com muitas pás de terra as funções gráficas do R base.
+
+Em *A Layered Grammar	of Graphics*, Hadley sugeriu que os principais aspectos de um gráfico (dados, sistema de coordenadas, rótulos e anotações) podiam ser divididos em camadas, construídas uma a uma na elaboração do gráfico. Essa é a essência do `ggplot2`.
+
+No gráfico abaixo, temos informação de 32 carros com respeito a 4 variáveis: milhas por galão, tonelagem, transmissão e número de cilindros. O objeto geométrico escolhido para representar os dados foi o **ponto**. As posições dos pontos no eixo xy mapeia a associação entre a tonelagem e a quantidade de milhas por galão. A cor dos pontos mapeia o número de cilindros de cada carro, enquanto a forma dos pontos mapeia o tipo de transmissão. Observando o código, fica claro como cada linha/camada representa um aspecto diferente do gráfico.
+
+Os conceitos criados por Leland e Hadley defendem que essa estrutura pode ser utilizada para construir e entender qualquer tipo de gráfico, dando a eles, dessa maneira, a sua definição formal.
+
+```{r}
+ggplot(mtcars) +
+  geom_point(aes(x = disp, y = mpg, shape = as.factor(am), color = cyl)) +
+  labs(x = "Tonelagem", y = "Milhas por galão", 
+       shape = "Transmissão", color = "Cilindros") +
+  scale_shape_discrete(labels = c("Automática","Manual")) +
+  theme_bw() +
+  theme(legend.position = "bottom") 
+  
+```
+
+
+Por fim, é preciso frisar que, apesar de a gramática prover uma forte fundação para a construção de gráficos, ela não indica qual gráfico deve ser usado ou como ele deve parecer. Essas escolhas, fundamentadas na pergunta a ser respondida, nem sempre são triviais, e negligenciá-las pode gerar gráficos mal construídos e conclusões equivocadas. Cabe a nós, estatísticos, desenvolver, aprimorar e divulgar as técnicas de visualização adequadas para cada tipo de variável, assim como apontar ou denunciar os usos incorretos e mal-intencionados. Mas, em um mundo cuja veracidade das notícias é cada vez menos importante, é papel de todos ter senso crítico para entender e julgar as informações trazidas por um gráfico.
+
+

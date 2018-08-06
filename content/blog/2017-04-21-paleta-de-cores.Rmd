@@ -1,0 +1,194 @@
+---
+title: "K-means e paleta de cores"
+date: "2017-04-22T13:07:31+02:00"
+tags: ["imagens", "cluster", "kmeans"]
+categories: ["análises", "r"]
+banner: "img/banners/paleta-cores.png"
+author: ["Daniel"]
+summary: "Uma aplicação interessante de algoritmos de clusterização é a obtenção de 
+paletas de cores a partir de imagens. Veja como isso pode ser feito usando
+o R."
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, cache = TRUE)
+```
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+# saveRDS(centroides, "centroides.rds")
+# saveRDS(paleta, "paleta.rds")
+library(dplyr)
+centroides <- readRDS("../../static/data/paleta-de-cores/centroides.rds")
+paleta <- readRDS("../../static/data/paleta-de-cores/paleta.rds")
+```
+
+Uma aplicação interessante de algoritmos de clusterização é a obtenção de 
+paletas de cores a partir de imagens. Veja como isso pode ser feito usando
+o R.
+
+Em primeiro lugar, vamos ler a imagem como uma matriz para o R.
+Existem diversas bibliotecas para carregar as imagens, vamos usar aqui
+a [`jpeg`](https://CRAN.R-project.org/package=jpeg). Para esse caso ela
+é melhor porque já lê a imagem no formato que precisamos.
+
+```{r bowie, eval=FALSE}
+library(jpeg)
+library(magrittr)
+img <- readJPEG("img/david-bowie.jpg")
+```
+
+A imagem lida pelo pacote `jpeg` é representada por um `array` com dimensões:
+`c(altura, largura, n_bandas)` que no nosso caso é `c(1100, 727, 3)`. O número de bandas é 3: R, G e B.
+
+Podemos exibir a imagem no R, convertendo o array, primeiro em um obheto do tipo 
+`raster` e depois simplesmente usando a função `plot`.
+
+```{r raster, fig.height=16, fig.width=16, eval=FALSE}
+plot(as.raster(img))
+```
+
+![](/img/blog/paleta-de-cores/david-bowie.jpg)
+
+O problema de obter a paleta de cores de uma imagem pode ser formulado como um
+problema de clusterização: "obter grupos de individuos que possuem a menor diferença dentro de cada um e a maior diferença possível entre os grupos de 
+acordo com algumas características das unidades amostrais".
+
+Nesse caso, os indivíduos são os pixels da imagem e as características que
+estamos interessados são os valores de R, de G e de B (valores que representam a
+cor do pixel). Para o algortimos de 
+clusterização, precisamos de uma matriz com as 3 colunas R, G e B e largura*altura (numero de pixels) linhas representado os indivíduos. É exatamente essa conversão
+que o trecho de código a seguir realiza.
+
+```{r matrix, eval=FALSE}
+img_matrix <- apply(img, 3, as.numeric)
+```
+
+Agora temos uma matriz com 3 colunas e 799.700 linhas.
+Vamos aplicar agora o algoritmo k-means, para organizar cada um desses pixels em 
+um grupo. O K-means pede o número de grupos como input, vamos começar
+com 6.
+
+```{r kmeans, eval=FALSE}
+km <- kmeans(img_matrix, centers = 6)
+```
+
+O objeto gerado pela função `kmeans` armazena
+um vetor chamado `cluster` (do tamanho do número de linhas da matriz) com um
+identificador do grupo de cada observação da matriz.
+
+A cor que representa cada um dos grupos é representada pelo vetor 
+c(r, g, b) com a média de todas as observações de cada um dos grupos.
+Podemos obter isso com algumas manipulações usando o `dplyr`.
+
+```{r calccentroid, eval=FALSE}
+library(tibble)
+library(dplyr)
+img_df <- tibble(
+  r = img_matrix[,1], 
+  g = img_matrix[,2], 
+  b = img_matrix[,3],
+  cluster = km$cluster
+  )
+centroides <- img_df %>%
+  group_by(cluster) %>%
+  summarise_all(mean)
+```
+
+```{r centroid}
+centroides
+```
+
+Também transformamos uma cor r, g e b em uma representação hexadecimal.
+Assim conseguimos um vetor de caracteres que representa a a paleta de cores.
+
+```{r cores}
+centroides <- centroides %>%
+  mutate(cor = rgb(r, g, b))
+centroides$cor
+```
+
+Para exibir a paleta vamos usar a seguinte função que foi copiada 
+e levemente modificada [daqui](https://github.com/karthik/wesanderson)
+
+```{r exibir, fig.height=2}
+exibir <- function(x) {
+  n <- length(x)
+  old <- par(mar = c(0.5, 0.5, 0.5, 0.5))
+  on.exit(par(old))
+
+  image(1:n, 1, as.matrix(1:n), col = x,
+        ylab = "", xaxt = "n", yaxt = "n", bty = "n")
+}
+exibir(sort(centroides$cor))
+```
+
+Assim obtivemos uma paleta de cores da imagem que mostramos anteriormente. 
+Vamos colocar todo o código que fizemos passo a passo aqui em uma única função para podermos facilmente criar a paleta de cores para outras imagens.
+
+```{r paleta}
+criar_paleta <- function(img, num_cores){
+  # transforma a imagem em uma matriz
+  img_matrix <- apply(img, 3, as.numeric)
+  # treina o algoritmo de k médias
+  km <- kmeans(img_matrix, centers = num_cores)
+  img_df <- tibble(
+    r = img_matrix[,1], 
+    g = img_matrix[,2], 
+    b = img_matrix[,3],
+    cluster = km$cluster
+  )
+  # calcula os centroides dos grupos
+  centroides <- img_df %>%
+    group_by(cluster) %>%
+    summarise_all(mean)
+  # transforma a cor em hexadecimal
+  centroides <- centroides %>%
+    mutate(cor = rgb(r, g, b))
+  # vetor de cores
+  sort(centroides$cor)
+}
+```
+
+Vejamos agora o que acontece com essa bela imagem do filme Moonrise Kingdom do
+Wes Anderson, que é famoso por fazer filmes com belas paletas de cores.
+
+```{r moonrise, fig.height=8, fig.width=16, eval=FALSE}
+moonrise <- readJPEG("img/moonrise-kingdom.jpg")
+plot(as.raster(moonrise))
+```
+
+![](/blog/img/moonrise-kingdom.jpg)
+
+```{r eval=FALSE}
+paleta <- criar_paleta(moonrise, 6)
+```
+
+```{r paleta2, fig.height=2}
+exibir(paleta)
+```
+
+É isso. Se você gostou, tente fazer com outras imagens e compartilhe com a gente os resultados.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

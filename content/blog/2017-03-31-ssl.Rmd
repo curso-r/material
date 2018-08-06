@@ -1,0 +1,50 @@
+---
+title: "Requisições seguras"
+date: "2017-03-31"
+tags: ["Web scraping", "SSL"]
+categories: ["conceitos", "r"]
+banner: "img/banners/ssl-error.png"
+author: ["Julio"]
+summary: "No mundo do web scraping, muitas vezes precisamos acessar sites HTTPS, a versão segura do HTTP (Hyper Text Transfer Protocol). Esse protocolo é utilizado para encriptar as mensagens trocadas por usuário e servidor. O pacote httr utiliza um padrão SSL (Secure Sockets Layer) para lidar com HTTPS..."
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, cache = TRUE)
+```
+
+No mundo do web scraping, muitas vezes precisamos acessar sites `HTTPS`, a versão `S`egura do `HTTP` (Hyper Text Transfer Protocol). Esse protocolo é utilizado para encriptar as mensagens trocadas por usuário e servidor. 
+
+O pacote `httr` utiliza um padrão `SSL` (Secure Sockets Layer) para lidar com `HTTPS`. O SSL nada mais é que uma forma de informar ao servidor que você é você, garantindo que suas mensagens só possam ser interpretadas por esse servidor, e vice-versa. O padrão do `httr` funciona bem para a maioria dos sites, permitindo o acesso sem sofrimento.
+
+No entanto, alguns sites dão o seguinte erro:
+
+```{r error = TRUE}
+httr::GET("https://esaj.tjsp.jus.br")
+```
+
+A solução para esse problema é bem simples. Basta mandar o `httr` ignorar o protocolo `SSL` usando a função `httr::config()`. Ignorar o SSL costuma ser uma má ideia, pois faz com que as mensagens entre usuário e servidor voltem a ser em texto puro, como se fosse `HTTP`. Mas no web scraping isso não é exatamente um problema.
+
+Para solucionar o problema acima, rode:
+
+```{r}
+httr::GET("https://esaj.tjsp.jus.br", httr::config(ssl_verifypeer = FALSE))
+```
+
+E... Feliz web scraping! 
+
+**OBS:** Certa vez um amigo teve problema com SSL mesmo tentando a solução acima numa máquina com Ubuntu Resolvemos o problema reinstalando a biblioteca `libcurl4-openssl-dev` via `apt-get` e o pacote `curl` do R. Assim:
+
+No terminal:
+
+```shell
+sudo apt-get update
+sudo apt-get install libcurl4-openssl-dev
+```
+
+No R:
+
+```{r eval=FALSE}
+install.packages('curl')
+```
+
+

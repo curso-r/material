@@ -1,0 +1,167 @@
+---
+title: "Colando textos"
+date: "2017-04-17T13:07:31+02:00"
+tags: ["strings", "pacotes", "glue"]
+categories: ["tutoriais", "r"]
+banner: "img/banners/glue.png"
+author: ["Julio"]
+draft: false
+summary: "Uma tarefa muito comum no R é colar textos. As funções mais importantes para isso são paste() e sprintf(), que vêm com o pacote base. Nesse artigo, vamos falar dessas duas funções e de um novo pacote do tidyverse, o glue."
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, cache = TRUE)
+```
+
+Uma tarefa muito comum no `R` é colar textos. As funções mais importantes para isso são `paste()` e `sprintf()`, que vêm com o pacote `base`. Nesse artigo, vamos falar dessas duas funções e de um novo pacote do `tidyverse`, o `glue`.
+
+## `paste()`
+
+A função `paste()` recebe um conjunto indeterminado de objetos como argumento através do `...` e vai colando os objetos passados elemento a elemento. Isso significa que se você passar dois vetores de tamanho `n`, a função `paste()` retornará um vetor de tamanho `n` sendo cada posição a colagem dos dois vetores nessa posição. Por padrão, a colagem é feita com um separador de espaço simples (`" "`). Exemplo:
+
+```{r}
+paste(c(1, 2, 3), c(4, 5, 6))
+```
+
+É possível alterar o separador pelo argumento `sep = `. Um atalho útil para o separador vazio (`""`) é a função `paste0`:
+
+```{r}
+paste0(c(1, 2, 3), c(4, 5, 6))
+```
+
+Algumas vezes nosso interesse não é juntar vetores elemento a elemento, mas sim passar um vetor e colar todos seus elementos. Isso é feito com o parâmetro `collapse = `:
+
+```{r}
+paste(c(1, 2, 3, 4, 5, 6), collapse = '@')
+```
+
+Se você passar mais de um vetor e mandar colapsar os elementos, o `paste()` vai primeiro colar e depois colapsar:
+
+```{r}
+paste(c(1, 2, 3), c(4, 5, 6), collapse = '@')
+```
+
+### Cuidado
+
+Tenha muito cuidado ao passar vetores com **comprimentos diferentes** no `paste()`! Assim como muitas funções do R, o `paste()` faz reciclagem, ou seja, ele copia os elementos do menor vetor até ele ficar com o comprimento do maior vetor[^1]. O problema é que o `paste()` faz isso silenciosamente e não avisa se você inserir um vetor com comprimento que não é múltiplo dos demais. Veja que resultado bizarro:
+
+[^1]: Mais sobre isso no livro [R inferno](http://www.burns-stat.com/pages/Tutor/R_inferno.pdf)
+
+```{r}
+paste(5:9, 1:3, 4:5)
+```
+
+Por essas e outras que dizemos que às vezes o R funciona bem demais...
+
+## `sprintf()`
+
+O `sprintf()` é similar ao `printf` do `C`. Primeiro escrevemos um texto com `%s` no lugar das coisas que queremos substituir. Depois colocamos esses objetos nos outros argumentos da função, na ordem em que eles aparecem no texto.
+
+```{r}
+sprintf('Aba%ste', 'ca')
+```
+
+Quando o argumento é um vetor, a função retorna um vetor com as substituições ponto a ponto.
+
+```{r}
+sprintf('Aba%ste', c('ca', 'ixas'))
+```
+
+Se o texto contém mais de um `%s` e os objetos correspondentes são vetores, o `sprintf()` tenta *reciclar* os vetores para ficarem do mesmo tamanho. Isso só funciona quando todos os objetos têm comprimentos que são múltiplos do comprimento do maior objeto.
+
+Isso funciona:
+
+```{r}
+sprintf('Aba%s%s', c('ca'), c('xi', 'te')) # ca foi reciclado
+```
+
+Isso não funciona:
+
+```{r error=TRUE}
+sprintf('Aba%s%s', c('ca', 'ixaste'), c('xi', 'te', '.'))
+```
+
+Nem sempre queremos substituir pedaços do nosso texto por outros textos. No lugar do `%s`, é possível colocar padrões para números, por exemplo. Eu uso bastante o `%d`, que recebe inteiros. Uma funcionalidade legal do `%d` é a possibilidade de adicionar zeros à esquerda quando um número não atinge certa quantidade de dígitos. Assim, quando ordenamos um vetor de textos que começa com números, a ordenação é a mesma da versão numérica do vetor.
+
+Exemplo:
+
+```{r}
+nums <- 1:11
+sort(as.character(nums))    # ordenado pela string: 10 vem antes de 2
+sort(sprintf('%02d', nums)) # ordenado pela string: 02 vem antes de 10
+```
+
+## `glue`
+
+O [`glue`](https://github.com/tidyverse/glue) é um pacote recente. Sua primeira aparição no GitHub foi em 23/12/2016! Isso significa que é provável que algumas coisas mudem, mas isso não nos impede de aproveitar o que a ferramenta tem de bom.
+
+A função `glue()` é uma generalização do `sprintf()` que permite chamar objetos do R diretamente ao invés de utilizar o `%s`. Os objetos podem estar no *global environment* ou descritos por meio de objetos nomeados nos argumentos do `glue()`. Basta inserir os objetos entre chaves `{}`:
+
+```{r}
+library(glue)
+planeta <- 'mundo'
+glue('Olá {planeta} pela {y}a vez', y = 1)
+```
+
+Tembém é possível adicionar expressões dentro das chaves:
+
+```{r}
+p <- 1.123123123
+glue('{p * 100}% das pessoas adoram R.')
+```
+
+```{r}
+glue('{scales::percent(p)} das pessoas adoram R.')
+```
+
+A função `collapse()` é parecida com o `paste()` quando `collapse = ''`, mas só aceita um objeto como entrada:
+
+```{r}
+x <- collapse(1:10)
+x
+all.equal(x, paste(1:10, collapse = ''))
+```
+
+Se quiser colar os objetos elemento a elemento e depois colapsar, faça isso explicitamente em duas operações:
+
+```{r echo=FALSE}
+library(magrittr)
+```
+
+```{r}
+glue('{letters}/{LETTERS}') %>% 
+  collapse(', ')
+```
+
+O `glue` também tem uma função extra para trabalhar melhor com o `%>%`, o `glue_data()`. O primeiro argumento dessa função é uma lista ou `data.frame`, e seus nomes são utilizados como variáveis para alimentar as chaves das strings. Use o `.` para fazer operações com toda a base de dados:
+
+```{r}
+mtcars %>% 
+  head() %>% 
+  glue_data('O carro {row.names(.)} rende {mpg} milhas por galão.')
+```
+
+## Resumo
+
+- Use `paste()` para colar ou colapsar elementos usando um separador fixado.
+- Use `sprintf()` quando quiser colocar objetos dentro de um texto complexo.
+- Em todos os casos existe uma solução usando `glue`.
+
+Atualmente sempre que tenho um problema desse tipo uso o `glue`. Até o momento, não encontrei nenhum problema ou dificuldade. A vida do cientista de dados é mais feliz no `tidyverse`!
+
+É isso. Happy coding ;)
+
+## Extra:
+
+O [Guilherme Jardim Duarte](https://github.com/duarteguilherme) fez uma ótima sugestão logo após a publicação deste artigo. No pacote `stringi` existe um operador `%s+%` que cola textos iterativamente, com uma sintaxe similar à linguagem `python`, que permite a colagem de textos usando um simples `+`. Exemplo:
+
+```{r}
+library(stringi)
+'a' %s+%
+  'ba' %s+%
+  'ca' %s+%
+  'xi'
+```
+
+Você pode adicionar esse operador como um atalho no RStudio, análogo ao `Ctrl+Shift+M` que usamos para escrever o `%>%`. Para isso, veja [esse tutorial sobre RStudio Addins](https://rstudio.github.io/rstudioaddins/).
+

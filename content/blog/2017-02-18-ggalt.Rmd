@@ -1,0 +1,66 @@
+---
+title: "Pacote ggalt"
+date: "2017-02-18T13:07:31+02:00"
+tags: ["gráficos", "pacotes", "survival"]
+categories: ["tutoriais", "r"]
+banner: "img/banners/ggalt.png"
+author: ["Julio"]
+summary: "O pacote `ggalt` é uma extensão ao `ggplot2` que permite fazer algumas coisas muito úteis. Uma delas é a possibilidade de fazer faixas de confiança para gráficos do tipo escada. Isso permite adicionar intervalos de confiança para modelos Kaplan-Meier, muito utilizados em Análise de Sobrevivência."
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, cache = TRUE)
+```
+
+O pacote `ggalt` é uma extensão ao `ggplot2` que permite fazer algumas coisas muito úteis. Uma delas é a possibilidade de fazer faixas de confiança para gráficos do tipo escada. Isso permite adicionar intervalos de confiança para modelos Kaplan-Meier, muito utilizados em Análise de Sobrevivência. 
+
+É possível instalar o pacote `ggalt` usando a função `install.packages()`:  
+
+```{r eval=FALSE}
+install.packages('ggalt')
+```
+
+Para exemplificar a utilização do `ggalt`, vamos utilizar os pacotes abaixo.
+
+```{r warning=FALSE, message=FALSE}
+library(dplyr)
+library(ggplot2)
+library(ggalt)
+library(broom)
+library(survival)
+```
+
+Nesse exemplo, utilizaremos a base de dados `lung` que vem com o pacote `survival`. Primeiramente, ajustamos um modelo Kaplan-Meier simples, usando a função `survfit()`. Esse modelo tenta explicar a sobrevivência de pacientes com câncer de pulmão para cada sexo.
+
+```{r}
+# modelo kaplan-meier simples
+km <- survfit(Surv(time, status) ~ sex, data = lung)
+```
+
+A função `tidy()` do pacote `broom` transforma o resultado do modelo numa tabela, já preparada para gerar gráficos.
+
+```{r}
+d_km <- tidy(km)
+
+knitr::kable(head(d_km))
+```
+
+O gráfico da Figura \@ref(fig:ruim) usa a função `geom_ribbon()` para gerar os intervalos de confiança. Essa função liga os pontos da faixa diretamente, o que é inadequado do ponto de vista estatístico.
+
+```{r ruim, width=12, height=8, fig.cap="Intervalos de confiança usando apenas `ggplot2` e `geom_ribbon()`."}
+ggplot(d_km, aes(x = time, y = estimate, colour = strata)) +
+  geom_ribbon(aes(ymin = conf.low, ymax = conf.high, fill = strata), 
+              alpha = .1, size = .1) +
+  geom_step() +
+  theme_bw(16)
+```
+
+Na Figura \@ref(fig:bom), adicionamos o parâmetro `stat = "stepribbon"`, que faz com que o `ggplot` utilize a função `stat_stepribbon()` do `ggalt` para o cálculo da faixa. Isso faz com que os intervalos tenham comportamento de escada, como queríamos.
+
+```{r bom, width=12, height=8, fig.cap="Intervalos de confiança usando `stat = 'stepribbon'."}
+ggplot(d_km, aes(x = time, y = estimate, colour = strata)) +
+  geom_ribbon(aes(ymin = conf.low, ymax = conf.high, fill = strata), 
+              stat = 'stepribbon', alpha = .1, size = .1) +
+  geom_step() +
+  theme_bw(16)
+```

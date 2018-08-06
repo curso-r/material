@@ -1,0 +1,100 @@
+---
+title: "Whatsapp"
+date: "2017-11-24T14:25:00+03:00"
+tags: ["sf", "tidyverse"]
+categories: ["tutoriais", "r"]
+banner: "img/banners/sf.png"
+author: ["Julio"]
+summary: "Hoje mais uma vez fui salvo por uma feature pensada no universo tidy. Dessa vez, o grande culpado foi o sf, um pacote ainda em estágio de desenvolvimento mas que já considero pacas..."
+draft: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, cache = TRUE, eval=FALSE)
+```
+
+```{r echo=FALSE, message=FALSE}
+library(tidyverse)
+txt <- "~/Downloads/whatsapp.txt" %>% 
+  read_file() %>% 
+  str_replace_all("\n+", "\n") %>% 
+  str_replace_all("\n([0-9]{2}/[0-9]{2}/[0-9]{2})", "@@@\\1") %>% 
+  str_split("@@@") %>% 
+  unlist() %>% 
+  as_tibble() %>% 
+  separate(value, c("date", "msg"), sep = " - ", extra = "merge") %>% 
+  mutate(date = lubridate::dmy_hm(date)) %>% 
+  filter(str_detect(msg, ":")) %>% 
+  separate(msg, c("person", "message"), sep = ": ", extra = "merge") %>% 
+  filter(lubridate::year(date) == 2017)
+```
+
+
+```{r}
+txt_tidy <- txt %>% 
+  mutate(message = message %>% 
+           str_replace_all("(.)\\1{2,}", "\\1") %>% 
+           abjutils::rm_accent() %>% 
+           str_to_lower() %>% 
+           str_replace_all("[^a-z ]", "") %>% 
+           str_trim() %>% 
+           str_replace_all(" +", " ")) %>% 
+  filter(message != "midia omitida")
+```
+
+```{r}
+txt_tidy %>% 
+  mutate(words = str_split(message, " ")) %>% 
+  unnest(words) %>%
+  mutate(words = case_when(
+    words %in% c("k", "kk") ~ "kkk",
+    words %in% c("vc", "vcs") ~ "vc",
+    words %in% c("mto", "muito") ~ "muito",
+    words %in% c("perigoso", "pirigoso") ~ "pirigoso",
+    str_detect(words, "haha") ~ "hahaha",
+    str_detect(words, "pastek") ~ "pasteko",
+    words %in% c("hj", "hoje") ~ "hoje",
+    TRUE ~ words
+  )) %>% 
+  count(words) %>% 
+  filter(!words %in% c("hahaha", "kkk")) %>% 
+  filter(!words %in% c("", "ai", "pra", "q", "vou", "vai", "ta", "to", "pq"), 
+         str_length(words) > 1,
+         !words %in% abjutils::rm_accent(tm::stopwords("pt")),
+         n > 30) %>% 
+  with(d3wordcloud::d3wordcloud(words, n))
+  
+```
+
+```{r}
+txt_tidy %>% 
+  mutate(person = case_when(
+    person == "Julio Trecenti" ~ "Julio",
+    person == "Bruno Nápole" ~ "Bruno",
+    person == "Marcos Nona" ~ "Nona",
+    person == "Willian Hiroshi" ~ "Hiroshi",
+    person == "Jader Cel" ~ "Jader",
+    person == "Letícia Lima" ~ "Letícia",
+    person == "Leandro Liberti" ~ "Leandro",
+    person == "Leo Marcos" ~ "Leonardo",
+    person == "Alessandra Andrade" ~ "Alessandra",
+    person == "Fezinha" ~ "Fernanda",
+    person == "Fabio Neri" ~ "Fabio",
+    TRUE ~ person
+  )) %>% 
+  mutate(person = fct_rev(fct_infreq(person))) %>% {
+    pct <- count(., person) %>% 
+      mutate(p = scales::percent(n / sum(n)))
+    ggplot(., aes(x = person, fill = person)) +
+      geom_bar() +
+      guides(fill = FALSE) +
+      coord_flip() +
+      theme_minimal(16) +
+      geom_text(aes(label = p, y = n), data = pct, hjust = -0.1) +
+      labs(x = "Pessoa", y = "Mensagens") +
+      ggtitle("Quantidade de mensagens por pessoa") +
+      scale_y_continuous(limits = c(0, 4000), breaks = 0:10 * 500)
+  }
+  
+```
+

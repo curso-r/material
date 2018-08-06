@@ -1,0 +1,289 @@
+---
+title: "Diagramas de Venn em R"
+date: "2017-04-29T23:26:00+03:00"
+tags: ["gráficos", "pacotes", "venneuler"]
+categories: ["tutoriais", "r"]
+banner: "img/banners/venn.png"
+author: ["Fernando"]
+summary: "Diagramas de Venn são representações eficientes das conjuntas de quantidades moderadas de variáveis binárias. Neste post você vai aprender a construir os principais tipos de diagramas de Venn que estão implementados em R."
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, cache = TRUE)
+```
+
+Diagramas de Venn são como slides de PowerPoint. Se eles tem poucos elementos concisos em uma ordem inteligente, um leitor consegue conectar as ideias expostas e aprender alguma coisa. Em caso contrário, o excesso de informação se transforma em um obstáculo para a comunicação.
+
+Bons diagramas de Venn são capazes de te fazer perceber cruzamentos que não estão no seu radar. [No blog do Andrew Gelman](http://andrewgelman.com/2006/03/29/the_serenity_pr/) tem um exemplo interessante. Ele considera uma oração, em inglês, que pede: 
+
+> God give me the serenity to accept things which cannot be changed;
+> Give me courage to change things which must be changed;
+> And the wisdom to distinguish one from the other. 
+
+Pelo jeito em que ela foi escrita, parece que só existem dois tipos de coisas: aquelas que não podem ser modificadas e aquelas que nós devemos mudar. Entretanto, esse não é o caso:
+
+- Se uma coisa pode ser modificada e eu não devo mudá-la, ela não é importante.
+- Se uma coisa coisa não pode ser modificada e eu devo mudá-la, eu preciso aceitá-la.
+
+```{r, echo = F, message=F, comment=F, erro = F}
+library("venneuler")
+df <- data.frame(elements=c("1",
+                            "2",
+                            "3",
+                            "4",
+                            "4",
+                            "4",
+                            "5",
+                            "6",
+                            "7",
+                            "8",
+                            "9",
+                            "10",
+                            "11",
+                            "12"),
+                 
+                 sets=c("Coisas que preciso\nmudar",
+                        "Coisas que preciso\nmudar",
+                        "Coisas que preciso\nmudar",
+                        "Coisas que não posso\nmudar",
+                        "Coisas que devo\naceitar",
+                        "Coisas que preciso\nmudar",
+                        "Coisas que não posso\nmudar",
+                        "Coisas que não posso\nmudar",
+                        "Coisas que não posso\nmudar",
+                        "Coisas que posso mudar,\nmas não preciso",
+                        "Coisas que posso mudar,\nmas não preciso",
+                        "Coisas que posso mudar,\nmas não preciso",
+                        "Coisas que não posso\nmudar",
+                        "Coisas que preciso\nmudar"))
+
+vd <- venneuler(df)
+vd$colors[3] <- NA
+vd$colors[4] <- NA
+
+vd$centers[4,] <- c(0.8, 0.49)
+vd$centers[3,1] <- 0.4306395
+
+vd$diameters[3] <- 0
+vd$diameters[1] <- 0.4
+vd$diameters[2] <- 0.4
+
+plot(vd, main = "Tipos de coisas")
+```
+
+Considerando esse diagrama, O Gelman até sugere uma prece mais cuidadosa:
+
+> Lord, grant me the serenity to accept things that cannot be changed,
+> courage to change things that must be changed;
+> discernment to ignore things that don't need changing;
+> acceptance that some things I need to change, i can't;
+> And the wisdom to understand Venn Diagrams.
+
+<!--É claro que existem diagramas complicados demais para serem úteis, mas, assim como slides ruins, a complexidade pode ser superada se houver muita boa vontade. O pior que pode acontecer é alguém-->
+A despeito da utilidade de Diagramas de Venn bem feitos, o R oferece poucas maneiras de construí-los. No CRAN, existem apenas três pacotes especializados em construir esses gráficos, mas duas delas são um pouco insatisfatórias. Neste post, vamos descobrir como fazer diagramas de Venn usando o pacote `VennDiagram`.
+
+## O Dataset
+
+Para não nos distrairmos com bases de dados complicadas, vamos usar uma tabela artifical inspirada [nesse link](https://rstudio-pubs-static.s3.amazonaws.com/13301_6641d73cfac741a59c0a851feb99e98b.html). Cada linha dessa base representa as preferências por animais de estimação de uma pessoa hipotética. No total temos 34 pessoas na base e as opções possíveis são "Cães","Gatos","Lagartos" e "Serpentes".
+
+O data.frame está disponível no código fonte desse post. 
+
+```{r, echo = F}
+dataset <- tibble::tribble(~Cat, ~Dog, ~Lizard, ~Snake,
+                      1,    1,    0,       0,
+                      0,    1,    1,       0,
+                      0,    1,    1,       0,
+                      1,    1,    0,       0,
+                      1,    1,    0,       0,
+                      1,    1,    0,       0,
+                      0,    1,    0,       0,
+                      0,    1,    0,       0,
+                      0,    1,    0,       0,
+                      0,    1,    0,       0,
+                      1,    1,    0,       0,
+                      1,    1,    0,       0,
+                      1,    1,    0,       0,
+                      1,    1,    0,       0,
+                      1,    1,    0,       0,
+                      1,    1,    0,       0,
+                      1,    1,    0,       0,
+                      1,    1,    0,       0,
+                      1,    1,    0,       0,
+                      1,    1,    0,       0,
+                      0,    0,    1,       1,
+                      0,    0,    1,       1,
+                      0,    0,    1,       0,
+                      0,    0,    1,       0,
+                      1,    0,    0,       0,
+                      1,    0,    0,       0,
+                      1,    0,    0,       0, 
+                      1,    0,    0,       0,
+                      0,    0,    0,       1,
+                      0,    0,    0,       1,
+                      0,    0,    0,       1,
+                      0,    0,    1,       0,
+                      0,    0,    1,       0,
+                      0,    0,    1,       0)
+```
+
+## Pacotes
+
+Codificar os gráficos no pacote `VennDiagram` é um pouco chato, por isso vamos precisar de outros pacotes pra ajudar. No geral, apenas as coisas do `tidyverse` já vão servir.
+
+O comando abaixo chama os pacotes que vamos usar neste post.
+
+```{r, message=F, error=F, comment=F}
+library(VennDiagram)
+library(tidyverse)
+```
+
+## Diagramas de Venn usando o pacote `VennDiagram`
+
+Como eu já disse antes, esse pacote é bem chato, pois em todos os gráficos você precisa escrever diretamente o número de elementos em cada pedaço dos conjuntos e os parâmetros gráficos detalhados demais. Pra funcionar bem, você tem que dizer exatamente o que quer fazer.
+
+Vamos começar fazendo um diagrama simples. Ele vai representar o conjunto de pessoas que gostam de cachorros.
+
+```{r, error=FALSE, message=FALSE, comment=FALSE, fig.width=5, fig.align='center'}
+numero_de_pessoas_que_gostam_de_cachorros <- dataset %>% 
+  dplyr::filter(Dog == 1) %>% 
+  nrow()
+
+grid.newpage()
+invisible(draw.single.venn(numero_de_pessoas_que_gostam_de_cachorros,
+                 #Número de elementos do conjunto
+                 category = "Pessoas que gostam de cachorros",
+                 #Nome do conjunto
+                 lty = "blank",
+                 #Grossura da borda dos conjuntos."blank" quer dizer que não vai ter borda
+                 fill = "light blue",
+                 #Cor do conjunto
+                 alpha = 0.5
+                 #Transparência do conjunto. Varia de 0 a 1
+                 ))
+```
+
+Complicando um pouco mais, dessa vez vamos fazer um diagrama que represente as pessoas que gostam de gatos ou de cachorros. 
+
+```{r, error=FALSE, message=FALSE, comment=FALSE, fig.width=5, fig.align='center'}
+numero_de_pessoas_que_gostam_de_cachorros <- dataset %>% 
+  dplyr::filter(Dog == 1) %>% 
+  nrow()
+
+numero_de_pessoas_que_gostam_de_gatos <- dataset %>% 
+  dplyr::filter(Cat == 1) %>% 
+  nrow()
+
+numero_de_pessoas_que_gostam_de_gatos_e_de_cachorros <- dataset %>% 
+  dplyr::filter(Dog == 1 & Cat == 1) %>% 
+  nrow()
+
+grid.newpage()
+invisible(draw.pairwise.venn(area1 = numero_de_pessoas_que_gostam_de_cachorros,
+                   #Número de elementos da primeira categoria
+                   area2 = numero_de_pessoas_que_gostam_de_gatos,
+                   #Número de elementos da segunda categoria
+                   cross.area = numero_de_pessoas_que_gostam_de_gatos_e_de_cachorros,
+                   #Número de elementos na intersecção
+                   category = c("Pessoas que gostam\nde cachorros",
+                                "Pessoas que gostam\nde gatos"),
+                   #Nome das categorias
+                   lty = c("blank", "blank"),
+                   #Grossura das bordas
+                   fill = c("light blue", "pink"),
+                   #Cores das bordas
+                   alpha = c(0.5, 0.5),
+                   #Transparência das bordas
+                   cat.pos = c(0, 0),
+                   #Posição dos títulos com relação aos círculos. 0 quer dizer "em cima"
+                   scaled = F
+                   #Constrói as áreas sem escala
+                   ))
+```
+
+A falta de escalas deixou esse gráfico simétrico e esteticamente agradável. Entretanto, em algumas situações é mais legal representar os conjuntos em escala.
+
+```{r, fig.width=5, fig.align='center'}
+numero_de_pessoas_que_gostam_de_cachorros <- dataset %>% 
+  dplyr::filter(Dog == 1) %>% 
+  nrow()
+
+numero_de_pessoas_que_gostam_de_serpentes <- dataset %>% 
+  dplyr::filter(Snake == 1) %>% 
+  nrow()
+
+numero_de_pessoas_que_gostam_de_cachorros_e_de_serpentes <- dataset %>% 
+  dplyr::filter(Dog == 1 & Snake == 1) %>% 
+  nrow()
+
+grid.newpage()
+invisible(draw.pairwise.venn(area1 = numero_de_pessoas_que_gostam_de_cachorros,
+                   #Número de elementos da primeira categoria
+                   area2 = numero_de_pessoas_que_gostam_de_serpentes,
+                   #Número de elementos da segunda categoria
+                   cross.area = numero_de_pessoas_que_gostam_de_cachorros_e_de_serpentes,
+                   #Número de elementos na intersecção
+                   category = c("Pessoas que gostam\nde cachorros",
+                                "Pessoas que gostam\nde serpentes"),
+                   #Nome das categorias
+                   lty = c("blank", "blank"),
+                   #Grossura das bordas
+                   fill = c("light blue", "light green"),
+                   #Cores das bordas
+                   alpha = c(0.5, 0.5),
+                   #Transparência das bordas
+                   cat.pos = c(0, 0),
+                   #Posição dos títulos com relação aos círculos. 0 quer dizer "em cima"
+                   scaled = T
+                   #Constrói as áreas sem escala
+                   ))
+```
+
+Até aqui tudo vai mais ou menos bem, mas a coisa fica bem mais chata quando você precisa representar um diagrama com três conjuntos. Você vai precisar passar pra função o tamanho de todos os pedacinhos.
+
+```{r, fig.width=5, fig.align='center'}
+
+numero_de_pessoas_que_gostam_de_gatos <- dataset %>% 
+  dplyr::filter(Cat == 1) %>% 
+  nrow()
+
+numero_de_pessoas_que_gostam_de_serpentes <- dataset %>% 
+  dplyr::filter(Snake == 1) %>% 
+  nrow()
+
+numero_de_pessoas_que_gostam_de_lagartos <- dataset %>% 
+  dplyr::filter(Lizard == 1) %>% 
+  nrow()
+
+numero_de_pessoas_que_gostam_de_gatos_e_de_serpentes <- dataset %>% 
+  dplyr::filter(Cat == 1 & Snake == 1) %>% 
+  nrow()
+
+numero_de_pessoas_que_gostam_de_gatos_e_de_lagartos <- dataset %>% 
+  dplyr::filter(Cat == 1 & Lizard == 1) %>% 
+  nrow()
+
+numero_de_pessoas_que_gostam_de_serpentes_e_de_lagartos <- dataset %>% 
+  dplyr::filter(Lizard == 1 & Snake == 1) %>% 
+  nrow()
+
+numero_de_pessoas_que_gostam_de_serpentes_e_lagartos_e_gatos <- dataset %>% 
+  dplyr::filter(Lizard == 1 & Snake == 1 & Cat == 1) %>% 
+  nrow()
+
+
+grid.newpage()
+invisible(draw.triple.venn(area1 = numero_de_pessoas_que_gostam_de_gatos,
+                 area2 = numero_de_pessoas_que_gostam_de_serpentes,
+                 area3 = numero_de_pessoas_que_gostam_de_lagartos,
+                 n12 = numero_de_pessoas_que_gostam_de_gatos_e_de_serpentes,
+                 n23 = numero_de_pessoas_que_gostam_de_serpentes_e_de_lagartos,
+                 n13 = numero_de_pessoas_que_gostam_de_gatos_e_de_lagartos, 
+                 n123 = numero_de_pessoas_que_gostam_de_serpentes_e_lagartos_e_gatos,
+                 category = c("Gatos",
+                              "Serpentes",
+                              "Lagartos"),
+                 lty = "blank", 
+                 fill = c("light blue", "green", "light green"),
+                 cat.pos = c(45,45,45),
+                 scaled = T))
+```

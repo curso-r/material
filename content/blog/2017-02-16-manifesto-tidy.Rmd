@@ -1,0 +1,72 @@
+---
+title: "Manifesto tidy"
+date: "2017-02-15T13:07:31+02:00"
+tags: ["tidyverse"]
+categories: ["conceitos", "r"]
+banner: "img/banners/tidyverse.jpg"
+author: ["Daniel"]
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, cache = TRUE)
+```
+
+O [manifesto das ferramentas tidy](https://cran.r-project.org/web/packages/tidyverse/vignettes/manifesto.html) 
+do Hadley Wickham é um dos documentos mais importantes sobre R dos últimos tempos. 
+Esse documento formaliza uma série de princípios que norteiam o desenvolvimento do
+[`tidyverse`](http://tidyverse.org/).
+
+O [`tidyverse`](http://tidyverse.org/), também chamado por muitos de *hadleyverse*, 
+é um conjunto de pacotes que, por compartilharem esses princípios do manifesto tidy, 
+podem ser utilizados naturalmente em conjunto. Pode-se dizer que existe o R antes do 
+`tidyverse` e o R depois do `tidyverse`. A linguagem mudou muito, a comunidade abraçou
+fortemente o uso desses princípios e tem muita gente criando pacotes para conversar
+uns com os outros dessa forma. No entanto, usar a filosofia *tidy* não é a única forma 
+de fazer pacotes do R, existem muitos pacotes excelentes que não utilizam essa filosofia. 
+Como o próprio texto diz "O contrário de *tidyverse* não é o **messy**verse, e sim muitos outros universos de pacotes interconectados.".
+
+Os princípios fundamentais do `tidyverse` são:
+
+1. Reutilizar estruturas de dados existentes.
+2. Organizar funções simples usando o *pipe*.
+3. Aderir à programação funcional.
+4. Projetado para ser usado por seres humanos.
+
+No [texto do manifesto tidy](https://cran.r-project.org/web/packages/tidyverse/vignettes/manifesto.html)
+cada um dos lemas é descrito de forma detalhada. Aqui, selecionei os aspectos que
+achei mais importante de cada um deles.
+
+### Reutilizar estruturas de dados existentes
+
+* Quando possível, é melhor utilizar estruturas de dados comuns do que criar uma 
+estrutura específica para o seu pacote.
+* Geralmente, é melhor reutilizar uma estrutura existente mesmo que ela não se 
+encaixe perfeitamente.
+
+### Organizar funções simples usando o *pipe*
+
+* Faça com que suas funções sejam o mais simples possíveis. Uma função deve poder
+ser descrita com apenas uma sentença.
+* A sua função deve fazer uma transformação no estilo *copy-on-modify* ou ter um
+efeito colateral. Nunca os dois.
+* O nome das funções devem ser verbos. Exceto quando as funções do pacote usam sempre
+o mesmo verbo. Ex: adicionar ou modificar.
+
+### Aderir à programação funcional
+
+* O R é uma linguagem de [programação funcional](https://pt.wikipedia.org/wiki/Programa%C3%A7%C3%A3o_funcional), não lute contra
+isso.
+
+### Projetado para ser usado por seres humanos
+
+* Desenvolva o seu pacote para ser usado por humanos. Foque em ter uma API clara 
+para que você escreva o código de maneira intuitiva e rápida. Eficiência dos 
+algoritmos é uma preocupação secundária, pois gastamos mais tempo escrevendo o código
+do que executando.
+
+------------
+
+Esses princípios são bem gerais, mas ajudam bastante a tomar decisões quando 
+estamos escrevendo o nosso código. Para finalizar, clique [aqui](https://github.com/search?utf8=%E2%9C%93&q=tidy+language%3Ar) 
+e veja uma busca no Github por "tidy" em repositórios de R. São mais de 2000 resultados
+quase todos seguindo essa filosofia e estendendo o *universo arrumado*.

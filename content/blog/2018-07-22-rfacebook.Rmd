@@ -1,0 +1,157 @@
+---
+title: "RFacebook: como conectar?"
+date: "2018-07-23T00:00:00+00:00"
+tags: ["app", "pacotes"]
+categories: ["tutoriais", "r"]
+banner: "img/banners/marks.png"
+author: ["Julio", "Bruna Wundervald"]
+summary: "Hoje nosso amigo Marcio nos procurou pedindo ajuda pois não estava conseguindo fazer o pacote Rfacebook funcionar. O problema estava logo no começo: a autenticação com a API do Facebook. Nesse post identificar e corrigir esse problema."
+draft: false
+---
+
+Hoje nosso amigo [Marcio Chiara](https://www.facebook.com/marcio.chiara) nos procurou pedindo ajuda pois não estava conseguindo fazer o pacote [Rfacebook](https://github.com/pablobarbera/Rfacebook) funcionar. O problema estava logo no começo: a autenticação com a API do Facebook.
+
+### O procedimento
+
+O procedimento básico para autenticar no Facebook usando o pacote `Rfacebook` consiste em três passos:
+
+1. Crie um aplicativo no [facebook developers](https://developers.facebook.com/apps/):
+    - O aplicativo deve ser do tipo "Login do Facebook"
+    - Depois de clicar em "Configurar", seleccione a plataforma "web"
+2. No menu da esquerda, clique em Configurações e obtenha o ID do Aplicativo e a Chave Secreta do Aplicativo. 
+    - Guarde nos objetos `client_id` e `client_secret`. Exemplo:
+3. `Rodar Rfacebook::fbOAuth()`.
+
+Exemplo (não rode):
+
+```{r eval=FALSE}
+client_id <- "274017323361669"
+client_secret <- "6ced33b11f41944e5a960f74c475a5fe"
+Rfacebook::fbOAuth(client_id, client_secret)
+```
+
+### O erro
+
+O erro aparece ao rodar
+
+```{r eval=FALSE}
+Rfacebook::fbOAuth(client_id, client_secret, 
+                   extended_permissions = TRUE)
+```
+
+A opção `extended_permissions` serve para dar acesso à algumas opções adicionais como aniversário, cidade de nascimento, etc. O erro que aparece é esse aqui:
+
+```{r echo=FALSE}
+knitr::include_graphics("/img/blog/rfacebook/Erro.png")
+```
+
+Como somos pessoas espertinhas, o que fizemos? Abrimos os links que o Facebook sugeriu? Re-estudamos toda a API do Facebook? Não! Apenas lemos e interpretamos o erro. A API estava recusando acesso às opções `user_relationships` e `publish_actions`, que são requeridas por meio da função `Rfacebook::fbOAuth()`. Aha!
+
+Depois de estudar um pouquinho, notamos que a API do Facebook [mudou recentemente](https://developers.facebook.com/docs/graph-api/changelog/breaking-changes/). Isso ocorreu por conta de alterações na política de privacidade do Facebook, que é sempre algo polêmico. Hoje em dia não é mais possível autorizar aplicativos para terem acesso à rede de relacionamentos e ações do usuário.
+
+O problema é que infelizmente o mantenedor do `Rfacebook` parou de atualizar o pacote:
+
+-----------
+
+```{r echo=FALSE}
+knitr::include_graphics("/img/blog/rfacebook/app.png")
+```
+
+-----------
+
+Então, o que fazer? Quando temos uma ferramenta que não funciona mais ou que está obsoleta, podemos i) jogar fora e fazer outra do zero ou ii) tentar arrumá-la para ficar top novamente.
+
+Por sorte, o R é open-source e permite que (ii) seja feito sem maiores esforços. De fato, basta mudar **uma linha** de código para que tudo volte a funcionar como antes. Basta mudar o objeto `scope` de
+
+```{r}
+scope <- c("user_birthday", "user_hometown", "user_location", 
+           "user_relationships", "publish_actions", "user_status", 
+           "user_likes")
+```
+
+para
+
+```{r}
+scope <- c("user_birthday", "user_hometown", "user_location", 
+           "user_status", "user_likes")
+```
+
+### A solução
+
+Com base nessas alterações, a [Bruna](http://brunaw.com) sugere a utilização da função modificada abaixo:
+
+```{r}
+new_fbOAuth <- function (app_id, app_secret, extended_permissions = FALSE, 
+                         legacy_permissions = FALSE, scope = NULL) {
+    facebook <- oauth_endpoint(authorize = "https://www.facebook.com/dialog/oauth", 
+                               access = "https://graph.facebook.com/oauth/access_token")
+    myapp <- oauth_app("facebook", app_id, app_secret)
+    if (is.null(scope)) {
+        if (extended_permissions == TRUE) {
+            
+            
+            # as alterações significativas estão aqui >>>
+            
+            scope <- c("user_birthday", "user_hometown", "user_location", 
+                       # "user_relationships", "publish_actions", 
+                       "user_status", "user_likes")
+        
+            
+        } else {
+            scope <- c("public_profile", "user_friends")
+        }
+        if (legacy_permissions == TRUE) {
+            scope <- c(scope, "read_stream")
+        }
+    }
+    if (packageVersion("httr") < "1.2") {
+        stop("Rfacebook requires httr version 1.2.0 or greater")
+    }
+    if (packageVersion("httr") <= "0.2") {
+        facebook_token <- oauth2.0_token(facebook, myapp, scope = scope)
+        fb_oauth <- sign_oauth2.0(facebook_token$access_token)
+        if (GET("https://graph.facebook.com/me", config = fb_oauth)$status == 200) {
+            message("Authentication successful.")
+        }
+    }
+    if (packageVersion("httr") > "0.2" & packageVersion("httr") <= 
+        "0.6.1") {
+        fb_oauth <- oauth2.0_token(facebook, myapp, scope = scope, cache = FALSE)
+        if (GET("https://graph.facebook.com/me", config(token = fb_oauth))$status == 200) {
+            message("Authentication successful.")
+        }
+    }
+    if (packageVersion("httr") > "0.6.1" & packageVersion("httr") < 
+        "1.2") {
+        Sys.setenv(HTTR_SERVER_PORT = "1410/")
+        fb_oauth <- oauth2.0_token(facebook, myapp, scope = scope, 
+                                   cache = FALSE)
+        if (GET("https://graph.facebook.com/me", config(token = fb_oauth))$status == 200) {
+            message("Authentication successful.")
+        }
+    }
+    if (packageVersion("httr") >= "1.2") {
+        fb_oauth <- oauth2.0_token(facebook, myapp, scope = scope, 
+                                   cache = FALSE)
+        if (GET("https://graph.facebook.com/me", config(token = fb_oauth))$status == 200) {
+            message("Authentication successful.")
+        }
+    }
+    error <- tryCatch(callAPI("https://graph.facebook.com/pablobarbera", 
+                              fb_oauth), error = function(e) e)
+    if (inherits(error, "error")) {
+        class(fb_oauth)[4] <- "v2"
+    }
+    if (!inherits(error, "error")) {
+        class(fb_oauth)[4] <- "v1"
+    }
+    return(fb_oauth)
+}
+
+```
+
+É isso. Happy coding ;)
+
+**Nota**: Se você já tinha um app criado no Facebook antes da mudança de política de privacidade, o ideal é que ele passe pelo [*App Review*](https://developers.facebook.com/docs/pages/), como sugerido no próprio pacote do `Rfacebook`.
+
+

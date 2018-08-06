@@ -1,0 +1,306 @@
+---
+title: "Unindo mapas: the tidy way"
+date: "2017-11-24T14:25:00+03:00"
+tags: ["sf", "tidyverse"]
+categories: ["tutoriais", "r"]
+banner: "img/banners/sf.png"
+author: ["Julio"]
+summary: "Hoje mais uma vez fui salvo por uma feature pensada no universo tidy. Dessa vez, o grande culpado foi o sf, um pacote ainda em estágio de desenvolvimento mas que já considero pacas..."
+draft: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, cache = TRUE, eval=FALSE)
+```
+
+Eu precisava escrever esse post porque estou morrendo de tesão por essa linguagem maravilhosa. O R é incrível. O [`tidyverse`](https://tidyverse.org) é incrível. Estatística é incrível. Não me aguento!!
+
+Hoje mais uma vez fui salvo por uma feature pensada no universo `tidy`. Dessa vez, o grande herói foi o pacote [`sf`](https://github.com/r-spatial/sf), um pacote ainda em estágio de desenvolvimento, mas que já considero pacas.
+
+O `sf`, *a.k.a.* Simple Features, é um pacote para trabalhar com mapas. Com ele é possível fazer projeções, gráficos, leitura/gravação de diversos formatos de mapas, entre muitas outras coisas. Esse é um dos pacotes patrocinados pelo [R Consortium](https://www.r-consortium.org/), uma iniciativa criada por várias empresas e pela R Foundation para injetar dinheiro em projetos de R que tenham alta relevância.
+
+O pacote `sf` é tão sensacional que merece um post só para ele. Hoje, eu falarei de apenas de uma de suas vantagens, que é sua integração perfeita com o `tidyverse`.
+
+## Contexto
+
+Eu faço parte da [Associação Brasileira de Jurimetria (ABJ)](http://abj.org.br), uma entidade sem fins lucrativos que faz pesquisa aplicada na área do Direito. Na ABJ produzimos diversas soluções tecnológicas para problemas do Direito, especialmente em questões relacionadas à elaboração de políticas públicas e administração dos tribunais.
+
+Num projeto recente, eu precisava levantar uma tabela de **municípios**, **comarcas**, **circunscrições** e **regiões administrativas** do Tribunal de Justiça de São Paulo. Minha tarefa era visualizar essas informações em mapas. Fazendo curta uma história longa, podemos dizer que:
+
+- uma **comarca** é o conjunto de um ou mais municípios contíguos 
+    - (contíguos = municípios que se tocam); 
+- uma **circunscrição** é um conjunto de uma ou mais comarcas contíguas; 
+- e uma **região** é... adivinha?
+
+No Estado de São Paulo, temos no total:
+
+- 645 municípios
+- 319 comarcas
+- 57 circunscrições
+- 10 regiões administrativas
+
+O problema é que não existe uma base de dados pública que relacione todos os 645 municípios com as respectivas regiões que as contêm. Então partimos para a obtenção via robizinhos.
+
+> P.S.: Não se esqueça do ciclo da ciência de dados! Vou falar disso sem parar para explicar. Na dúvida, leia o http://r4ds.had.co.nz/
+
+![](/img/blog/union-sf/data-science.png)
+
+<br/>
+
+As partes de `import` e `tidy` desse projeto processo foram sofríveis. Precisei fazer vários web scrapers e diversos códigos para lidar com nomes zoados dos municípios de São Paulo, como Moji/Mogi, Estrela D'Oeste/Doeste, Brodowski/Brodosqui etc. Quem quiser pode dar uma olhada nos códigos do [github da ABJ](https://github.com/abjur/abjMaps).
+
+## O problema
+
+Após passar o dia todo pegando esses dados, finalmente cheguei na parte de `transform` e `visualize`. Nossos objetivos nessa parte são:
+
+1. Carregar um mapa dos municípios de São Paulo no R.
+2. Agrupar as formas dos municípios em comarcas, circunscrições e regiões.
+3. Fazer mapas dos resultados obtidos.
+
+Em experiências anteriores já passei por maus bocados tentando completar a parte (2). Antigamente, a única função conhecida que fazia a união de polígonos era a `maptools::unionSpatialPolygons()`, que é contraintuitiva, mal documentada e difícil de usar na prática. Na verdade, tudo era difícil: desde ler o arquivo `.shp` baixado da internet até a parte de fazer o gráfico. Era R **raiz** mesmo. Mas hoje, para a felicidade de todos, temos a solução **nutella** ;)
+
+> Curiosamente, o Edzer Pebesma, autor do `sf`, também é contributor do `maptools` e mantenedor do `sp`, os pacotes mais importantes de análise espacial pré-tidyverse. Ou seja, ele não só manja do assunto como sabia que os pacotes dele precisavam melhorar. E, olha, ele mandou bem dessa vez.
+
+## Solução
+
+Vamos utilizar o `tidyverse` e o pacote `sf`. Para instalar o `tidyverse`, rode
+
+```{r eval=FALSE}
+install.packages("tidyverse")
+```
+
+> Para quem não sabe: o tidyverse é um pacote que instala muitos outros pacotes por trás, como `httr`, `ggplot2` e `dplyr`. Isso significa que pode demorar bastante tempo para instalar!
+
+A instalação do `sf` pode ser um tanto trabalhosa. Se você usa Windows, basta instalar o [Rtools](https://cran.r-project.org/bin/windows/Rtools/) e depois rodar
+
+```{r eval=FALSE}
+install.packages("sf")
+```
+
+Se você usa Mac ou Linux, recomendo ler a primeira página [da documentação oficial do pacote](https://r-spatial.github.io/sf/). Lá você pode checar todos os requerimentos do pacote em detalhe. Eu recomendo que você instale logo a versão de desenvolvimento:
+
+```{r eval=FALSE}
+devtools::install_github("r-spatial/sf")
+```
+
+Para rodar as funções gráficas, também recomendo que você instale a versão de desenvolvimento do `ggplot2`, rodando
+
+```{r eval=FALSE}
+devtools::install_github("tidyverse/ggplot2")
+```
+
+Outros pacotes que usaremos no meio do código são
+
+```{r}
+devtools::install_github("abjur/abjutils") # principalmente para remover acentos
+installed.packages("janitor") # para arrumar nomes das colunas da base de dados
+```
+
+### Parte 1: baixando os dados
+
+Primeiro, vamos baixar da internet! Obviamente, o melhor lugar para baixar esses arquivos é no FTP do [Instituto Brasileiro de Geografia e Estatística](ftp://geoftp.ibge.gov.br/organizacao_do_territorio/malhas_territoriais/).
+
+```{r eval=FALSE}
+# Cria uma pasta onde os arquivos serão salvos
+dir.create("shp", showWarnings = FALSE)
+
+# URL de download
+u_ibge <- paste0(
+  "ftp://geoftp.ibge.gov.br/organizacao_do_territorio/",
+  "malhas_territoriais/malhas_municipais/",
+  "municipio_2015/UFs/SP/sp_municipios.zip", 
+  collapse = "")
+```
+
+Utilizamos o pacote `httr` para baixar o arquivo zipado.
+
+```{r eval=FALSE}
+# Salva o arquivo em disco. httr::progress() 
+# serve para mostrar o andamento do download
+httr::GET(u_ibge, 
+          httr::write_disk("shp/sp.zip"),
+          httr::progress())
+
+```
+
+E usamos `unzip()` para dezipar os dados.
+
+```{r eval=FALSE}
+# dezipa os arquivoe
+unzip("shp/sp.zip", exdir = "shp/")
+```
+
+No final, você terá esses arquivos na pasta:
+
+```{r eval=FALSE}
+dir("shp")
+# "35MUE250GC_SIR.cpg" 
+# "35MUE250GC_SIR.dbf" 
+# "35MUE250GC_SIR.prj" 
+# "35MUE250GC_SIR.shp"
+# "35MUE250GC_SIR.shx" 
+# "sp.zip"
+```
+
+Para ler esses arquivos estranhos num objeto do R, utilizamos a função `sf::st_read()`, simples assim:
+
+```{r eval=FALSE}
+library(tidyverse)
+d_sf_municipio <- sf::st_read("shp/35MUE250GC_SIR.shp", quiet = TRUE)
+dplyr::glimpse(d_sf_municipio)
+# Observations: 645
+# Variables: 3
+# $ NM_MUNICIP <fctr> CAIUÁ, CASTILHO, DRACENA, ESTRELA DO NORTE, EUCLIDES D...
+# $ CD_GEOCMU  <fctr> 3509106, 3511003, 3514403, 3515301, 3515350, 3528700, ...
+# $ geometry   <simple_feature> MULTIPOLYGON (((-51.8600105..., MULTIPOLYGON...
+```
+
+Observe que temos três colunas na base de dados, nome do município, código do município e `geometry`. Essa terceira é do tipo `simple_feature` e carrega objetos do tipo `MULTIPOLYGON`. Ou seja, um objeto lido pelo `sf` nada mais é do que um `data.frame` que tem uma coluna especial, capaz de guardar objetos mais complexos, como polígonos. 
+
+> Chamamos esse tipo de coluna especial de `list-column`. Quem faz nossos [cursos avançados](http://curso-r.com/cursos/r4ds/) acaba aprendendo esses conceitos a partir do aninhamento de objetos e utilização de algoritmos mais complexos usando o pacote `purrr`.
+
+Agora, queremos juntar essa base com nossos dados de comarcas, circunscrições e regiões.
+
+```{r eval=FALSE}
+muni_comarcas_completo <- readRDS("muni_comarcas_completo.rds")
+dplyr::glimpse(muni_comarcas_completo)
+# Observations: 645
+# Variables: 9
+# $ cod_municipio     <int> 6504, 6829, 6506, 6508, 6808, 6511, 6915, 6515...
+# $ comarca           <chr> "ADAMANTINA", "ADAMANTINA", "AGUAI", "AGUAS DE...
+# $ municipio         <chr> "ADAMANTINA", "MARIAPOLIS", "AGUAI", "AGUAS DE...
+# $ tipo              <chr> "comarca", "municipio", "comarca", "comarca", ...
+# $ circunscricao     <chr> "Tupã", "Tupã", "São João da Boa Vista", "Ampa...
+# $ entrancia         <chr> "Entrância Inicial", "Entrância Inicial", "Ent...
+# $ num_circunscricao <chr> "30ª CJ", "30ª CJ", "50ª CJ", "54ª CJ", "54ª C...
+# $ num_regiao        <chr> "5ª RAJ", "5ª RAJ", "4ª RAJ", "4ª RAJ", "4ª RA...
+# $ regiao            <chr> "Presidente Prudente", "Presidente Prudente", ...
+```
+
+Para isso, vamos primeiro arrumar os nomes de `d_sf_municipio` e depois usar `dplyr::inner_join()`, assim:
+
+```{r eval=FALSE}
+d_sf_municipio <- d_sf_municipio %>% 
+  # deixa os nomes das colunas minusculos
+  janitor::clean_names() %>% 
+  # tira os acentos
+  dplyr::mutate(municipio = abjutils::rm_accent(nm_municip)) %>% 
+  # bases unidas jamais serão vencidas!
+  dplyr::inner_join(muni_comarcas_completo, "municipio")
+
+dplyr::glimpse(d_sf_municipio)
+# Observations: 645
+# Variables: 12
+# $ nm_municip        <fctr> CAIUÁ, CASTILHO, DRACENA, ESTRELA DO NORTE, E...
+# $ cd_geocmu         <fctr> 3509106, 3511003, 3514403, 3515301, 3515350, ...
+# $ municipio         <chr> "CAIUA", "CASTILHO", "DRACENA", "ESTRELA DO NO...
+# $ cod_municipio     <int> 6606, 6629, 6663, 6678, 6679, 6826, 6843, 6857...
+# $ comarca           <chr> "PRESIDENTE EPITACIO", "ANDRADINA", "DRACENA",...
+# $ tipo              <chr> "municipio", "municipio", "comarca", "municipi...
+# $ circunscricao     <chr> "Presidente Venceslau", "Andradina", "Dracena"...
+# $ entrancia         <chr> "Entrância Inicial", "Entrância Final", "Entrâ...
+# $ num_circunscricao <chr> "28ª CJ", "37ª CJ", "29ª CJ", "27ª CJ", "28ª C...
+# $ num_regiao        <chr> "5ª RAJ", "2ª RAJ", "5ª RAJ", "5ª RAJ", "5ª RA...
+# $ regiao            <chr> "Presidente Prudente", "Araçatuba", "President...
+# $ geometry          <simple_feature> MULTIPOLYGON (((-51.8600105..., MUL...
+```
+
+Se você quiser fazer um gráfico feinho só pra saber o que está rolando, use `plot()`:
+
+```{r eval=FALSE}
+plot(d_sf_municipio[, c("num_regiao", "geometry")])
+```
+
+![](/img/blog/union-sf/sf_blog01.png)
+
+### Parte 2: agrupando os municípios
+
+Aqui é onde a mágica acontece! Para unir os polígonos do mapa, por incrível que pareça, utilizaremos o pacote `dplyr`. O autor do pacote `sf`, Edzer Pebesma, teve a incrível ideia de criar um método `S3` para objetos do tipo `sf` (como é nosso caso), já fazendo algumas operações para nós. Na prática, o pacote estende e reimplementa mais de 20 funções provenientes do `dplyr`. Veja `?sf::dplyr` para detalhes.
+
+No nosso caso, vamos usar `group_by()` (ou `sf::group_by.sf()`) e `summarise()` (ou`sf::summarise.sf()`):
+
+```{r eval=FALSE}
+d_sf_comarca <- d_sf_municipio %>% 
+  dplyr::group_by(comarca) %>% 
+  dplyr::summarise() %>% 
+  dplyr::ungroup()
+
+dplyr::glimpse(d_sf_comarca)
+# Observations: 319
+# Variables: 2
+# $ comarca   <chr> "ADAMANTINA", "AGUAI", "AGUAS DE LINDOIA", "AGUDOS", "...
+# $ geometry  <simple_feature> MULTIPOLYGON (((-50.9930145..., MULTIPOLYGO...
+```
+
+Simples assim! Note que agora temos 319 objetos, que é exatamente o número de comarcas. Se quiser adicionar mais variáveis, basta incluí-las no `summarise()`:
+
+```{r eval=FALSE}
+d_sf_comarca <- d_sf_municipio %>% 
+  dplyr::group_by(comarca) %>% 
+  # a entrancia identifica o quão grande/relevante é uma comarca
+  dplyr::summarise(entrancia = dplyr::first(entrancia)) %>% 
+  dplyr::ungroup()
+```
+
+Para criar `d_sf_circunscricao` e `d_sf_regiao` utilizamos o mesmo procedimento.
+
+### Parte 3: montando os gráficos
+
+Agora digamos que você tenha essa lista de mapas
+
+```{r eval=FALSE}
+mapas <- list(
+  d_sf_municipio,
+  d_sf_comarca,
+  d_sf_circunscricao,
+  d_sf_regiao)
+```
+
+E você quer desenhar mapas com esses títulos
+
+```{r eval=FALSE}
+titulos <- c(
+  "Municípios", 
+  "Comarcas", 
+  "Circunscrições judiciárias", 
+  "Regiões Admnistrativas")
+```
+
+Vamos usar o `purrr::map2()` para montar nossos gráficos em `ggplot2` e guardar numa lista. Internamente, utilizaremos o `geom_sf()`, uma extensão do `ggplot2` criada para tratar objetos do pacote `sf`. Um código minimalista seria
+
+```{r eval=FALSE}
+graficos <- purrr::map2(mapas, titulos, ~{
+  ggplot(.x) +        # cria o ggplot
+    geom_sf() +       # desenha o mapa
+    ggtitle(.y) +     # adiciona o título
+    theme_minimal()   # deixa o fundo mais bonitinho
+})
+```
+
+Você pode usar a função `gridExtra::grid.arrange()` para juntar essa lista de gráficos em um gráfico só, rodando
+
+```{r eval=FALSE}
+gridExtra::grid.arrange(grobs = graficos)
+```
+
+O resultado final é o gráfico abaixo.
+
+
+![](/img/blog/union-sf/sf_blog02.png)
+
+Coisa mais linda!
+
+## Wrap-up
+
+- O pacote `sf` coloca a análise espacial no `tidyverse`
+- Use `st_read()` para ler *shapefiles* (arquivos SHP)
+    - O objeto resultante é um `data.frame` com uma coluna `geometry` especial que guarda os polígonos.
+- Várias funções do `dplyr` foram reimplementadas para funcionar com o `sf`. `summarise`, por exemplo, faz a união de polígonos, o que resolve nosso problema.
+- Você pode usar `geom_sf()` para fazer gráficos com `sf` usando o poderoso `ggplot2`.
+
+É isso pessoal. Espero que seja tão life saver para vocês como foi para mim. Happy coding ;)
+
+
+
+
+

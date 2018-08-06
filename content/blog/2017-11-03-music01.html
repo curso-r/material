@@ -1,0 +1,161 @@
+---
+title: "Estatística e Música"
+date: "2017-11-03T23:26:00+03:00"
+tags: ["musica"]
+categories: ["análises", "r"]
+banner: "img/banners/music01.jpg"
+author: ["Julio"]
+summary: "Já pensou em juntar estatística e música? Nessa série de posts mostro como estou pensando em fazer isso e os pacotes que vou criar nessa jornada..."
+draft: false
+---
+
+
+
+<blockquote>
+<p>Para quem está esperando posts sobre captchas, esperem mais um pouquinho 😀. Em novembro voltarei a postar sobre esse assunto.</p>
+</blockquote>
+<p>Em setembro de 2017, participei do <a href="http://compmus.ime.usp.br/sbcm/2017">16th Symposium on Computer Music</a>, organizado pelo prof. Marcelo Queiroz do IME-USP. O evento foi muito legal! Estou estudando música nos últimos meses e acho que farei meu doutorado em soluções que ligam estatística e música. É uma área realmente apaixonante.</p>
+<p>Uma das formas que usarei para aprender os métodos e estudar os conceitos será esse blog! Assim vocês poderão acompanhar meus avanços e propor ideias para colaborar com meus trabalhos. Pretendo desenvolver tanto modelos estatísticos e programação quanto teoria musical.</p>
+<p>Até o momento, tenho três posts planejados ou prontos:</p>
+<ul>
+<li>pacote <code>music21</code>: esse post! Veja abaixo.</li>
+<li>pacote <code>chordgen</code>: pacote que criei para gerar sequências aleatórias de acordes com o R</li>
+<li>artigo <code>deepbach</code>: um modelo de redes neurais capaz de imitar corais de Bach.</li>
+</ul>
+<section id="computacao-musical-numa-casca-de-noz" class="level2">
+<h2>Computação musical numa casca de noz</h2>
+<p>Apesar da minha falta de conhecimento sobre o tema, acredito que a área de computação musical pode ser resumida em três frentes:</p>
+<p><strong>Leitura</strong>: extrair dados estruturados dos áudios. Envolve <em>Music Information Retrieval</em> - MIR</p>
+<p><img src="/img/blog/music01/music-download.png" width="40%" style="display: block; margin: auto;" /></p>
+<p><strong>Composição</strong>: Criar ou completar músicas automaticamente</p>
+<p><img src="/img/blog/music01/music-generate.png" width="40%" style="display: block; margin: auto;" /></p>
+<p><strong>Edição</strong>: Adicionar efeitos na música para produção</p>
+<p><img src="/img/blog/music01/music-transform.png" width="40%" style="display: block; margin: auto;" /></p>
+<p>Meu foco será na parte de composição, com foco em harmonização, que significa criar e completar harmonias das músicas dado algum estilo (e.g. Bach ou Beatles). Também tentarei criar soluções de improviso, apesar de não garantir nada.</p>
+</section>
+<section id="music21" class="level1">
+<h1>music21</h1>
+<p>O objetivo do pacote <code>music21</code> é funcionar como um port pipeável (<code>%&gt;%</code>-able) da <a href="http://web.mit.edu/music21/doc/index.html">biblioteca music21, em python</a>. Ele usa o excelente pacote <a href="https://github.com/rstudio/reticulate"><code>reticulate</code></a> do RStudio como backend.</p>
+<p>Atualmente, o <code>music21</code> é mais limitado que a bibloteca em python. No entanto, graças ao <code>reticulate</code> é fácil rodar qualquer função do <code>music21</code> no R.</p>
+<section id="instalacao" class="level2">
+<h2>Instalação</h2>
+<p>Como o <code>music21</code> utiliza bibliotecas python, é necessário instalar algumas dependências antes. No Ubuntu, basta rodar</p>
+<pre class="bash"><code>sudo apt-get install python-pip
+sudo pip install pip --upgrade
+sudo pip install music21</code></pre>
+<p>Em outros sistemas opetacionais, veja a <a href="http://web.mit.edu/music21/">documentação oficial</a> da biblioteca.</p>
+<p>Eu tenho o péssimo hábito de não subir meus pacotes para o CRAN. Mas prometo que esse vou subir e manter. Por enquanto, para instalar o pacote <code>music21</code> é necessário rodar</p>
+<pre class="r"><code>devtools::install_github(&quot;jtrecenti/music21&quot;)</code></pre>
+<p>Você pode carregar o pacote rodando</p>
+<pre class="r"><code>library(music21)</code></pre>
+<p>Para usar a função de plotar uma partitura, você também precisara do <a href="http://lilypond.org/">lilypond</a>:</p>
+<pre class="bash"><code>sudo apt-get install lilypond</code></pre>
+</section>
+<section id="o-objeto-music21" class="level2">
+<h2>O objeto <code>music21</code></h2>
+<pre class="r"><code>library(music21)
+music21
+## Module(music21)</code></pre>
+<p>O objeto <code>music21</code> é um módulo do python. Com ele é possível rodar qualquer função do pacote usando <code>$</code>, tratando o objeto como uma <a href="http://adv-r.had.co.nz/R5.html">Reference Class</a>.</p>
+<pre class="r"><code>note &lt;- music21$note$Note(&quot;C#&quot;)
+note
+## &lt;music21.note.Note C#&gt;</code></pre>
+<pre class="r"><code>note %&gt;% 
+  plot()</code></pre>
+<p><img src="/img/blog/music01/note-1.png" /></p>
+</section>
+<section id="exemplo" class="level2">
+<h2>Exemplo</h2>
+<section id="corais-do-bach" class="level3">
+<h3>Corais do Bach</h3>
+<pre class="r"><code>get_composer(&quot;bach&quot;) %&gt;% 
+  head()
+## [1] &quot;/Library/Python/2.7/site-packages/music21/corpus/bach/bwv1.6.mxl&quot;  
+## [2] &quot;/Library/Python/2.7/site-packages/music21/corpus/bach/bwv10.7.mxl&quot; 
+## [3] &quot;/Library/Python/2.7/site-packages/music21/corpus/bach/bwv101.7.mxl&quot;
+## [4] &quot;/Library/Python/2.7/site-packages/music21/corpus/bach/bwv102.7.mxl&quot;
+## [5] &quot;/Library/Python/2.7/site-packages/music21/corpus/bach/bwv103.6.mxl&quot;
+## [6] &quot;/Library/Python/2.7/site-packages/music21/corpus/bach/bwv104.6.mxl&quot;</code></pre>
+<p>Vamos pegar uma delas e guardar numa variável</p>
+<pre class="r"><code>bach_music &lt;- get_composer(&quot;bach&quot;)[61] %&gt;% 
+  read_music()</code></pre>
+</section>
+<section id="plotando-a-musica-bwv165.6" class="level3">
+<h3>Plotando a música <em>bwv165.6</em></h3>
+<p>Basta rodar <code>plot()</code>!!</p>
+<pre class="r"><code>bach_music %&gt;% 
+  plot()</code></pre>
+<p><img src="/img/blog/music01/bach-1.png" /></p>
+<p>No RStudio, você pode usar a função <code>view()</code> para visualizar a música em melhor resolução no Viewer Pane.</p>
+</section>
+<section id="imprimindo-bwv165.6-so-o-soprano" class="level3">
+<h3>Imprimindo <em>bwv165.6</em> (só o soprano)</h3>
+<p>Para visualizar as notas de uma música basta rodar o objeto no console. A música é organizada por Measures (compassos) e cada compasso vai mostrar seus componentes. No primeiro compasso, podemos ver a clave de sol (TrebleClef), as definições do tom (sol maior) e do tempo (4/4). Nos demais, observamos as notas e os temos associados a cada nota. Por exemplo, temos uma nota F# no primeiro tempo.</p>
+<pre class="r"><code>bach_music[[1]]
+## {0.0} &lt;music21.instrument.Instrument P1: Soprano: Instrument 1&gt;
+## {0.0} &lt;music21.stream.Measure 0 offset=0.0&gt;
+##     {0.0} &lt;music21.clef.TrebleClef&gt;
+##     {0.0} &lt;music21.key.Key of G major&gt;
+##     {0.0} &lt;music21.meter.TimeSignature 4/4&gt;
+##     {0.0} &lt;music21.note.Note G&gt;
+## {1.0} &lt;music21.stream.Measure 1 offset=1.0&gt;
+##     {0.0} &lt;music21.note.Note G&gt;
+##     {1.0} &lt;music21.note.Note F#&gt;
+##     {2.0} &lt;music21.note.Note E&gt;
+##     {2.5} &lt;music21.note.Note F#&gt;
+##     {3.0} &lt;music21.note.Note G&gt;
+##     {3.5} &lt;music21.note.Note A&gt;
+## {5.0} &lt;music21.stream.Measure 2 offset=5.0&gt;
+##     {0.0} &lt;music21.note.Note B&gt;
+##     {0.5} &lt;music21.note.Note C&gt;
+##     {1.0} &lt;music21.note.Note A&gt;
+##     {2.0} &lt;music21.note.Note G&gt;
+##     {3.0} &lt;music21.note.Note G&gt;
+## {9.0} &lt;music21.stream.Measure 3 offset=9.0&gt;
+##     {0.0} &lt;music21.note.Note G&gt;
+##     {1.0} &lt;music21.note.Note A&gt;
+##     {1.5} &lt;music21.note.Note G&gt;
+##     {2.0} &lt;music21.note.Note F#&gt;
+##     {2.5} &lt;music21.note.Note E&gt;
+##     {3.0} &lt;music21.note.Note D&gt;
+## {13.0} &lt;music21.stream.Measure 4 offset=13.0&gt;
+##     {0.0} &lt;music21.note.Note G&gt;
+##     {2.0} &lt;music21.note.Note F#&gt;
+##     {3.0} &lt;music21.note.Note F#&gt;
+## {17.0} &lt;music21.stream.Measure 5 offset=17.0&gt;
+##     {0.0} &lt;music21.layout.SystemLayout&gt;
+##     {0.0} &lt;music21.note.Note G&gt;
+##     {1.0} &lt;music21.note.Note G&gt;
+##     {2.0} &lt;music21.note.Note A&gt;
+##     {3.0} &lt;music21.note.Note B&gt;
+## {21.0} &lt;music21.stream.Measure 6 offset=21.0&gt;
+##     {0.0} &lt;music21.note.Note A&gt;
+##     {2.0} &lt;music21.note.Note A&gt;
+##     {3.0} &lt;music21.note.Note B&gt;
+## {25.0} &lt;music21.stream.Measure 7 offset=25.0&gt;
+##     {0.0} &lt;music21.note.Note C&gt;
+##     {1.0} &lt;music21.note.Note B&gt;
+##     {2.0} &lt;music21.note.Note A&gt;
+##     {3.0} &lt;music21.note.Note B&gt;
+##     {3.5} &lt;music21.note.Note C&gt;
+## {29.0} &lt;music21.stream.Measure 8 offset=29.0&gt;
+##     {0.0} &lt;music21.note.Note A&gt;
+##     {2.0} &lt;music21.note.Note G&gt;
+##     {3.0} &lt;music21.bar.Barline style=final&gt;</code></pre>
+<p>Você pode tratar esse objeto como uma lista. Se você entrar numa nota, você poderá ver algumas características dela</p>
+<pre class="r"><code># Nota F#
+bach_music[[1]][[2]][[3]]
+## &lt;music21.note.Note F#&gt;
+
+# duração da nota
+bach_music[[1]][[2]][[3]]$duration
+## &lt;music21.duration.Duration 0.5&gt;
+
+# som exato
+bach_music[[1]][[2]][[3]]$pitch
+## F#4</code></pre>
+<p>Por enquanto vou acabar por aqui. Convido vocês a usarem o <code>music21</code> e experimentar suas funcionalidades. Adicionem issues em <a href="https://github.com/jtrecenti/music21/issues" class="uri">https://github.com/jtrecenti/music21/issues</a> e mandem pergundas nos comentários.</p>
+<p>É isso! Happy coding ;)</p>
+</section>
+</section>
+</section>

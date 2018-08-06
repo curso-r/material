@@ -1,0 +1,96 @@
+---
+title: "É possível rodar python no RStudio?"
+date: "2018-03-11T14:25:00+03:00"
+tags: ["python", "rstudio", "reticulate"]
+categories: ["tutoriais", "r"]
+banner: "img/banners/py.png"
+author: ["Julio"]
+summary: "RStudio é a melhor IDE para fazer ciência de dados. R e python são, no momento, as melhores linguagens para fazer ciência de dados. O RStudio foi criado para rodar R. Será que também serve para rodar python? Nesse post curtinho eu respondo que sim e explico como..."
+draft: false
+---
+
+
+
+<p>RStudio é a melhor IDE para fazer ciência de dados. R e python são, no momento, as melhores linguagens para fazer ciência de dados. O RStudio foi criado para rodar R.</p>
+<p>Mas será que o RStudio é bom para rodar python?</p>
+<p><img src="/blog/2018-03-11-python_files/figure-html/unnamed-chunk-2-1.png" width="480" style="display: block; margin: auto;" /></p>
+<p>Nesse post curtinho eu mostro que <strong>sim</strong> e explico como.</p>
+<div id="rodando-r-e-python-no-rmarkdown" class="section level3">
+<h3>Rodando R e python no RMarkdown</h3>
+<p>Primeiro, certifique-se de que você tem a versão <code>1.1.x</code> ou maior do RStudio instalado na sua máquina. Abra um arquivo RMarkdown em</p>
+<pre><code>File &gt; New file &gt; R Markdown...</code></pre>
+<p>Talvez seja necessário instalar alguns pacotes (por exemplo, o próprio <code>rmarkdown</code>) para abrir a telinha.</p>
+<blockquote>
+<p>Se você não sabe o que é RMarkdown, dê uma olhada na <a href="https://rmarkdown.rstudio.com/lesson-1.html">documentação oficial do RStudio</a>. Em poucas palavras, o RMarkdown é uma forma escrever textos e códigos dentro de um mesmo arquivo. Fazer análises com RMarkdown no RStudio é uma das coisas que torna essa IDE tão poderosa.</p>
+</blockquote>
+<p>Com o RMarkdown aberto, você pode inserir um <em>chunk</em> com <code>Ctrl + Alt + I</code>. Vai aparecer isso aqui:</p>
+<pre><code>&#39;&#39;&#39;{r}
+
+&#39;&#39;&#39;</code></pre>
+<p>Se você escrever um código em R aí dentro e mandar rodar, ele vai rodar.</p>
+<pre><code>&#39;&#39;&#39;{r}
+eu_gosto_de_R &lt;- &quot;nossa, como você é legal!&quot;
+eu_gosto_de_R
+&#39;&#39;&#39;
+
+[1] &quot;nossa, como você é legal!&quot;
+</code></pre>
+<p>Se você trocar <code>r</code> por <code>python</code>, você poderá rodar python. Só isso!</p>
+<pre><code>&#39;&#39;&#39;{python}
+eu_gosto_de_python = &quot;tudo bem, vida que segue&quot;
+print eu_gosto_de_python
+&#39;&#39;&#39;
+
+tudo bem, vida que segue
+</code></pre>
+</div>
+<div id="e-possivel-preservar-a-sessao-entre-chunks" class="section level3">
+<h3>É possível preservar a sessão entre chunks?</h3>
+<p>Até o RStudio <code>1.1.x</code>, não. Mas a partir da <a href="https://dailies.rstudio.com/">versão <code>1.2.x</code></a>, que ainda não foi lançada oficialmente, isso já funciona. Então, isso aqui funciona:</p>
+<pre><code>&#39;&#39;&#39;{python}
+eu_gosto_de_python += &quot;!!!&quot; 
+print eu_gosto_de_python
+&#39;&#39;&#39;
+
+tudo bem, vida que segue!!!
+</code></pre>
+<p>Com essa atualização, você também pode pegar os objetos rodados em python direto para o R, e vice-versa</p>
+<p>Ler objetos do python no R, carregando o pacote <code>reticulate</code>:</p>
+<pre><code>&#39;&#39;&#39;{r}
+library(reticulate)
+
+veio_do_python &lt;- py$eu_gosto_de_python
+paste(veio_do_python, &quot; Segue no R.&quot;)
+&#39;&#39;&#39;
+
+[1] &quot;tudo bem, vida que segue!!! Segue no R.&quot;
+</code></pre>
+<p>Ler objetos do R no python usando o objeto <code>r.</code>:</p>
+<pre><code>&#39;&#39;&#39;{python}
+print r.eu_gosto_de_R + &quot; Também no python.&quot;
+&#39;&#39;&#39;
+
+nossa, como você é legal! Também no python
+</code></pre>
+<blockquote>
+<p>As versões <code>1.2.x</code> ainda não foram lançadas oficialmente. Ou seja, elas podem ter problemas de funcinamento. Muito cuidado ao usar as daily builds do RStudio!</p>
+</blockquote>
+</div>
+<div id="um-pouco-de-explicacao" class="section level3">
+<h3>Um pouco de explicação</h3>
+<p>Tudo isso é possível graças ao pacote <a href="http://curso-r.com/blog/2017/11/20/2017-11-20-reticulate/"><code>reticulate</code></a> do RStudio, que é responsável por criar uma sessão do python dentro do R. A versão mais atualizada desse pacote utiliza a função <code>reticulate::eng_python</code>, que é adicionada como uma opção <code>knitr::knit_engines$set()</code> do pacote <code>knitr</code>.</p>
+<p>Na versão <code>1.2.x</code> do RStudio, a utilização dessa engine vem integrada ao editor do RMarkdown, permitindo que você rode os códigos em python e em R diretamente. Nas versões anteriores, você só conseguirá obter os resultados após compilar o documento para algum formato de saída (HTML, PDF, Word, etc).</p>
+<p>Atualmente, o <code>reticulate</code> já sabe transferir vários objetos entre as linguagens: - Objetos atômicos como números, strings etc funcionam sem nenhuma dor. - Com um pouquinho de esforço, também podemos transferir <code>data.frame</code>s entre R e <code>Pandas</code>, matrizes e arrays entre R e <code>NumPy</code>. - Objetos complexos do python são tratados como <a href="http://curso-r.com/blog/2017/06/19/2017-06-19-environments/">environments</a> no R. - Para mais detalhes, veja <a href="https://rstudio.github.io/reticulate/index.html#type-conversions">esse link</a>.</p>
+<p>O pacote <code>reticulate</code> também permite que você abra uma sessão interativa do python dentro do console do R, usando a função <code>py_repl()</code>. Veja <a href="https://rstudio.github.io/reticulate/index.html#python-repl">essa parte da documentação do reticulate</a> para detalhes.</p>
+</div>
+<div id="wrap-up" class="section level3">
+<h3>Wrap-up</h3>
+<ul>
+<li>Você pode rodar R e python no RMarkdown dentro do RStudio.</li>
+<li>Para obter todas as funcionalidades, baixe a <a href="https://dailies.rstudio.com/">daily build, versão 1.2.x</a>. Mas tome cuidado.</li>
+<li>O objeto <code>reticulate::py</code> guarda objetos carregados no python dentro do R.</li>
+<li>O objeto <code>r.</code> guarda objetos carregados no R dentro do python.</li>
+<li>Fique atualizada e obtenha mais informações no <a href="https://rstudio.github.io/reticulate/index.html">pacote reticulate</a>.</li>
+</ul>
+<p>É isso pessoal. Happy coding ;)</p>
+</div>

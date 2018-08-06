@@ -1,0 +1,69 @@
+---
+title: "Como usar Estimators do TensorFlow no R"
+date: "2017-04-02T13:07:31+02:00"
+tags: ["tensorflow"]
+categories: ["tutoriais", "r"]
+banner: "img/banners/"
+author: ["Daniel"]
+draft: true
+---
+
+
+
+<p>Quem já usou TensorFlow sabe que uma das partes mais difíceis é organizar o seu código de forma que os <code>tensors</code> não se misturem de uma sessão para a outra, você não tenha que repetir intermináveis loops de treino do modelo e etc.</p>
+<p>Para ajudar nisso, foi desenvolvida uma API chamada <code>Estimators</code> que nos permite organizar os modelos de forma bem intuitiva. Para quem se interessar, vale a pena começar por <a href="https://www.youtube.com/watch?v=t64ortpgS-E">esse vídeo</a>, que é uma apresentação do Martin Wicke na TensorFlow Dev Summit.</p>
+<p>Nesse post vou implementar uma regressão linear simples usando o TensorFlow apenas para mostrar como funciona a organização do código usando a Estimator API que por enquanto não é oficial, mas será na versão 1.2.</p>
+<p>Para usar o TensorFlow pelo R, a melhor forma é usar o pacote <a href="https://github.com/rstudio/tensorflow"><code>tensorflow</code></a> A instalação não é muito simples, pois é necessário, ter o python e o TensorFlow para o python configurados, para depois instalar o pacote. Não vou entrar em detalhes da instalação, mas no <a href="https://github.com/rstudio/tensorflow">README no pacote</a> tem uma descrição de como instalar.</p>
+<p>Um bom tutorial de como implementar o seu próprio <code>Estimator</code> está disponível <a href="https://www.tensorflow.org/extend/estimators">neste link</a>. Basicamente, para tudo funcionar precisamos definir uma função chamada <code>model_fn</code>.</p>
+<div id="definindo-o-modelo" class="section level2">
+<h2>Definindo o modelo</h2>
+<p>A função <code>model_fn</code> tem, em python, o seguinte formato:</p>
+<pre><code>def model_fn(features, targets, mode, params):
+   # Logic to do the following:
+   # 1. Configure the model via TensorFlow operations
+   # 2. Define the loss function for training/evaluation
+   # 3. Define the training operation/optimizer
+   # 4. Generate predictions
+   # 5. Return predictions/loss/train_op/eval_metric_ops in ModelFnOps object
+   return ModelFnOps(mode, predictions, loss, train_op, eval_metric_ops)</code></pre>
+<p>Ou seja, a função recebe os argumentos <code>features</code>, <code>targets</code>, <code>mode</code> e <code>params</code> e configura o modelo, usando as operações do TensorFlow, define a função de perda, define a operação de treino e gera as predições.</p>
+<pre class="r"><code>library(tensorflow)
+model_fn_lib &lt;- tf$contrib$learn$python$learn$estimators$model_fn
+model_fn &lt;- function(features = NULL, targets = NULL, mode = NULL, params = NULL){
+  
+  output &lt;- tf$contrib$layers$linear(features, 1L)
+  
+  predictions &lt;- tf$reshape(output, shape(-1L))
+  predictions_dict &lt;- dict(predictions = predictions)
+  
+  loss &lt;- tf$losses$mean_squared_error(targets, predictions)
+  
+  eval_metric_ops &lt;- dict(
+    rmse = tf$metrics$root_mean_squared_error(tf$cast(targets, tf$float64), predictions) 
+  )
+  
+  train_op &lt;- tf$contrib$layers$optimize_loss(
+    loss = loss,
+    global_step = tf$contrib$framework$get_global_step(),
+    learning_rate = params[[&quot;learning_rate&quot;]],
+    optimizer = &quot;SGD&quot;
+  )
+          
+  model_fn_lib$ModelFnOps(
+      mode = mode,
+      predictions = predictions_dict,
+      loss = loss,
+      train_op = train_op,
+      eval_metric_ops = eval_metric_ops
+  )
+}
+
+tf_lm &lt;- tf$contrib$learn$Estimator(model_fn = model_fn, params = dict(learning_rate = 0.5))</code></pre>
+<pre class="r"><code>x &lt;- matrix(model.matrix(~ disp + hp + drat, data = mtcars), nrow = 32)
+y &lt;- mtcars$mpg
+x &lt;- tf$constant(x)
+y &lt;- tf$constant(y)
+
+tf_lm$fit(x = x, y = y, steps = 100)
+tf_lm$</code></pre>
+</div>

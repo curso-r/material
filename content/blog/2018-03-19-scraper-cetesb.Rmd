@@ -1,0 +1,267 @@
+---
+title: "Web scraping do sistema de qualidade do ar da CETESB"
+date: "2018-03-19T14:25:00+03:00"
+tags: ["web-scraping", "dados-abertos"]  
+categories: ["tutoriais", "r"]
+banner: "img/banners/scraper-cetesb.jpg"
+author: ["William"]
+summary: "Nem sempre dados públicos são disponibilizados de forma eficiente para a coleta. Neste post, vamos exercitar a arte do web scraping para raspar dados de poluição do ar da CETESB."
+draft: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, 
+                      cache = TRUE, 
+                      eval = FALSE)
+```
+
+
+A minha tese de doutorado envolve a análise de dados de poluição do ar. Parte do trabalho está em encontrar bases de dados que exemplifiquem temas que eu precise discutir. Informações sobre poluição do ar geralmente são disponibilizados por órgãos públicos de monitoramento ambiental, o que deveria, por princípio, garantir a fácil acesso e a coleta eficiente dos dados. Como sabemos, nem sempre é isso que acontece.
+
+Neste post, vamos exercitar a arte do web scraping construindo um scraper para coletar dados de poluição do ar da CETESB. O texto original está no [blog que criei para divulgar resultados parciais da minha tese](https://rpollution.com).
+
+# Qualar
+
+O [Qualar](http://qualar.cetesb.sp.gov.br/qualar/home.do) é o sistema de informações de qualidade do ar da CETESB. Por meio dele, podemos acessar os dados de todas as estações de monitoramento do estado de São Paulo. O sistema exige a criação de um login e então o envio de um pequeno formulário com quais informações você gostaria de visualizar.
+
+O Qualar funciona muito bem para pequenas consultas, mas na extração de uma massa grande de dados existem duas dificuldades:
+
+1. Se você precisa de dados de várias estações e de vários poluente, você precisará repetir esse processo para cada combinação de estação/poluente. Pegar todos os dados de ozônio da Grande São Paulo, por exemplo, exigiria repetir a solicitação 23 vezes.
+
+2. Como a planilha é impressa na tela, se você precisar de uma série muito longa, você vai demorar bastante para carregar a página e seu computador corre um grande risco de travar no meio do caminho por falta de RAM.
+
+Para contornar este problema, vamos usar o R para construir um código que simule uma requisição de dados ao Qualar. Em seguida, vamos transformar o código numa função para replicar o processo para diversos parâmetros rodando apenas algumas linhas de códigos.
+
+**Observação**: o sistema também tem uma opção "Exportar dados Avançado". Nela, é possível escolher até 3 parâmetros para cada estação e os dados não são impressos na tela, sendo gerado diretamente um arquivo csv para download. Porém, com a desculpa de praticar a construção do scraper, não vamos usar essa opção.
+
+# Construindo o scraper
+
+Para construir o scraper, vamos seguir os passos definidos [neste post](http://curso-r.com/blog/2017/05/19/2017-05-19-scrapper-ssp/) da Curso-R escrito pelo [Fernando Corrêa](https://github.com/azeloc). São eles:
+
+1. Definir a página que você quer raspar.
+2. Identificar exatamente as requisições que produzem o que você quer.
+3. Construir um programa que imite as requisições que você faria manualmente.
+4. Repetir o passo (3) quantas vezes quiser.
+
+Um fluxo mais estruturado do web scraping é discutido [neste post](http://curso-r.com/blog/2018/02/18/2018-02-18-fluxo-scraping/) do [Caio Lente](https://github.com/ctlente/).
+
+## PASSO 1
+
+Para chegar na página que queremos raspar, precisamos passar pelas seguintes etapas dentro do Qualar: login, pesquisa e janela com os dados. Veja abaixo como prosseguir.
+
+**Login**: fazer o login [na página inicial](http://qualar.cetesb.sp.gov.br/qualar/home.do).
+
+```{r, echo=FALSE, fig.align='center'}
+knitr::include_graphics("/img/blog/scraper-cetesb/qualar_login.png")
+```
+
+
+**Pesquisa**: na próxima página, acessar "Consultas/Exportar Dados" no menu da esquerda e preencher a pesquisa com os dados do parâmetro que você quer acessar.
+
+```{r, echo=FALSE, fig.align='center'}
+knitr::include_graphics("/img/blog/scraper-cetesb/qualar_form.png")
+```
+
+
+**Dados**: na nova janela aberta pelo site estão os dados que queremos raspar.
+
+```{r, echo=FALSE, fig.align='center'}
+knitr::include_graphics("/img/blog/scraper-cetesb/qualar_dados.png")
+```
+
+<br>
+
+## PASSO 2
+
+Para descobrir qual requisição é feita em cada momento, podemos utilizar o "Inspect element" do navegador. Eu estou usando o Firefox neste post, mas o procedimento é semelhante em outros navegadores. 
+
+O login é uma submissão de formulário. Inspecionando o html da página, podemos ver que os itens que o formulário precisa enviar são o "cetesb_login" e o "cetesb_passoword".
+
+```{r, echo=FALSE, fig.align='center'}
+knitr::include_graphics("/img/blog/scraper-cetesb/inspect-form-login.png")
+```
+
+Para descobrir que tipo de requisição o login faz, basta abrir o Inspect element antes de fazer o login, logar no site e olhar a aba "Network". A requisição que queremos é a "autenticador". Ela faz uma requisição POST para a url "http://qualar.cetesb.sp.gov.br/qualar/autenticador".
+
+```{r, echo=FALSE, fig.align='center'}
+knitr::include_graphics("/img/blog/scraper-cetesb/inspect_login.png")
+```
+
+Não vou mostrar aqui, mas a requisição que a pesquisa faz para acessar os dados também é a submissão de um formulário e pode ser encontrada de forma equivalente. 
+
+Assim, para acessar os dados, precisaremos enviar outra requisição POST, agora para a url "http://qualar.cetesb.sp.gov.br/qualar/exportaDados.do", contendo os itens desse novo formulário, que são as informações que preencheríamos na pesquisa. No próximo passo, vai ficar mais claro o que estamos fazendo nessa etapa.
+
+
+## PASSO 3
+
+Vamos criar um código que imite essas requisições.
+
+Primeiro, como o sistema Qualar exige login, precisamos capturar o cookie do site para *manter a sessão logada* nas requisições seguintes. O cookie da sessão é guardado no objeto `my_cookie`, que será passado em todas as requisições.
+
+```{r, eval = FALSE}
+library(magrittr)
+library(httr)
+
+res <- GET("http://qualar.cetesb.sp.gov.br/qualar/home.do")
+my_cookie <- cookies(res)$value %>% purrr::set_names(cookies(res)$name)
+```
+
+Agora, precisamos enviar a requisição POST para fazer o login e acessar o sistema. 
+
+- Os parâmetros do formulário são colocados dentro do argumento `body=` da função `POST()`. Se você estiver replicando, basta substituir os valores `seu_login` e `sua_senha` pelo login e senha que você obteve ao se cadastrar no Qualar.
+
+- O argumento `encode = "form"` especifica que a requisição é uma submissão de formulário.
+
+- O parâmetro `enviar = "OK"` indica que estamos submetendo o formulário.
+
+- O cookie é passado usando a função `set_cookies()`.
+
+```{r, eval = FALSE}
+url <- "http://qualar.cetesb.sp.gov.br/qualar/autenticador"
+
+res <- POST(
+  url, 
+  body = list(
+    cetesb_login = "seu_login",
+    cetesb_password = "sua_senha",
+    enviar = "OK"
+  ), 
+  encode = "form",
+  set_cookies(my_cookie)
+)
+```
+
+Então fazemos uma requisição POST para acessar os dados. Essa requisição imita a pesquisa dentro da página "Exportar dados". Nela, precisamos definir quais dados queremos acessar.
+
+```{r, eval = FALSE}
+url <- "http://qualar.cetesb.sp.gov.br/qualar/exportaDados.do"
+
+res <- POST(
+  url,
+  query = list(method = "pesquisar"),
+  body = list(
+    irede = "A",
+    dataInicialStr  = "04/03/2018",
+    dataFinalStr = "05/03/2018",
+    cDadosInvalidos = "on",
+    iTipoDado = "P",
+    estacaoVO.nestcaMonto = "72",
+    parametroVO.nparmt = "63"
+  ),
+  encode = "form",
+  set_cookies(my_cookie)
+)
+```
+
+Observe que, apesar de na pesquisa conseguirmos selecionar o nome da estação e do parâmetro, a requisição envia ids numéricos. No Qualar, eu encontrei apenas os ids das estações, mas os valores de ambos os parâmetros podem ser encontrados inspecionando o html da página. Para facilitar a nossa vida, eu salvei esses valores nos arquivos `station_ids.csv` e `param_ids.csv`, que podem ser baixados pelo [repositório do blog no Github](https://github.com/williamorim/Rpollution-blog/tree/master/content/blog/data).
+
+Para finalizar, precisamos ler o resultado da nossa requisição e transformar a tabela existe no html em um data frame.
+
+```{r, eval = FALSE}
+content(res) %>% 
+  rvest::html_table(fill = TRUE) %>%
+  extract2(2)
+```
+
+## Passo 4
+
+Agora, vamos transformar nosso código numa função para poder repetir o processo várias vezes para diversos parâmetros.
+
+```{r, eval = FALSE}
+scraper_CETESB <- function(station, parameter, start, end, 
+                           type = "P", login, password, 
+                           invalidData = "on", network = "A") {
+  
+  
+  res <- GET("http://qualar.cetesb.sp.gov.br/qualar/home.do")
+  my_cookie <- cookies(res)$value %>% purrr::set_names(cookies(res)$name)
+  
+  url <- "http://qualar.cetesb.sp.gov.br/qualar/autenticador"
+  
+  res <- POST(
+    url, 
+    body = list(
+      cetesb_login = login,
+      cetesb_password = password,
+      enviar = "OK"
+    ), 
+    encode = "form",
+    set_cookies(my_cookie)
+  )
+  
+  url <- "http://qualar.cetesb.sp.gov.br/qualar/exportaDados.do"
+  
+  res <- POST(
+    url,
+    query = list(method = "pesquisar"),
+    body = list(
+      irede = network,
+      dataInicialStr  = start,
+      dataFinalStr = end,
+      cDadosInvalidos = invalidData,
+      iTipoDado = type,
+      estacaoVO.nestcaMonto = station,
+      parametroVO.nparmt = parameter
+    ),
+    encode = "form",
+    set_cookies(my_cookie)
+  )
+  
+  content(res) %>% 
+  rvest::html_table(fill = TRUE) %>%
+  extract2(2)
+  
+}
+```
+
+Assim, basta rodar a função abaixo com o seu login e senha para obter em alguns segundos uma tabela com os dados solicitados. Veja um exemplo:
+
+```{r, eval=FALSE}
+dados_cetesb <- scraper_CETESB(station = "72", 
+               parameter = "63", 
+               start = "04/03/2018", 
+               end = "05/03/2018", 
+               type = "P", 
+               login = "seu_login", 
+               password = "sua_senha", 
+               invalidData = "on", 
+               network = "A")
+```
+
+Precisamos apenas tirar as colunas vazias e corrigir o nome das colunas.
+
+```{r}
+dados_cetesb <- dados_cetesb %>%
+  janitor::remove_empty_cols()
+  
+col_names <- as.character(dados_cetesb[1,])
+
+dados_cetesb <- dados_cetesb %>% 
+  magrittr::set_colnames(col_names) %>% 
+  dplyr::slice(-1)
+```
+
+Assim obtemos os dados que queríamos:
+
+```{r}
+dados_cetesb %>% 
+  dplyr::select(`Nome Estação`:`Média Horária`) %>% 
+  head %>% 
+  knitr::kable()
+```
+
+```{r, echo = FALSE, eval=TRUE}
+library(magrittr)
+
+readr::read_rds(path = "../../static/data/scraper-cetesb/dados_cetesb.rds") %>% 
+  dplyr::select(`Nome Estação`:`Média Horária`) %>% 
+  head %>% 
+  knitr::kable()
+```
+
+Iterando essa função fica fácil repetir o processo para diversas estações e parâmetros.
+
+É isso! Dúvidas, críticas e sugestões, deixe um comentário. 
+
+Até a próxima!
+

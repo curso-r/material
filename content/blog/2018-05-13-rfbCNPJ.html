@@ -1,0 +1,705 @@
+---
+title: "rfbCNPJ: Repositório de CNPJs da Receita"
+date: "2018-05-13T00:00:00+00:00"
+tags: ["banco-de-dados", "receita"]
+categories: ["análises", "r", "pacotes"]
+banner: "img/banners/rfbCNPJ.png"
+author: ["Julio"]
+summary: "Durante nosso último curso de introdução a programação em R, um aluno me pediu ajuda para carregar os dados de CNPJs da Receita Federal. Eu me animei tanto com essa base que decidi montar um pacotinho para baixar ler e organizar esses dados..."
+draft: false
+---
+
+<script src="/rmarkdown-libs/htmlwidgets/htmlwidgets.js"></script>
+<link href="/rmarkdown-libs/vis/vis.css" rel="stylesheet" />
+<script src="/rmarkdown-libs/vis/vis.min.js"></script>
+<script src="/rmarkdown-libs/visNetwork-binding/visNetwork.js"></script>
+
+
+<p>Durante nosso <a href="http://loja.curso-r.com">último curso de introdução a programação em R</a>, o <a href="https://github.com/reichaves">Reinaldo Chaves</a> me pediu ajuda para carregar os dados de <a href="http://idg.receita.fazenda.gov.br/orientacao/tributaria/cadastros/cadastro-nacional-de-pessoas-juridicas-cnpj/dados-abertos-do-cnpj">CNPJs da Receita Federal</a>. Eu me animei tanto com essa base que decidi montar um pacotinho para baixar, ler e organizar esses dados.</p>
+<div id="pacote" class="section level1">
+<h1>Pacote</h1>
+<p>O pacote <a href="https://github.com/jtrecenti/rfbCNPJ"><code>rfbCNPJ</code></a> baixa e lê os arquivos contendo a lista de todas as empresas do Brasil, disponibilizado pela <a href="http://idg.receita.fazenda.gov.br/orientacao/tributaria/cadastros/cadastro-nacional-de-pessoas-juridicas-cnpj/dados-abertos-do-cnpj">Receita Federal em 15 de dezembro de 2017</a>.</p>
+<p>São duas tabelas, separadas por UF: i) <code>empresas</code>, contendo informações de CNPJ e nome da empresa e ii) <code>socios</code>, contendo quadro de sócios. Essa base de dados é atualizada pela própria RFB e eu não faço ideia de quando será atualizada novamente.</p>
+<p>Como os arquivos são do tipo <a href="https://readr.tidyverse.org/reference/read_fwf.html">fixed width</a>, algumas pessoas podem ter dificuldade para ler e empilhar os arquivos no R. Esse pacote facilita as operações de download e leitura.</p>
+<div id="instalacao" class="section level2">
+<h2>Instalação</h2>
+<p>Você pode instalar o pacote <code>rfbCNPJ</code> do CRAN rodando</p>
+<pre class="r"><code># ainda não foi aprovado no CRAN...
+install.packages(&quot;rfbCNPJ&quot;)</code></pre>
+<p>Você também pode baixar diretamente do GitHub rodando:</p>
+<pre class="r"><code># install.packages(&quot;devtools&quot;)
+devtools::install_github(&quot;jtrecenti/rfbCNPJ&quot;)</code></pre>
+</div>
+<div id="download-de-arquivos-brutos" class="section level2">
+<h2>Download de arquivos brutos</h2>
+<p>Você pode baixar o arquivo <code>.txt</code> bruto de cada UF usando o comando
+<code>rfb_download()</code>. Por padrão, temos <code>ufs = NULL</code>, que baixará os arquivos
+de todas as UFs. Esses arquivos somam aproximadamente 4.8 GB em disco.</p>
+<pre class="r"><code>rfb_download(ufs = c(&quot;AC&quot;, &quot;RR&quot;), path = &quot;caminho/da/pasta&quot;)</code></pre>
+</div>
+<div id="parse" class="section level2">
+<h2>Parse</h2>
+<p>A partir de uma pasta contendo os arquivos txt, você pode carregar as bases
+de dados rodando <code>rfb_read()</code> com os caminhos dos arquivos ou <code>rfb_read_dir()</code>
+diretamente para ler todos os arquivos da pasta. Certifique-se de que a pasta
+que contém os arquivos a serem lidos contém apenas os arquivos baixados
+em <code>.txt</code>.</p>
+<pre class="r"><code>path &lt;- &quot;caminho/da/pasta&quot;
+all_files &lt;- fs::dir_ls(path)
+
+dados &lt;- rfb_read(all_files)
+dados &lt;- rfb_read_dir(path) # equivalente</code></pre>
+</div>
+<div id="carregando-dados" class="section level2">
+<h2>Carregando dados</h2>
+<p>Os dados são carregados numa tabela complexa com duas <em>list-columns</em>.</p>
+<pre class="r"><code>library(tibble)
+print(dados, n = 27)</code></pre>
+<pre><code># A tibble: 27 x 3
+   file         empresa                  socio                   
+   &lt;chr&gt;        &lt;list&gt;                   &lt;list&gt;                  
+ 1 D71214AC.txt &lt;tibble [15,690 × 3]&gt;    &lt;tibble [26,268 × 6]&gt;   
+ 2 D71214AL.txt &lt;tibble [60,067 × 3]&gt;    &lt;tibble [109,762 × 6]&gt;  
+ 3 D71214AM.txt &lt;tibble [64,306 × 3]&gt;    &lt;tibble [121,095 × 6]&gt;  
+ 4 D71214AP.txt &lt;tibble [15,941 × 3]&gt;    &lt;tibble [28,063 × 6]&gt;   
+ 5 D71214BA.txt &lt;tibble [422,396 × 3]&gt;   &lt;tibble [787,637 × 6]&gt;  
+ 6 D71214CE.txt &lt;tibble [193,654 × 3]&gt;   &lt;tibble [352,841 × 6]&gt;  
+ 7 D71214DF.txt &lt;tibble [194,734 × 3]&gt;   &lt;tibble [368,607 × 6]&gt;  
+ 8 D71214ES.txt &lt;tibble [179,150 × 3]&gt;   &lt;tibble [354,358 × 6]&gt;  
+ 9 D71214GO.txt &lt;tibble [328,524 × 3]&gt;   &lt;tibble [619,810 × 6]&gt;  
+10 D71214MA.txt &lt;tibble [123,736 × 3]&gt;   &lt;tibble [201,854 × 6]&gt;  
+11 D71214MG.txt &lt;tibble [962,930 × 3]&gt;   &lt;tibble [1,916,405 × 6]&gt;
+12 D71214MS.txt &lt;tibble [102,208 × 3]&gt;   &lt;tibble [189,673 × 6]&gt;  
+13 D71214MT.txt &lt;tibble [141,464 × 3]&gt;   &lt;tibble [262,358 × 6]&gt;  
+14 D71214PA.txt &lt;tibble [159,079 × 3]&gt;   &lt;tibble [274,004 × 6]&gt;  
+15 D71214PB.txt &lt;tibble [79,275 × 3]&gt;    &lt;tibble [138,596 × 6]&gt;  
+16 D71214PE.txt &lt;tibble [224,184 × 3]&gt;   &lt;tibble [426,520 × 6]&gt;  
+17 D71214PI.txt &lt;tibble [61,627 × 3]&gt;    &lt;tibble [105,008 × 6]&gt;  
+18 D71214PR.txt &lt;tibble [708,109 × 3]&gt;   &lt;tibble [1,392,658 × 6]&gt;
+19 D71214RJ.txt &lt;tibble [843,040 × 3]&gt;   &lt;tibble [1,708,931 × 6]&gt;
+20 D71214RN.txt &lt;tibble [80,562 × 3]&gt;    &lt;tibble [150,411 × 6]&gt;  
+21 D71214RO.txt &lt;tibble [62,385 × 3]&gt;    &lt;tibble [109,774 × 6]&gt;  
+22 D71214RR.txt &lt;tibble [11,908 × 3]&gt;    &lt;tibble [21,737 × 6]&gt;   
+23 D71214RS.txt &lt;tibble [670,093 × 3]&gt;   &lt;tibble [1,350,159 × 6]&gt;
+24 D71214SC.txt &lt;tibble [498,511 × 3]&gt;   &lt;tibble [974,351 × 6]&gt;  
+25 D71214SE.txt &lt;tibble [63,303 × 3]&gt;    &lt;tibble [114,081 × 6]&gt;  
+26 D71214SP.txt &lt;tibble [2,730,412 × 3]&gt; &lt;tibble [5,585,988 × 6]&gt;
+27 D71214TO.txt &lt;tibble [51,629 × 3]&gt;    &lt;tibble [89,911 × 6]&gt;</code></pre>
+<p>A primeira coluna complexa mostra dados das empresas, e a segunda mostra dados dos sócios. Para carregar uma dessas listas, use <code>tidyr::unnest()</code>, como veremos abaixo.</p>
+<p><strong>Empresas</strong>:</p>
+<pre class="r"><code>library(magrittr)
+
+empresas &lt;- dados %&gt;% 
+  dplyr::select(file, empresa) %&gt;% 
+  tidyr::unnest(empresa)
+  
+empresas</code></pre>
+<pre><code># A tibble: 9,048,917 x 4
+   file         tipo  cnpj           nome_empresarial                    
+   &lt;chr&gt;        &lt;chr&gt; &lt;chr&gt;          &lt;chr&gt;                               
+ 1 D71214AC.txt 01    07398403000180 BOI GORDO AGROPECUARIA COMERCIO E R…
+ 2 D71214AC.txt 01    03173169000131 CONSELHO ESCOLAR BOM JESUS          
+ 3 D71214AC.txt 01    07399184000153 D &amp; A SOLUCOES INFORMATICA LTDA - ME
+ 4 D71214AC.txt 01    07399188000131 SOCIEDADE AGRICOLA POERINHA         
+ 5 D71214AC.txt 01    03300047000169 ASSOCIACAO MAO AMIGA DE PRODUTORES …
+ 6 D71214AC.txt 01    04940648000107 ASSOCIACAO DOS PRODUTORES RURAIS E …
+ 7 D71214AC.txt 01    04940653000101 CONSELHO ESCOLAR POLO HORTIGRANJEIRO
+ 8 D71214AC.txt 01    04940654000156 CONSELHO ESCOLAR CENTRO EDUCACIONAL…
+ 9 D71214AC.txt 01    03301098000105 ASSOCIACAO AGROEXTRATIVISTA SANTOS …
+10 D71214AC.txt 01    01653480000152 DENEVS - TERCEIRIZACAO LTDA         
+# ... with 9,048,907 more rows
+</code></pre>
+<p><strong>Sócios:</strong></p>
+<pre class="r"><code>socios &lt;- dados %&gt;% 
+  dplyr::select(file, socio) %&gt;% 
+  tidyr::unnest(socio)
+  
+socios</code></pre>
+<pre><code># A tibble: 17,780,860 x 7
+   file   tipo  cnpj  indicador_cpf_c… cpf_cnpj_socio qualificacao nome  
+   &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;            &lt;chr&gt;          &lt;chr&gt;        &lt;chr&gt; 
+ 1 D7121… 02    0739… 2                NA             49           SELMA…
+ 2 D7121… 02    0739… 2                NA             22           MARCE…
+ 3 D7121… 02    0317… 2                NA             16           MARIA…
+ 4 D7121… 02    0739… 2                NA             49           DILSO…
+ 5 D7121… 02    0739… 2                NA             22           ANGEL…
+ 6 D7121… 02    0739… 2                NA             16           RAIMU…
+ 7 D7121… 02    0330… 2                NA             16           MOISE…
+ 8 D7121… 02    0494… 2                NA             16           RAIMU…
+ 9 D7121… 02    0494… 2                NA             16           MARIA…
+10 D7121… 02    0494… 2                NA             16           EUCLI…
+# ... with 17,780,850 more rows
+</code></pre>
+<p>A descrição das qualificações pode ser encontrada na base <code>qualificacao</code>, disponível dentro do pacote:</p>
+<pre class="r"><code>data(qualificacao, package = &quot;rfbCNPJ&quot;)
+
+qualificacao</code></pre>
+<pre><code># A tibble: 40 x 2
+   qualificacao qualificacao_nm             
+   &lt;chr&gt;        &lt;chr&gt;                       
+ 1 05           Administrador               
+ 2 08           Conselheiro de Administração
+ 3 10           Diretor                     
+ 4 16           Presidente                  
+ 5 17           Procurador                  
+ 6 20           Sociedade Consorciada       
+ 7 21           Sociedade Filiada           
+ 8 22           Sócio                       
+ 9 23           Sócio Capitalista           
+10 24           Sócio Comanditado           
+# ... with 30 more rows</code></pre>
+<p>Para juntar com a base de dados dos sócios, basta dar <code>dplyr::inner_join()</code>!</p>
+</div>
+<div id="download-de-arquivos-binarios" class="section level2">
+<h2>Download de arquivos binários</h2>
+<p>Você pode carregar os arquivos binários (em <code>.rds</code>) diretamente da web usando a função <code>rfb_import()</code>. Essa função baixa os arquivos binários diretamente do
+<a href="https://www.dropbox.com/sh/tneczglkt11co0b/AABuRuJR02w2QcUbuhSl1XvLa?dl=0">Dropbox</a>. Você pode baixar usando o parâmetro <code>type=</code>, com as opções “all”
+(<code>tibble</code> complexa com <em>list-columns</em>), “empresas” (<code>tibble</code> retangular) e
+“socios” (<code>tibble</code> retangular).</p>
+<pre class="r"><code>empresas &lt;- rfb_import(&quot;empresas&quot;, path = &quot;.&quot;)</code></pre>
+<p>Você também pode baixar os dados dos arquivos binários em <code>.rds</code> desses links
+com arquivos armazenados diretamente no dropbox:</p>
+<ul>
+<li><a href="https://www.dropbox.com/s/js3lvm0ogpxcjch/rfb.rds?dl=1">rfb (list-column)</a></li>
+<li><a href="https://www.dropbox.com/s/9h06mn9rzml4d2h/rfb_empresas.rds?dl=1">empresas</a></li>
+<li><a href="https://www.dropbox.com/s/67rs8fiv77gu73f/rfb_socios.rds?dl=1">socios</a></li>
+</ul>
+<p>Para ler um desses arquivos, basta rodar</p>
+<pre class="r"><code>dados &lt;- readRDS(&quot;caminho/para/dados.rds&quot;)</code></pre>
+<hr />
+</div>
+</div>
+<div id="analises" class="section level1">
+<h1>Análises</h1>
+<p>Vamos brincar um pouco com esses dados?</p>
+<div id="empresas-por-uf" class="section level2">
+<h2>Empresas por UF</h2>
+<p>Minha hipótese inicial era que o estado com maior quantidade de CNPJs por pessoa era SP. Mas isso não é verdade! Os estados do Sul estão dominando, junto com DF. São Paulo aparece apenas na quarta posição.</p>
+<pre class="r"><code>
+# você pode baixar o `abjData` do GitHub rodando
+# devtools::install_github(&quot;abjur/abjData&quot;)
+
+# relação de códigos de UF e UFs
+cods &lt;- abjData::cadmun %&gt;% 
+  dplyr::select(uf_sigla = uf, uf_cod = UFCOD) %&gt;% 
+  dplyr::distinct()
+# População de cada UF
+pop &lt;- abjData::pnud_uf %&gt;% 
+  dplyr::filter(ano == 2010) %&gt;% 
+  dplyr::inner_join(cods, c(&quot;uf&quot; = &quot;uf_cod&quot;)) %&gt;% 
+  dplyr::select(uf_sigla, popt)
+
+# fazendo o join das bases!
+empresas %&gt;% 
+  dplyr::mutate(uf_sigla = stringr::str_extract(
+    file, &quot;([A-Z]{2})(?=\\.txt)&quot;)) %&gt;% 
+  dplyr::inner_join(pop, &quot;uf_sigla&quot;) %&gt;%
+  # calculando a razão entre população e quantidade de empresas
+  dplyr::group_by(uf_sigla) %&gt;% 
+  dplyr::summarise(n = n(), 
+                   pop = dplyr::first(popt),
+                   prop = n / pop) %&gt;% 
+  dplyr::arrange(dplyr::desc(prop)) %&gt;% 
+  dplyr::mutate(prop = scales::percent(prop)) %&gt;% 
+  knitr::kable()
+</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">UF</th>
+<th align="right">Qtd. Empresas</th>
+<th align="right">População</th>
+<th align="left">Razão(%)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">SC</td>
+<td align="right">498511</td>
+<td align="right">6199948</td>
+<td align="left">8.04%</td>
+</tr>
+<tr class="even">
+<td align="left">DF</td>
+<td align="right">194734</td>
+<td align="right">2541714</td>
+<td align="left">7.66%</td>
+</tr>
+<tr class="odd">
+<td align="left">PR</td>
+<td align="right">708109</td>
+<td align="right">10348243</td>
+<td align="left">6.84%</td>
+</tr>
+<tr class="even">
+<td align="left">SP</td>
+<td align="right">2730412</td>
+<td align="right">40915382</td>
+<td align="left">6.67%</td>
+</tr>
+<tr class="odd">
+<td align="left">RS</td>
+<td align="right">670093</td>
+<td align="right">10593366</td>
+<td align="left">6.33%</td>
+</tr>
+<tr class="even">
+<td align="left">GO</td>
+<td align="right">328524</td>
+<td align="right">5934767</td>
+<td align="left">5.54%</td>
+</tr>
+<tr class="odd">
+<td align="left">RJ</td>
+<td align="right">843040</td>
+<td align="right">15871448</td>
+<td align="left">5.31%</td>
+</tr>
+<tr class="even">
+<td align="left">ES</td>
+<td align="right">179150</td>
+<td align="right">3477472</td>
+<td align="left">5.15%</td>
+</tr>
+<tr class="odd">
+<td align="left">MG</td>
+<td align="right">962930</td>
+<td align="right">19383604</td>
+<td align="left">4.97%</td>
+</tr>
+<tr class="even">
+<td align="left">MT</td>
+<td align="right">141464</td>
+<td align="right">2961977</td>
+<td align="left">4.78%</td>
+</tr>
+<tr class="odd">
+<td align="left">MS</td>
+<td align="right">102208</td>
+<td align="right">2404628</td>
+<td align="left">4.25%</td>
+</tr>
+<tr class="even">
+<td align="left">RO</td>
+<td align="right">62385</td>
+<td align="right">1515025</td>
+<td align="left">4.12%</td>
+</tr>
+<tr class="odd">
+<td align="left">TO</td>
+<td align="right">51629</td>
+<td align="right">1349770</td>
+<td align="left">3.83%</td>
+</tr>
+<tr class="even">
+<td align="left">SE</td>
+<td align="right">63303</td>
+<td align="right">2038459</td>
+<td align="left">3.11%</td>
+</tr>
+<tr class="odd">
+<td align="left">BA</td>
+<td align="right">422396</td>
+<td align="right">13755200</td>
+<td align="left">3.07%</td>
+</tr>
+<tr class="even">
+<td align="left">RR</td>
+<td align="right">11908</td>
+<td align="right">421159</td>
+<td align="left">2.83%</td>
+</tr>
+<tr class="odd">
+<td align="left">PE</td>
+<td align="right">224184</td>
+<td align="right">8646409</td>
+<td align="left">2.59%</td>
+</tr>
+<tr class="even">
+<td align="left">RN</td>
+<td align="right">80562</td>
+<td align="right">3127820</td>
+<td align="left">2.58%</td>
+</tr>
+<tr class="odd">
+<td align="left">AP</td>
+<td align="right">15941</td>
+<td align="right">652768</td>
+<td align="left">2.44%</td>
+</tr>
+<tr class="even">
+<td align="left">CE</td>
+<td align="right">193654</td>
+<td align="right">8317604</td>
+<td align="left">2.33%</td>
+</tr>
+<tr class="odd">
+<td align="left">AC</td>
+<td align="right">15690</td>
+<td align="right">690774</td>
+<td align="left">2.27%</td>
+</tr>
+<tr class="even">
+<td align="left">PA</td>
+<td align="right">159079</td>
+<td align="right">7247979</td>
+<td align="left">2.19%</td>
+</tr>
+<tr class="odd">
+<td align="left">PB</td>
+<td align="right">79275</td>
+<td align="right">3706991</td>
+<td align="left">2.14%</td>
+</tr>
+<tr class="even">
+<td align="left">PI</td>
+<td align="right">61627</td>
+<td align="right">3050838</td>
+<td align="left">2.02%</td>
+</tr>
+<tr class="odd">
+<td align="left">AL</td>
+<td align="right">60067</td>
+<td align="right">3045851</td>
+<td align="left">1.97%</td>
+</tr>
+<tr class="even">
+<td align="left">MA</td>
+<td align="right">123736</td>
+<td align="right">6317987</td>
+<td align="left">1.96%</td>
+</tr>
+<tr class="odd">
+<td align="left">AM</td>
+<td align="right">64306</td>
+<td align="right">3301221</td>
+<td align="left">1.95%</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="quantidade-de-socios" class="section level2">
+<h2>Quantidade de sócios</h2>
+<p>Qual a distribuição de quantidade de sócios?</p>
+<p>Para responder à essa pergunta, considerei apenas sócios pessoa física. Não fiz filtros de qualificação. Você tem alguma ideia de como poderíamos selecionar as qualificações corretas sobre a base de <code>qualificacao</code>?</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Qtd. Sócios</th>
+<th align="right">Empresas</th>
+<th align="left">Proporção</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">2</td>
+<td align="right">5911971</td>
+<td align="left">65.4%</td>
+</tr>
+<tr class="even">
+<td align="left">1</td>
+<td align="right">2265100</td>
+<td align="left">25.0%</td>
+</tr>
+<tr class="odd">
+<td align="left">3</td>
+<td align="right">551072</td>
+<td align="left">6.1%</td>
+</tr>
+<tr class="even">
+<td align="left">4</td>
+<td align="right">174558</td>
+<td align="left">1.9%</td>
+</tr>
+<tr class="odd">
+<td align="left">[5, 15]</td>
+<td align="right">134898</td>
+<td align="left">1.5%</td>
+</tr>
+<tr class="even">
+<td align="left">[16, 584]</td>
+<td align="right">5714</td>
+<td align="left">0.1%</td>
+</tr>
+</tbody>
+</table>
+<p>Dois terços das empresas são formadas por dois sócios e 90% das empresas são formadas por um ou dois sócios.</p>
+<p>Fiquei interessado em saber quais empresas estão na última faixa de quantidade de sócios. A tabela abaixo mostra as 10 empresas com mais sócios nessa base. Além da EY, não conheço nenhuma das empresas abaixo. O que dá para notar é que boa parte delas está ligada ao ramo médico.</p>
+<table>
+<colgroup>
+<col width="94%" />
+<col width="5%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">nome_empresarial</th>
+<th align="right">n</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">COMED - CORPO MEDICO LTDA</td>
+<td align="right">584</td>
+</tr>
+<tr class="even">
+<td align="left">QUIRON PRONTO SOCORRO LTDA - ME</td>
+<td align="right">481</td>
+</tr>
+<tr class="odd">
+<td align="left">SIMEA - SOCIEDADE INTEGRADA MEDICA DO AMAZONAS LTDA</td>
+<td align="right">391</td>
+</tr>
+<tr class="even">
+<td align="left">NOVA FAMILIA LTDA - EPP</td>
+<td align="right">371</td>
+</tr>
+<tr class="odd">
+<td align="left">SOCIEDADE BAURUENSE DE PRESTACAO DE SERVICOS MEDICOS SOBAME</td>
+<td align="right">347</td>
+</tr>
+<tr class="even">
+<td align="left">ERNST &amp; YOUNG ASSESSORIA EMPRESARIAL LTDA</td>
+<td align="right">332</td>
+</tr>
+<tr class="odd">
+<td align="left">UNIAO CONSULTORIA LTDA</td>
+<td align="right">285</td>
+</tr>
+<tr class="even">
+<td align="left">INSTITUTO MEDICO DE CLINICA E PEDIATRIA DO ESTADO DO AMAZONAS S/S LTDA</td>
+<td align="right">284</td>
+</tr>
+<tr class="odd">
+<td align="left">UROLOGISTAS DO ESTADO DO RIO DE JANEIRO LTDA</td>
+<td align="right">281</td>
+</tr>
+<tr class="even">
+<td align="left">SNC &amp; CIA ADMINISTRACAO DE BENS</td>
+<td align="right">277</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="pessoas-com-mais-empresas" class="section level2">
+<h2>Pessoas com mais empresas</h2>
+<p>Quem são os sócios com maior número de empresas? Temos abaixo uma lista dos 20 mais. Claramente, muitos desses nomes são homônimos. O primeiro nome da lista que me parece pouco provável de ter homônimos é o Renato Gamba Rocha Diniz. Também fiquei interessado nesse “Não Consta na Base”…</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">nome</th>
+<th align="right">n_empresas</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">JOSE CARLOS DA SILVA</td>
+<td align="right">2084</td>
+</tr>
+<tr class="even">
+<td align="left">JOAO BATISTA DA SILVA</td>
+<td align="right">1518</td>
+</tr>
+<tr class="odd">
+<td align="left">LUIZ CARLOS DA SILVA</td>
+<td align="right">1488</td>
+</tr>
+<tr class="even">
+<td align="left">MARIA APARECIDA DA SILVA</td>
+<td align="right">1487</td>
+</tr>
+<tr class="odd">
+<td align="left">ANTONIO CARLOS DA SILVA</td>
+<td align="right">1372</td>
+</tr>
+<tr class="even">
+<td align="left">JOSE CARLOS DOS SANTOS</td>
+<td align="right">1339</td>
+</tr>
+<tr class="odd">
+<td align="left">MARIA JOSE DA SILVA</td>
+<td align="right">1119</td>
+</tr>
+<tr class="even">
+<td align="left">CARLOS ALBERTO DA SILVA</td>
+<td align="right">1091</td>
+</tr>
+<tr class="odd">
+<td align="left">JOSE CARLOS DE OLIVEIRA</td>
+<td align="right">1055</td>
+</tr>
+<tr class="even">
+<td align="left">MARCOS ANTONIO DA SILVA</td>
+<td align="right">1038</td>
+</tr>
+<tr class="odd">
+<td align="left">NAO CONSTA NA BASE</td>
+<td align="right">1035</td>
+</tr>
+<tr class="even">
+<td align="left">JOSE ANTONIO DA SILVA</td>
+<td align="right">1017</td>
+</tr>
+<tr class="odd">
+<td align="left">RENATO GAMBA ROCHA DINIZ</td>
+<td align="right">946</td>
+</tr>
+<tr class="even">
+<td align="left">JOSE ROBERTO DA SILVA</td>
+<td align="right">907</td>
+</tr>
+<tr class="odd">
+<td align="left">LUIZ CARLOS DOS SANTOS</td>
+<td align="right">882</td>
+</tr>
+<tr class="even">
+<td align="left">PAULO ROBERTO DA SILVA</td>
+<td align="right">839</td>
+</tr>
+<tr class="odd">
+<td align="left">JOSE PEREIRA DA SILVA</td>
+<td align="right">804</td>
+</tr>
+<tr class="even">
+<td align="left">JOAO BATISTA DE OLIVEIRA</td>
+<td align="right">770</td>
+</tr>
+<tr class="odd">
+<td align="left">RENATA ROSSI CUPPOLONI RODRIGUES</td>
+<td align="right">766</td>
+</tr>
+<tr class="even">
+<td align="left">ANTONIO CARLOS DOS SANTOS</td>
+<td align="right">762</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="sexo-dos-socios" class="section level2">
+<h2>Sexo dos sócios</h2>
+<p>Agora vamos usar o pacote <a href="https://github.com/meirelesff/genderBR"><code>genderBR</code></a> para pegar o sexo mais provável de todas as pessoas. No total, temos 11.388.120 nomes únicos na base (isso subestima a quantidade de pessoas, por conta de homônimos).</p>
+<p>Para essa análise, tivemos de retirar 392.533 nomes em que o <code>genderBR</code> não foi capaz de estimar o sexo. Isso corresponde a 2,2% da base. Creio que não seja absurdo afirmar que os valores omitidos influenciam no resultado.</p>
+<p>Nessa análise também não desconsiderei pessoas que fazem parte de mais de uma empresa. Ou seja, se uma pessoa tem 2 ou mais empresas, ela é contada 2 ou mais vezes.</p>
+<p>Minha hipótese inicial era a de que teríamos mais homens como sócios de empresas, por razões históricas/culturais (e queremos mudar isso!). Aparentemente a hipótese foi confirmada: 3/5 dos sócios são homens. Sugiro refinar essa análise pela qualificação e pela repetição de pessoas em empresas distintas.</p>
+<pre class="r"><code>sexo_socios &lt;- socios %&gt;% 
+  # apenas pessoas físicas
+  dplyr::filter(indicador_cpf_cnpj == &quot;2&quot;) %&gt;% 
+  # extrai primeiro nome
+  dplyr::mutate(primeiro_nome = stringr::str_extract(nome, &quot;[^ ]+&quot;)) %&gt;%
+  # conta primeiro nome
+  dplyr::count(primeiro_nome) %&gt;%
+  # estima a probabilidade de ser do sexo feminino
+  dplyr::mutate(sexo = genderBR::get_gender(primeiro_nome, prob = TRUE)) %&gt;% 
+  # retira estimações NA (cuidado!)
+  dplyr::filter(!is.na(sexo))</code></pre>
+<pre class="r"><code>library(ggplot2)
+grafico &lt;- sexo_socios %&gt;% 
+  # É feminino se sexo &gt; 0.5 (mais de 50% feminino observado no IBGE)
+  dplyr::mutate(sexo = dplyr::if_else(sexo &gt; .5, &quot;Fem&quot;, &quot;Masc&quot;)) %&gt;% 
+  dplyr::group_by(sexo) %&gt;% 
+  dplyr::summarise(total = sum(n)) %&gt;% 
+  dplyr::arrange(dplyr::desc(total)) %&gt;%
+  # adiciona proporção em %
+  dplyr::mutate(prop = scales::percent(total / sum(total))) %&gt;% 
+  # aqui começa o gráfico
+  ggplot(aes(x = sexo, y = total/1000, fill = sexo)) +
+  geom_col() +
+  # daqui pra baixo é só estética
+  coord_flip() +
+  geom_text(aes(label = prop), size = 6, hjust = 1, vjust = -1) +
+  theme_minimal(16) +
+  ggtitle(&quot;Quantidade de empresas por sexo&quot;) +
+  labs(x = &quot;Sexo&quot;, y = &quot;Total (milhares)&quot;)
+
+grafico</code></pre>
+<p><img src="/blog/2018-05-13-rfbCNPJ/empresas_sexo.png" /><!-- --></p>
+</div>
+<div id="analise-extra" class="section level2">
+<h2>Análise Extra</h2>
+<p>O <a href="http://sillasgonzaga.com/">Sillas</a> sugeriu (e executou!) uma análise adicional. A ideia era montar um grafo das empresas que compartilham sócios da Comissão de Valores Mobiliários (CVM). A CVM guarda informações de todas as empresas de capital aberto do Brasil. Uma investigação interessante é estudar se os sócios fazem parte de várias empresas. A visualização adequada para isso é um grafo das companhias, ligados pela presença de sócios com o mesmo nome.</p>
+<div id="baixando-dados-da-cvm" class="section level3">
+<h3>Baixando dados da CVM</h3>
+<p>É bem tranquilo baixar as informações das empresas cadastradas na CVM:</p>
+<pre class="r"><code>
+# download do arquivo \ipado
+link &lt;- &quot;http://sistemas.cvm.gov.br/cadastro/SPW_CIA_ABERTA.ZIP&quot;
+file_name &lt;- &quot;~/Downloads/companhias.zip&quot;
+httr::GET(link, httr::write_disk(file_name))
+# dezipando arquivo
+unzip(&quot;companhias.zip&quot;, exdir = &quot;.&quot;)
+
+cvm &lt;- readr::read_delim(
+  file = &quot;SPW_CIA_ABERTA.txt&quot;, 
+  delim = &quot;\t&quot;,
+  col_types = stringr::str_dup(&quot;c&quot;, 42),
+  locale = readr::locale(encoding = &quot;latin1&quot;)
+) %&gt;% 
+  # limpa os nomes zoados
+  janitor::clean_names()
+
+# pega apenas empresas da CVM
+socios_cvm &lt;- socios %&gt;% 
+  dplyr::inner_join(cvm, &quot;cnpj&quot;) %&gt;% 
+  dplyr::filter(indicador_cpf_cnpj == &quot;2&quot;) %&gt;% 
+  dplyr::distinct(cnpj, nome, .keep_all = TRUE)</code></pre>
+</div>
+<div id="montando-o-grafo" class="section level3">
+<h3>Montando o grafo</h3>
+<p>Cada nó de nosso grafo é uma empresa Uma aresta existe entre dois nós se as empresas têm pelo menos uma pessoa em comum no quadro de sócios. Para fazer o grafo, eu fiz uma pequena alteração <a href="https://gist.github.com/sillasgonzaga/4a7cb7135a04c6e7e274680b71fbc643">no código que o Sillas me mandou</a>, para usar o <code>visNetwork</code> (que é dinâmico) no lugar do <code>ggraph</code> (que é lindo, porém estático).</p>
+<pre class="r"><code># pequena limpeza na base
+empresas &lt;- socios_cvm %&gt;% 
+  dplyr::select(empresa = denom_comerc, pessoa = nome) %&gt;% 
+  dplyr::mutate(empresa = abjutils::rm_accent(empresa)) %&gt;% 
+  dplyr::distinct(empresa, pessoa)
+
+# arestas do grafo
+edges &lt;- dplyr::inner_join(empresas, empresas, by = &quot;pessoa&quot;) %&gt;% 
+  dplyr::filter(empresa.x != empresa.y) %&gt;% 
+  dplyr::distinct(empresa.x, empresa.y) %&gt;% 
+  dplyr::rowwise() %&gt;% 
+  # concatena as empresas de forma ordenada
+  dplyr::mutate(concat = paste(sort(c(empresa.x, empresa.y)), 
+                               collapse = &quot;_&quot;)) %&gt;% 
+  dplyr::ungroup() %&gt;% 
+  # tira arestas duplicadas
+  dplyr::distinct(concat, .keep_all = TRUE) %&gt;% 
+  dplyr::select(from = empresa.x, to = empresa.y)
+
+# nós do grafo
+nodes &lt;- empresas %&gt;% 
+  dplyr::distinct(empresa, .keep_all = TRUE) %&gt;% 
+  dplyr::transmute(id = empresa, label = empresa) %&gt;% 
+  # apenas empresas com alguma conexão
+  dplyr::filter(label %in% c(edges$from, edges$to))
+
+# guarda numa lista
+g &lt;- list(nodes = nodes, edges = edges)</code></pre>
+<pre class="r"><code>library(visNetwork)
+
+v &lt;- visNetwork::visNetwork(g$nodes, g$edges)
+v &lt;- visNetwork::visOptions(v, highlightNearest = TRUE,
+                            nodesIdSelection = TRUE)
+
+v</code></pre>
+<div id="htmlwidget-1" style="width:672px;height:480px;" class="visNetwork html-widget"></div>
+<script type="application/json" data-for="htmlwidget-1">{"x":{"nodes":{"id":["BOMPRECO - HIPER BOMPRECO","BRASKEM","POLIALDEN","PRONOR","NITROCARBONO","TRIKEM SA","POLITENO IND E COMERCIO S.A.","OXITENO NORDESTE","BBM PARTICIPACOES","SEGUROS DA BAHIA","ODEBRECHT","BCO BOCOM BBM","BCO ECONOMICO","COELBA","BANEB","SIBRA","CARAIBA METAIS S.A","CONEPAR","KIEPPE","BANCO BILBAO VIZCAYA ARGENTARIA BRASILSA","J. MACEDO ALIM NORDESTE S/A  - AGUIA S/A","TELEST","BRASPEROLA S/A","TEBA","ECO101 CONCESSIONARIA DE RODOVIAS S.A.","SAMA","BR HOME CENTERS S.A.","ENERGISA MINAS GERAIS","MAGNESITA S/A","SIDERURGICA PAINS","SANTANENSE","BANCO CREDITO REAL DE MG","COTEMINAS","USIMINAS","PARAIBUNA","REDE ENERGIA PARTICIPACOES S.A.","WEMBLEY SOCIEDADE ANONIMA","MERCANTIL LEASING","MERCANTIL BRASIL","BANCO MERCANTIL DE INVESTIMENTOS SA","CEMIG","SAMITRI","BANCO MERCANTIL DO BRASIL S/A","TELEMIG","SAAG INVESTIMENTOS S.A.","CONCESSIONARIA BR-040 S.A.","ENERSUL","ALL - AMERICA LATINA LOGISTICA MALHA NORTE S.A.","SID ACONORTE","CELPE","FIBRASIL TEXTIL","BOMPRECO SUPERMERCADO","BANCO BANESTADO","HSBC SEGUROS BRASIL","BCO BAMERINDUS DO BRASIL S.A. - EM LIQUIDACAO EXTRAJUDICIAL","BAMERINDUS SA PARTICIPACOES E EMPREENDIMENTOS - EM LIQUIDACAO EXTRAJUDICIAL","PINCEIS TIGRE","COMPANHIA DE CREDITO FINANCIAMENTO E INVESTIMENTO RCI BRAISL","CIA DE ARREND MERCANTIL RCI BRASIL","HSBC LEASING","BEMATECH  S/A","INTERMULTIMODAL S.A OPERADORA DE PLATAFORMAS INTERNACIONAIS DE LOGISTICA MULTIMODAL","EOX ENERGIA EOLICA S.A.","LOUCOS POR FUTEBOL S.A.","DELUXE MOTORS S.A","ECTAS HOLDING S.A.","DROGARIAS AMERICANAS SA","EKOPARKING SA","INTERCOSMETIC HOLDING S/A","COMPANHIA FERRIFERA BRASILEIRA S.A.","TECNO WASTE S.A.","ATIVOS BRASILEIROS S.A.","ETHOS SECURITIZADORA S/A","LOGOS COMPANHIA SECURITIZADORA S/A","SUL AMERICA STA CRUZ","UNIAO DE SEGUROS","IPIRANGA DISTRIBUIDORA","NORDESTE QUIMICA","AMIL PARTICIPACOES S/A","FERRO LIGAS","BRASIL TELECOM S.A.","BTG PACTUAL SERVICOS FINANCEIROS S/A DTVM","LIGHT","CIMINAS","BANGU DESENV","SADE","COMPANHIA DE EMBALAGENS METALICAS - MMSA","IVI","RHEEM EMPRS","NORTEC QUIMICA S.A.","SUL AMERICA S/A","BANCO UBS PACTUAL S/A","CAEMI","NORBERTO ODEBRECHT","FABRICA BANGU","TELEMAR","VOTEC","SULACAP","SUL AMERICA SEGUROS","MUCISA","FABRIMAR","MOTORTEC","PETROLEO IPIRANGA","FININVEST","CEDULA CFI","BERJ","BCO NACIONAL INV","SATMA SUL AMERICA","GERDAU S.A.","IBM LEASING","NACIONAL BANCO","LINHAS DE MACAPA TRANSMISSORA DE ENERGIA S.A.","LINHAS DE XINGU TRANSMISSORA DE ENERGIA S.A.","AFLUENTE TRANSMISSAO DE ENERGIA ELETRICA S/A","CENTENNIAL ASSET PARTICIPACOES SUDESTE S/A","MLOG S.A.","PRINER SERVICOS INDUSTRIAIS S.A.","CONCESSIONARIA PONTE RIO-NITEROI S.A. - ECOPONTE","TRIPLICE SECURITIZADORA DE ATIVOS MERCANTIS S.A.","TRIUNFO SECURITIZADORA DE ATIVOS S.A.","YARA BRASIL FERTILIZANTES S.A.","TITAN","VINICOLA RIOGRAND","METALURGICA GERDAU","INDAC - INDUSTRIA, ADM. E COMERCIO S.A.","ADUBOS CRA","BCO CRED REAL DO RS","BANRISUL S.A. ADMINISTRADORA DE CONSORCIOS","BANRISUL S/A","BAGERGS","ZIVI S/A","CIA IOCHPE","ELEVA","FORJAS TAURUS SA","CELULOSE IRANI","DHB","SDV","SONAE DISTRIBUICAO BRASIL","ANTARCTICA POLAR","AMADEO ROSSI SA METALURGICA E MUNICOES","CALCADOS AZALEIA S.A.","SEIVA S.A. - FLORESTAS E INDUSTRIAS","CIA HABITASUL DE PARTICIPACOES","FRAS-LE S.A.","GRANOLEO S/A","STARA S.A. - INDUSTRIA DE IMPLEMENTOS AGRICOLAS","NOVO HAMBURGO SEGS","PETROPAR S.A.","FUNDIROSSI","SADIA","CECRISA","KARSTEN","KUALA S.A.","CHAPECO AVICOLA","RENAUXVIEW","CHAPECO","BUNGE ALIMENTOS SA","TIGRE","EMBRACO","COMPANHIA ENERGETICA JAGUARA","COMPANHIA ENERGETICA MIRANDA","ENERGISA SERGIPE","BANCO ITABANCO S/A","ERNESTO NEUGEBAUER","HERCULES S/A","BANK OF AMERICA - BRASIL S/A ( BANCO MULTIPLO )","FERTISUL SA","DURATEX","PROMON TECNOLOGIA","TECPART","EPEDA","FENICIAPAR S/A","ZOGBI LEASING","AGROCERES","SID MICROELETRONICA","ELUMA","COMPANHIA BRASILEIRA DE CARTUCHOS - CBC","COFAP","RHODIA","ODONTOPREV S/A","BANCO SAFRA","ALL - AMERICA LATINA LOGISTICA MALHA OESTE S.A.","RACINVEST","SID INFORMATICA","WHIRLPOOL S.A","BCP TELECOMUNICACOES","BANCO PAN SA","POLPAR S.A.","EMBRAER","ITAMARATI LEASING","NOROESTE SEGURADORA","SERRANA FERTILIZANTES SA","GERAL DE CONCRETO S.A.","PAPEL SAO ROBERTO","MAHLE METAL LEVE","KLABIN","ANTARCTICA PAULISTA","SAMCIL","JEREISSATI PARTICIPACOES S/A","DROGA RAIA","SUZANO HOLDING S.A.","ACOS VILLARES","PEVE PARTICIPACOES","BCO SANTANDER NOROESTE","ITAU UNIBANCO","BANCO BRADESCO S.A.","ALFA DE INVESTIMENTO","ALUSA","ENIA","BONFIGLIOLI","SEARLE","SANTANDER LEASING S.A. ARREND MERC","BANCO BCN S.A.","BANCO SUDAMERIS BRASIL SA","BOAVISTA SA ARR MERC","PAULISTA DE ENERGIA","BANCO MERCANTIL DE SAO PAULO S/A","BCO BANDEIRANTES","BUNGE BRASIL S.A.","BUNGE FERTILIZANTES","BRASMOTOR S.A","FABRICACAO DE CIMENTO PORTLAND","ETERNIT","PROMON","VIGOR","PREMESA","CBPO","BANCO BMG","BANCO COMERCIAL E DE INVESTIMENTO SUDAMERIS S.A.","BENZENEX","BANESPA","VICU","FERTIBRAS S/A","BANCO NOSSA CAIXA S/A","COINVEST CIA.DE INVESTIMENTOS INTERLAGOS","D F VASCONCELLOS S/A O.M.A.P.","CAMARGO CORREA","ITAUSA","CETENCO","RACIONAL ENGENHARIA","DROGASIL SA","SECURIT","MEDIAL SAUDE S/A","AES ELETROPAULO","CENTENARIO","WAGNER","BFB LEASING","ARRENDAMENTO MERCANTIL","BRADESPLAN PARTICIPACOES S.A.","COMPANHIA DE GAS DE SAO PAULO - COMGAS","SABESP","BRADESCO LEASING S.A. ARREND. MERCANTIL","NORCHEM","BANCO CRUZEIRO DO SUL SA","UNIBANCO LEASING S.A.","CAMARGO CORREA CIMENTOS SA","BANESTADO LEASING","OXITENO S.A. INDUSTRIA E COMERCIO","USINA COSTA PINTO S/A ACUCAR E ALCOOL","USINA S BARBARA","BRADESCO BCN LEASING","BANCOCIDADE LEASING","BCO BANDEIRANTES INVESTIMENTOS","SPLICE","AUXILIAR PART","FINAUSTRIA ARRENDAMENTO MERCANTIL S.A.","SANTANDER LEASING S.A.","VILLARES MECANICA","SCOPUS","PAO DE ACUCAR","BRADESCO LEASING SA ARREND MERCANTIL","TAM","FINASA LEASING","ABC BRASIL","CPM BRAXIS S/A","DIBENS LEASING SA","ELEKEIROZ","BANCO DE PERNAMBUCO S.A. - BANDEPE","-","MUNCK","ITAULEASING","PERDIGAO AGRO SA","SAO CARLOS EMPREEND.E PARTICIPACOES S.A.","PEVE PREDIOS S.A.","MADEPAN","COSAN SA INDUSTRIA E COMERCIO","VULCABRAS S/A.","HUMAITA","IGUATEMI EMPRESA DE SHOPPING CENTERS S/A","MUNDIAL","ITAUTEC INFORMATICA S.A.","GERDAU INFORMATICA","ELEKEIROZ S/A","CITI CP","CMA PARTICIPACOES SA","OPP PETROQUIMICA","JSL S.A.","TOTVS S.A","SANTISTA TEXTIL S.A.","ECONOMICO SA A M","SANTISTA ALIMENTOS","FISIBA","CSN","CPFL","MELAMINA ULTRA SA INDUSTRIA QUIMICA","BANCO SANTANDER (BRASIL) S.A.","ULTRAPAR PARTICIPACOES SA","LDC BIOENERGIA SA","BANCO BOAVISTA INTERATLANTICO SA","BANCO SANTANDER S.A.","LA FONTE TELECOM S/A","UNIBANCO SA","RUMO LOGISTICA OPERADORA MULTIMODAL S.A.","FIBRA LEASING SA ARREND MERC","POLONIA","UNIPAR CARBOCLORO S.A.","AYMORE LEASING","CREDICARD","HSBC ASSET FINANCE (BRASIL) AR MERC S.A.","BMG LEASING","ULTRA PARTICIPACOES","TEXTILIA","ITAUTEC S.A. - GRUPO ITAUTEC","BCO REAL","ALFA HOLDINGS","ALFA FINANCEIRA","CONSORCIO ALFA","BANCO ITAU BBA  S.A.","COPERSUCAR SA","CONCESSIONARIA AUTO RAPOSO TAVARES SA-CART","VIARONDON CONCESSIONARIA DE RODOVIA SA","CVC BRASIL OPERADORA E AGENCIA DE VIAGENS SA","CONCESSIONARIA DAS RODOVIAS AYRTON SENNA E CARVALHO PINTO S/A","BRASIL PHARMA SA","ROPASC PARTICIPACOES S/A","FERREIRA GOMES ENERGIA S.A.","VOSTOK PARTICIPACOES SA","MENFIS PARTICIPACOES S/A","HIDROVIAS DO BRASIL S.A.","PATMOS PARTICIPACOES S/A","EGEU PARTICIPACOES SA","VIGOR ALIMENTOS S.A.","HARPIA OMEGA PARTICIPACOES S.A.","NISA PARTICIPACOES","NAOMI PARTICIPACOES","BELEZA PARTICIPACOES","NOAH PARTICIPACOES","GAIA FLORESTAL SECURITIZADORA S.A.","JP PARTICIPACOES S.A.","COSAN LOGISTICA S.A.","GAIA CRED CIA SECURITIZADORA DE CREDITOS FINANCEIROS S.A.","MOVIDA PARTICIPACOES S.A.","BTGI QUARTZO PARTICIPACOES S.A.","BTGI SAFIRA PARTICIPACOES S.A.","FINSBURY PARTICIPACOES S.A.","FOXFIELD PARTICIPACOES S.A.","FOURSTONES PARTICIPACOES S.A.","FRIESTON PARTICIPACOES S.A.","ARGO TRANSMISSAO DE ENERGIA S.A.","ARGO ENERGIA EMPREENDIMENTOS E PARTICIPACOES S.A.","VERT COMPANHIA SECURITIZADORA","COMPANHIA SEC. DE CREDITOS FIN. CARTOES CONSIGNADOS BMG"],"label":["BOMPRECO - HIPER BOMPRECO","BRASKEM","POLIALDEN","PRONOR","NITROCARBONO","TRIKEM SA","POLITENO IND E COMERCIO S.A.","OXITENO NORDESTE","BBM PARTICIPACOES","SEGUROS DA BAHIA","ODEBRECHT","BCO BOCOM BBM","BCO ECONOMICO","COELBA","BANEB","SIBRA","CARAIBA METAIS S.A","CONEPAR","KIEPPE","BANCO BILBAO VIZCAYA ARGENTARIA BRASILSA","J. MACEDO ALIM NORDESTE S/A  - AGUIA S/A","TELEST","BRASPEROLA S/A","TEBA","ECO101 CONCESSIONARIA DE RODOVIAS S.A.","SAMA","BR HOME CENTERS S.A.","ENERGISA MINAS GERAIS","MAGNESITA S/A","SIDERURGICA PAINS","SANTANENSE","BANCO CREDITO REAL DE MG","COTEMINAS","USIMINAS","PARAIBUNA","REDE ENERGIA PARTICIPACOES S.A.","WEMBLEY SOCIEDADE ANONIMA","MERCANTIL LEASING","MERCANTIL BRASIL","BANCO MERCANTIL DE INVESTIMENTOS SA","CEMIG","SAMITRI","BANCO MERCANTIL DO BRASIL S/A","TELEMIG","SAAG INVESTIMENTOS S.A.","CONCESSIONARIA BR-040 S.A.","ENERSUL","ALL - AMERICA LATINA LOGISTICA MALHA NORTE S.A.","SID ACONORTE","CELPE","FIBRASIL TEXTIL","BOMPRECO SUPERMERCADO","BANCO BANESTADO","HSBC SEGUROS BRASIL","BCO BAMERINDUS DO BRASIL S.A. - EM LIQUIDACAO EXTRAJUDICIAL","BAMERINDUS SA PARTICIPACOES E EMPREENDIMENTOS - EM LIQUIDACAO EXTRAJUDICIAL","PINCEIS TIGRE","COMPANHIA DE CREDITO FINANCIAMENTO E INVESTIMENTO RCI BRAISL","CIA DE ARREND MERCANTIL RCI BRASIL","HSBC LEASING","BEMATECH  S/A","INTERMULTIMODAL S.A OPERADORA DE PLATAFORMAS INTERNACIONAIS DE LOGISTICA MULTIMODAL","EOX ENERGIA EOLICA S.A.","LOUCOS POR FUTEBOL S.A.","DELUXE MOTORS S.A","ECTAS HOLDING S.A.","DROGARIAS AMERICANAS SA","EKOPARKING SA","INTERCOSMETIC HOLDING S/A","COMPANHIA FERRIFERA BRASILEIRA S.A.","TECNO WASTE S.A.","ATIVOS BRASILEIROS S.A.","ETHOS SECURITIZADORA S/A","LOGOS COMPANHIA SECURITIZADORA S/A","SUL AMERICA STA CRUZ","UNIAO DE SEGUROS","IPIRANGA DISTRIBUIDORA","NORDESTE QUIMICA","AMIL PARTICIPACOES S/A","FERRO LIGAS","BRASIL TELECOM S.A.","BTG PACTUAL SERVICOS FINANCEIROS S/A DTVM","LIGHT","CIMINAS","BANGU DESENV","SADE","COMPANHIA DE EMBALAGENS METALICAS - MMSA","IVI","RHEEM EMPRS","NORTEC QUIMICA S.A.","SUL AMERICA S/A","BANCO UBS PACTUAL S/A","CAEMI","NORBERTO ODEBRECHT","FABRICA BANGU","TELEMAR","VOTEC","SULACAP","SUL AMERICA SEGUROS","MUCISA","FABRIMAR","MOTORTEC","PETROLEO IPIRANGA","FININVEST","CEDULA CFI","BERJ","BCO NACIONAL INV","SATMA SUL AMERICA","GERDAU S.A.","IBM LEASING","NACIONAL BANCO","LINHAS DE MACAPA TRANSMISSORA DE ENERGIA S.A.","LINHAS DE XINGU TRANSMISSORA DE ENERGIA S.A.","AFLUENTE TRANSMISSAO DE ENERGIA ELETRICA S/A","CENTENNIAL ASSET PARTICIPACOES SUDESTE S/A","MLOG S.A.","PRINER SERVICOS INDUSTRIAIS S.A.","CONCESSIONARIA PONTE RIO-NITEROI S.A. - ECOPONTE","TRIPLICE SECURITIZADORA DE ATIVOS MERCANTIS S.A.","TRIUNFO SECURITIZADORA DE ATIVOS S.A.","YARA BRASIL FERTILIZANTES S.A.","TITAN","VINICOLA RIOGRAND","METALURGICA GERDAU","INDAC - INDUSTRIA, ADM. E COMERCIO S.A.","ADUBOS CRA","BCO CRED REAL DO RS","BANRISUL S.A. ADMINISTRADORA DE CONSORCIOS","BANRISUL S/A","BAGERGS","ZIVI S/A","CIA IOCHPE","ELEVA","FORJAS TAURUS SA","CELULOSE IRANI","DHB","SDV","SONAE DISTRIBUICAO BRASIL","ANTARCTICA POLAR","AMADEO ROSSI SA METALURGICA E MUNICOES","CALCADOS AZALEIA S.A.","SEIVA S.A. - FLORESTAS E INDUSTRIAS","CIA HABITASUL DE PARTICIPACOES","FRAS-LE S.A.","GRANOLEO S/A","STARA S.A. - INDUSTRIA DE IMPLEMENTOS AGRICOLAS","NOVO HAMBURGO SEGS","PETROPAR S.A.","FUNDIROSSI","SADIA","CECRISA","KARSTEN","KUALA S.A.","CHAPECO AVICOLA","RENAUXVIEW","CHAPECO","BUNGE ALIMENTOS SA","TIGRE","EMBRACO","COMPANHIA ENERGETICA JAGUARA","COMPANHIA ENERGETICA MIRANDA","ENERGISA SERGIPE","BANCO ITABANCO S/A","ERNESTO NEUGEBAUER","HERCULES S/A","BANK OF AMERICA - BRASIL S/A ( BANCO MULTIPLO )","FERTISUL SA","DURATEX","PROMON TECNOLOGIA","TECPART","EPEDA","FENICIAPAR S/A","ZOGBI LEASING","AGROCERES","SID MICROELETRONICA","ELUMA","COMPANHIA BRASILEIRA DE CARTUCHOS - CBC","COFAP","RHODIA","ODONTOPREV S/A","BANCO SAFRA","ALL - AMERICA LATINA LOGISTICA MALHA OESTE S.A.","RACINVEST","SID INFORMATICA","WHIRLPOOL S.A","BCP TELECOMUNICACOES","BANCO PAN SA","POLPAR S.A.","EMBRAER","ITAMARATI LEASING","NOROESTE SEGURADORA","SERRANA FERTILIZANTES SA","GERAL DE CONCRETO S.A.","PAPEL SAO ROBERTO","MAHLE METAL LEVE","KLABIN","ANTARCTICA PAULISTA","SAMCIL","JEREISSATI PARTICIPACOES S/A","DROGA RAIA","SUZANO HOLDING S.A.","ACOS VILLARES","PEVE PARTICIPACOES","BCO SANTANDER NOROESTE","ITAU UNIBANCO","BANCO BRADESCO S.A.","ALFA DE INVESTIMENTO","ALUSA","ENIA","BONFIGLIOLI","SEARLE","SANTANDER LEASING S.A. ARREND MERC","BANCO BCN S.A.","BANCO SUDAMERIS BRASIL SA","BOAVISTA SA ARR MERC","PAULISTA DE ENERGIA","BANCO MERCANTIL DE SAO PAULO S/A","BCO BANDEIRANTES","BUNGE BRASIL S.A.","BUNGE FERTILIZANTES","BRASMOTOR S.A","FABRICACAO DE CIMENTO PORTLAND","ETERNIT","PROMON","VIGOR","PREMESA","CBPO","BANCO BMG","BANCO COMERCIAL E DE INVESTIMENTO SUDAMERIS S.A.","BENZENEX","BANESPA","VICU","FERTIBRAS S/A","BANCO NOSSA CAIXA S/A","COINVEST CIA.DE INVESTIMENTOS INTERLAGOS","D F VASCONCELLOS S/A O.M.A.P.","CAMARGO CORREA","ITAUSA","CETENCO","RACIONAL ENGENHARIA","DROGASIL SA","SECURIT","MEDIAL SAUDE S/A","AES ELETROPAULO","CENTENARIO","WAGNER","BFB LEASING","ARRENDAMENTO MERCANTIL","BRADESPLAN PARTICIPACOES S.A.","COMPANHIA DE GAS DE SAO PAULO - COMGAS","SABESP","BRADESCO LEASING S.A. ARREND. MERCANTIL","NORCHEM","BANCO CRUZEIRO DO SUL SA","UNIBANCO LEASING S.A.","CAMARGO CORREA CIMENTOS SA","BANESTADO LEASING","OXITENO S.A. INDUSTRIA E COMERCIO","USINA COSTA PINTO S/A ACUCAR E ALCOOL","USINA S BARBARA","BRADESCO BCN LEASING","BANCOCIDADE LEASING","BCO BANDEIRANTES INVESTIMENTOS","SPLICE","AUXILIAR PART","FINAUSTRIA ARRENDAMENTO MERCANTIL S.A.","SANTANDER LEASING S.A.","VILLARES MECANICA","SCOPUS","PAO DE ACUCAR","BRADESCO LEASING SA ARREND MERCANTIL","TAM","FINASA LEASING","ABC BRASIL","CPM BRAXIS S/A","DIBENS LEASING SA","ELEKEIROZ","BANCO DE PERNAMBUCO S.A. - BANDEPE","-","MUNCK","ITAULEASING","PERDIGAO AGRO SA","SAO CARLOS EMPREEND.E PARTICIPACOES S.A.","PEVE PREDIOS S.A.","MADEPAN","COSAN SA INDUSTRIA E COMERCIO","VULCABRAS S/A.","HUMAITA","IGUATEMI EMPRESA DE SHOPPING CENTERS S/A","MUNDIAL","ITAUTEC INFORMATICA S.A.","GERDAU INFORMATICA","ELEKEIROZ S/A","CITI CP","CMA PARTICIPACOES SA","OPP PETROQUIMICA","JSL S.A.","TOTVS S.A","SANTISTA TEXTIL S.A.","ECONOMICO SA A M","SANTISTA ALIMENTOS","FISIBA","CSN","CPFL","MELAMINA ULTRA SA INDUSTRIA QUIMICA","BANCO SANTANDER (BRASIL) S.A.","ULTRAPAR PARTICIPACOES SA","LDC BIOENERGIA SA","BANCO BOAVISTA INTERATLANTICO SA","BANCO SANTANDER S.A.","LA FONTE TELECOM S/A","UNIBANCO SA","RUMO LOGISTICA OPERADORA MULTIMODAL S.A.","FIBRA LEASING SA ARREND MERC","POLONIA","UNIPAR CARBOCLORO S.A.","AYMORE LEASING","CREDICARD","HSBC ASSET FINANCE (BRASIL) AR MERC S.A.","BMG LEASING","ULTRA PARTICIPACOES","TEXTILIA","ITAUTEC S.A. - GRUPO ITAUTEC","BCO REAL","ALFA HOLDINGS","ALFA FINANCEIRA","CONSORCIO ALFA","BANCO ITAU BBA  S.A.","COPERSUCAR SA","CONCESSIONARIA AUTO RAPOSO TAVARES SA-CART","VIARONDON CONCESSIONARIA DE RODOVIA SA","CVC BRASIL OPERADORA E AGENCIA DE VIAGENS SA","CONCESSIONARIA DAS RODOVIAS AYRTON SENNA E CARVALHO PINTO S/A","BRASIL PHARMA SA","ROPASC PARTICIPACOES S/A","FERREIRA GOMES ENERGIA S.A.","VOSTOK PARTICIPACOES SA","MENFIS PARTICIPACOES S/A","HIDROVIAS DO BRASIL S.A.","PATMOS PARTICIPACOES S/A","EGEU PARTICIPACOES SA","VIGOR ALIMENTOS S.A.","HARPIA OMEGA PARTICIPACOES S.A.","NISA PARTICIPACOES","NAOMI PARTICIPACOES","BELEZA PARTICIPACOES","NOAH PARTICIPACOES","GAIA FLORESTAL SECURITIZADORA S.A.","JP PARTICIPACOES S.A.","COSAN LOGISTICA S.A.","GAIA CRED CIA SECURITIZADORA DE CREDITOS FINANCEIROS S.A.","MOVIDA PARTICIPACOES S.A.","BTGI QUARTZO PARTICIPACOES S.A.","BTGI SAFIRA PARTICIPACOES S.A.","FINSBURY PARTICIPACOES S.A.","FOXFIELD PARTICIPACOES S.A.","FOURSTONES PARTICIPACOES S.A.","FRIESTON PARTICIPACOES S.A.","ARGO TRANSMISSAO DE ENERGIA S.A.","ARGO ENERGIA EMPREENDIMENTOS E PARTICIPACOES S.A.","VERT COMPANHIA SECURITIZADORA","COMPANHIA SEC. DE CREDITOS FIN. CARTOES CONSIGNADOS BMG"]},"edges":{"from":["BOMPRECO - HIPER BOMPRECO","BOMPRECO - HIPER BOMPRECO","BRASKEM","BRASKEM","BRASKEM","BRASKEM","BRASKEM","POLIALDEN","POLIALDEN","PRONOR","PRONOR","PRONOR","NITROCARBONO","TRIKEM SA","OXITENO NORDESTE","OXITENO NORDESTE","OXITENO NORDESTE","OXITENO NORDESTE","BBM PARTICIPACOES","ODEBRECHT","BCO BOCOM BBM","BCO ECONOMICO","COELBA","COELBA","BANEB","BANEB","BANEB","BANEB","BANEB","BANEB","BANEB","BANEB","BANEB","BANEB","BANEB","BANEB","BANEB","BANEB","BANEB","BANEB","BANEB","SIBRA","CARAIBA METAIS S.A","CONEPAR","CONEPAR","KIEPPE","BANCO BILBAO VIZCAYA ARGENTARIA BRASILSA","BANCO BILBAO VIZCAYA ARGENTARIA BRASILSA","BANCO BILBAO VIZCAYA ARGENTARIA BRASILSA","BANCO BILBAO VIZCAYA ARGENTARIA BRASILSA","BANCO BILBAO VIZCAYA ARGENTARIA BRASILSA","BANCO BILBAO VIZCAYA ARGENTARIA BRASILSA","BANCO BILBAO VIZCAYA ARGENTARIA BRASILSA","BANCO BILBAO VIZCAYA ARGENTARIA BRASILSA","BANCO BILBAO VIZCAYA ARGENTARIA BRASILSA","J. MACEDO ALIM NORDESTE S/A  - AGUIA S/A","J. MACEDO ALIM NORDESTE S/A  - AGUIA S/A","TELEST","BRASPEROLA S/A","ECO101 CONCESSIONARIA DE RODOVIAS S.A.","ECO101 CONCESSIONARIA DE RODOVIAS S.A.","SAMA","SAMA","BR HOME CENTERS S.A.","ENERGISA MINAS GERAIS","ENERGISA MINAS GERAIS","ENERGISA MINAS GERAIS","MAGNESITA S/A","SIDERURGICA PAINS","SIDERURGICA PAINS","SANTANENSE","SANTANENSE","BANCO CREDITO REAL DE MG","BANCO CREDITO REAL DE MG","BANCO CREDITO REAL DE MG","BANCO CREDITO REAL DE MG","BANCO CREDITO REAL DE MG","COTEMINAS","USIMINAS","PARAIBUNA","REDE ENERGIA PARTICIPACOES S.A.","REDE ENERGIA PARTICIPACOES S.A.","MERCANTIL LEASING","MERCANTIL LEASING","MERCANTIL LEASING","MERCANTIL BRASIL","MERCANTIL BRASIL","BANCO MERCANTIL DE INVESTIMENTOS SA","CEMIG","CEMIG","CEMIG","SAMITRI","CONCESSIONARIA BR-040 S.A.","ENERSUL","ALL - AMERICA LATINA LOGISTICA MALHA NORTE S.A.","ALL - AMERICA LATINA LOGISTICA MALHA NORTE S.A.","SID ACONORTE","CELPE","FIBRASIL TEXTIL","FIBRASIL TEXTIL","BOMPRECO SUPERMERCADO","BANCO BANESTADO","BANCO BANESTADO","BANCO BANESTADO","BANCO BANESTADO","BANCO BANESTADO","BANCO BANESTADO","HSBC SEGUROS BRASIL","HSBC SEGUROS BRASIL","BCO BAMERINDUS DO BRASIL S.A. - EM LIQUIDACAO EXTRAJUDICIAL","BCO BAMERINDUS DO BRASIL S.A. - EM LIQUIDACAO EXTRAJUDICIAL","BCO BAMERINDUS DO BRASIL S.A. - EM LIQUIDACAO EXTRAJUDICIAL","BCO BAMERINDUS DO BRASIL S.A. - EM LIQUIDACAO EXTRAJUDICIAL","BAMERINDUS SA PARTICIPACOES E EMPREENDIMENTOS - EM LIQUIDACAO EXTRAJUDICIAL","BAMERINDUS SA PARTICIPACOES E EMPREENDIMENTOS - EM LIQUIDACAO EXTRAJUDICIAL","BAMERINDUS SA PARTICIPACOES E EMPREENDIMENTOS - EM LIQUIDACAO EXTRAJUDICIAL","PINCEIS TIGRE","PINCEIS TIGRE","COMPANHIA DE CREDITO FINANCIAMENTO E INVESTIMENTO RCI BRAISL","COMPANHIA DE CREDITO FINANCIAMENTO E INVESTIMENTO RCI BRAISL","CIA DE ARREND MERCANTIL RCI BRASIL","HSBC LEASING","BEMATECH  S/A","INTERMULTIMODAL S.A OPERADORA DE PLATAFORMAS INTERNACIONAIS DE LOGISTICA MULTIMODAL","INTERMULTIMODAL S.A OPERADORA DE PLATAFORMAS INTERNACIONAIS DE LOGISTICA MULTIMODAL","INTERMULTIMODAL S.A OPERADORA DE PLATAFORMAS INTERNACIONAIS DE LOGISTICA MULTIMODAL","INTERMULTIMODAL S.A OPERADORA DE PLATAFORMAS INTERNACIONAIS DE LOGISTICA MULTIMODAL","INTERMULTIMODAL S.A OPERADORA DE PLATAFORMAS INTERNACIONAIS DE LOGISTICA MULTIMODAL","INTERMULTIMODAL S.A OPERADORA DE PLATAFORMAS INTERNACIONAIS DE LOGISTICA MULTIMODAL","INTERMULTIMODAL S.A OPERADORA DE PLATAFORMAS INTERNACIONAIS DE LOGISTICA MULTIMODAL","INTERMULTIMODAL S.A OPERADORA DE PLATAFORMAS INTERNACIONAIS DE LOGISTICA MULTIMODAL","INTERMULTIMODAL S.A OPERADORA DE PLATAFORMAS INTERNACIONAIS DE LOGISTICA MULTIMODAL","INTERMULTIMODAL S.A OPERADORA DE PLATAFORMAS INTERNACIONAIS DE LOGISTICA MULTIMODAL","EOX ENERGIA EOLICA S.A.","EOX ENERGIA EOLICA S.A.","EOX ENERGIA EOLICA S.A.","EOX ENERGIA EOLICA S.A.","EOX ENERGIA EOLICA S.A.","EOX ENERGIA EOLICA S.A.","EOX ENERGIA EOLICA S.A.","EOX ENERGIA EOLICA S.A.","EOX ENERGIA EOLICA S.A.","LOUCOS POR FUTEBOL S.A.","LOUCOS POR FUTEBOL S.A.","LOUCOS POR FUTEBOL S.A.","LOUCOS POR FUTEBOL S.A.","LOUCOS POR FUTEBOL S.A.","LOUCOS POR FUTEBOL S.A.","LOUCOS POR FUTEBOL S.A.","LOUCOS POR FUTEBOL S.A.","DELUXE MOTORS S.A","DELUXE MOTORS S.A","DELUXE MOTORS S.A","DELUXE MOTORS S.A","DELUXE MOTORS S.A","DELUXE MOTORS S.A","DELUXE MOTORS S.A","ECTAS HOLDING S.A.","ECTAS HOLDING S.A.","ECTAS HOLDING S.A.","ECTAS HOLDING S.A.","ECTAS HOLDING S.A.","ECTAS HOLDING S.A.","DROGARIAS AMERICANAS SA","DROGARIAS AMERICANAS SA","DROGARIAS AMERICANAS SA","DROGARIAS AMERICANAS SA","DROGARIAS AMERICANAS SA","EKOPARKING SA","EKOPARKING SA","EKOPARKING SA","EKOPARKING SA","INTERCOSMETIC HOLDING S/A","INTERCOSMETIC HOLDING S/A","INTERCOSMETIC HOLDING S/A","COMPANHIA FERRIFERA BRASILEIRA S.A.","COMPANHIA FERRIFERA BRASILEIRA S.A.","TECNO WASTE S.A.","ETHOS SECURITIZADORA S/A","SUL AMERICA STA CRUZ","SUL AMERICA STA CRUZ","SUL AMERICA STA CRUZ","IPIRANGA DISTRIBUIDORA","IPIRANGA DISTRIBUIDORA","NORDESTE QUIMICA","AMIL PARTICIPACOES S/A","BRASIL TELECOM S.A.","BTG PACTUAL SERVICOS FINANCEIROS S/A DTVM","CIMINAS","BANGU DESENV","SADE","COMPANHIA DE EMBALAGENS METALICAS - MMSA","NORTEC QUIMICA S.A.","SUL AMERICA S/A","SUL AMERICA S/A","BANCO UBS PACTUAL S/A","NORBERTO ODEBRECHT","VOTEC","SULACAP","SUL AMERICA SEGUROS","MUCISA","PETROLEO IPIRANGA","FININVEST","FININVEST","FININVEST","BERJ","BERJ","BERJ","BERJ","BERJ","BERJ","BERJ","BERJ","BERJ","BERJ","BERJ","BERJ","BCO NACIONAL INV","BCO NACIONAL INV","GERDAU S.A.","GERDAU S.A.","GERDAU S.A.","GERDAU S.A.","IBM LEASING","LINHAS DE MACAPA TRANSMISSORA DE ENERGIA S.A.","CENTENNIAL ASSET PARTICIPACOES SUDESTE S/A","CONCESSIONARIA PONTE RIO-NITEROI S.A. - ECOPONTE","TRIPLICE SECURITIZADORA DE ATIVOS MERCANTIS S.A.","YARA BRASIL FERTILIZANTES S.A.","YARA BRASIL FERTILIZANTES S.A.","TITAN","TITAN","TITAN","VINICOLA RIOGRAND","VINICOLA RIOGRAND","METALURGICA GERDAU","METALURGICA GERDAU","METALURGICA GERDAU","INDAC - INDUSTRIA, ADM. E COMERCIO S.A.","INDAC - INDUSTRIA, ADM. E COMERCIO S.A.","ADUBOS CRA","BCO CRED REAL DO RS","BCO CRED REAL DO RS","BCO CRED REAL DO RS","BCO CRED REAL DO RS","BCO CRED REAL DO RS","BCO CRED REAL DO RS","BCO CRED REAL DO RS","BCO CRED REAL DO RS","BANRISUL S.A. ADMINISTRADORA DE CONSORCIOS","BANRISUL S/A","ZIVI S/A","ZIVI S/A","CIA IOCHPE","ELEVA","FORJAS TAURUS SA","FORJAS TAURUS SA","CELULOSE IRANI","CELULOSE IRANI","DHB","ANTARCTICA POLAR","ANTARCTICA POLAR","AMADEO ROSSI SA METALURGICA E MUNICOES","CALCADOS AZALEIA S.A.","SEIVA S.A. - FLORESTAS E INDUSTRIAS","CIA HABITASUL DE PARTICIPACOES","FRAS-LE S.A.","NOVO HAMBURGO SEGS","NOVO HAMBURGO SEGS","NOVO HAMBURGO SEGS","NOVO HAMBURGO SEGS","NOVO HAMBURGO SEGS","SADIA","CECRISA","KARSTEN","KUALA S.A.","CHAPECO AVICOLA","BUNGE ALIMENTOS SA","COMPANHIA ENERGETICA JAGUARA","BANCO ITABANCO S/A","BANCO ITABANCO S/A","BANCO ITABANCO S/A","BANCO ITABANCO S/A","BANCO ITABANCO S/A","BANCO ITABANCO S/A","BANCO ITABANCO S/A","BANCO ITABANCO S/A","BANCO ITABANCO S/A","BANCO ITABANCO S/A","BANCO ITABANCO S/A","BANCO ITABANCO S/A","BANCO ITABANCO S/A","BANCO ITABANCO S/A","BANCO ITABANCO S/A","ERNESTO NEUGEBAUER","HERCULES S/A","BANK OF AMERICA - BRASIL S/A ( BANCO MULTIPLO )","FERTISUL SA","FERTISUL SA","DURATEX","DURATEX","DURATEX","DURATEX","DURATEX","DURATEX","PROMON TECNOLOGIA","EPEDA","ZOGBI LEASING","ZOGBI LEASING","ZOGBI LEASING","ZOGBI LEASING","ZOGBI LEASING","ZOGBI LEASING","AGROCERES","SID MICROELETRONICA","COMPANHIA BRASILEIRA DE CARTUCHOS - CBC","COFAP","RHODIA","ODONTOPREV S/A","BANCO SAFRA","ALL - AMERICA LATINA LOGISTICA MALHA OESTE S.A.","RACINVEST","WHIRLPOOL S.A","BCP TELECOMUNICACOES","BANCO PAN SA","BANCO PAN SA","BANCO PAN SA","BANCO PAN SA","BANCO PAN SA","BANCO PAN SA","BANCO PAN SA","BANCO PAN SA","BANCO PAN SA","POLPAR S.A.","POLPAR S.A.","EMBRAER","ITAMARATI LEASING","ITAMARATI LEASING","ITAMARATI LEASING","ITAMARATI LEASING","ITAMARATI LEASING","ITAMARATI LEASING","ITAMARATI LEASING","ITAMARATI LEASING","NOROESTE SEGURADORA","NOROESTE SEGURADORA","NOROESTE SEGURADORA","NOROESTE SEGURADORA","SERRANA FERTILIZANTES SA","SERRANA FERTILIZANTES SA","GERAL DE CONCRETO S.A.","SAMCIL","SAMCIL","JEREISSATI PARTICIPACOES S/A","JEREISSATI PARTICIPACOES S/A","JEREISSATI PARTICIPACOES S/A","DROGA RAIA","SUZANO HOLDING S.A.","PEVE PARTICIPACOES","PEVE PARTICIPACOES","PEVE PARTICIPACOES","PEVE PARTICIPACOES","PEVE PARTICIPACOES","PEVE PARTICIPACOES","PEVE PARTICIPACOES","PEVE PARTICIPACOES","PEVE PARTICIPACOES","BCO SANTANDER NOROESTE","BCO SANTANDER NOROESTE","BCO SANTANDER NOROESTE","BCO SANTANDER NOROESTE","BCO SANTANDER NOROESTE","ITAU UNIBANCO","ITAU UNIBANCO","ITAU UNIBANCO","ITAU UNIBANCO","ITAU UNIBANCO","ITAU UNIBANCO","ITAU UNIBANCO","ITAU UNIBANCO","ITAU UNIBANCO","ITAU UNIBANCO","BANCO BRADESCO S.A.","BANCO BRADESCO S.A.","BANCO BRADESCO S.A.","BANCO BRADESCO S.A.","BANCO BRADESCO S.A.","BANCO BRADESCO S.A.","BANCO BRADESCO S.A.","BANCO BRADESCO S.A.","ALFA DE INVESTIMENTO","ALFA DE INVESTIMENTO","ALFA DE INVESTIMENTO","ALFA DE INVESTIMENTO","ALFA DE INVESTIMENTO","ALUSA","BONFIGLIOLI","SANTANDER LEASING S.A. ARREND MERC","SANTANDER LEASING S.A. ARREND MERC","SANTANDER LEASING S.A. ARREND MERC","SANTANDER LEASING S.A. ARREND MERC","SANTANDER LEASING S.A. ARREND MERC","BANCO BCN S.A.","BANCO BCN S.A.","BANCO BCN S.A.","BANCO BCN S.A.","BANCO BCN S.A.","BANCO BCN S.A.","BANCO BCN S.A.","BANCO SUDAMERIS BRASIL SA","BANCO SUDAMERIS BRASIL SA","BANCO SUDAMERIS BRASIL SA","BOAVISTA SA ARR MERC","BOAVISTA SA ARR MERC","BOAVISTA SA ARR MERC","BOAVISTA SA ARR MERC","BOAVISTA SA ARR MERC","BOAVISTA SA ARR MERC","BOAVISTA SA ARR MERC","BOAVISTA SA ARR MERC","PAULISTA DE ENERGIA","BANCO MERCANTIL DE SAO PAULO S/A","BANCO MERCANTIL DE SAO PAULO S/A","BANCO MERCANTIL DE SAO PAULO S/A","BANCO MERCANTIL DE SAO PAULO S/A","BANCO MERCANTIL DE SAO PAULO S/A","BANCO MERCANTIL DE SAO PAULO S/A","BANCO MERCANTIL DE SAO PAULO S/A","BCO BANDEIRANTES","BCO BANDEIRANTES","BCO BANDEIRANTES","BCO BANDEIRANTES","BCO BANDEIRANTES","BCO BANDEIRANTES","BCO BANDEIRANTES","BCO BANDEIRANTES","BCO BANDEIRANTES","BUNGE BRASIL S.A.","FABRICACAO DE CIMENTO PORTLAND","FABRICACAO DE CIMENTO PORTLAND","ETERNIT","ETERNIT","ETERNIT","VIGOR","VIGOR","BANCO BMG","BANCO BMG","BANCO BMG","DURATEX","BANCO COMERCIAL E DE INVESTIMENTO SUDAMERIS S.A.","BANCO COMERCIAL E DE INVESTIMENTO SUDAMERIS S.A.","BENZENEX","BANESPA","BANESPA","BANESPA","BANESPA","VICU","VICU","VICU","BANCO NOSSA CAIXA S/A","COINVEST CIA.DE INVESTIMENTOS INTERLAGOS","CAMARGO CORREA","ITAUSA","ITAUSA","ITAUSA","ITAUSA","ITAUSA","CETENCO","AES ELETROPAULO","BFB LEASING","BFB LEASING","BFB LEASING","BFB LEASING","BFB LEASING","BFB LEASING","BFB LEASING","ARRENDAMENTO MERCANTIL","BRADESPLAN PARTICIPACOES S.A.","BRADESPLAN PARTICIPACOES S.A.","BRADESPLAN PARTICIPACOES S.A.","BRADESPLAN PARTICIPACOES S.A.","BRADESPLAN PARTICIPACOES S.A.","BRADESPLAN PARTICIPACOES S.A.","BRADESPLAN PARTICIPACOES S.A.","COMPANHIA DE GAS DE SAO PAULO - COMGAS","BRADESCO LEASING S.A. ARREND. MERCANTIL","BRADESCO LEASING S.A. ARREND. MERCANTIL","BRADESCO LEASING S.A. ARREND. MERCANTIL","BRADESCO LEASING S.A. ARREND. MERCANTIL","NORCHEM","NORCHEM","NORCHEM","BANCO CRUZEIRO DO SUL SA","CAMARGO CORREA CIMENTOS SA","BANESTADO LEASING","BANESTADO LEASING","BANESTADO LEASING","BANESTADO LEASING","BANESTADO LEASING","BANESTADO LEASING","BANESTADO LEASING","OXITENO S.A. INDUSTRIA E COMERCIO","USINA COSTA PINTO S/A ACUCAR E ALCOOL","USINA COSTA PINTO S/A ACUCAR E ALCOOL","USINA COSTA PINTO S/A ACUCAR E ALCOOL","USINA COSTA PINTO S/A ACUCAR E ALCOOL","USINA S BARBARA","USINA S BARBARA","USINA S BARBARA","BRADESCO BCN LEASING","BRADESCO BCN LEASING","BRADESCO BCN LEASING","BRADESCO BCN LEASING","BANCOCIDADE LEASING","BANCOCIDADE LEASING","BANCOCIDADE LEASING","SPLICE","FINAUSTRIA ARRENDAMENTO MERCANTIL S.A.","FINAUSTRIA ARRENDAMENTO MERCANTIL S.A.","FINAUSTRIA ARRENDAMENTO MERCANTIL S.A.","FINAUSTRIA ARRENDAMENTO MERCANTIL S.A.","FINAUSTRIA ARRENDAMENTO MERCANTIL S.A.","FINAUSTRIA ARRENDAMENTO MERCANTIL S.A.","SANTANDER LEASING S.A.","SANTANDER LEASING S.A.","SANTANDER LEASING S.A.","SCOPUS","BRADESCO LEASING SA ARREND MERCANTIL","BRADESCO LEASING SA ARREND MERCANTIL","TAM","FINASA LEASING","DIBENS LEASING SA","DIBENS LEASING SA","DIBENS LEASING SA","DIBENS LEASING SA","DIBENS LEASING SA","ELEKEIROZ","ELEKEIROZ","BANCO DE PERNAMBUCO S.A. - BANDEPE","BANCO DE PERNAMBUCO S.A. - BANDEPE","ITAULEASING","ITAULEASING","ITAULEASING","ITAULEASING","SAO CARLOS EMPREEND.E PARTICIPACOES S.A.","MADEPAN","COSAN SA INDUSTRIA E COMERCIO","COSAN SA INDUSTRIA E COMERCIO","HUMAITA","IGUATEMI EMPRESA DE SHOPPING CENTERS S/A","ITAUTEC INFORMATICA S.A.","ITAUTEC INFORMATICA S.A.","ELEKEIROZ S/A","CITI CP","CITI CP","CITI CP","JSL S.A.","CSN","CSN","MELAMINA ULTRA SA INDUSTRIA QUIMICA","BANCO SANTANDER (BRASIL) S.A.","BANCO SANTANDER (BRASIL) S.A.","ULTRAPAR PARTICIPACOES SA","UNIBANCO SA","UNIBANCO SA","RUMO LOGISTICA OPERADORA MULTIMODAL S.A.","FIBRA LEASING SA ARREND MERC","AYMORE LEASING","CREDICARD","ALFA HOLDINGS","ALFA HOLDINGS","ALFA FINANCEIRA","BRASIL PHARMA SA","BRASIL PHARMA SA","BRASIL PHARMA SA","ROPASC PARTICIPACOES S/A","ROPASC PARTICIPACOES S/A","ROPASC PARTICIPACOES S/A","ROPASC PARTICIPACOES S/A","VOSTOK PARTICIPACOES SA","VOSTOK PARTICIPACOES SA","VOSTOK PARTICIPACOES SA","MENFIS PARTICIPACOES S/A","MENFIS PARTICIPACOES S/A","HIDROVIAS DO BRASIL S.A.","HIDROVIAS DO BRASIL S.A.","PATMOS PARTICIPACOES S/A","HARPIA OMEGA PARTICIPACOES S.A.","HARPIA OMEGA PARTICIPACOES S.A.","NISA PARTICIPACOES","NISA PARTICIPACOES","NISA PARTICIPACOES","NISA PARTICIPACOES","NISA PARTICIPACOES","NISA PARTICIPACOES","NISA PARTICIPACOES","NAOMI PARTICIPACOES","NAOMI PARTICIPACOES","NAOMI PARTICIPACOES","NAOMI PARTICIPACOES","NAOMI PARTICIPACOES","NAOMI PARTICIPACOES","BELEZA PARTICIPACOES","BELEZA PARTICIPACOES","BELEZA PARTICIPACOES","BELEZA PARTICIPACOES","BELEZA PARTICIPACOES","NOAH PARTICIPACOES","NOAH PARTICIPACOES","NOAH PARTICIPACOES","NOAH PARTICIPACOES","GAIA FLORESTAL SECURITIZADORA S.A.","BTGI QUARTZO PARTICIPACOES S.A.","FINSBURY PARTICIPACOES S.A.","FINSBURY PARTICIPACOES S.A.","FINSBURY PARTICIPACOES S.A.","FOXFIELD PARTICIPACOES S.A.","FOXFIELD PARTICIPACOES S.A.","FOURSTONES PARTICIPACOES S.A.","ARGO TRANSMISSAO DE ENERGIA S.A.","VERT COMPANHIA SECURITIZADORA"],"to":["BOMPRECO SUPERMERCADO","SONAE DISTRIBUICAO BRASIL","CONEPAR","ODEBRECHT","KIEPPE","POLITENO IND E COMERCIO S.A.","MLOG S.A.","KIEPPE","OPP PETROQUIMICA","NITROCARBONO","BBM PARTICIPACOES","SEGUROS DA BAHIA","BBM PARTICIPACOES","LDC BIOENERGIA SA","OXITENO S.A. INDUSTRIA E COMERCIO","ULTRAPAR PARTICIPACOES SA","MELAMINA ULTRA SA INDUSTRIA QUIMICA","ULTRA PARTICIPACOES","SEGUROS DA BAHIA","KIEPPE","FIBRA LEASING SA ARREND MERC","ECONOMICO SA A M","CELPE","AFLUENTE TRANSMISSAO DE ENERGIA ELETRICA S/A","BCO CRED REAL DO RS","NOVO HAMBURGO SEGS","BOAVISTA SA ARR MERC","BRADESCO LEASING S.A. ARREND. MERCANTIL","BRADESCO BCN LEASING","FINASA LEASING","PEVE PREDIOS S.A.","BANCO ITABANCO S/A","BANCO MERCANTIL DE SAO PAULO S/A","BANCOCIDADE LEASING","BANCO CREDITO REAL DE MG","BANCO BCN S.A.","BRADESPLAN PARTICIPACOES S.A.","BERJ","PEVE PARTICIPACOES","BANCO BRADESCO S.A.","BRADESCO LEASING SA ARREND MERCANTIL","FERRO LIGAS","ELUMA","COSAN SA INDUSTRIA E COMERCIO","COSAN LOGISTICA S.A.","OPP PETROQUIMICA","BERJ","BANCO ITABANCO S/A","ZOGBI LEASING","PEVE PARTICIPACOES","BANCO BRADESCO S.A.","BRADESPLAN PARTICIPACOES S.A.","BRADESCO LEASING SA ARREND MERCANTIL","HUMAITA","BANCO BOAVISTA INTERATLANTICO SA","SADIA","PERDIGAO AGRO SA","TELEMIG","TEBA","CONCESSIONARIA PONTE RIO-NITEROI S.A. - ECOPONTE","CONCESSIONARIA DAS RODOVIAS AYRTON SENNA E CARVALHO PINTO S/A","ETERNIT","WAGNER","PRINER SERVICOS INDUSTRIAIS S.A.","REDE ENERGIA PARTICIPACOES S.A.","ENERSUL","ENERGISA SERGIPE","PAO DE ACUCAR","SID ACONORTE","INDAC - INDUSTRIA, ADM. E COMERCIO S.A.","COTEMINAS","WEMBLEY SOCIEDADE ANONIMA","BOAVISTA SA ARR MERC","BRADESCO LEASING S.A. ARREND. MERCANTIL","BRADESCO BCN LEASING","BANCOCIDADE LEASING","BERJ","WEMBLEY SOCIEDADE ANONIMA","KLABIN","CAEMI","ENERSUL","ENERGISA SERGIPE","MERCANTIL BRASIL","BANCO MERCANTIL DE INVESTIMENTOS SA","BANCO MERCANTIL DO BRASIL S/A","BANCO MERCANTIL DO BRASIL S/A","BANCO MERCANTIL DE INVESTIMENTOS SA","BANCO MERCANTIL DO BRASIL S/A","SAAG INVESTIMENTOS S.A.","LIGHT","FRAS-LE S.A.","CENTENNIAL ASSET PARTICIPACOES SUDESTE S/A","CONCESSIONARIA AUTO RAPOSO TAVARES SA-CART","ENERGISA SERGIPE","ALL - AMERICA LATINA LOGISTICA MALHA OESTE S.A.","RUMO LOGISTICA OPERADORA MULTIMODAL S.A.","INDAC - INDUSTRIA, ADM. E COMERCIO S.A.","AFLUENTE TRANSMISSAO DE ENERGIA ELETRICA S/A","FIBRA LEASING SA ARREND MERC","TEXTILIA","SONAE DISTRIBUICAO BRASIL","ARRENDAMENTO MERCANTIL","ITAU UNIBANCO","BANCO BMG","BFB LEASING","BMG LEASING","COPERSUCAR SA","UNIAO DE SEGUROS","BANCO BRADESCO S.A.","BAMERINDUS SA PARTICIPACOES E EMPREENDIMENTOS - EM LIQUIDACAO EXTRAJUDICIAL","BANCO UBS PACTUAL S/A","BTG PACTUAL SERVICOS FINANCEIROS S/A DTVM","ITAMARATI LEASING","BANCO UBS PACTUAL S/A","BTG PACTUAL SERVICOS FINANCEIROS S/A DTVM","ITAMARATI LEASING","TIGRE","FABRIMAR","CIA DE ARREND MERCANTIL RCI BRASIL","BANCO SANTANDER (BRASIL) S.A.","BANCO SANTANDER (BRASIL) S.A.","HSBC ASSET FINANCE (BRASIL) AR MERC S.A.","TOTVS S.A","EOX ENERGIA EOLICA S.A.","LOUCOS POR FUTEBOL S.A.","DELUXE MOTORS S.A","ECTAS HOLDING S.A.","DROGARIAS AMERICANAS SA","EKOPARKING SA","INTERCOSMETIC HOLDING S/A","COMPANHIA FERRIFERA BRASILEIRA S.A.","TECNO WASTE S.A.","ATIVOS BRASILEIROS S.A.","LOUCOS POR FUTEBOL S.A.","DELUXE MOTORS S.A","ECTAS HOLDING S.A.","DROGARIAS AMERICANAS SA","EKOPARKING SA","INTERCOSMETIC HOLDING S/A","COMPANHIA FERRIFERA BRASILEIRA S.A.","TECNO WASTE S.A.","ATIVOS BRASILEIROS S.A.","DELUXE MOTORS S.A","ECTAS HOLDING S.A.","DROGARIAS AMERICANAS SA","EKOPARKING SA","INTERCOSMETIC HOLDING S/A","COMPANHIA FERRIFERA BRASILEIRA S.A.","TECNO WASTE S.A.","ATIVOS BRASILEIROS S.A.","ECTAS HOLDING S.A.","DROGARIAS AMERICANAS SA","EKOPARKING SA","INTERCOSMETIC HOLDING S/A","COMPANHIA FERRIFERA BRASILEIRA S.A.","TECNO WASTE S.A.","ATIVOS BRASILEIROS S.A.","DROGARIAS AMERICANAS SA","EKOPARKING SA","INTERCOSMETIC HOLDING S/A","COMPANHIA FERRIFERA BRASILEIRA S.A.","TECNO WASTE S.A.","ATIVOS BRASILEIROS S.A.","EKOPARKING SA","INTERCOSMETIC HOLDING S/A","COMPANHIA FERRIFERA BRASILEIRA S.A.","TECNO WASTE S.A.","ATIVOS BRASILEIROS S.A.","INTERCOSMETIC HOLDING S/A","COMPANHIA FERRIFERA BRASILEIRA S.A.","TECNO WASTE S.A.","ATIVOS BRASILEIROS S.A.","COMPANHIA FERRIFERA BRASILEIRA S.A.","TECNO WASTE S.A.","ATIVOS BRASILEIROS S.A.","TECNO WASTE S.A.","ATIVOS BRASILEIROS S.A.","ATIVOS BRASILEIROS S.A.","LOGOS COMPANHIA SECURITIZADORA S/A","SUL AMERICA S/A","SUL AMERICA SEGUROS","SATMA SUL AMERICA","PETROLEO IPIRANGA","ULTRAPAR PARTICIPACOES SA","ENIA","MEDIAL SAUDE S/A","TELEMAR","BANCO UBS PACTUAL S/A","EMBRACO","FABRICA BANGU","IVI","RHEEM EMPRS","STARA S.A. - INDUSTRIA DE IMPLEMENTOS AGRICOLAS","SUL AMERICA SEGUROS","SATMA SUL AMERICA","ITAMARATI LEASING","CBPO","MOTORTEC","SATMA SUL AMERICA","SATMA SUL AMERICA","CEDULA CFI","ULTRAPAR PARTICIPACOES SA","UNIBANCO LEASING S.A.","ITAU UNIBANCO","BCO BANDEIRANTES","BANCO ITABANCO S/A","ZOGBI LEASING","PEVE PARTICIPACOES","BANCO BRADESCO S.A.","BRADESPLAN PARTICIPACOES S.A.","BRADESCO LEASING SA ARREND MERCANTIL","HUMAITA","BANCO BOAVISTA INTERATLANTICO SA","BOAVISTA SA ARR MERC","BANCO MERCANTIL DE SAO PAULO S/A","BRADESCO BCN LEASING","BANCOCIDADE LEASING","IGUATEMI EMPRESA DE SHOPPING CENTERS S/A","NACIONAL BANCO","METALURGICA GERDAU","INDAC - INDUSTRIA, ADM. E COMERCIO S.A.","SEIVA S.A. - FLORESTAS E INDUSTRIAS","ACOS VILLARES","GERDAU INFORMATICA","LINHAS DE XINGU TRANSMISSORA DE ENERGIA S.A.","MLOG S.A.","CONCESSIONARIA DAS RODOVIAS AYRTON SENNA E CARVALHO PINTO S/A","TRIUNFO SECURITIZADORA DE ATIVOS S.A.","BENZENEX","FERTIBRAS S/A","VINICOLA RIOGRAND","DHB","SDV","DHB","SDV","SEIVA S.A. - FLORESTAS E INDUSTRIAS","INDAC - INDUSTRIA, ADM. E COMERCIO S.A.","ACOS VILLARES","SEIVA S.A. - FLORESTAS E INDUSTRIAS","ACOS VILLARES","PETROPAR S.A.","NOVO HAMBURGO SEGS","BOAVISTA SA ARR MERC","BRADESCO LEASING S.A. ARREND. MERCANTIL","BRADESCO BCN LEASING","FINASA LEASING","PEVE PREDIOS S.A.","BANCO MERCANTIL DE SAO PAULO S/A","BANCOCIDADE LEASING","BANRISUL S/A","BAGERGS","HERCULES S/A","MUNDIAL","COSAN SA INDUSTRIA E COMERCIO","GRANOLEO S/A","COMPANHIA BRASILEIRA DE CARTUCHOS - CBC","D F VASCONCELLOS S/A O.M.A.P.","CIA HABITASUL DE PARTICIPACOES","PAPEL SAO ROBERTO","SDV","ANTARCTICA PAULISTA","FABRICACAO DE CIMENTO PORTLAND","FUNDIROSSI","VULCABRAS S/A.","ACOS VILLARES","PAPEL SAO ROBERTO","RUMO LOGISTICA OPERADORA MULTIMODAL S.A.","BOAVISTA SA ARR MERC","BRADESCO LEASING S.A. ARREND. MERCANTIL","BRADESCO BCN LEASING","FINASA LEASING","PEVE PREDIOS S.A.","PERDIGAO AGRO SA","COPERSUCAR SA","RENAUXVIEW","POLONIA","CHAPECO","BUNGE FERTILIZANTES","COMPANHIA ENERGETICA MIRANDA","BOAVISTA SA ARR MERC","BANCO MERCANTIL DE SAO PAULO S/A","BRADESCO LEASING S.A. ARREND. MERCANTIL","BRADESCO BCN LEASING","BANCOCIDADE LEASING","FINASA LEASING","PEVE PREDIOS S.A.","BANCO BCN S.A.","ZOGBI LEASING","PEVE PARTICIPACOES","BANCO BRADESCO S.A.","BRADESPLAN PARTICIPACOES S.A.","BRADESCO LEASING SA ARREND MERCANTIL","HUMAITA","BANCO BOAVISTA INTERATLANTICO SA","FENICIAPAR S/A","MUNDIAL","ABC BRASIL","SERRANA FERTILIZANTES SA","BUNGE BRASIL S.A.","MADEPAN","ITAUSA","TECPART","ITAUTEC INFORMATICA S.A.","ELEKEIROZ S/A","ITAUTEC S.A. - GRUPO ITAUTEC","PROMON","BCO BANDEIRANTES INVESTIMENTOS","PEVE PARTICIPACOES","BANCO BRADESCO S.A.","BRADESPLAN PARTICIPACOES S.A.","BRADESCO LEASING SA ARREND MERCANTIL","HUMAITA","BANCO BOAVISTA INTERATLANTICO SA","SEARLE","SID INFORMATICA","D F VASCONCELLOS S/A O.M.A.P.","MAHLE METAL LEVE","FISIBA","SANTANDER LEASING S.A. ARREND MERC","ARRENDAMENTO MERCANTIL","RUMO LOGISTICA OPERADORA MULTIMODAL S.A.","RACIONAL ENGENHARIA","BRASMOTOR S.A","CMA PARTICIPACOES SA","ITAMARATI LEASING","BANCO BCN S.A.","BOAVISTA SA ARR MERC","BANCO MERCANTIL DE SAO PAULO S/A","BRADESPLAN PARTICIPACOES S.A.","BRADESCO BCN LEASING","BANCOCIDADE LEASING","FINASA LEASING","PEVE PREDIOS S.A.","SUZANO HOLDING S.A.","PREMESA","ULTRAPAR PARTICIPACOES SA","BANCO BCN S.A.","BOAVISTA SA ARR MERC","BANCO MERCANTIL DE SAO PAULO S/A","BRADESPLAN PARTICIPACOES S.A.","BRADESCO BCN LEASING","BANCOCIDADE LEASING","FINASA LEASING","PEVE PREDIOS S.A.","BCO SANTANDER NOROESTE","SANTANDER LEASING S.A. ARREND MERC","BANESPA","BANCO SANTANDER S.A.","BUNGE BRASIL S.A.","COPERSUCAR SA","FABRICACAO DE CIMENTO PORTLAND","MUNCK","SECURIT","LA FONTE TELECOM S/A","IGUATEMI EMPRESA DE SHOPPING CENTERS S/A","JP PARTICIPACOES S.A.","DROGASIL SA","PREMESA","BANCO BRADESCO S.A.","BOAVISTA SA ARR MERC","BANCO MERCANTIL DE SAO PAULO S/A","BRADESCO BCN LEASING","BANCOCIDADE LEASING","BRADESCO LEASING SA ARREND MERCANTIL","BRADESPLAN PARTICIPACOES S.A.","HUMAITA","BANCO BOAVISTA INTERATLANTICO SA","SANTANDER LEASING S.A. ARREND MERC","BANESPA","SANTANDER LEASING S.A.","BANCO SANTANDER (BRASIL) S.A.","BANCO SANTANDER S.A.","BFB LEASING","BANCO ITAU BBA  S.A.","ITAULEASING","CITI CP","UNIBANCO SA","BCO BANDEIRANTES","BANESTADO LEASING","FINAUSTRIA ARRENDAMENTO MERCANTIL S.A.","CREDICARD","DIBENS LEASING SA","BRADESCO LEASING SA ARREND MERCANTIL","BRADESPLAN PARTICIPACOES S.A.","HUMAITA","BANCO BOAVISTA INTERATLANTICO SA","BOAVISTA SA ARR MERC","BANCO MERCANTIL DE SAO PAULO S/A","BRADESCO BCN LEASING","BANCOCIDADE LEASING","ALFA FINANCEIRA","BANCO SUDAMERIS BRASIL SA","BANCO COMERCIAL E DE INVESTIMENTO SUDAMERIS S.A.","ALFA HOLDINGS","CONSORCIO ALFA","FERREIRA GOMES ENERGIA S.A.","AUXILIAR PART","BANESPA","SANTANDER LEASING S.A.","BANCO SANTANDER (BRASIL) S.A.","BANCO SANTANDER S.A.","BANCO DE PERNAMBUCO S.A. - BANDEPE","BOAVISTA SA ARR MERC","BANCO MERCANTIL DE SAO PAULO S/A","BRADESPLAN PARTICIPACOES S.A.","BRADESCO BCN LEASING","BANCOCIDADE LEASING","FINASA LEASING","PEVE PREDIOS S.A.","BANCO COMERCIAL E DE INVESTIMENTO SUDAMERIS S.A.","BCO REAL","ABC BRASIL","BANCO MERCANTIL DE SAO PAULO S/A","BRADESPLAN PARTICIPACOES S.A.","BRADESCO BCN LEASING","BANCOCIDADE LEASING","FINASA LEASING","PEVE PREDIOS S.A.","BRADESCO LEASING S.A. ARREND. MERCANTIL","BRADESCO LEASING SA ARREND MERCANTIL","CPFL","BRADESPLAN PARTICIPACOES S.A.","BRADESCO BCN LEASING","BANCOCIDADE LEASING","FINASA LEASING","PEVE PREDIOS S.A.","BRADESCO LEASING SA ARREND MERCANTIL","BRADESCO LEASING S.A. ARREND. MERCANTIL","CREDICARD","CITI CP","BANESTADO LEASING","FINAUSTRIA ARRENDAMENTO MERCANTIL S.A.","DIBENS LEASING SA","ITAULEASING","UNIBANCO SA","BANCO ITAU BBA  S.A.","BFB LEASING","SANTISTA ALIMENTOS","COSAN SA INDUSTRIA E COMERCIO","RUMO LOGISTICA OPERADORA MULTIMODAL S.A.","WAGNER","UNIPAR CARBOCLORO S.A.","AES ELETROPAULO","UNIPAR CARBOCLORO S.A.","VIGOR ALIMENTOS S.A.","BFB LEASING","ARRENDAMENTO MERCANTIL","BMG LEASING","ELEKEIROZ","AYMORE LEASING","BCO REAL","FERTIBRAS S/A","BANCO SANTANDER S.A.","SANTANDER LEASING S.A.","BANCO SANTANDER (BRASIL) S.A.","BANCO DE PERNAMBUCO S.A. - BANDEPE","FIBRA LEASING SA ARREND MERC","TEXTILIA","CSN","CPM BRAXIS S/A","VILLARES MECANICA","SANTISTA TEXTIL S.A.","ELEKEIROZ S/A","ITAUTEC S.A. - GRUPO ITAUTEC","ELEKEIROZ","MADEPAN","ITAUTEC INFORMATICA S.A.","CENTENARIO","SABESP","ARRENDAMENTO MERCANTIL","BMG LEASING","BANCO ITAU BBA  S.A.","BANESTADO LEASING","FINAUSTRIA ARRENDAMENTO MERCANTIL S.A.","UNIBANCO SA","CREDICARD","BMG LEASING","BRADESCO BCN LEASING","BANCOCIDADE LEASING","FINASA LEASING","PEVE PREDIOS S.A.","BRADESCO LEASING SA ARREND MERCANTIL","HUMAITA","BANCO BOAVISTA INTERATLANTICO SA","RUMO LOGISTICA OPERADORA MULTIMODAL S.A.","BRADESCO BCN LEASING","BANCOCIDADE LEASING","FINASA LEASING","PEVE PREDIOS S.A.","BANCO DE PERNAMBUCO S.A. - BANDEPE","BANCO SANTANDER (BRASIL) S.A.","SANTANDER LEASING S.A.","BCO REAL","-","FINAUSTRIA ARRENDAMENTO MERCANTIL S.A.","UNIBANCO SA","CREDICARD","DIBENS LEASING SA","ITAULEASING","BANCO ITAU BBA  S.A.","CITI CP","ULTRAPAR PARTICIPACOES SA","USINA S BARBARA","COSAN SA INDUSTRIA E COMERCIO","RUMO LOGISTICA OPERADORA MULTIMODAL S.A.","COSAN LOGISTICA S.A.","COSAN SA INDUSTRIA E COMERCIO","RUMO LOGISTICA OPERADORA MULTIMODAL S.A.","COSAN LOGISTICA S.A.","BANCOCIDADE LEASING","FINASA LEASING","PEVE PREDIOS S.A.","BRADESCO LEASING SA ARREND MERCANTIL","FINASA LEASING","PEVE PREDIOS S.A.","BRADESCO LEASING SA ARREND MERCANTIL","VIARONDON CONCESSIONARIA DE RODOVIA SA","UNIBANCO SA","CREDICARD","DIBENS LEASING SA","ITAULEASING","BANCO ITAU BBA  S.A.","CITI CP","BANCO DE PERNAMBUCO S.A. - BANDEPE","BANCO SANTANDER (BRASIL) S.A.","BANCO SANTANDER S.A.","GERDAU INFORMATICA","HUMAITA","BANCO BOAVISTA INTERATLANTICO SA","CVC BRASIL OPERADORA E AGENCIA DE VIAGENS SA","PEVE PREDIOS S.A.","CITI CP","UNIBANCO SA","CREDICARD","BANCO ITAU BBA  S.A.","ITAULEASING","MADEPAN","ITAUTEC INFORMATICA S.A.","BANCO SANTANDER (BRASIL) S.A.","BANCO SANTANDER S.A.","UNIBANCO SA","CREDICARD","BANCO ITAU BBA  S.A.","CITI CP","RUMO LOGISTICA OPERADORA MULTIMODAL S.A.","ITAUTEC INFORMATICA S.A.","RUMO LOGISTICA OPERADORA MULTIMODAL S.A.","COSAN LOGISTICA S.A.","BANCO BOAVISTA INTERATLANTICO SA","JP PARTICIPACOES S.A.","ELEKEIROZ S/A","ITAUTEC S.A. - GRUPO ITAUTEC","ITAUTEC S.A. - GRUPO ITAUTEC","UNIBANCO SA","CREDICARD","BANCO ITAU BBA  S.A.","MOVIDA PARTICIPACOES S.A.","FIBRA LEASING SA ARREND MERC","TEXTILIA","ULTRA PARTICIPACOES","BANCO SANTANDER S.A.","COPERSUCAR SA","ULTRA PARTICIPACOES","CREDICARD","BANCO ITAU BBA  S.A.","COSAN LOGISTICA S.A.","TEXTILIA","BCO REAL","BANCO ITAU BBA  S.A.","ALFA FINANCEIRA","CONSORCIO ALFA","CONSORCIO ALFA","HARPIA OMEGA PARTICIPACOES S.A.","BTGI QUARTZO PARTICIPACOES S.A.","BTGI SAFIRA PARTICIPACOES S.A.","VOSTOK PARTICIPACOES SA","MENFIS PARTICIPACOES S/A","PATMOS PARTICIPACOES S/A","EGEU PARTICIPACOES SA","MENFIS PARTICIPACOES S/A","PATMOS PARTICIPACOES S/A","EGEU PARTICIPACOES SA","PATMOS PARTICIPACOES S/A","EGEU PARTICIPACOES SA","ARGO TRANSMISSAO DE ENERGIA S.A.","ARGO ENERGIA EMPREENDIMENTOS E PARTICIPACOES S.A.","EGEU PARTICIPACOES SA","BTGI QUARTZO PARTICIPACOES S.A.","BTGI SAFIRA PARTICIPACOES S.A.","NAOMI PARTICIPACOES","BELEZA PARTICIPACOES","NOAH PARTICIPACOES","FINSBURY PARTICIPACOES S.A.","FOXFIELD PARTICIPACOES S.A.","FOURSTONES PARTICIPACOES S.A.","FRIESTON PARTICIPACOES S.A.","BELEZA PARTICIPACOES","NOAH PARTICIPACOES","FINSBURY PARTICIPACOES S.A.","FOXFIELD PARTICIPACOES S.A.","FOURSTONES PARTICIPACOES S.A.","FRIESTON PARTICIPACOES S.A.","NOAH PARTICIPACOES","FINSBURY PARTICIPACOES S.A.","FOXFIELD PARTICIPACOES S.A.","FOURSTONES PARTICIPACOES S.A.","FRIESTON PARTICIPACOES S.A.","FINSBURY PARTICIPACOES S.A.","FOXFIELD PARTICIPACOES S.A.","FOURSTONES PARTICIPACOES S.A.","FRIESTON PARTICIPACOES S.A.","GAIA CRED CIA SECURITIZADORA DE CREDITOS FINANCEIROS S.A.","BTGI SAFIRA PARTICIPACOES S.A.","FOXFIELD PARTICIPACOES S.A.","FOURSTONES PARTICIPACOES S.A.","FRIESTON PARTICIPACOES S.A.","FOURSTONES PARTICIPACOES S.A.","FRIESTON PARTICIPACOES S.A.","FRIESTON PARTICIPACOES S.A.","ARGO ENERGIA EMPREENDIMENTOS E PARTICIPACOES S.A.","COMPANHIA SEC. DE CREDITOS FIN. CARTOES CONSIGNADOS BMG"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot"},"manipulation":{"enabled":false}},"groups":null,"width":null,"height":null,"idselection":{"enabled":true,"style":"width: 150px; height: 26px","useLabels":true},"byselection":{"enabled":false,"style":"width: 150px; height: 26px","multiple":false,"hideColor":"rgba(200,200,200,0.5)"},"main":null,"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","highlight":{"enabled":true,"hoverNearest":false,"degree":1,"algorithm":"all","hideColor":"rgba(200,200,200,0.5)","labelOnly":true},"collapse":{"enabled":false,"fit":false,"resetHighlight":true,"clusterOptions":null}},"evals":[],"jsHooks":[]}</script>
+<p>Use seu mouse para navegar no grafo e descobrir os principais clusters de empresas!</p>
+</div>
+</div>
+</div>
+<div id="wrap-up" class="section level1">
+<h1>Wrap-up</h1>
+<ul>
+<li>O pacote <code>rfbCNPJ</code> serve para organizar os dados de CNPJ da Receita Federal.</li>
+<li>Use a função <code>rfb_import()</code> para ler os binários prontinhos para leitura diretamente do dropbox.</li>
+<li>Além de descobrir todos os 9.048.917 CNPJs e 11.388.120 nomes únicos de pessoas, podemos fazer análises exploratórias com esses dados.</li>
+</ul>
+<div id="links-e-agradecimentos" class="section level2">
+<h2>Links e agradecimentos</h2>
+<ul>
+<li>Valeu, amigos da curso-r.com e agregados, que me orientaram a criar a função <code>rfb_import()</code>.</li>
+<li>Veja também o <a href="http://brasil.io">Brasil.io</a> do <a href="https://github.com/turicas">Turicas</a>, que tem os mesmos arquivos para download. Ele me informou também que a base dele é mais confiável, pois apresenta correções de dados incorretos da Receita.</li>
+<li>Acompanhe o <a href="http://sillasgonzaga.com/">blog do Sillas</a> que é muito mara!</li>
+</ul>
+<p>É isso. Happy coding ;)</p>
+</div>
+</div>

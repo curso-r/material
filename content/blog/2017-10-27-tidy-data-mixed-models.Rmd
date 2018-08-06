@@ -1,0 +1,166 @@
+---
+title: "Tidy Data, Teste T Pareado e Modelos Mistos"
+date: "2017-10-27T10:12:00+03:00"
+tags: ["curso-r"]
+categories: ["r"]
+banner: "img/banners/banner-tidy-data.png"
+author: ["Daniel"]
+summary: "O que teste t-pareado, modelos mistos e tidy data podem ter a ver? Veja neste post como a estrutura dos seus dados pode afetar a forma que você fará a sua análise."
+---
+
+```{r include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, cache = TRUE)
+```
+
+
+O que teste t-pareado, modelos mistos e tidy data podem ter a ver? Veja neste post como a estrutura dos seus dados pode afetar a forma que você fará a sua análise.
+
+Para começar, vamos relemebrar o que é *tidy data* para depois seguir ao ponto do post.
+
+# Tidy Data
+
+Tidy data é um conceito introduzido pelo Hadley Wickham [neste paper](https://www.jstatsoft.org/article/view/v059i10/v59i10.pdf).
+
+Esse paper é, para mim, o melhor artigo do Hadley. A primeira frase da definição cita Tolstói e diz:
+
+> Like families, tidy datasets are all alike but every messy dataset is messy in its own way.
+
+Essa frase resume a vida de qualquer um que trabalha ou já trabalhou com análise de dados. O ponto mais importante do que significa *tidy data* também está neste primeiro parágrafo: são datasets em que a estrutura dos dados está ligada padronizadamente com o seu significado. A forma padronizada é:
+
+1) Cada variável é uma coluna de uma tabela
+2) Cada observação é uma linha de uma tabela
+3) Cada tipo de unidade observacional forma uma tabela
+
+O exemplo cássico é o seguinte. Primeiro vamos ver um banco de dados *desarrumado*.
+
+```{r echo=FALSE}
+df <- data.frame(
+  Pais = c("Brasil", "Argentina", "Chile"),
+  Idh2015 = c(0.754, 0.827, 0.847),
+  Idh2014 = c(0.755, 0.836, 0.832)
+)
+knitr::kable(df)
+```
+
+Esse dataset está *desarrumado* pois existem duas colunas **Idh2015** e **Idh2014** que representam a mesma variável: **IDH** e uma variável implícita **ANO**, que também aparece nesta duas colunas. A forma *tidy* de representar este dataset seria:
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+df %>%
+  gather(ano, idh, -Pais) %>%
+  mutate(ano = parse_number(ano)) %>%
+  knitr::kable()
+```
+
+
+## O que isso tem a ver com ...
+
+... teste t-pareado ou com modelos mistos?
+
+Suponha que queremos inferir se houve alguma mudança na média do IDH de um ano para o outro.
+Ou seja testar se a média do IDH de 2015 é diferente da média do IDH de 2014.
+Vamos considerar um banco de dados simulado:
+
+```{r message=FALSE, warning=FALSE}
+set.seed(10201)
+library(tidyverse)
+df <- data_frame(
+  Pais = paste0("pais", 1:50),
+  Idh2014 = runif(50),
+  Idh2015 = Idh2014 + rnorm(50, mean = 0.1, sd = 0.025)
+)
+```
+
+Uma forma de fazer isso é usar o teste t pareado que é ensinado nos cursos introdutórios de estatística. Basicamente o que ele faz é testar se a média da diferença entre o IDH2015 e o IDH 2014 é diferente de zero. Isso é diferente de um teste T usual, pois o teste t pareado ajusta o seu cálculo da variância para considerar que existem duas fontes de incerteza.
+
+No R a forma mais natural de fazer isso é:
+
+```{r}
+teste <- t.test(df$Idh2015, df$Idh2014, paired=TRUE)
+```
+
+Note que o nosso banco de dados está *desarrumado* e mesmo assim foi muito simples fazer
+esse teste no R. Agora vamos arrumar o banco de dados.
+
+```{r}
+df <- df %>%
+  gather(ano, idh, -Pais) %>%
+  mutate(ano = parse_number(ano))
+```
+
+Agora para fazer o mesmo teste, poderíamos filtrar o banco de dados duas vezes, por exemplo:
+
+```{r, comment=''}
+t.test(df$idh[df$ano == 2015], df$idh[df$ano == 2014], paired = TRUE)
+```
+
+Mas aí estamos voltando para a forma desarrumada para fazer o teste.
+Outra forma de fazer é considerar essa comparação de médias como um problema de regressão em que a suposição independência das observações não é válida, uma vez que dado um pais, com certeza existe relação entre o idh de 2014 e de 2015.
+
+Vamos ajustar um modelo com efeitos aleatórios para esse problema e comparar os resultados.
+
+```{r message=FALSE, warning=FALSE, comment=''}
+library(nlme)
+model <- lme(idh ~ as.factor(ano), random = ~1|Pais, data = df)
+summary(model)
+```
+
+
+Estamos interessados em comparar a significância do efeito fixo da variável ano nesse
+modelo com a do teste t-pareado. Veja que no caso a estatística T do testes é idêntica: 27.35.
+
+Vimos que a forma como os dados estão estruturados no seu banco de dados pode influenciar 
+a técnica utilizada para a sua análise. Se ele estivesse na forma *desarrumada* o mais natural 
+seria aplicar um teste t pareado, se ele estivesse em formado *tidy* o natural seria usar um
+modelo misto. No seu paper, Hadley argumenta que a maioria dos 
+softwares esperam que o seu banco de dados esteja *arrumado* no sentido de que 
+cada variável é uma coluna e cada observação é uma linha.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

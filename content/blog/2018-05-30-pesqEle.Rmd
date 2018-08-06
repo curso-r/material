@@ -1,0 +1,152 @@
+---
+title: "pesqEle: dados de pesquisas eleitorais"
+date: "2018-05-30T00:00:00+00:00"
+tags: ["app", "pacotes"]
+categories: ["análises", "r"]
+banner: "img/banners/pesqEle.png"
+author: ["Julio"]
+summary: "Nesse ano eleitoral, a preocupação com as pesquisas eleitorais é ainda maior. É nossa obrigação como cidadãos e cidadãs acompanhar e monitorar as pesquisas eleitorais registradas, detectando e apontando o dedo para possíveis fraudes. Esse post busca ajudar..."
+draft: false
+---
+
+Além de ser sócio-fundador da [R6](rseis.com.br) consultoria, a *holding* que controla a [Curso-R.com](curso-r.com), também estou presidente do [Conselho Regional de Estatística - 3a Região](http://conre3.org.br/portal). Uma de nossas incumbências como conselheiros é encontrar formas de monitorar e fiscalizar as pesquisas eleitorais.
+
+Nesse ano eleitoral, por conta da pluralidade de candidatos e grande fragmentação do cenário político, a preocupação com as pesquisas eleitorais é ainda maior. O cenário incerto gera pesquisas com resultados incertos. Isso é um prato cheio para oportunistas que desejam influenciar a opinião pública através de pesquisas forjadas.
+
+Por isso, é nossa obrigação como cidadãos e cidadãs acompanhar e monitorar as pesquisas eleitorais registradas, detectando e apontando o dedo para possíveis fraudes. Esse post busca ajudar a população nesse sentido.
+
+# O *sistema* pesqEle
+
+O [pesqEle](http://inter01.tse.jus.br/pesqele-publico/) é o repositório oficial de pesquisas eleitorais disponibilizado pelo Tribunal Superior Eleitoral (TSE). Lá podemos encontrar diversas informações sobre as pesquisas registradas. Dá até para ver os questionários aplicados e a metodologia de coleta.
+
+Infelizmente, o formulário de cadastro do pesqEle é problemático, permitindo a entrada de dados sem padronização. Isso atrapalha bastante na hora de organizar os dados e fazer análises.
+
+Outro problema do pesqEle é que ele é pouco divulgado. Essa base de dados tem informações importantíssimas que deveriam ser usadas pelas associações, conselhos e mídia para monitorar as pesquisas, mas o foco é sempre nos resultado que são apresentados, e não na metodologia empregada para realização dos levantamentos.
+
+Como bom estatístico que sou e faxineiro de dados, me senti obrigado a divulgar esses dados de uma forma razoável. Veja como abaixos
+
+# O *pacote* `pesqEle`
+
+O site do pesqEle não disponibiliza API para acesso aos dados e seria muito complicado pedir atualizações de dados via LAI. Por isso, foi criamos um raspador para obter os dados automaticamente. O pacote [`pesqEle`](https://github.com/conre3/pesqEle) é o resultado desse esforço.
+
+O pacote exporta apenas uma função, `pe_2018()`, usada para download e arrumação dos dados do `pesqEle`. Ela faz o download de todas as pesquisas de 2018 por raspagem de dados. Por padrão, os arquivos HTML são armazenados na pasta `data-raw/html_2018`, mas é possível alterar essa pasta pelo parâmetro `path=`. Exemplo:
+
+```r
+pe <- pe_2018("pasta")
+dplyr::glimpse(pe)
+```
+```
+Observations: 186
+Variables: 24
+$ id_seq             <int> 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14...
+$ id_pesq            <chr> "MA-05302/2018", "DF-03958/2018", "DF-06553/2...
+$ info_uf            <chr> "MA", "DF", "DF", "PI", "PI", "SP", "SP", "PI...
+$ info_election      <chr> "Eleições Gerais 2018", "Eleições Gerais 2018...
+$ info_position      <chr> "", "Deputado Distrital", "Deputado Federal",...
+$ comp_nm            <chr> "M R BORGES SERVICOS / MBO PUBLICIDADE, MARKE...
+$ comp_cnpj          <chr> "00905916000190", "00850844000121", "00850844...
+$ comp_contract_same <chr> "Sim", "Sim", "Sim", "Não", "Não", "Não", "Nã...
+$ stat_id            <chr> "1791", "CONRE 1a. Região No. 9403", "CONRE 1...
+$ stat_nm            <chr> "ANTONIO CARLOS RODRIGUES BARBOSA", "LUCIANA ...
+$ pesq_n             <dbl> 10973, 3200, 3200, 320, 320, 601, 601, 320, 8...
+$ pesq_val           <dbl> 15700, 32000, 32000, 3000, 3000, 6000, 0, 300...
+$ pesq_contractors   <chr> "CNPJ: 00905916000190 - M R BORGES SERVICOS",...
+$ pesq_origin        <chr> "Vazio", "Vazio", "Vazio", "Recursos proprios...
+$ pesq_same          <lgl> FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FAL...
+$ dt_reg             <date> 2018-05-12, 2018-03-26, 2018-03-26, 2018-02-...
+$ dt_pub             <date> 2018-05-18, 2018-04-01, 2018-04-01, 2018-02-...
+$ dt_start           <date> 2018-03-26, 2018-03-21, 2018-03-21, 2018-02-...
+$ dt_end             <date> 2018-05-04, 2018-03-30, 2018-03-30, 2018-02-...
+$ txt_verif          <chr> "Sistema interno de controle e verificação, c...
+$ txt_method         <chr> "METODOLOGIA: A pesquisa foi realizada median...
+$ txt_about          <chr> "Trata-se de uma amostra não aleatória por co...
+$ txt_plan           <chr> ". PLANO AMOSTRAL E INTERVALOS DE CONFIANÇA: ...
+$ stat_unique        <chr> "1791_A535", "9403_L252", "9403_L252", "5102_...
+```    
+
+Ao rodar pela primeira vez, provavelmente o download demorará por volta de 15-20 minutos, dependendo da conexão com a internet. Nas próximas vezes o download é mais rápido pois o programa não baixa pesquisas já armazenadas em arquivos HTML.
+
+Se não quiser rodar a função `pe_2018()`, armazenamos os dados no objeto `pesqEle::pesqEle_2018`. Esse objeto é uma `data.frame()` com as mesmas colunas resultantes de `pe_2018()`. Essas variáveis são
+
+-   Identificadores:
+    -   `id_seq`: ID sequencial
+    -   `id_pesq`: ID de registro da pesquisa
+-   Informações da eleição
+    -   `info_uf`: Unidade Federativa indicando abrangência da pesquisa ("BR" = Brasil)
+    -   `info_election`: Eleição (no caso, sempre 2018)
+    -   `info_position`: Cargo eleitoral
+-   Informações da empresa
+    -   `comp_nm`: Nome da empresa que realizou a pesquisa
+    -   `comp_cnpj`: CNPJ da empresa que realizou a pesquisa
+    -   `comp_contract_same`: Contratante é a própria empresa?
+-   Informações do estatístico responsável
+    -   `stat_id`: ID do estatístico
+    -   `stat_nm`
+    -   `stat_unique`: Código único do estatístico. Os nomes dos estatísticos estavam escritos de formas diferentes, então arrumamos utilizando o pacote `SoundexBR` e outras heurísticas. Nada garante que o pacote contenha mais erros nos nomes.
+-   Informações sobre a pesquisa
+    -   `pesq_n`: Tamanho da amostra.
+    -   `pesq_val`: Custo da pesquisa informado no registro.
+    -   `pesq_contractors`: Empresas que contrataram a pesquisa.
+    -   `pesq_origin`: Origem dos recursos da pesquisa.
+    -   `pesq_same`: Indica se o contratante da pesquisa é a própria empresa e a pesquisa foi realizada com recursos próprios (em 2018 não tem nenhuma).
+-   Datas
+    -   `dt_reg`: Data de registro da pesquisa.
+    -   `dt_pub`: Data de publicação da pesquisa.
+    -   `dt_start`: Data de início da pesquisa.
+    -   `dt_end`: Data de término da pesquisa.
+-   Informações adicionais (texto)
+    -   `txt_verif`, `txt_method`, `txt_about`, `txt_plan`: informações adicionais da pesquisa, geralmente em texto, sobre metodologia, aplicação e outros detalhes.
+
+A base passou por uma série de limpezas para ficar minimamente utilizável. Essas faxinas incluem arrumação de nomes dos estatísticos, empresas e UFs.
+
+# Shiny App
+
+Não podemos ficar só nas tabelinhas, né? 
+
+Também fizemos um app para visualizar os dados e levantar algumas estatísticas básicas. O [William]() é o ser maravilhoso e iluminado por trás desse app, que ficou realmente lindo.
+
+Após instalar o pacote, você pode abrir o app do `pesqEle` localmente rodando
+
+``` r
+shiny::runApp(system.file("app", package = "pesqEle"))
+```
+
+Para rodar o app, além dos pacotes do `tidyverse` e `shiny`, você precisará instalar os pacotes `shinydashboard`, `highcharter`, `shinyBS` e `shinyjs`. Todos eles estão no CRAN e podem ser instalados via `install.packages()`.
+
+Também disponibilizamos o app nos servidores do CONRE-3. Você pode acessar diretamente aqui: 
+
+<div align="center">
+<a href="http://pesqele.conre3.org.br/app" target="_blank">http://pesqele.conre3.org.br/app</a>
+</div>
+
+Coloquei o app dentro de um `iframe` para acesso direto:
+
+<div align="center">
+<iframe src="http://pesqele.conre3.org.br/app" width="100%" height="700px" frameBorder="0" style="max-width:500px">
+</iframe>
+</div>
+
+# Desenvolvendo o pesqEle
+
+Se você tem interesse em baixar os dados de outras formas e aplicar outras regras para arrumação, você pode! No entanto, para isso terá de trabalhar com as funções não documentadas do `pesqEle`. O pacote está longe de seu estado ideal.
+
+Caso essa parte do pacote se torne realmente útil no futuro, pretendo deixar essas funções exportadas e documentadas. Para isso, no entanto, precisarei de muito apoio da comunidade.
+
+Por enquanto, recomendo que você dê uma fuçada no [repositório do pacote no github](https://github.com/conre3/pesqEle) e adicione [issues](https://github.com/conre3/pesqEle/issues).
+
+# Links
+
+- Siga o CONRE-3 no [Facebook](https://www.facebook.com/CONRE3/) e acesse a página do site sobre [pesquisas eleitorais](http://www.conre3.org.br/portal/pesquisa-eleitoral/).
+- Contribua com o [pesqEle](https://github.com/conre3/pesqEle)!!
+
+# Curso de web scraping
+
+Se quiser aprender mais sobre raspagem de dados, não esqueça que temos [turmas abertas para um Workshop bem legal!](http://loja.curso-r.com/web-scraping). Eu serei um dos ministrantes.
+
+<div align="center">
+<a href="http://loja.curso-r.com/web-scraping" target="_blank">
+<img src="http://cdn.ecvol.com/s/loja.curso-r.com/produtos/web-scraping/g/0.png"/>
+</a>
+</div>
+
+É isso pessoal! Happy coding ;)

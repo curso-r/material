@@ -1,0 +1,36 @@
+---
+title: "Gráfico de radar (ou de teia) em ggplot2"
+date: "2017-07-06T10:12:00+03:00"
+tags: ["radar", "teia", "ggplot2"]
+categories: ["tutoriais", "r"]
+banner: "img/banners/guess_delim.png"
+author: ["Athos"]
+draft: true
+summary: ""
+---
+
+
+
+<p>No fim do post nós vamos construir o seguinte gráfico:</p>
+<pre class="r"><code>grafico_final</code></pre>
+<p><img src="/blog/2017-07-06-radar-com-ggplot2_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p>Conhecido como gráfico de radar ou gráfico de teia, muito conhecido pelos usuários de excel. No ggplot2 não é tão direto e precisa de alguns passos pra construí-lo. Dividi em 5 passos, vamos a eles.</p>
+<div id="passo-1---rearranjando-o-banco-de-dados" class="section level2">
+<h2>Passo 1 - rearranjando o banco de dados</h2>
+</div>
+<div id="passo-2---montando-as-linhas" class="section level2">
+<h2>Passo 2 - montando as linhas</h2>
+</div>
+<div id="passo-3---dobrando-para-a-forma-circular" class="section level2">
+<h2>Passo 3 - dobrando para a forma circular</h2>
+</div>
+<div id="passo-4---ligando-os-pontos" class="section level2">
+<h2>Passo 4 - ligando os pontos</h2>
+</div>
+<div id="passo-5---retificando-as-curvas" class="section level2">
+<h2>Passo 5 - retificando as curvas</h2>
+<pre class="r"><code>library(tidyr)
+library(ggplot2)
+library(tibble)
+library(dplyr)</code></pre>
+</div>

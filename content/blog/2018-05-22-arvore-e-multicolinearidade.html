@@ -1,0 +1,95 @@
+---
+title: "Modelos beseados em árvores são imunes à multicolinearidade?"
+date: "2018-05-22T00:00:00+00:00"
+tags: ["machine learning", "random forest", "multicolinearidade"]
+categories: ["conceitos", "r"]
+banner: "img/banners/banner-arvore-e-multicolinearidade.png"
+author: ["Athos", "Julio"]
+summary: "Modelos baseados em árvores como árvores de decisão, random forest, ligthGBM e xgboost são conhecidos, dentre outras qualidades, pela sua robustês diante do problema de multicolinearidade. Esse post mostra que isso não é totalmente verdade."
+draft: false
+---
+
+
+
+<p>Modelos baseados em árvores como árvores de decisão, random forest, ligthGBM e xgboost são conhecidos, dentre outras qualidades, pela sua robustês diante do problema de multicolinearidade. É sabido que seu poder preditivo não se abala na presença de variáveis extremamente correlacionadas.</p>
+<p>Porém, quem nunca usou um Random Forest pra fazer seleção de variáveis? Pegar, por exemplo, as top 10 mais importantes e descartar o resto?</p>
+<p>Ou até mesmo arriscou uma interpretação e concluiu sobre a ordem das variáveis mais importantes?</p>
+<p>Abaixo mostraremos o porquê não devemos ignorar a questão da multicolinearidade completamente!</p>
+<div id="um-modelo-bonitinho" class="section level2">
+<h2>Um modelo bonitinho</h2>
+<p>Primeiro vamos ajustar um modelo bonitinho, livre de multicolinearidade. Suponha que queiramos prever <code>Petal.Length</code> utilizando as medidas das sépalas (<code>Sepal.Width</code> e <code>Sepal.Length</code>) da nossa boa e velha base <code>iris</code>.</p>
+<pre class="r"><code>library(tidyverse)
+## ── Attaching packages ─────────────── tidyverse 1.2.1 ──
+## ✔ ggplot2 2.2.1.9000     ✔ purrr   0.2.4     
+## ✔ tibble  1.4.2          ✔ dplyr   0.7.4     
+## ✔ tidyr   0.8.0          ✔ stringr 1.3.1     
+## ✔ readr   1.1.1          ✔ forcats 0.3.0
+## ── Conflicts ────────────────── tidyverse_conflicts() ──
+## ✖ dplyr::filter() masks stats::filter()
+## ✖ dplyr::lag()    masks stats::lag()
+
+iris2 &lt;- iris %&gt;% select(Sepal.Length, Sepal.Width, Petal.Length)
+iris2 %&gt;% cor %&gt;% corrplot::corrplot()</code></pre>
+<p><img src="/blog/2018-05-22-arvore-e-multicolinearidade_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p>O gráfico acima mostra que as variáveis explicativas não são fortemente correlacionadas. Ajustando uma random fores, temos a seguinte ordem de importância das variáveis:</p>
+<pre class="r"><code>library(randomForest)
+iris2_rf &lt;- randomForest(Petal.Length ~ ., data = iris2)
+varImpPlot(iris2_rf)</code></pre>
+<p><img src="/blog/2018-05-22-arvore-e-multicolinearidade_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p>Sem surpresas. Agora vamos para o problema!</p>
+</div>
+<div id="um-modelo-com-feinho" class="section level2">
+<h2>Um modelo com feinho</h2>
+<p>Vamos forjar uma situação extrema em que muitas variáveis sejam multicolineares. Vou fazer isso repetindo a coluna <code>Sepal.Length</code> várias vezes.</p>
+<pre class="r"><code>iris3 &lt;- accumulate(1:20, ~{
+  .x[[paste0(&quot;Sepal.Length&quot;, .y)]] &lt;-  iris2$Sepal.Length
+  .x
+}, .init = iris2)
+
+iris3[[20]] %&gt;% cor %&gt;% corrplot::corrplot(order = &quot;alphabet&quot;)</code></pre>
+<p><img src="/blog/2018-05-22-arvore-e-multicolinearidade_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p>Agora a coisa tá feia! Temos 20 variáveis perfeitamente colineares. Mesmo assim um random forest nessa nova base não perderia poder preditivo.</p>
+<p>Mas como ficou a importância das variáveis?</p>
+<pre class="r"><code>iris3_rf &lt;- randomForest(Petal.Length ~ ., data = iris3[[20]])
+varImpPlot(iris3_rf)</code></pre>
+<p><img src="/blog/2018-05-22-arvore-e-multicolinearidade_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p>Aqui o jogo já se inverteu: concluiríamos que <code>Sepal.Width</code> é mais importante de todas as variáveis!</p>
+</div>
+<div id="selecao-de-variaveis-furado" class="section level2">
+<h2>Seleção de variáveis furado</h2>
+<p>O gráfico abaixo mostra que quanto mais variáveis correlacionadas tivermos, menor a importância de TODAS ELAS SIMULTANEAMENTE! É como se as variáveis colineares repartissem a importância entre elas.</p>
+<pre class="r"><code># ajusta random forest para bases com 1 a 20 repetições de `Sepal.Length`
+rfs &lt;- map(iris3, ~ randomForest(Petal.Length ~ ., data = .x) %&gt;% importance)
+
+# extrai as importâncias das repetições de `Sepal.Length`
+importancia &lt;- map_dfr(rfs, ~{
+  .x %&gt;% 
+    as.data.frame() %&gt;% 
+    tibble::rownames_to_column() %&gt;% 
+    dplyr::filter(stringr::str_detect(rowname, &quot;^Sepal.Length&quot;))
+}, .id = &quot;n_repeticoes&quot;) %&gt;%
+  mutate(n_repeticoes = as.numeric(n_repeticoes))
+
+# Gráfico do número de variáveis multicolineares vs importância
+importancia %&gt;%
+  ggplot(aes(x = n_repeticoes, y = IncNodePurity)) +
+  geom_point() +
+  geom_hline(yintercept = 40, size = 1, linetype = &quot;dashed&quot;, colour = &quot;red&quot;) +
+  labs(x = &quot;Qtd de repetições da coluna `Sepal.Length`&quot;, y = &quot;Importância&quot;, title = &quot;Gráfico da relação entre o número de variáveis multicolineares vs importância&quot;)</code></pre>
+<p><img src="/blog/2018-05-22-arvore-e-multicolinearidade_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p>Na prática, se estabelecessemos um corte no valor de importância pra descartar variáveis (como ilustrado pela linha vermelha), teríamos um problema em potencial: poderíamos estar jogando fora informação muito importante.</p>
+</div>
+<div id="como-tratar-multicolinearidade-entao" class="section level2">
+<h2>Como tratar multicolinearidade, então?</h2>
+<p>Algumas maneiras de lidar com multicolinearidade são:</p>
+<ul>
+<li>Observar a matriz de correlação</li>
+<li><a href="http://www.sthda.com/english/articles/39-regression-model-diagnostics/160-multicollinearity-essentials-and-vif-in-r/">VIF</a></li>
+<li><a href="https://machinelearningmastery.com/feature-selection-with-the-caret-r-package/">Recursive feature elimination</a></li>
+</ul>
+</div>
+<div id="conclusao" class="section level2">
+<h2>Conclusão</h2>
+<p>Cuidado ao jogar tudo no caldeirão! Devemos sempre nos preocupar com multicolinearidade, mesmo ajustando modelos baseados em árvores.</p>
+<p>Abs!</p>
+</div>

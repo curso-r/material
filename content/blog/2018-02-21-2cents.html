@@ -1,0 +1,538 @@
+---
+title: "Meus 2 Centavos: análise das notas"
+date: "2018-02-23T14:25:00+03:00"
+tags: ["sf", "tidyverse"]
+categories: ["tutoriais", "r"]
+banner: "img/banners/out_0262.png"
+author: ["Julio"]
+summary: "Tiago Belotti do canal do YouTube Meus 2 Centavos é o meu crítico de cinema favorito. Gasto uma quantidade de tempo que não me orgulho vendo os vídeos desse ser maravilhoso. Nesse post mostro como obtive as notas dele para verificar uma dúvida que estava me corroendo..."
+draft: false
+---
+
+<script src="/rmarkdown-libs/htmlwidgets/htmlwidgets.js"></script>
+<script src="/rmarkdown-libs/plotly-binding/plotly.js"></script>
+<script src="/rmarkdown-libs/typedarray/typedarray.min.js"></script>
+<script src="/rmarkdown-libs/jquery/jquery.min.js"></script>
+<link href="/rmarkdown-libs/crosstalk/css/crosstalk.css" rel="stylesheet" />
+<script src="/rmarkdown-libs/crosstalk/js/crosstalk.min.js"></script>
+<link href="/rmarkdown-libs/plotlyjs/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="/rmarkdown-libs/plotlyjs/plotly-latest.min.js"></script>
+
+
+<p><a href="https://www.youtube.com/channel/UCiSarBtpSphUrxtKDIW9c_A">Tiago Belotti</a> é o meu crítico de cinema favorito. Gasto uma quantidade de tempo que não me orgulho vendo os vídeos desse ser maravilhoso. Atualmente, muitas vezes eu prefiro ver a crítica dele do filme que o próprio filme, seguindo cegamente as indicações dele a partir das notas que ele coloca no final da crítica. Recomendo fortemente que acessem o canal do Belotti.</p>
+<p><img src="/blog/2018-02-21-2cents/out_0045.png" style="display: block; margin: auto;" /></p>
+<p>O Tiago já mencionou várias vezes que as notas que ele dá aos filmes não representam toda a crítica realizada. Por exemplo, ele já montou listas de Top 10 colocando filmes com notas medianas à frente de filmes com notas altas. Mesmo assim, não dá pra não querer saber a nota que ele dá aos filmes, é um vício!</p>
+<p>A minha necessidade visceral de saber as notas dadas aos filmes começou quando a seguinte pergunta apareceu na minha mente:</p>
+<blockquote>
+<p>Será que o Tiago está ficando bonzinho? A nota média está aumentando ao longo do tempo?</p>
+</blockquote>
+<p>E assim acabou o meu final de semana. Eu precisava obter esses dados de qualquer forma.</p>
+<div id="como-extrair-as-notas-dos-videos" class="section level3">
+<h3>Como extrair as notas dos vídeos</h3>
+<p>O código para extrair as notas é pra lá de esotérico e usa um monte de funções auxiliares de pacotes do <code>linux</code>. Como o amigo <a href="http://ctlente.com">Caio Lente</a> adora falar, meus códigos costumam ter muitas <em>partes móveis</em>…</p>
+<p>A obtenção das notas dos filmes passa pelo seguinte fluxo:</p>
+<ol style="list-style-type: decimal">
+<li>Baixar os vídeos do youtube</li>
+<li>Extrair os frames dos vídeos</li>
+<li>Encontrar a imagem que tem a nota</li>
+<li>Limpar a imagem que tem a nota</li>
+<li>Passar um algoritmo de OCR (Optical Character Recognition) na imagem</li>
+<li>Cruzar com uma base de metadados do YouTube, usando o pacote <code>tuber</code></li>
+</ol>
+<p>Vou explicar brevemente como cada um desses passos foi executado. O código não é totalmente reprodutível pois o código completo com os loops ficaria pouco legível.</p>
+</div>
+<div id="passo-1-baixar-os-videos" class="section level3">
+<h3>Passo 1: Baixar os vídeos</h3>
+<p>Os vídeos foram baixados usando um pacote chamado <code>youtube-dl</code>. Para instalá-lo num Ubuntu 16.04 podemos rodar</p>
+<pre><code>sudo apt install youtube-dl</code></pre>
+<p>O download da lista de reprodução do Tiago Belotti de 2015 pode ser realizada rodando, por exemplo:</p>
+<pre><code>youtube-dl -f 160 https://www.youtube.com/playlist?list=PLy-phHpv7EKaioTZ39lNd_nvitGNtQadl</code></pre>
+<p>Realizei o download numa resolução bem ruim e sem áudio, para ocupar pouco espaço em disco. Faça isso para todos os anos (2013 até 2017) e pronto! Temos os vídeos.</p>
+<div align="center">
+<iframe width="560" height="315" src="https://www.youtube.com/embed/-KStBYHbNqo?start=70" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen>
+</iframe>
+</div>
+</div>
+<div id="passo-2-extrair-os-frames-dos-videos" class="section level3">
+<h3>Passo 2: Extrair os frames dos vídeos</h3>
+<p>Os arquivos de vídeo foram transformados utilizando <code>ffmpeg</code>, também baixado como pacote do linux. Para instalá-lo num Ubuntu 16.04 podemos rodar</p>
+<pre><code>sudo apt install ffmpeg</code></pre>
+<p>A função <code>tirar_screenshots()</code> recebe o nome de um arquivo de vídeo, cria uma pasta com esse nome e salva os screenshots na pasta.</p>
+<pre class="r"><code>tirar_screenshots &lt;- function(vfile) {
+  # folder and file names
+  file_name &lt;- tools::file_path_sans_ext(basename(vfile))
+  folder_name &lt;- glue(&quot;imgs/{file_name}&quot;)
+  if (!file.exists(folder_name)) {
+    dir.create(folder_name, showWarnings = FALSE, recursive = TRUE)
+    out &lt;- glue(&quot;{folder_name}/out_&quot;)
+    # take screenshots
+    take_shots &lt;- glue(&quot;ffmpeg -y -i &#39;{vfile}&#39; -vf fps=1 &#39;{out}%04d.png&#39;&quot;)
+    system(take_shots)
+  }
+}</code></pre>
+<p>Basta fazer um loop (com <code>purrr</code>, não <code>for</code>, rs) para processar todos os arquivos de vídeo. Resultado:</p>
+<p><img src="/blog/2018-02-21-2cents/frames.png" /><!-- --></p>
+</div>
+<div id="passo-3-encontrar-a-imagem-que-tem-a-nota" class="section level3">
+<h3>Passo 3: Encontrar a imagem que tem a nota</h3>
+<p>A nota geralmente aparece no canto superior direito da imagem:</p>
+<p><img src="/blog/2018-02-21-2cents/out_0277.png" style="display: block; margin: auto;" /></p>
+<p>Então, vamos recortar esse pedaço e pegar qual imagem tem maior concentração de vermelho. A função <code>cortar_canto()</code> utiliza o <code>magick</code> para pegar o canto da imagem e salva num arquivo temporário.</p>
+<pre class="r"><code>cortar_canto &lt;- function(img_file) {
+  img_file %&gt;% 
+    magick::image_read() %&gt;% 
+    magick::image_crop(&quot;x60+180&quot;) %&gt;% 
+    magick::image_write(tempfile())
+}</code></pre>
+<p>A função <code>somar_vermelho()</code> pega a imagem e calcula a quantidade de vermelhos, tirando os casos em que há vermelho conjuntamente com outras cores (como branco, por exemplo).</p>
+<pre class="r"><code>somar_vermelho &lt;- function(img_file) {
+  p &lt;- png::readPNG(img_file)
+  if (length(dim(png_img)) != 3) return(0)
+  sum(p[,,1] == 1.0 &amp; p[,,2] &lt; 0.1 &amp; p[,,3] &lt; 0.1)
+}</code></pre>
+<p>Assim, a soma de vermelhos de um arquivo fica</p>
+<pre class="r"><code>&quot;out_0277.png&quot; %&gt;%
+  cortar_canto() %&gt;% 
+  somar_vermelho()
+# [1] 758</code></pre>
+<p>Basta rodar isso para todos os arquivos e depois selecionar a imagem que tem a maior contagem.</p>
+</div>
+<div id="passo-4-limpar-a-imagem-que-tem-a-nota" class="section level3">
+<h3>Passo 4: Limpar a imagem que tem a nota</h3>
+<p>A função <code>limpar_imagem()</code> recebe a imagem cortada e faz a limpeza, soltando apenas os números, prontos para receber o algoritmo de OCR.</p>
+<pre class="r"><code>limpar_imagem &lt;- function(img_cut) {
+  tmp &lt;- tempfile()
+  # filtros a serem aplicados em cada cor
+  parms &lt;- c(red = .9, green = .2, blue = .2)
+  png::readPNG(img_cut) %&gt;% 
+    purrr::array_branch(3) %&gt;% 
+    purrr::map2(parms, ~.x &gt; .y) %&gt;% 
+    purrr::map_at(2:3, magrittr::not) %&gt;% 
+    purrr::reduce(magrittr::and) %&gt;% 
+    magrittr::multiply_by(-1) %&gt;% 
+    magrittr::add(1) %&gt;% 
+    png::writePNG(tmp)
+  tmp
+}</code></pre>
+<pre class="r"><code>&quot;out_0277.png&quot; %&gt;%
+  cortar_canto() %&gt;% 
+  limpar_imagem()</code></pre>
+<p><img src="/blog/2018-02-21-2cents/out_raw.png" style="display: block; margin: auto;" /></p>
+</div>
+<div id="passo-5-passar-um-algoritmo-de-ocr" class="section level3">
+<h3>Passo 5: Passar um algoritmo de OCR</h3>
+<p>Finalmente, a função <code>pegar_nota()</code> utiliza <code>tesseract</code> para transformar as imagens em números</p>
+<pre class="r"><code>pegar_nota &lt;- function(img_filtered) {
+  # whitelist de numeros
+  engine &lt;- tesseract::tesseract(options = list(
+    tessedit_char_whitelist = &quot;1234567890.&quot;))
+  # apply tesseract
+  img &lt;- img_filtered %&gt;% 
+    magick::image_read() %&gt;% 
+    magick::image_trim() %&gt;% 
+    tesseract::ocr(engine = engine) %&gt;% 
+    readr::parse_number()
+}</code></pre>
+<p>A utilização final do algoritmo fica assim:</p>
+<pre class="r"><code>&quot;out_0277.png&quot; %&gt;%
+  cortar_canto() %&gt;% 
+  limpar_imagem() %&gt;% 
+  pegar_nota()
+# [1] 8.3</code></pre>
+<p>Pronto! Agora é só loopar em todos os arquivos e teremos as notas de todos os filmes.</p>
+<blockquote>
+<p>Infelizmente, o algoritmo de OCR do tesseract não é lá essas coisas, e precisei arrumar muitos desses dados na mão.</p>
+</blockquote>
+</div>
+<div id="passo-6-cruzar-com-uma-base-de-metadados-do-youtube" class="section level3">
+<h3>Passo 6: Cruzar com uma base de metadados do YouTube</h3>
+<p>Agora, vamos cruzar com os metadados do youtube. Os nomes dos arquivos baixados pelo <code>youtube-dl</code> vêm com um código no final, por exemplo com <code>UVN6ljuRzp8</code>. É possível utilizar esses códigos no <code>tuber</code> para obter metadados de um vídeo, dessa forma:</p>
+<pre class="r"><code>## código para obter um token de acesso
+# tuber::yt_oauth(
+#   &quot;998136489867-5t3tq1g7hbovoj46dreqd6k5kd35ctjn.apps.googleusercontent.com&quot;,
+#   &quot;MbOSt6cQhhFkwETXKur-L9rN&quot;)
+detalhes &lt;- tuber::get_video_details(&quot;UVN6ljuRzp8&quot;)
+
+## pegar nome do filme
+purrr::pluck(detalhes, 4, 1, &quot;snippet&quot;, &quot;title&quot;)
+# [1] &quot;JOGO PERIGOSO (Gerald&#39;s Game, Netflix, 2017) - Crítica&quot;
+
+## pegar data de disponibilização
+purrr::pluck(detalhes, 4, 1, &quot;snippet&quot;, &quot;publishedAt&quot;)
+# [1] &quot;2017-10-07T14:39:54.000Z&quot;</code></pre>
+<p>Usei esses metadados para extrair a data de disponibilização dos vídeos. No final, fiquei com a seguinte base de dados com 386 filmes classificados (mostrando apenas 20 linhas):</p>
+<table>
+<colgroup>
+<col width="15%" />
+<col width="63%" />
+<col width="13%" />
+<col width="6%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">id</th>
+<th align="left">nm</th>
+<th align="left">data</th>
+<th align="right">nota</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">j5udRStwytk</td>
+<td align="left">007 CONTRA SPECTRE (2015)</td>
+<td align="left">2015-11-05</td>
+<td align="right">6.4</td>
+</tr>
+<tr class="even">
+<td align="left">HdYnkiiWwe8</td>
+<td align="left">120 BATIMENTOS POR MINUTO (2017)</td>
+<td align="left">2018-01-04</td>
+<td align="right">8.6</td>
+</tr>
+<tr class="odd">
+<td align="left">GXfe2CSKiHw</td>
+<td align="left">12 YEARS A SLAVE (12 Anos de Escravidão, 2013)</td>
+<td align="left">2014-01-04</td>
+<td align="right">9.0</td>
+</tr>
+<tr class="even">
+<td align="left">j-kiltl6_uk</td>
+<td align="left">1922 (Netflix, 2017)</td>
+<td align="left">2017-10-24</td>
+<td align="right">7.0</td>
+</tr>
+<tr class="odd">
+<td align="left">zsNoXCMnTmo</td>
+<td align="left">300 - A ASCENSÃO DO IMPÉRIO (2014)</td>
+<td align="left">2014-03-07</td>
+<td align="right">7.1</td>
+</tr>
+<tr class="even">
+<td align="left">60hUNlmK30A</td>
+<td align="left">A AUTÓPSIA (The Autopsy of Jane Doe, 2016)</td>
+<td align="left">2017-05-01</td>
+<td align="right">5.7</td>
+</tr>
+<tr class="odd">
+<td align="left">1sNNzBDVlLk</td>
+<td align="left">A BELA E A FERA (Beauty and the Beast, 2017)</td>
+<td align="left">2017-03-16</td>
+<td align="right">8.5</td>
+</tr>
+<tr class="even">
+<td align="left">Zuk5QzVccWA</td>
+<td align="left">ABOUT TIME (Questão de Tempo, 2013)</td>
+<td align="left">2013-11-28</td>
+<td align="right">8.1</td>
+</tr>
+<tr class="odd">
+<td align="left">aRjxN0ShsE8</td>
+<td align="left">A BRUXA (The Witch, 2016)</td>
+<td align="left">2016-03-05</td>
+<td align="right">8.2</td>
+</tr>
+<tr class="even">
+<td align="left">n4xrIu4xKo8</td>
+<td align="left">A CABANA (The Shack, 2017)</td>
+<td align="left">2017-04-07</td>
+<td align="right">3.4</td>
+</tr>
+<tr class="odd">
+<td align="left">t8W-DbCbPVY</td>
+<td align="left">A CHEGADA (Arrival, 2016)</td>
+<td align="left">2016-11-22</td>
+<td align="right">9.4</td>
+</tr>
+<tr class="even">
+<td align="left">M5GBLtYgz14</td>
+<td align="left">A COLINA ESCARLATE (Crimson Peak, 2015)</td>
+<td align="left">2015-10-15</td>
+<td align="right">6.2</td>
+</tr>
+<tr class="odd">
+<td align="left">Sv-M7jfTGM0</td>
+<td align="left">A CULPA É DAS ESTRELAS (The Fault in Our Stars, 2014)</td>
+<td align="left">2014-06-05</td>
+<td align="right">7.2</td>
+</tr>
+<tr class="even">
+<td align="left">EALV4nw-vx0</td>
+<td align="left">A ENTREVISTA (The Interview, 2014)</td>
+<td align="left">2014-12-27</td>
+<td align="right">6.7</td>
+</tr>
+<tr class="odd">
+<td align="left">4I44eE82Jk4</td>
+<td align="left">A FORMA DA ÁGUA (The Shape of Water, 2017)</td>
+<td align="left">2018-01-24</td>
+<td align="right">9.3</td>
+</tr>
+<tr class="even">
+<td align="left">MnpZqlfZ_KE</td>
+<td align="left">A GAROTA DINAMARQUESA (The Danish Girl, 2015)</td>
+<td align="left">2016-02-12</td>
+<td align="right">6.8</td>
+</tr>
+<tr class="odd">
+<td align="left">HjAxuKPzucY</td>
+<td align="left">A GAROTA NO TREM (The Girl on the Train, 2016)</td>
+<td align="left">2016-10-27</td>
+<td align="right">5.1</td>
+</tr>
+<tr class="even">
+<td align="left">UuyN4G9BQgI</td>
+<td align="left">A GHOST STORY (2017)</td>
+<td align="left">2017-09-28</td>
+<td align="right">10.0</td>
+</tr>
+<tr class="odd">
+<td align="left">9irKAQoDN88</td>
+<td align="left">A GRANDE APOSTA (The Big Short, 2015)</td>
+<td align="left">2016-01-18</td>
+<td align="right">7.8</td>
+</tr>
+<tr class="even">
+<td align="left">bNsUkl8hGvk</td>
+<td align="left">ÁGUAS RASAS (The Shallows, 2016)</td>
+<td align="left">2016-08-07</td>
+<td align="right">7.0</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="analises" class="section level2">
+<h2>Análises</h2>
+<p>Agora que temos uma base de dados, podemos fazer algumas análises!</p>
+<p>Primeiro, é claro, vamos fazer os top 20 e os top -20</p>
+<pre class="r"><code>notas_2cents %&gt;%
+  dplyr::select(nm, nota) %&gt;% 
+  dplyr::arrange(desc(nota)) %&gt;% 
+  utils::head(20) %&gt;% 
+  knitr::kable()</code></pre>
+<div align="center">
+<table>
+<thead>
+<tr class="header">
+<th align="left">nm</th>
+<th align="right">nota</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">A GHOST STORY (2017)</td>
+<td align="right">10.0</td>
+</tr>
+<tr class="even">
+<td align="left">A QUALQUER CUSTO (Hell or High Water, 2016)</td>
+<td align="right">10.0</td>
+</tr>
+<tr class="odd">
+<td align="left">BINGO - O REI DAS MANHÃS (2017)</td>
+<td align="right">10.0</td>
+</tr>
+<tr class="even">
+<td align="left">BLADE RUNNER 2049 (2017)</td>
+<td align="right">10.0</td>
+</tr>
+<tr class="odd">
+<td align="left">ELLE (2016)</td>
+<td align="right">10.0</td>
+</tr>
+<tr class="even">
+<td align="left">MAD MAX - ESTRADA DA FÚRIA (2015)</td>
+<td align="right">10.0</td>
+</tr>
+<tr class="odd">
+<td align="left">MOONLIGHT (2016)</td>
+<td align="right">10.0</td>
+</tr>
+<tr class="even">
+<td align="left">RELATOS SELVAGENS (Relatos salvajes, 2014)</td>
+<td align="right">10.0</td>
+</tr>
+<tr class="odd">
+<td align="left">SPOTLIGHT (Segredos Revelados, 2015)</td>
+<td align="right">10.0</td>
+</tr>
+<tr class="even">
+<td align="left">THE HANDMAIDEN (Ah-ga-ssi, 2016)</td>
+<td align="right">10.0</td>
+</tr>
+<tr class="odd">
+<td align="left">O QUARTO DE JACK (Room, 2015)</td>
+<td align="right">9.9</td>
+</tr>
+<tr class="even">
+<td align="left">TRÊS ANÚNCIOS PARA UM CRIME (2017)</td>
+<td align="right">9.9</td>
+</tr>
+<tr class="odd">
+<td align="left">BOYHOOD (2014)</td>
+<td align="right">9.7</td>
+</tr>
+<tr class="even">
+<td align="left">DEADPOOL (2016)</td>
+<td align="right">9.5</td>
+</tr>
+<tr class="odd">
+<td align="left">WHIPLASH - EM BUSCA DA PERFEIÇÃO (2014)</td>
+<td align="right">9.5</td>
+</tr>
+<tr class="even">
+<td align="left">A CHEGADA (Arrival, 2016)</td>
+<td align="right">9.4</td>
+</tr>
+<tr class="odd">
+<td align="left">AMOR &amp; AMIZADE (Love &amp; Friendship, 2016)</td>
+<td align="right">9.4</td>
+</tr>
+<tr class="even">
+<td align="left">CORRA! (Get Out, 2017)</td>
+<td align="right">9.4</td>
+</tr>
+<tr class="odd">
+<td align="left">LA LA LAND (2016)</td>
+<td align="right">9.4</td>
+</tr>
+<tr class="even">
+<td align="left">O REGRESSO (The Revenant, 2015)</td>
+<td align="right">9.4</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><img src="/blog/2018-02-21-2cents/out_0301.png" style="display: block; margin: auto;" /></p>
+<p>Não assistiu a algum desses filmes? Tá na hora de ver!</p>
+<pre class="r"><code>notas_2cents %&gt;%
+  dplyr::select(nm, nota) %&gt;% 
+  dplyr::arrange(nota) %&gt;% 
+  utils::head(20) %&gt;% 
+  knitr::kable()</code></pre>
+<div align="center">
+<table>
+<thead>
+<tr class="header">
+<th align="left">nm</th>
+<th align="right">nota</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">DEUSES DO EGITO (Gods of Egypt, 2016)</td>
+<td align="right">0.0</td>
+</tr>
+<tr class="even">
+<td align="left">PORTA DOS FUNDOS - CONTRATO VITALÍCIO (2016)</td>
+<td align="right">2.1</td>
+</tr>
+<tr class="odd">
+<td align="left">MULHERES AO ATAQUE (The Other Woman, 2014)</td>
+<td align="right">2.3</td>
+</tr>
+<tr class="even">
+<td align="left">CINQUENTA TONS DE CINZA (2015)</td>
+<td align="right">2.5</td>
+</tr>
+<tr class="odd">
+<td align="left">TRANSFORMERS - A ERA DA EXTINÇÃO (2014)</td>
+<td align="right">2.5</td>
+</tr>
+<tr class="even">
+<td align="left">INFERNO (2016)</td>
+<td align="right">3.3</td>
+</tr>
+<tr class="odd">
+<td align="left">A CABANA (The Shack, 2017)</td>
+<td align="right">3.4</td>
+</tr>
+<tr class="even">
+<td align="left">ASSASSINS CREED (2016)</td>
+<td align="right">3.5</td>
+</tr>
+<tr class="odd">
+<td align="left">ALICE ATRAVÉS DO ESPELHO (2016)</td>
+<td align="right">3.6</td>
+</tr>
+<tr class="even">
+<td align="left">FRANKENSTEIN - ENTRE ANJOS E DEMÔNIOS (2014)</td>
+<td align="right">3.6</td>
+</tr>
+<tr class="odd">
+<td align="left">PETER PAN (Pan, 2015)</td>
+<td align="right">3.6</td>
+</tr>
+<tr class="even">
+<td align="left">A MÚMIA (The Mummy, 2017)</td>
+<td align="right">3.8</td>
+</tr>
+<tr class="odd">
+<td align="left">ANTES QUE EU VÁ (Before I Fall, 2017)</td>
+<td align="right">3.8</td>
+</tr>
+<tr class="even">
+<td align="left">QUARTETO FANTÁSTICO (2015)</td>
+<td align="right">3.8</td>
+</tr>
+<tr class="odd">
+<td align="left">CONVERGENTE (Allegiant, 2016)</td>
+<td align="right">3.9</td>
+</tr>
+<tr class="even">
+<td align="left">DEBI &amp; LÓIDE 2 (Dumb and Dumber To, 2014)</td>
+<td align="right">3.9</td>
+</tr>
+<tr class="odd">
+<td align="left">JOGOS MORTAIS - JIGSAW (2017)</td>
+<td align="right">4.0</td>
+</tr>
+<tr class="even">
+<td align="left">JUNTOS E MISTURADOS (Blended, 2014)</td>
+<td align="right">4.0</td>
+</tr>
+<tr class="odd">
+<td align="left">The Mortal Instruments - City of Bones (2013)</td>
+<td align="right">4.0</td>
+</tr>
+<tr class="even">
+<td align="left">ANNABELLE (2014)</td>
+<td align="right">4.1</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Já assistiu a algum desses filmes? Meus pêsames!</p>
+<div id="testando-a-minha-hipotese" class="section level3">
+<h3>Testando a minha hipótese</h3>
+<p>Finalmente, pude testar minha hipótese!</p>
+<pre class="r"><code>p &lt;- notas_2cents %&gt;% 
+  ggplot(aes(x = data, y = nota, group = nm)) +
+  geom_point() +
+  geom_smooth(aes(group = 1), method = &quot;lm&quot;, se = FALSE) +
+  theme_minimal(16)
+plotly::ggplotly(p)</code></pre>
+<div id="330e12842c30" style="width:768px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="330e12842c30">{"x":{"data":[{"x":[16744,17535,16074,17463,16136,17287,17241,16037,16865,17263,17127,16723,16226,16431,17555,16843,17101,17437,16818,17020,17462,16104,17006,17212,16751,16949,17296,16294,16098,16087,17424,17038,16912,17454,17326,17122,17164,16314,16353,17394,16836,17303,17340,17142,17500,17181,16800,16968,16296,17208,16131,16463,17189,17407,17401,16713,16900,16060,17492,16765,16072,16035,16884,16733,17031,17524,17402,16449,17447,16097,17459,17024,17481,16374,16847,17060,16112,16995,17051,17042,16558,16162,16919,17110,16009,16821,16042,16539,17444,16625,16535,16478,16090,17332,17415,16875,17285,16804,16839,17410,16391,16896,17071,17471,17472,16965,17454,16857,16170,16605,17452,16997,16042,17107,17373,16108,17513,17138,17129,15960,17370,16058,16622,16560,17080,15989,17017,17187,16577,17439,16259,17508,17423,17193,17081,17435,16506,16458,17246,16337,16095,16074,16100,16469,17475,16345,16185,17255,16204,16702,16734,17336,15988,16079,16282,17284,16317,16675,17352,16632,16371,16927,17154,16974,17091,16522,16122,16518,16380,17088,16961,17416,16580,17199,17010,16247,16177,16950,17446,17501,16759,16393,16031,17215,16402,16993,17533,16274,16597,16910,17359,15995,17384,17436,16493,17235,17120,17179,16055,17218,17485,17204,17222,17451,17210,17509,16306,16796,16569,17430,16971,16220,17177,15896,16327,16695,16882,17544,17144,16660,17172,16906,17184,16003,16201,17317,16110,16142,17036,16080,16140,16688,16772,16163,16555,16219,15943,16413,16553,17547,17428,17013,16917,16978,17092,16471,17540,17297,16255,16187,17543,17391,16618,17381,16150,16252,16414,16050,16218,16455,16360,17346,17294,17073,16088,17489,17115,17479,16673,16106,16770,16351,16825,17521,17308,16828,16856,16302,17457,16805,17516,17098,16665,15940,17169,17274,17498,16709,17259,16716,16114,17312,17382,16270,17417,16587,16726,16983,17248,17323,15995,16985,17030,16653,17206,16678,16408,17135,17494,17305,16399,16117,17151,16898,16475,16129,17065,17174,16727,17197,16339,16650,16481,17117,16209,16807,17045,16788,17514,16809,16486,16740,17133,17079,17247,17460,16583,16423,15921,15965,16981,17106,15946,16903,15933,16397,17551,16332,17539,15910,16021,15966,16015,17465,17561,16590,16511,16148,16201,16265,17560,16852,16958,16126,17421,17396,16863,16232,17388,17270,16527,16768,17276,16548,17534,16233,17505,16134,16954,15974,16442,15951,15882,16939,16211,16880],"y":[6.4,8.6,9,7,7.1,5.7,8.5,8.1,8.2,3.4,9.4,6.2,7.2,6.7,9.3,6.8,5.1,10,7.8,7,6.9,6.9,5,5.9,7.2,3.6,6.3,7,5.6,7.3,4.9,9.4,5.2,6.6,3.8,7.4,9.1,7.9,4.1,6.8,9.1,3.8,8.2,10,6.3,3.5,7.4,4.6,4.6,8.8,7.3,7.1,7.8,6.6,4.4,7.5,6.9,5.5,6.8,6.8,8.5,7,6.6,7.6,4.7,7,10,9.3,10,8.5,8.2,8.6,7,9.7,8.4,6.5,4.4,6.6,5.6,6.7,6.4,8.5,9.2,8.6,8.6,9,6.5,4.7,6.1,7,7,2.5,8.4,7.3,7.8,3.9,9.4,8.4,9.5,4.6,3.9,7.6,7.5,5.3,7.6,8.1,8.1,0,5.1,8.6,7.9,7.6,7.6,7.4,8.8,8.6,6,4.1,10,8,8.6,7.4,7.8,6.8,7,5.7,6,6.3,8.8,7.8,8.3,7.6,7.4,8.8,6.7,7.7,6.4,8.1,7.1,8.2,3.6,8,7.5,7.1,6.1,9.2,7.9,6.1,7.1,7.5,6.9,8.6,8.8,4.8,9.1,7.3,6.3,4.1,7.7,7.9,7.1,8,6.9,4.8,3.3,7.8,8.1,4.4,7.7,9,8,8.2,7.6,7.4,6.8,5.9,7.6,5.7,8.3,4,7.6,7.5,7.7,7.5,7.5,7.8,6.7,4,5.8,7.7,7.3,6.9,8.6,5.5,5.5,6.6,8.9,9.4,5.7,8.2,6.9,7.4,9.1,7.6,8,9.2,6.1,8.3,10,9.2,5.8,5.6,9.3,5.9,5.5,5.4,7.6,8.6,7.6,8.1,8.7,8.6,10,8.5,2.3,7.8,8.2,4.7,6.4,8,8,7.1,7.9,9,6.9,8,6.4,9.1,8.1,7.7,5.2,6.9,4.1,4.6,7.3,4.6,7.8,8.2,7.2,6.7,7.4,7.4,4.5,6.9,7.4,8.7,7.5,6.5,8.1,7.6,6.3,8.1,9.2,4.6,8.6,6.5,7.3,8.4,8.8,6.1,8.3,7.1,9.9,7.2,6.4,9.4,5.6,4.6,8.3,9.3,9.2,7.2,7,5,4.8,9.1,7,7.9,8.1,3.6,7.9,4.7,9.3,9.1,5,4.9,8,2.1,4.8,8.1,7.7,7.6,7.1,3.8,7.9,9,5.3,8.4,8,4.9,10,6.8,8.1,7.5,8.8,6.3,6.7,7.8,8.1,8.7,6.9,8.2,7.2,6,8.4,10,7.4,9.1,9.2,8.5,7.7,7.5,8.2,8.2,7.4,7.9,5.6,8.3,5,8.1,5.6,10,5,8,4,7.4,7.9,7.2,7.6,6.9,7.7,7.1,7.4,8.1,7.2,6.6,8,7.1,4.2,2.5,9.9,7.5,5.6,7.1,9.2,8.1,6.4,4.4,5,6.4,6.4,4.4,7.2,8.9,8.4,7.1,7,8,6.4,6.3,9.5,5.3,6.8,6.9,6.9,8.9],"text":["data: 2015-11-05<br />nota:  6.4<br />nm: 007 CONTRA SPECTRE (2015)","data: 2018-01-04<br />nota:  8.6<br />nm: 120 BATIMENTOS POR MINUTO (2017)","data: 2014-01-04<br />nota:  9.0<br />nm: 12 YEARS A SLAVE (12 Anos de Escravidão, 2013)","data: 2017-10-24<br />nota:  7.0<br />nm: 1922 (Netflix, 2017)","data: 2014-03-07<br />nota:  7.1<br />nm: 300 - A ASCENSÃO DO IMPÉRIO (2014)","data: 2017-05-01<br />nota:  5.7<br />nm: A AUTÓPSIA (The Autopsy of Jane Doe, 2016)","data: 2017-03-16<br />nota:  8.5<br />nm: A BELA E A FERA (Beauty and the Beast, 2017)","data: 2013-11-28<br />nota:  8.1<br />nm: ABOUT TIME (Questão de Tempo, 2013)","data: 2016-03-05<br />nota:  8.2<br />nm: A BRUXA (The Witch, 2016)","data: 2017-04-07<br />nota:  3.4<br />nm: A CABANA (The Shack, 2017)","data: 2016-11-22<br />nota:  9.4<br />nm: A CHEGADA (Arrival, 2016)","data: 2015-10-15<br />nota:  6.2<br />nm: A COLINA ESCARLATE (Crimson Peak, 2015)","data: 2014-06-05<br />nota:  7.2<br />nm: A CULPA É DAS ESTRELAS (The Fault in Our Stars, 2014)","data: 2014-12-27<br />nota:  6.7<br />nm: A ENTREVISTA (The Interview, 2014)","data: 2018-01-24<br />nota:  9.3<br />nm: A FORMA DA ÁGUA (The Shape of Water, 2017)","data: 2016-02-12<br />nota:  6.8<br />nm: A GAROTA DINAMARQUESA (The Danish Girl, 2015)","data: 2016-10-27<br />nota:  5.1<br />nm: A GAROTA NO TREM (The Girl on the Train, 2016)","data: 2017-09-28<br />nota: 10.0<br />nm: A GHOST STORY (2017)","data: 2016-01-18<br />nota:  7.8<br />nm: A GRANDE APOSTA (The Big Short, 2015)","data: 2016-08-07<br />nota:  7.0<br />nm: ÁGUAS RASAS (The Shallows, 2016)","data: 2017-10-23<br />nota:  6.9<br />nm: A GUERRA DOS SEXOS (Battle of the Sexes, 2017)","data: 2014-02-03<br />nota:  6.9<br />nm: ÁLBUM DE FAMÍLIA (August - Osage County, 2013)","data: 2016-07-24<br />nota:  5.0<br />nm: A LENDA DE TARZAN (The Legend of Tarzan, 2016)","data: 2017-02-15<br />nota:  5.9<br />nm: ALIADOS (Allied, 2016)","data: 2015-11-12<br />nota:  7.2<br />nm: ALIANÇA DO CRIME (Black Mass, 2015)","data: 2016-05-28<br />nota:  3.6<br />nm: ALICE ATRAVÉS DO ESPELHO (2016)","data: 2017-05-10<br />nota:  6.3<br />nm: ALIEN - COVENANT (2017)","data: 2014-08-12<br />nota:  7.0<br />nm: AMANTES ETERNOS (Only Lovers Left alive, 2014)","data: 2014-01-28<br />nota:  5.6<br />nm: A MENINA QUE ROUBAVA LIVROS","data: 2014-01-17<br />nota:  7.3<br />nm: AMERICAN HUSTLE (Trapaça, 2013)","data: 2017-09-15<br />nota:  4.9<br />nm: AMITYVILLE - O DESPERTAR (Amityville - The Awakening, 2017)","data: 2016-08-25<br />nota:  9.4<br />nm: AMOR & AMIZADE (Love & Friendship, 2016)","data: 2016-04-21<br />nota:  5.2<br />nm: AMOR POR DIREITO (Freeheld, 2015)","data: 2017-10-15<br />nota:  6.6<br />nm: A MORTE TE DÁ PARABÉNS! (Happy Death Day, 2017)","data: 2017-06-09<br />nota:  3.8<br />nm: A MÚMIA (The Mummy, 2017)","data: 2016-11-17<br />nota:  7.4<br />nm: ANIMAIS FANTÁSTICOS E ONDE HABITAM (2016)","data: 2016-12-29<br />nota:  9.1<br />nm: ANIMAIS NOTURNOS (Nocturnal Animals, 2016)","data: 2014-09-01<br />nota:  7.9<br />nm: ANJOS DA LEI 2 (22 Jump Street, 2014)","data: 2014-10-10<br />nota:  4.1<br />nm: ANNABELLE (2014)","data: 2017-08-16<br />nota:  6.8<br />nm: ANNABELLE 2 - A CRIAÇÃO DO MAL (Annabelle - Creation, 2017)","data: 2016-02-05<br />nota:  9.1<br />nm: ANOMALISA (2015)","data: 2017-05-17<br />nota:  3.8<br />nm: ANTES QUE EU VÁ (Before I Fall, 2017)","data: 2017-06-23<br />nota:  8.2<br />nm: AO CAIR DA NOITE (It Comes at Night, 2017)","data: 2016-12-07<br />nota: 10.0<br />nm: A QUALQUER CUSTO (Hell or High Water, 2016)","data: 2017-11-30<br />nota:  6.3<br />nm: ASSASSINATO NO EXPRESSO DO ORIENTE (2017)","data: 2017-01-15<br />nota:  3.5<br />nm: ASSASSINS CREED (2016)","data: 2015-12-31<br />nota:  7.4<br />nm: AS SUFRAGISTAS (Suffragette, 2015)","data: 2016-06-16<br />nota:  4.6<br />nm: AS TARTARUGAS NINJA - FORA DAS SOMBRAS (2016)","data: 2014-08-14<br />nota:  4.6<br />nm: AS TARTARUGAS NINJA (Teenage Mutant Ninja Turtles, 2014)","data: 2017-02-11<br />nota:  8.8<br />nm: A TARTARUGA VERMELHA (La tortue rouge, 2016)","data: 2014-03-02<br />nota:  7.3<br />nm: ATÉ O FIM (All Is Lost, 2014)","data: 2015-01-28<br />nota:  7.1<br />nm: A TEORIA DE TUDO (The Theory of Everything, 2014)","data: 2017-01-23<br />nota:  7.8<br />nm: ATÉ O ÚLTIMO HOMEM (Hacksaw Ridge, 2016)","data: 2017-08-29<br />nota:  6.6<br />nm: ATÔMICA (Atomic Blonde, 2017)","data: 2017-08-23<br />nota:  4.4<br />nm: A TORRE NEGRA (The Dark Tower, 2017)","data: 2015-10-05<br />nota:  7.5<br />nm: A TRAVESSIA (The Walk, 2015)","data: 2016-04-09<br />nota:  6.9<br />nm: AVE, CÉSAR! (Hail, Caesar! 2016)","data: 2013-12-21<br />nota:  5.5<br />nm: A VIDA SECRETA DE WALTER MITTY (2013)","data: 2017-11-22<br />nota:  6.8<br />nm: A VILÃ (Ak-Nyeo, 2017)","data: 2015-11-26<br />nota:  6.8<br />nm: A VISITA (The Visit, 2015)","data: 2014-01-02<br />nota:  8.5<br />nm: Azul é a Cor Mais Quente (La vie dAdèle, 2013)","data: 2013-11-26<br />nota:  7.0<br />nm: BAD GRANDPA (Vovô Sem Vergonha, 2013)","data: 2016-03-24<br />nota:  6.6<br />nm: BATMAN VS SUPERMAN - A ORIGEM DA JUSTIÇA (2016)","data: 2015-10-25<br />nota:  7.6<br />nm: BEASTS OF NO NATION (2015)","data: 2016-08-18<br />nota:  4.7<br />nm: BEN-HUR (2016)","data: 2017-12-24<br />nota:  7.0<br />nm: BETTER WATCH OUT (2016)","data: 2017-08-24<br />nota: 10.0<br />nm: BINGO - O REI DAS MANHÃS (2017)","data: 2015-01-14<br />nota:  9.3<br />nm: BIRDMAN (2014)","data: 2017-10-08<br />nota: 10.0<br />nm: BLADE RUNNER 2049 (2017)","data: 2014-01-27<br />nota:  8.5<br />nm: BLUE JASMINE (2013)","data: 2017-10-20<br />nota:  8.2<br />nm: BOM COMPORTAMENTO (Good Time, 2017)","data: 2016-08-11<br />nota:  8.6<br />nm: BONE TOMAHAWK (2015)","data: 2017-11-11<br />nota:  7.0<br />nm: BORG VS MCENROE (2017)","data: 2014-10-31<br />nota:  9.7<br />nm: BOYHOOD (2014)","data: 2016-02-16<br />nota:  8.4<br />nm: BROOKLYN (2015)","data: 2016-09-16<br />nota:  6.5<br />nm: BRUXA DE BLAIR (Blair Witch, 2016)","data: 2014-02-11<br />nota:  4.4<br />nm: CAÇADORES DE OBRAS-PRIMAS (2014)","data: 2016-07-13<br />nota:  6.6<br />nm: CAÇA-FANTASMAS (Ghostbusters, 2016)","data: 2016-09-07<br />nota:  5.6<br />nm: CÃES DE GUERRA (War Dogs, 2016)","data: 2016-08-29<br />nota:  6.7<br />nm: CAFÉ SOCIETY (2016)","data: 2015-05-03<br />nota:  6.4<br />nm: CAKE (Uma Razão para Viver, 2014)","data: 2014-04-02<br />nota:  8.5<br />nm: CAPITÃO AMÉRICA 2 - O SOLDADO INVERNAL (2014)","data: 2016-04-28<br />nota:  9.2<br />nm: CAPITÃO AMERICA - GUERRA CIVIL (2016)","data: 2016-11-05<br />nota:  8.6<br />nm: CAPITÃO FANTÁSTICO (Captain Fantastic, 2016)","data: 2013-10-31<br />nota:  8.6<br />nm: CAPITÃO PHILLIPS (2013)","data: 2016-01-21<br />nota:  9.0<br />nm: CAROL (2015)","data: 2013-12-03<br />nota:  6.5<br />nm: CARRIE, A ESTRANHA (1976 e 2013)","data: 2015-04-14<br />nota:  4.7<br />nm: CHAPPIE (2015)","data: 2017-10-05<br />nota:  6.1<br />nm: CHURCHILL (2017)","data: 2015-07-09<br />nota:  7.0<br />nm: CIDADES DE PAPEL (Paper Towns, 2015)","data: 2015-04-10<br />nota:  7.0<br />nm: CINDERELA (2015)","data: 2015-02-12<br />nota:  2.5<br />nm: CINQUENTA TONS DE CINZA (2015)","data: 2014-01-20<br />nota:  8.4<br />nm: CLUBE DE COMPRAS DALLAS (2013)","data: 2017-06-15<br />nota:  7.3<br />nm: COLOSSAL (2017)","data: 2017-09-06<br />nota:  7.8<br />nm: COMO NOSSOS PAIS (2017)","data: 2016-03-15<br />nota:  3.9<br />nm: CONVERGENTE (Allegiant, 2016)","data: 2017-04-29<br />nota:  9.4<br />nm: CORRA! (Get Out, 2017)","data: 2016-01-04<br />nota:  8.4<br />nm: CREED (Nascido para Lutar, 2015)","data: 2016-02-08<br />nota:  9.5<br />nm: DEADPOOL (2016)","data: 2017-09-01<br />nota:  4.6<br />nm: DEATH NOTE (Netflix, 2017)","data: 2014-11-17<br />nota:  3.9<br />nm: DEBI & LÓIDE 2 (Dumb and Dumber To, 2014)","data: 2016-04-05<br />nota:  7.6<br />nm: DECISÃO DE RISCO (Eye in the Sky, 2015)","data: 2016-09-27<br />nota:  7.5<br />nm: DEMÔNIO DE NEON (The Neon Demon, 2016)","data: 2017-11-01<br />nota:  5.3<br />nm: DEPOIS DAQUELA MONTANHA (The Mountain Between Us, 2017)","data: 2017-11-02<br />nota:  7.6<br />nm: DESERTO (Desierto, 2015)","data: 2016-06-13<br />nota:  8.1<br />nm: DESTINO ESPECIAL (Midnight Special, 2016)","data: 2017-10-15<br />nota:  8.1<br />nm: DETROIT EM REBELIÃO (2017)","data: 2016-02-26<br />nota:  0.0<br />nm: DEUSES DO EGITO (Gods of Egypt, 2016)","data: 2014-04-10<br />nota:  5.1<br />nm: DIVERGENTE (2014)","data: 2015-06-19<br />nota:  8.6<br />nm: DIVERTIDA MENTE (Inside Out, 2015)","data: 2017-10-13<br />nota:  7.9<br />nm: DOENTES DE AMOR (The Big Sick, 2017)","data: 2016-07-15<br />nota:  7.6<br />nm: DOIS CARAS LEGAIS (The Nice Guys, 2016)","data: 2013-12-03<br />nota:  7.6<br />nm: DON JON (Como Não Perder Essa Mulher, 2013)","data: 2016-11-02<br />nota:  7.4<br />nm: DOUTOR ESTRANHO (2016)","data: 2017-07-26<br />nota:  8.8<br />nm: DUNKIRK (2017)","data: 2014-02-07<br />nota:  8.6<br />nm: ELA (Her, 2013)","data: 2017-12-13<br />nota:  6.0<br />nm: EL CAMINO CHRISTMAS (Netflix, 2017)","data: 2016-12-03<br />nota:  4.1<br />nm: ELIS (2016)","data: 2016-11-24<br />nota: 10.0<br />nm: ELLE (2016)","data: 2013-09-12<br />nota:  8.0<br />nm: ELYSIUM (2013)","data: 2017-07-23<br />nota:  8.6<br />nm: EM RITMO DE FUGA (Baby Driver, 2017)","data: 2013-12-19<br />nota:  7.4<br />nm: ENDERS GAME (2013)","data: 2015-07-06<br />nota:  7.8<br />nm: ENQUANTO SOMOS JOVENS (2015)","data: 2015-05-05<br />nota:  6.8<br />nm: ENTRE ABELHAS (2015)","data: 2016-10-06<br />nota:  7.0<br />nm: ERA DOS GIGANTES (2016)","data: 2013-10-11<br />nota:  5.7<br />nm: ESCAPE PLAN (Rota de Fuga, 2013)","data: 2016-08-04<br />nota:  6.0<br />nm: ESQUADRÃO SUICIDA (Suicide Squad, 2016)","data: 2017-01-21<br />nota:  6.3<br />nm: ESTRELAS ALÉM DO TEMPO (Hidden Figures, 2016)","data: 2015-05-22<br />nota:  8.8<br />nm: EX MACHINA (2015)","data: 2017-09-30<br />nota:  7.8<br />nm: EXODUS - DE ONDE EU VIM NÃO EXISTE MAIS (2017)","data: 2014-07-08<br />nota:  8.3<br />nm: EXPRESSO DO AMANHÃ (Snowpiercer, 2013)","data: 2017-12-08<br />nota:  7.6<br />nm: EXTRAORDINÁRIO (Wonder, 2017)","data: 2017-09-14<br />nota:  7.4<br />nm: FEITO NA AMÉRICA (American Made, 2017)","data: 2017-01-27<br />nota:  8.8<br />nm: FENCES (2016)","data: 2016-10-07<br />nota:  6.7<br />nm: FESTA DA SALSICHA (Sausage Party, 2016)","data: 2017-09-26<br />nota:  7.7<br />nm: FIRST THEY KILLED MY FATHER (Netflix, 2017)","data: 2015-03-12<br />nota:  6.4<br />nm: FOCUS (Golpe Duplo, 2015)","data: 2015-01-23<br />nota:  8.1<br />nm: FOXCATCHER (2014)","data: 2017-03-21<br />nota:  7.1<br />nm: FRAGMENTADO (Split, 2017)","data: 2014-09-24<br />nota:  8.2<br />nm: FRANK (2014)","data: 2014-01-25<br />nota:  3.6<br />nm: FRANKENSTEIN - ENTRE ANJOS E DEMÔNIOS (2014)","data: 2014-01-04<br />nota:  8.0<br />nm: FROZEN (2013)","data: 2014-01-30<br />nota:  7.5<br />nm: FRUITVALE STATION - A ÚLTIMA PARADA (2013)","data: 2015-02-03<br />nota:  7.1<br />nm: FURY (Corações de Ferro, 2014)","data: 2017-11-05<br />nota:  6.1<br />nm: GABRIEL E A MONTANHA (2017)","data: 2014-10-02<br />nota:  9.2<br />nm: GAROTA EXEMPLAR (Gone Girl, 2014)","data: 2014-04-25<br />nota:  7.9<br />nm: GETÚLIO (2014)","data: 2017-03-30<br />nota:  6.1<br />nm: GHOST IN THE SHELL (2017)","data: 2014-05-14<br />nota:  7.1<br />nm: GODZILLA (2014)","data: 2015-09-24<br />nota:  7.5<br />nm: GOODNIGHT MOMMY (Ich seh, Ich seh, 2015)","data: 2015-10-26<br />nota:  6.9<br />nm: GOOSEBUMPS - MONSTROS E ARREPIOS (2015)","data: 2017-06-19<br />nota:  8.6<br />nm: GRAVE (Raw, 2016)","data: 2013-10-10<br />nota:  8.8<br />nm: GRAVITY (Gravidade, 2013)","data: 2014-01-09<br />nota:  4.8<br />nm: GRUDGE MATCH (Ajuste de Contas, 2014)","data: 2014-07-31<br />nota:  9.1<br />nm: GUARDIÕES DA GALAXIA (2014)","data: 2017-04-28<br />nota:  7.3<br />nm: GUARDIÕES DA GALÁXIA VOL. 2 (Guardians of the Galaxy Vol. 2, 2017)","data: 2014-09-04<br />nota:  6.3<br />nm: HÉRCULES (2014)","data: 2015-08-28<br />nota:  4.1<br />nm: HITMAN - AGENTE 47 (2015)","data: 2017-07-05<br />nota:  7.7<br />nm: HOMEM-ARANHA - DE VOLTA AO LAR (Spider-Man- Homecoming, 2017)","data: 2015-07-16<br />nota:  7.9<br />nm: HOMEM-FORMIGA (2015)","data: 2014-10-28<br />nota:  7.1<br />nm: HORNS (O Pacto, 2014)","data: 2016-05-06<br />nota:  8.0<br />nm: HUSH - A MORTE OUVE (2016)","data: 2016-12-19<br />nota:  6.9<br />nm: IMPERIUM (2016)","data: 2016-06-22<br />nota:  4.8<br />nm: INDEPENDENCE DAY - O RESSURGIMENTO (2016)","data: 2016-10-17<br />nota:  3.3<br />nm: INFERNO (2016)","data: 2015-03-28<br />nota:  7.8<br />nm: INHERENT VICE (Vício Inerente, 2014)","data: 2014-02-21<br />nota:  8.1<br />nm: INSIDE LLEWYN DAVIS (2013)","data: 2015-03-24<br />nota:  4.4<br />nm: INSURGENTE (2015)","data: 2014-11-06<br />nota:  7.7<br />nm: INTERESTELAR (Interstellar, 2014)","data: 2016-10-14<br />nota:  9.0<br />nm: INVASÃO ZUMBI (Busanhaeng, 2016)","data: 2016-06-09<br />nota:  8.0<br />nm: INVOCAÇÃO DO MAL 2 (The Conjuring 2, 2016)","data: 2017-09-07<br />nota:  8.2<br />nm: IT - A COISA (2017)","data: 2015-05-25<br />nota:  7.6<br />nm: IT FOLLOWS (Corrente do Mal, 2015)","data: 2017-02-02<br />nota:  7.4<br />nm: JACKIE (2016)","data: 2016-07-28<br />nota:  6.8<br />nm: JASON BOURNE (2016)","data: 2014-06-26<br />nota:  5.9<br />nm: JERSEY BOYS - EM BUSCA DA MÚSICA","data: 2014-04-17<br />nota:  7.6<br />nm: JOE (2014)","data: 2016-05-29<br />nota:  5.7<br />nm: JOGO DO DINHEIRO (Money Monster, 2016)","data: 2017-10-07<br />nota:  8.3<br />nm: JOGO PERIGOSO (Geralds Game, Netflix, 2017)","data: 2017-12-01<br />nota:  4.0<br />nm: JOGOS MORTAIS - JIGSAW (2017)","data: 2015-11-20<br />nota:  7.6<br />nm: JOGOS VORAZES - A ESPERANÇA - O FINAL (2015)","data: 2014-11-19<br />nota:  7.5<br />nm: JOGOS VORAZES - A ESPERANÇA - PARTE 1 (2014)","data: 2013-11-22<br />nota:  7.7<br />nm: JOGOS VORAZES - EM CHAMAS (2013)","data: 2017-02-18<br />nota:  7.5<br />nm: JOHN WICK - CHAPTER 2 (2017)","data: 2014-11-28<br />nota:  7.5<br />nm: JOHN WICK (De Volta ao Jogo, 2014)","data: 2016-07-11<br />nota:  7.8<br />nm: JULIETA (2016)","data: 2018-01-02<br />nota:  6.7<br />nm: JUMANJI - BEM-VINDO À SELVA (2017)","data: 2014-07-23<br />nota:  4.0<br />nm: JUNTOS E MISTURADOS (Blended, 2014)","data: 2015-06-11<br />nota:  5.8<br />nm: JURASSIC WORLD - O Mundo dos Dinossauros (2015)","data: 2016-04-19<br />nota:  7.7<br />nm: JUVENTUDE (Youth, 2015)","data: 2017-07-12<br />nota:  7.3<br />nm: KEDI (Gatos, 2017)","data: 2013-10-17<br />nota:  6.9<br />nm: KICK-ASS 2 (2013)","data: 2017-08-06<br />nota:  8.6<br />nm: KIMI NO NA WA. (Your Name., 2016)","data: 2017-09-27<br />nota:  5.5<br />nm: KINGSMAN - O CÍRCULO DOURADO (Kingsman - The Golden Circle, 2017)","data: 2015-02-27<br />nota:  5.5<br />nm: KINGSMAN - SERVIÇO SECRETO (2015)","data: 2017-03-10<br />nota:  6.6<br />nm: KONG - A ILHA DA CAVEIRA (Kong - Skull Island, 2017)","data: 2016-11-15<br />nota:  8.9<br />nm: KUBO E AS CORDAS MÁGICAS (Kubo and the Two Strings, 2016)","data: 2017-01-13<br />nota:  9.4<br />nm: LA LA LAND (2016)","data: 2013-12-16<br />nota:  5.7<br />nm: LAST VEGAS (Última Viagem a Vegas, 2013)","data: 2017-02-21<br />nota:  8.2<br />nm: LEGO BATMAN - O FILME (The LEGO Batman Movie, 2017)","data: 2017-11-15<br />nota:  6.9<br />nm: LIGA DA JUSTIÇA (Justice League, 2017)","data: 2017-02-07<br />nota:  7.4<br />nm: LION (2016)","data: 2017-02-25<br />nota:  9.1<br />nm: LOGAN (2017)","data: 2017-10-12<br />nota:  7.6<br />nm: LOGAN LUCKY - ROUBO EM FAMÍLIA (2017)","data: 2017-02-13<br />nota:  8.0<br />nm: LOVING (2016)","data: 2017-12-09<br />nota:  9.2<br />nm: LUCKY (2017)","data: 2014-08-24<br />nota:  6.1<br />nm: LUCY (2014)","data: 2015-12-27<br />nota:  8.3<br />nm: MACBETH - AMBIÇÃO E GUERRA (2015)","data: 2015-05-14<br />nota: 10.0<br />nm: MAD MAX - ESTRADA DA FÚRIA (2015)","data: 2017-09-21<br />nota:  9.2<br />nm: MÃE! (Mother!, 2017)","data: 2016-06-19<br />nota:  5.8<br />nm: MAIS FORTE QUE O MUNDO - A HISTÓRIA DE JOSÉ ALDO (2016)","data: 2014-05-30<br />nota:  5.6<br />nm: MALÉVOLA (Maleficent, 2014)","data: 2017-01-11<br />nota:  9.3<br />nm: MANCHESTER À BEIRA-MAR (Manchester by the Sea, 2016)","data: 2013-07-10<br />nota:  5.9<br />nm: MAN OF STEEL (Homem de Aço, 2013)","data: 2014-09-14<br />nota:  5.5<br />nm: MAZE RUNNER - CORRER OU MORRER (The Maze Runner, 2014)","data: 2015-09-17<br />nota:  5.4<br />nm: MAZE RUNNER - PROVA DE FOGO (2015)","data: 2016-03-22<br />nota:  7.6<br />nm: ME AND EARL AND THE DYING GIRL (2015)","data: 2018-01-13<br />nota:  8.6<br />nm: ME CHAME PELO SEU NOME (Call Me by Your Name, 2017)","data: 2016-12-09<br />nota:  7.6<br />nm: MICHELLE E OBAMA (Southside with You, 2016)","data: 2015-08-13<br />nota:  8.1<br />nm: MISSÃO - IMPOSSÍVEL - NAÇÃO SECRETA (2015)","data: 2017-01-06<br />nota:  8.7<br />nm: MOANA (2016)","data: 2016-04-15<br />nota:  8.6<br />nm: MOGLI - O MENINO LOBO (The Jungle Book, 2016)","data: 2017-01-18<br />nota: 10.0<br />nm: MOONLIGHT (2016)","data: 2013-10-25<br />nota:  8.5<br />nm: MUD (Amor Bandido, 2013) -  Crítica-y2q5pDUgrm0","data: 2014-05-11<br />nota:  2.3<br />nm: MULHERES AO ATAQUE (The Other Woman, 2014)","data: 2017-05-31<br />nota:  7.8<br />nm: MULHER-MARAVILHA (Wonder Woman, 2017)","data: 2014-02-09<br />nota:  8.2<br />nm: NEBRASKA (2013)","data: 2014-03-13<br />nota:  4.7<br />nm: NEED FOR SPEED - O FILME (2014)","data: 2016-08-23<br />nota:  6.4<br />nm: NERVE - UM JOGO SEM REGRAS (2016)","data: 2014-01-10<br />nota:  8.0<br />nm: NINFOMANÍACA - Volume 1 (2014)","data: 2014-03-11<br />nota:  8.0<br />nm: NINFOMANÍACA - Volume 2 (2014)","data: 2015-09-10<br />nota:  7.1<br />nm: NOCAUTE (Southpaw, 2015)","data: 2015-12-03<br />nota:  7.9<br />nm: NO CORAÇÃO DO MAR (In the Heart of the Sea, 2015)","data: 2014-04-03<br />nota:  9.0<br />nm: NOÉ (Noah, 2014)","data: 2015-04-30<br />nota:  6.9<br />nm: NOITE SEM FIM (Run All Night, 2015)","data: 2014-05-29<br />nota:  8.0<br />nm: NO LIMITE DO AMANHÃ (Edge of Tomorrow, 2014)","data: 2013-08-26<br />nota:  6.4<br />nm: NOW YOU SEE ME (Truque de Mestre, 2013)","data: 2014-12-09<br />nota:  9.1<br />nm: O ABUTRE (Nightcrawler, 2014)","data: 2015-04-28<br />nota:  8.1<br />nm: O ANO MAIS VIOLENTO (A Most Violent Year, 2014)","data: 2018-01-16<br />nota:  7.7<br />nm: O ARTISTA DO DESASTRE (The Disaster Artist, 2017)","data: 2017-09-19<br />nota:  5.2<br />nm: O ASSASSINO - O PRIMEIRO ALVO (American Assassin, 2017)","data: 2016-07-31<br />nota:  6.9<br />nm: O BOM GIGANTE AMIGO (The BFG, 2016)","data: 2016-04-26<br />nota:  4.1<br />nm: O CAÇADOR E A RAINHA DO GELO (2016)","data: 2016-06-26<br />nota:  4.6<br />nm: O CASEIRO (2016)","data: 2016-10-18<br />nota:  7.3<br />nm: O CONTADOR (The Accountant, 2016)","data: 2015-02-05<br />nota:  4.6<br />nm: O DESTINO DE JÚPITER (Jupiter Ascending, 2015)","data: 2018-01-09<br />nota:  7.8<br />nm: O DESTINO DE UMA NAÇÃO (Darkest Hour, 2017)","data: 2017-05-11<br />nota:  8.2<br />nm: O DIA DO ATENTADO (Patriots Day, 2016)","data: 2014-07-04<br />nota:  7.2<br />nm: O ESPELHO (Oculus, 2014)","data: 2014-04-27<br />nota:  6.7<br />nm: O ESPETACULAR HOMEM-ARANHA 2 - A AMEAÇA DE ELECTRO (2014)","data: 2018-01-12<br />nota:  7.4<br />nm: O ESTRANGEIRO (The Foreigner, 2017)","data: 2017-08-13<br />nota:  7.4<br />nm: O ESTRANHO QUE NÓS AMAMOS (The Beguiled, 2017)","data: 2015-07-02<br />nota:  4.5<br />nm: O EXTERMINADOR DO FUTURO - GÊNESIS (2015)","data: 2017-08-03<br />nota:  6.9<br />nm: O FILME DA MINHA VIDA (2017)","data: 2014-03-21<br />nota:  7.4<br />nm: O GRANDE HERÓI (Lone Survivor, 2013)","data: 2014-07-01<br />nota:  8.7<br />nm: O GRANDE HOTEL BUDAPESTE (2014)","data: 2014-12-10<br />nota:  7.5<br />nm: O HOBBIT - A BATALHA DOS CINCO EXÉRCITOS (2014)","data: 2013-12-11<br />nota:  6.5<br />nm: O HOBBIT - A DESOLAÇÃO DE SMAUG (2013)","data: 2014-05-28<br />nota:  8.1<br />nm: O HOMEM DUPLICADO (2014)","data: 2015-01-20<br />nota:  7.6<br />nm: O JOGO DA IMITAÇÃO (The Imitation Game, 2014)","data: 2014-10-17<br />nota:  6.3<br />nm: O JUIZ (The Judge, 2014)","data: 2017-06-29<br />nota:  8.1<br />nm: OKJA (Netflix, 2017)","data: 2017-05-08<br />nota:  9.2<br />nm: O LAMENTO (Goksung, 2016)","data: 2016-09-29<br />nota:  4.6<br />nm: O LAR DAS CRIANÇAS PECULIARES (2016)","data: 2014-01-18<br />nota:  8.6<br />nm: O LOBO DE WALL STREET (2013)","data: 2017-11-19<br />nota:  6.5<br />nm: O MATADOR (Netflix, 2017)","data: 2016-11-10<br />nota:  7.3<br />nm: O NASCIMENTO DE UMA NAÇÃO (The Birth of a Nation, 2016)","data: 2017-11-09<br />nota:  8.4<br />nm: ONE OF US (Netflix, 2017)","data: 2015-08-26<br />nota:  8.8<br />nm: O PEQUENO PRÍNCIPE (2015)","data: 2014-02-05<br />nota:  6.1<br />nm: OPERAÇÃO SOMBRA - JACK RYAN (2014)","data: 2015-12-01<br />nota:  8.3<br />nm: O PRESENTE (The Gift, 2015)","data: 2014-10-08<br />nota:  7.1<br />nm: O PROTETOR (The Equalizer, 2014)","data: 2016-01-25<br />nota:  9.9<br />nm: O QUARTO DE JACK (Room, 2015)","data: 2017-12-21<br />nota:  7.2<br />nm: O QUE TE FAZ MAIS FORTE (Stronger, 2017)","data: 2017-05-22<br />nota:  6.4<br />nm: O RASTRO (2017)","data: 2016-01-28<br />nota:  9.4<br />nm: O REGRESSO (The Revenant, 2015)","data: 2016-02-25<br />nota:  5.6<br />nm: ORGULHO E PRECONCEITO E ZUMBIS (2016)","data: 2014-08-20<br />nota:  4.6<br />nm: OS MERCENÁRIOS 3 (The Expendables 3, 2014)","data: 2017-10-18<br />nota:  8.3<br />nm: OS MEYEROWITZ - FAMÍLIA NÃO SE ESCOLHE (Netflix, 2017)","data: 2016-01-05<br />nota:  9.3<br />nm: OS OITO ODIADOS (The Hateful Eight, 2015)","data: 2017-12-16<br />nota:  9.2<br />nm: OS ÚLTIMOS JEDI (2017) - COMENTÁRIOS COM SPOILERS!-GTQj4SL_xcE","data: 2016-10-24<br />nota:  7.2<br />nm: OUIJA - ORIGEM DO MAL (Ouija - Origin of Evil, 2016)","data: 2015-08-18<br />nota:  7.0<br />nm: O ÚLTIMO CINE DRIVE-IN (2014)","data: 2013-08-23<br />nota:  5.0<br />nm: PAIN & GAIN (Sem Dor, Sem Ganho, 2013)","data: 2017-01-03<br />nota:  4.8<br />nm: PASSAGEIROS (Passengers, 2016)","data: 2017-04-18<br />nota:  9.1<br />nm: PATERSON (2016)","data: 2017-11-28<br />nota:  7.0<br />nm: PATTI CAKE$ (2017)","data: 2015-10-01<br />nota:  7.9<br />nm: PERDIDO EM MARTE (The Martian, 2015)","data: 2017-04-03<br />nota:  8.1<br />nm: PERSONAL SHOPPER (2016)","data: 2015-10-08<br />nota:  3.6<br />nm: PETER PAN (Pan, 2015)","data: 2014-02-13<br />nota:  7.9<br />nm: PHILOMENA (2013)","data: 2017-05-26<br />nota:  4.7<br />nm: PIRATAS DO CARIBE - A VINGANÇA DE SALAZAR (2017)","data: 2017-08-04<br />nota:  9.3<br />nm: PLANETA DOS MACACOS - A GUERRA (War for the Planet of the Apes, 2017)","data: 2014-07-19<br />nota:  9.1<br />nm: PLANETA DOS MACACOS - O CONFRONTO (2014)","data: 2017-09-08<br />nota:  5.0<br />nm: POLÍCIA FEDERAL - A LEI É PARA TODOS (2017)","data: 2015-06-01<br />nota:  4.9<br />nm: POLTERGEIST - O FENÔMENO (1982 e 2015)","data: 2015-10-18<br />nota:  8.0<br />nm: PONTE DOS ESPIÕES (Bridge of Spies, 2015)","data: 2016-07-01<br />nota:  2.1<br />nm: PORTA DOS FUNDOS - CONTRATO VITALÍCIO (2016)","data: 2017-03-23<br />nota:  4.8<br />nm: POWER RANGERS (2017)","data: 2017-06-06<br />nota:  8.1<br />nm: PREVENGE (2017)","data: 2013-10-17<br />nota:  7.7<br />nm: PRISONERS (Os Suspeitos, 2013)","data: 2016-07-03<br />nota:  7.6<br />nm: PROCURANDO DORY (Finding Dory, 2016)","data: 2016-08-17<br />nota:  7.1<br />nm: QUANDO AS LUZES SE APAGAM (Lights Out, 2016)","data: 2015-08-06<br />nota:  3.8<br />nm: QUARTETO FANTÁSTICO (2015)","data: 2017-02-09<br />nota:  7.9<br />nm: QUASE 18 (The Edge of Seventeen, 2016)","data: 2015-08-31<br />nota:  9.0<br />nm: QUE HORAS ELA VOLTA (2015)","data: 2014-12-04<br />nota:  5.3<br />nm: QUERO MATAR MEU CHEFE 2 (Horrible Bosses 2, 2014)","data: 2016-11-30<br />nota:  8.4<br />nm: RAINHA DE KATWE (Queen of Katwe, 2016)","data: 2017-11-24<br />nota:  8.0<br />nm: RAINHA DO MUNDO (Queen of Earth, 2015)","data: 2017-05-19<br />nota:  4.9<br />nm: REI ARTHUR - A LENDA DA ESPADA (King Arthur - Legend of the Sword, 2017)","data: 2014-11-25<br />nota: 10.0<br />nm: RELATOS SELVAGENS (Relatos salvajes, 2014)","data: 2014-02-16<br />nota:  6.8<br />nm: ROBOCOP (2014)","data: 2016-12-16<br />nota:  8.1<br />nm: ROGUE ONE - UMA HISTÓRIA STAR WARS (2016)","data: 2016-04-07<br />nota:  7.5<br />nm: RUA CLOVERFIELD, 10 (10 Cloverfield Lane, 2016)","data: 2015-02-09<br />nota:  8.8<br />nm: SELMA (Uma Luta pela Igualdade, 2014)","data: 2014-02-28<br />nota:  6.3<br />nm: SEM ESCALAS (Non-Stop, 2014)","data: 2016-09-21<br />nota:  6.7<br />nm: SETE HOMENS E UM DESTINO (The Magnificent Seven, 2016)","data: 2017-01-08<br />nota:  7.8<br />nm: SETE MINUTOS DEPOIS DA MEIA-NOITE (A Monster Calls, 2016)","data: 2015-10-19<br />nota:  8.1<br />nm: SICARIO - TERRA DE NINGUÉM (2015)","data: 2017-01-31<br />nota:  8.7<br />nm: SILÊNCIO (Silence, 2016)","data: 2014-09-26<br />nota:  6.9<br />nm: SIN CITY - A DAMA FATAL (A Dame to Kill For, 2014)","data: 2015-08-03<br />nota:  8.2<br />nm: SLOW WEST (2015)","data: 2015-02-15<br />nota:  7.2<br />nm: SNIPER AMERICANO (American Sniper, 2014)","data: 2016-11-12<br />nota:  6.0<br />nm: SNOWDEN - HERÓI OU TRAIDOR (Snowden, 2016)","data: 2014-05-19<br />nota:  8.4<br />nm: SOB A PELE (Under the Skin, 2014)","data: 2016-01-07<br />nota: 10.0<br />nm: SPOTLIGHT (Segredos Revelados, 2015)","data: 2016-09-01<br />nota:  7.4<br />nm: STAR TREK - SEM FRONTEIRAS (Star Trek Beyond, 2016)","data: 2015-12-19<br />nota:  9.1<br />nm: STAR WARS - O DESPERTAR DA FORÇA (2015)","data: 2017-12-14<br />nota:  9.2<br />nm: STAR WARS - OS ÚLTIMOS JEDI (2017)","data: 2016-01-09<br />nota:  8.5<br />nm: STEVE JOBS (2015)","data: 2015-02-20<br />nota:  7.7<br />nm: STILL ALICE (Para Sempre Alice, 2014)","data: 2015-11-01<br />nota:  7.5<br />nm: STRAIGHT OUTTA COMPTON - A HISTÓRIA DO N.W.A. (2015)","data: 2016-11-28<br />nota:  8.2<br />nm: SULLY - O HERÓI DO RIO HUDSON (Sully, 2016)","data: 2016-10-05<br />nota:  8.2<br />nm: SWISS ARMY MAN (2016)","data: 2017-03-22<br />nota:  7.4<br />nm: T2 TRAINSPOTTING (2017)","data: 2017-10-21<br />nota:  7.9<br />nm: TERRA SELVAGEM (Wind River, 2017)","data: 2015-05-28<br />nota:  5.6<br />nm: TERREMOTO - A FALHA DE SAN ANDREAS (2015)","data: 2014-12-19<br />nota:  8.3<br />nm: THE BABADOOK (2014)","data: 2013-08-04<br />nota:  5.0<br />nm: THE BLING RING (A Gangue de Hollywood, 2013)","data: 2013-09-17<br />nota:  8.1<br />nm: THE CONJURING (Invocação do Mal, 2013)","data: 2016-06-29<br />nota:  5.6<br />nm: THE FUNDAMENTALS OF CARING (2016)","data: 2016-11-01<br />nota: 10.0<br />nm: THE HANDMAIDEN (Ah-ga-ssi, 2016)","data: 2013-08-29<br />nota:  5.0<br />nm: THE INTERNSHIP (Os Estagiários, 2013)","data: 2016-04-12<br />nota:  8.0<br />nm: THE LOBSTER (2015)","data: 2013-08-16<br />nota:  4.0<br />nm: The Mortal Instruments - City of Bones (2013)","data: 2014-11-23<br />nota:  7.4<br />nm: THE ONE I LOVE (2014)","data: 2018-01-20<br />nota:  7.9<br />nm: THE POST (2017)","data: 2014-09-19<br />nota:  7.2<br />nm: THE ROVER - A CAÇADA (2014)","data: 2018-01-08<br />nota:  7.6<br />nm: THE SQUARE (2017)","data: 2013-07-24<br />nota:  6.9<br />nm: THE WOLVERINE (Wolverine - Imortal, 2013)","data: 2013-11-12<br />nota:  7.7<br />nm: THE WORLDS END (Heróis de Ressaca, 2013)","data: 2013-09-18<br />nota:  7.1<br />nm: THIS IS THE END (É o Fim, 2013)","data: 2013-11-06<br />nota:  7.4<br />nm: THOR - O MUNDO SOMBRIO (2013)","data: 2017-10-26<br />nota:  8.1<br />nm: THOR - RAGNAROK (2017)","data: 2018-01-30<br />nota:  7.2<br />nm: TODO O DINHEIRO DO MUNDO (All the Money in the World, 2017)","data: 2015-06-04<br />nota:  6.6<br />nm: TOMORROWLAND (2015)","data: 2015-03-17<br />nota:  8.0<br />nm: TOP FIVE (2014)","data: 2014-03-19<br />nota:  7.1<br />nm: TOQUE DE MESTRE (Grand Piano, 2014)","data: 2014-05-11<br />nota:  4.2<br />nm: TRANSCENDENCE - A REVOLUÇÃO (2014)","data: 2014-07-14<br />nota:  2.5<br />nm: TRANSFORMERS - A ERA DA EXTINÇÃO (2014)","data: 2018-01-29<br />nota:  9.9<br />nm: TRÊS ANÚNCIOS PARA UM CRIME (Three Billboards Outside Ebbing, Missouri, 2017)","data: 2016-02-21<br />nota:  7.5<br />nm: TRUMBO (Lista Negra, 2015)","data: 2016-06-06<br />nota:  5.6<br />nm: TRUQUE DE MESTRE - O 2º ATO (Now You See Me 2, 2016)","data: 2014-02-25<br />nota:  7.1<br />nm: TUDO POR UM FURO (2013)","data: 2017-09-12<br />nota:  9.2<br />nm: UMA MULHER FANTÁSTICA (Una Mujer Fantástica, 2017)","data: 2017-08-18<br />nota:  8.1<br />nm: UM CONTRATEMPO (Contratiempo, 2016)","data: 2016-03-03<br />nota:  6.4<br />nm: UM HOMEM ENTRE GIGANTES (Concussion, 2015)","data: 2014-06-11<br />nota:  4.4<br />nm: UM MILHÃO DE MANEIRAS DE PEGAR NA PISTOLA (2014)","data: 2017-08-10<br />nota:  5.0<br />nm: VALERIAN E A CIDADE DOS MIL PLANETAS (2017)","data: 2017-04-14<br />nota:  6.4<br />nm: VELOZES E FURIOSOS 8 (The Fate of the Furious, 2017)","data: 2015-04-02<br />nota:  6.4<br />nm: VELOZES & FURIOSOS 7 (Furious 7, 2015)","data: 2015-11-29<br />nota:  4.4<br />nm: VICTOR FRANKENSTEIN (2015)","data: 2017-04-20<br />nota:  7.2<br />nm: VIDA (Life, 2017)","data: 2015-04-23<br />nota:  8.9<br />nm: VINGADORES - ERA DE ULTRON (2015)","data: 2018-01-03<br />nota:  8.4<br />nm: VIVA - A VIDA É UMA FESTA (Coco, 2017)","data: 2014-06-12<br />nota:  7.1<br />nm: VIZINHOS (Neighbors, 2014)","data: 2017-12-05<br />nota:  7.0<br />nm: VOYEUR (Netflix, 2017)","data: 2014-03-05<br />nota:  8.0<br />nm: WALT NOS BASTIDORES DE MARY POPPINS (2013)","data: 2016-06-02<br />nota:  6.4<br />nm: WARCRAFT - O PRIMEIRO ENCONTRO DE DOIS MUNDOS (2016)","data: 2013-09-26<br />nota:  6.3<br />nm: WERE THE MILLERS (Família do Bagulho, 2013)","data: 2015-01-07<br />nota:  9.5<br />nm: WHIPLASH - EM BUSCA DA PERFEIÇÃO (2014)","data: 2013-09-03<br />nota:  5.3<br />nm: WHITE HOUSE DOWN (O Ataque, 2013)","data: 2013-06-26<br />nota:  6.8<br />nm: WORLD WAR Z (Guerra Mundial Z, 2013)","data: 2016-05-18<br />nota:  6.9<br />nm: X-MEN - APOCALIPSE (2016)","data: 2014-05-21<br />nota:  6.9<br />nm: X-MEN - DIAS DE UM FUTURO ESQUECIDO (2014)","data: 2016-03-20<br />nota:  8.9<br />nm: ZOOTOPIA (2016)"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,0,0,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(0,0,0,1)"}},"hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[15882,15903.253164557,15924.5063291139,15945.7594936709,15967.0126582278,15988.2658227848,16009.5189873418,16030.7721518987,16052.0253164557,16073.2784810127,16094.5316455696,16115.7848101266,16137.0379746835,16158.2911392405,16179.5443037975,16200.7974683544,16222.0506329114,16243.3037974684,16264.5569620253,16285.8101265823,16307.0632911392,16328.3164556962,16349.5696202532,16370.8227848101,16392.0759493671,16413.3291139241,16434.582278481,16455.835443038,16477.0886075949,16498.3417721519,16519.5949367089,16540.8481012658,16562.1012658228,16583.3544303797,16604.6075949367,16625.8607594937,16647.1139240506,16668.3670886076,16689.6202531646,16710.8734177215,16732.1265822785,16753.3797468354,16774.6329113924,16795.8860759494,16817.1392405063,16838.3924050633,16859.6455696203,16880.8987341772,16902.1518987342,16923.4050632911,16944.6582278481,16965.9113924051,16987.164556962,17008.417721519,17029.6708860759,17050.9240506329,17072.1772151899,17093.4303797468,17114.6835443038,17135.9367088608,17157.1898734177,17178.4430379747,17199.6962025316,17220.9493670886,17242.2025316456,17263.4556962025,17284.7088607595,17305.9620253165,17327.2151898734,17348.4683544304,17369.7215189873,17390.9746835443,17412.2278481013,17433.4810126582,17454.7341772152,17475.9873417722,17497.2405063291,17518.4936708861,17539.746835443,17561],"y":[6.78502595646802,6.7928853159743,6.80074467548059,6.80860403498688,6.81646339449317,6.82432275399946,6.83218211350575,6.84004147301203,6.84790083251832,6.85576019202461,6.8636195515309,6.87147891103719,6.87933827054347,6.88719763004976,6.89505698955605,6.90291634906234,6.91077570856863,6.91863506807492,6.9264944275812,6.93435378708749,6.94221314659378,6.95007250610007,6.95793186560636,6.96579122511265,6.97365058461893,6.98150994412522,6.98936930363151,6.9972286631378,7.00508802264409,7.01294738215037,7.02080674165666,7.02866610116295,7.03652546066924,7.04438482017553,7.05224417968181,7.0601035391881,7.06796289869439,7.07582225820068,7.08368161770697,7.09154097721326,7.09940033671954,7.10725969622583,7.11511905573212,7.12297841523841,7.1308377747447,7.13869713425099,7.14655649375727,7.15441585326356,7.16227521276985,7.17013457227614,7.17799393178242,7.18585329128871,7.193712650795,7.20157201030129,7.20943136980758,7.21729072931387,7.22515008882015,7.23300944832644,7.24086880783273,7.24872816733902,7.25658752684531,7.2644468863516,7.27230624585788,7.28016560536417,7.28802496487046,7.29588432437675,7.30374368388304,7.31160304338932,7.31946240289561,7.3273217624019,7.33518112190819,7.34304048141448,7.35089984092077,7.35875920042705,7.36661855993334,7.37447791943963,7.38233727894592,7.39019663845221,7.39805599795849,7.40591535746478],"text":["1: 1<br />data: 15882.00<br />nota: 6.785026<br />nm: 1","1: 1<br />data: 15903.25<br />nota: 6.792885<br />nm: 1","1: 1<br />data: 15924.51<br />nota: 6.800745<br />nm: 1","1: 1<br />data: 15945.76<br />nota: 6.808604<br />nm: 1","1: 1<br />data: 15967.01<br />nota: 6.816463<br />nm: 1","1: 1<br />data: 15988.27<br />nota: 6.824323<br />nm: 1","1: 1<br />data: 16009.52<br />nota: 6.832182<br />nm: 1","1: 1<br />data: 16030.77<br />nota: 6.840041<br />nm: 1","1: 1<br />data: 16052.03<br />nota: 6.847901<br />nm: 1","1: 1<br />data: 16073.28<br />nota: 6.855760<br />nm: 1","1: 1<br />data: 16094.53<br />nota: 6.863620<br />nm: 1","1: 1<br />data: 16115.78<br />nota: 6.871479<br />nm: 1","1: 1<br />data: 16137.04<br />nota: 6.879338<br />nm: 1","1: 1<br />data: 16158.29<br />nota: 6.887198<br />nm: 1","1: 1<br />data: 16179.54<br />nota: 6.895057<br />nm: 1","1: 1<br />data: 16200.80<br />nota: 6.902916<br />nm: 1","1: 1<br />data: 16222.05<br />nota: 6.910776<br />nm: 1","1: 1<br />data: 16243.30<br />nota: 6.918635<br />nm: 1","1: 1<br />data: 16264.56<br />nota: 6.926494<br />nm: 1","1: 1<br />data: 16285.81<br />nota: 6.934354<br />nm: 1","1: 1<br />data: 16307.06<br />nota: 6.942213<br />nm: 1","1: 1<br />data: 16328.32<br />nota: 6.950073<br />nm: 1","1: 1<br />data: 16349.57<br />nota: 6.957932<br />nm: 1","1: 1<br />data: 16370.82<br />nota: 6.965791<br />nm: 1","1: 1<br />data: 16392.08<br />nota: 6.973651<br />nm: 1","1: 1<br />data: 16413.33<br />nota: 6.981510<br />nm: 1","1: 1<br />data: 16434.58<br />nota: 6.989369<br />nm: 1","1: 1<br />data: 16455.84<br />nota: 6.997229<br />nm: 1","1: 1<br />data: 16477.09<br />nota: 7.005088<br />nm: 1","1: 1<br />data: 16498.34<br />nota: 7.012947<br />nm: 1","1: 1<br />data: 16519.59<br />nota: 7.020807<br />nm: 1","1: 1<br />data: 16540.85<br />nota: 7.028666<br />nm: 1","1: 1<br />data: 16562.10<br />nota: 7.036525<br />nm: 1","1: 1<br />data: 16583.35<br />nota: 7.044385<br />nm: 1","1: 1<br />data: 16604.61<br />nota: 7.052244<br />nm: 1","1: 1<br />data: 16625.86<br />nota: 7.060104<br />nm: 1","1: 1<br />data: 16647.11<br />nota: 7.067963<br />nm: 1","1: 1<br />data: 16668.37<br />nota: 7.075822<br />nm: 1","1: 1<br />data: 16689.62<br />nota: 7.083682<br />nm: 1","1: 1<br />data: 16710.87<br />nota: 7.091541<br />nm: 1","1: 1<br />data: 16732.13<br />nota: 7.099400<br />nm: 1","1: 1<br />data: 16753.38<br />nota: 7.107260<br />nm: 1","1: 1<br />data: 16774.63<br />nota: 7.115119<br />nm: 1","1: 1<br />data: 16795.89<br />nota: 7.122978<br />nm: 1","1: 1<br />data: 16817.14<br />nota: 7.130838<br />nm: 1","1: 1<br />data: 16838.39<br />nota: 7.138697<br />nm: 1","1: 1<br />data: 16859.65<br />nota: 7.146556<br />nm: 1","1: 1<br />data: 16880.90<br />nota: 7.154416<br />nm: 1","1: 1<br />data: 16902.15<br />nota: 7.162275<br />nm: 1","1: 1<br />data: 16923.41<br />nota: 7.170135<br />nm: 1","1: 1<br />data: 16944.66<br />nota: 7.177994<br />nm: 1","1: 1<br />data: 16965.91<br />nota: 7.185853<br />nm: 1","1: 1<br />data: 16987.16<br />nota: 7.193713<br />nm: 1","1: 1<br />data: 17008.42<br />nota: 7.201572<br />nm: 1","1: 1<br />data: 17029.67<br />nota: 7.209431<br />nm: 1","1: 1<br />data: 17050.92<br />nota: 7.217291<br />nm: 1","1: 1<br />data: 17072.18<br />nota: 7.225150<br />nm: 1","1: 1<br />data: 17093.43<br />nota: 7.233009<br />nm: 1","1: 1<br />data: 17114.68<br />nota: 7.240869<br />nm: 1","1: 1<br />data: 17135.94<br />nota: 7.248728<br />nm: 1","1: 1<br />data: 17157.19<br />nota: 7.256588<br />nm: 1","1: 1<br />data: 17178.44<br />nota: 7.264447<br />nm: 1","1: 1<br />data: 17199.70<br />nota: 7.272306<br />nm: 1","1: 1<br />data: 17220.95<br />nota: 7.280166<br />nm: 1","1: 1<br />data: 17242.20<br />nota: 7.288025<br />nm: 1","1: 1<br />data: 17263.46<br />nota: 7.295884<br />nm: 1","1: 1<br />data: 17284.71<br />nota: 7.303744<br />nm: 1","1: 1<br />data: 17305.96<br />nota: 7.311603<br />nm: 1","1: 1<br />data: 17327.22<br />nota: 7.319462<br />nm: 1","1: 1<br />data: 17348.47<br />nota: 7.327322<br />nm: 1","1: 1<br />data: 17369.72<br />nota: 7.335181<br />nm: 1","1: 1<br />data: 17390.97<br />nota: 7.343040<br />nm: 1","1: 1<br />data: 17412.23<br />nota: 7.350900<br />nm: 1","1: 1<br />data: 17433.48<br />nota: 7.358759<br />nm: 1","1: 1<br />data: 17454.73<br />nota: 7.366619<br />nm: 1","1: 1<br />data: 17475.99<br />nota: 7.374478<br />nm: 1","1: 1<br />data: 17497.24<br />nota: 7.382337<br />nm: 1","1: 1<br />data: 17518.49<br />nota: 7.390197<br />nm: 1","1: 1<br />data: 17539.75<br />nota: 7.398056<br />nm: 1","1: 1<br />data: 17561.00<br />nota: 7.405915<br />nm: 1"],"type":"scatter","mode":"lines","name":"fitted values","line":{"width":3.77952755905512,"color":"rgba(51,102,255,1)","dash":"solid"},"hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":33.0029057700291,"r":10.6268161062682,"b":60.5728518057285,"l":71.1996679119967},"font":{"color":"rgba(0,0,0,1)","family":"","size":21.2536322125363},"xaxis":{"domain":[0,1],"type":"linear","autorange":false,"range":[15798.05,17644.95],"tickmode":"array","ticktext":["2014","2015","2016","2017","2018"],"tickvals":[16071,16436,16801,17167,17532],"categoryorder":"array","categoryarray":["2014","2015","2016","2017","2018"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":5.31340805313408,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":17.0029057700291},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"y","title":"data","titlefont":{"color":"rgba(0,0,0,1)","family":"","size":21.2536322125363},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"type":"linear","autorange":false,"range":[-0.5,10.5],"tickmode":"array","ticktext":["0.0","2.5","5.0","7.5","10.0"],"tickvals":[0,2.5,5,7.5,10],"categoryorder":"array","categoryarray":["0.0","2.5","5.0","7.5","10.0"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":5.31340805313408,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":17.0029057700291},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"x","title":"nota","titlefont":{"color":"rgba(0,0,0,1)","family":"","size":21.2536322125363},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":false,"legend":{"bgcolor":null,"bordercolor":null,"borderwidth":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":17.0029057700291}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":[{"name":"Collaborate","icon":{"width":1000,"ascent":500,"descent":-50,"path":"M487 375c7-10 9-23 5-36l-79-259c-3-12-11-23-22-31-11-8-22-12-35-12l-263 0c-15 0-29 5-43 15-13 10-23 23-28 37-5 13-5 25-1 37 0 0 0 3 1 7 1 5 1 8 1 11 0 2 0 4-1 6 0 3-1 5-1 6 1 2 2 4 3 6 1 2 2 4 4 6 2 3 4 5 5 7 5 7 9 16 13 26 4 10 7 19 9 26 0 2 0 5 0 9-1 4-1 6 0 8 0 2 2 5 4 8 3 3 5 5 5 7 4 6 8 15 12 26 4 11 7 19 7 26 1 1 0 4 0 9-1 4-1 7 0 8 1 2 3 5 6 8 4 4 6 6 6 7 4 5 8 13 13 24 4 11 7 20 7 28 1 1 0 4 0 7-1 3-1 6-1 7 0 2 1 4 3 6 1 1 3 4 5 6 2 3 3 5 5 6 1 2 3 5 4 9 2 3 3 7 5 10 1 3 2 6 4 10 2 4 4 7 6 9 2 3 4 5 7 7 3 2 7 3 11 3 3 0 8 0 13-1l0-1c7 2 12 2 14 2l218 0c14 0 25-5 32-16 8-10 10-23 6-37l-79-259c-7-22-13-37-20-43-7-7-19-10-37-10l-248 0c-5 0-9-2-11-5-2-3-2-7 0-12 4-13 18-20 41-20l264 0c5 0 10 2 16 5 5 3 8 6 10 11l85 282c2 5 2 10 2 17 7-3 13-7 17-13z m-304 0c-1-3-1-5 0-7 1-1 3-2 6-2l174 0c2 0 4 1 7 2 2 2 4 4 5 7l6 18c0 3 0 5-1 7-1 1-3 2-6 2l-173 0c-3 0-5-1-8-2-2-2-4-4-4-7z m-24-73c-1-3-1-5 0-7 2-2 3-2 6-2l174 0c2 0 5 0 7 2 3 2 4 4 5 7l6 18c1 2 0 5-1 6-1 2-3 3-5 3l-174 0c-3 0-5-1-7-3-3-1-4-4-5-6z"},"click":"function(gd) { \n        // is this being viewed in RStudio?\n        if (location.search == '?viewer_pane=1') {\n          alert('To learn about plotly for collaboration, visit:\\n https://cpsievert.github.io/plotly_book/plot-ly-for-collaboration.html');\n        } else {\n          window.open('https://cpsievert.github.io/plotly_book/plot-ly-for-collaboration.html', '_blank');\n        }\n      }"}],"cloud":false},"source":"A","attrs":{"330e4b4b81d1":{"x":{},"y":{},"type":"scatter"},"330e65edb2ca":{"x":{},"y":{}}},"cur_data":"330e4b4b81d1","visdat":{"330e4b4b81d1":["function (y) ","x"],"330e65edb2ca":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1}},"base_url":"https://plot.ly"},"evals":["config.modeBarButtonsToAdd.0.click"],"jsHooks":{"render":[{"code":"function(el, x) { var ctConfig = crosstalk.var('plotlyCrosstalkOpts').set({\"on\":\"plotly_click\",\"persistent\":false,\"dynamic\":false,\"selectize\":false,\"opacityDim\":0.2,\"selected\":{\"opacity\":1}}); }","data":null}]}}</script>
+<p>Parece que a nota média do Tiago Belotti subiu um pouquinho ao longo dos anos, mas nada muito significativo. Ou seja, minha hipótese de que o Tiago Belotti ficou mais bonzinho não se verifica. Ele é super consistente!</p>
+<p>Outras investigações que eu gostaria de fazer:</p>
+<ol style="list-style-type: decimal">
+<li>Qual a relação das notas do Tiago com o Rotten Tomatoes ou o IMDb?</li>
+<li>Será que é possível prever a nota do Tiago com base em outras notas e características do filme?</li>
+<li>O Tiago avalia diferente filmes de gêneros diferentes?</li>
+</ol>
+<p>Para essas investigações, seria necessário cruzar essa base com a base do Rotten Tomatoes e do IMDb. Quem sabe num próximo post!</p>
+<p>É isso pessoal. Um abraço, e até a próxima.</p>
+<p><img src="/blog/2018-02-21-2cents/out_0266.png" style="display: block; margin: auto;" /></p>
+</div>
+<div id="agradecimentos" class="section level3">
+<h3>Agradecimentos</h3>
+<p><a href="https://sillasgonzaga.github.io/">Sillas</a> pelas ideias de visualização, que acabei não postando. E também para os amigos que brincaram comigo na datathon sobre isso: <a href="https://github.com/brunaw">Bruna Wunderwald</a>, <a href="http://confeitariamag.com/author/lucianakeiko/">Luciana Keiko</a>, <a href="http://curso-r.com">William</a>, <a href="http://curso-r.com">Caio Lente</a>, <a href="https://github.com/duarteguilherme">Guilherme</a> e quem mais eu tiver esquecido.</p>
+</div>
+<div id="cursos-r-basico-e-web-scraping" class="section level3">
+<h3>Cursos R básico e Web Scraping</h3>
+<p>Não perca a oportunidade de se inscrever nos nossos cursos!</p>
+<ul>
+<li><a href="http://workshop.curso-r.com/web-scraping/">Web Scraping - 10 de março de 2018</a></li>
+<li><a href="http://workshop.curso-r.com/introducao-programacao-r/">R básico - 17 e 24 de março de 2018</a></li>
+</ul>
+</div>
+</div>

@@ -1,0 +1,139 @@
+---
+title: "Tratando erros: the tidy way"
+date: "2017-04-20T13:07:31+02:00"
+tags: ["coding", "pacotes", "purrr"]
+categories: ["tutoriais", "r"]
+banner: "img/banners/error.jpg"
+author: ["Julio"]
+draft: false
+summary: "Tratar erros no R é importante para identificar problemas nos códigos e evitar retrabalho. Quem nunca rodou um algoritmo pesadíssimo que deu errado na última iteração? Nesse artigo, veremos como trabalhar com erros no R e a versão tidy dessas soluções."
+---
+
+
+```{r echo=F}
+knitr::opts_chunk$set(collapse = TRUE, cache = TRUE)
+```
+
+Tratar erros no R é importante para identificar problemas nos códigos e evitar retrabalho. Quem nunca rodou um algoritmo pesadíssimo que deu errado na última iteração? Nesse artigo, veremos como trabalhar com erros no R e a versão `tidy` dessas soluções.
+
+## Usando `try()` e `tryCatch()`
+
+A forma tradicional de tratar erros no R é com a função `tryCatch()`. Essa função tem como primeiro argumento uma expressão a ser avaliada e argumentos diversos para trabalhar com os erros. A versão mais compacta do `tryCatch()` é escrita assim:
+
+```{r}
+tryCatch(sqrt(1), error = function(e) e)
+tryCatch(sqrt('a'), error = function(e) e)
+```
+
+O `try()` é uma simplificação de `tryCatch()` que assume que não estamos interessados no erro, mas sim no resultado da função quando ela dá certo. O código abaixo não trava:
+
+```{r}
+try(sqrt(1))
+try(sqrt('a'))
+## Error in sqrt("a") : non-numeric argument to mathematical function
+```
+
+Existe até mesmo uma versão quieta do `try()`, usando o parâmetro `silent = `. Quando a expressão dá um erro, o `try()` retorna a mensagem de erro de forma invisível, ou seja, sem mostrar explicitamente para o usuário.
+
+```{r}
+x <- try(sqrt('a'), silent = TRUE)
+x
+```
+
+## Usando advérbios do `purrr`
+
+Hoje em dia, o jeito mais arrumado de tratar erros é usando as funções `purrr::possibly()` e suas amigas, `quietly()` e `safely()`. Note que todas essas palavras são advérbios: o objetivo delas é alterar o comportamento de outros verbos (outras funções). Essa forma de pensar nos nomes das funções (funções são verbos, modificadores de funções são advérbios) faz parte do [princípio tidy](http://curso-r.com/blog/2017/02/15/2017-02-16-manifesto-tidy/).
+
+- `safely()` retorna uma lista com elementos `result` e `error`. Quando a função não dá erro, `error` fica igual a `NULL`. Quando a função dá erro, `error` guarda a mensagem de erro e `result` guarda o valor do parâmetro `otherwise = `, que por padrão é `NULL`.
+- `possibly()` é uma versão mais otimista do `safely()`, que exige a definição de `otherwise = ` e não guarda as mensagens de erro.
+- `quietly()` não trata erros (ou seja, ela trava quando dá erro), mas guarda informações sobre *warnings* e *messages*.
+
+```{r, echo=FALSE, fig.cap='Admita, você não imaginava que teria de pensar em gramática para programar em R.', fig.width=8, fig.height=4}
+library(magick)
+x <- image_read('../../static/img/blog/try/adverbs.jpg')
+plot(x)
+```
+
+Vamos ver as três funções colocadas em prática. Como exemplo usaremos a função `log`, que i) retorna um número quando a entrada é um número positivo, ii) dá um warning quando a entrada é um número menor ou igual a zero, e iii) dá um erro se a entrada não é um número.
+
+```{r error = TRUE}
+log(10)
+log(-1)
+log('a')
+```
+
+Vamos fazer as versões modificadas de `log`:
+
+```{r}
+library(purrr)
+safe_log <- safely(log) # outra forma fancy de escrever isso: log %>% safely()
+possible_log <- possibly(log, otherwise = 'putz')
+quiet_log <- quietly(log)
+```
+
+Vamos mapear os seguintes elementos nessas funções:
+
+```{r}
+entradas <- list(10, -1, 'a')
+```
+
+Agora, os resultados:
+
+```{r, error=TRUE}
+## Esse código vai travar
+map(entradas, log) 
+```
+
+- `safely()`:
+
+```{r}
+## Retorna uma lista com erros e resultados NULL
+map(entradas, safe_log)
+```
+
+- `possibly()`:
+
+```{r}
+## Retorna uma lista com os resultados que deram certo
+map(entradas, possible_log)
+```
+
+- `quietly()`:
+
+```{r error = TRUE}
+## Também trava, mesmo problema de log
+map(entradas, quiet_log) 
+
+## Quando funciona, retorna todos os warnings e messages
+map(entradas[1:2], quiet_log)
+```
+
+## Combo com `purrr` e `tibble`
+
+Um combo que eu gosto bastante de usar é adicionar erros do código retornado por `safely()` dentro de uma `tibble`. Uma forma de fazer isso é com o código abaixo:
+
+```{r warning=FALSE}
+library(tibble)
+
+# adiciona um resultado default caso dê erro. No caso, NA.
+safe_log2 <- log %>% safely(otherwise = NA_real_)
+
+d_result <- entradas %>% 
+  map(safe_log2) %>% 
+  # ao invés de uma lista de tamanho 3 com 2 elementos (result e error),
+  # temos uma lista de tamanho 2 (result e error) com 3 elementos.
+  transpose() %>%    
+  # simplifica o vetor de resultados
+  simplify_all() %>% 
+  # converte para data frame
+  as_tibble()
+
+d_result
+```
+
+Assim, é possível guardar as informações dos erros de forma concisa, sem perder a informação dos erros.
+
+E é isso. Happy coding ;)
+
+**PS**: Até pouco tempo atrás eu usava a função `dplyr::failwith()` para fazer o mesmo que `possibly()`. Porém, descobri que essa função [será retirada do `dplyr` no futuro](https://github.com/tidyverse/dplyr/blob/master/NEWS.md#deprecated-and-defunct). Então se você é um usuário de `failwith()`, está na hora de mudar!
+

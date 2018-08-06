@@ -1,0 +1,142 @@
+---
+title: "Quebrando CAPTCHAs - Parte II: O pacote decryptr"
+date: "2017-07-10T13:07:31+02:00"
+tags: ["r", "captcha"]
+categories: ["r"]
+banner: "img/banners/captcha_02.png"
+author: ["Julio"]
+draft: false
+summary: "No último post sobre CAPTCHAs anunciei uma série de posts sobre CAPTCHAs. Uma da nossas iniciativas principais nesse tema é a criação do pacote decryptr, um framework completo para modelagem de CAPTCHAs. Hoje veremos como..."
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, cache = TRUE)
+```
+
+
+No meu último post anunciei que começaríamos uma série sobre CAPTCHAs. Uma da nossas iniciativas principais nesse tema é a criação do [pacote decryptr](https://github.com/decryptr/decryptr). Hoje veremos como usar algumas das funções principais desse pacote.
+
+## Suposições do `decryptr`
+
+Ao criar o `decryptr` reduzimos um pouco o escopo de CAPTCHAs que gostaríamos de incluir. Fizemos isso para não ficarmos malucos, pois existem diversos tipos de testes disponíveis na web! 
+
+As suposições são:
+
+1. Apenas imagens `jpg` ou `png`.
+1. Uma imagem possui apenas números e letras.
+1. A quantidade de caracteres de um CAPTCHA é fixa.
+1. Dois CAPTCHAs de mesma origem têm sempre as mesmas dimensões.
+1. Não conseguimos nem queremos quebrar o [reCAPTCHA](https://www.google.com/recaptcha/intro/invisible.html).
+
+## Instalação
+
+O `decryptr` ainda não está no CRAN. Isso significa que para instalá-lo você precisará do `devtools`:
+
+```{r eval=FALSE}
+if (!require(devtools)) install.packages('devtools')
+devtools::install_github('decryptr/decryptr')
+```
+
+As funções principais do `decryptr` são 
+
+- `download()`: baixar imagens da web. 
+- `read_captcha()`: adiciona metadados úteis a uma string com o caminho do CAPTCHA.
+- `load_captcha()`: carrega a imagem na memória.
+- `plot.captcha()`: método `S3` para desenhar o CAPTCHA na tela.
+- `classify.captcha()`: método `S3` para classificar CAPTCHAs manualmente.
+- `prepare.captcha()`: método `S3` para carregar CAPTCHAs em um formato adequado para modelagem usando o Keras.
+- `model.captcha()`: método `S3` para modelar os CAPTCHAs.
+- `predict.captcha()`: método `S3` para classificar um CAPTCHA a partir de um modelo ajustado e um caminho de imagem.
+
+### Fluxo de utilização
+
+O modo de uso planejado do `decryptr` está descrito na Figura \@ref(fig:fluxo).
+
+```{r fluxo, fig.cap='Fluxo de utilização do pacote `decryptr`.', echo=FALSE, cache=FALSE}
+DiagrammeR::grViz('
+digraph rmarkdown {
+graph [layout = circo]
+download->read
+read->plot
+read->classify
+read->prepare
+prepare->model
+model->predict
+read->predict
+}', height = 400, width = 750)
+```
+
+Como ainda não temos a teoria completa para ajuste de modelos, nesse post vamos ficar com a utilização das funções de download, visualização e classificação.
+
+## Download
+
+A função `download()` tem cinco parâmetros:
+
+- `url=` o link do CAPTCHA que queremos baixar.
+- `dest=` a pasta que queremos salvar a imagem.
+- `n=` a quantidade de CAPTCHAs a serem baixados.
+- `secure=` se `TRUE`, fará o download com a opção `ssl_verifypeer = FALSE` ([veja esse post](http://curso-r.com/blog/2017/03/31/2017-03-31-ssl/))
+- `type=` extensão do arquivo (`jpg`/`jpeg` ou `png`).
+
+Essa não é uma das funções mais seguras do mundo, já que dependemos de uma boa conexão com o servidor de onde os CAPTCHAs serão baixados. A função também não trata de problemas com bloqueio de IP.
+
+Para facilitar a utilização do `decryptr`, adicionamos algumas funções do tipo `download_*()`, que já contêm os padrões para download de alguns sites específicos:
+
+- `download_rfb`: [Consulta de CNPJ da Receita federal](http://www.receita.fazenda.gov.br/pessoajuridica/cnpj/cnpjreva/cnpjreva_solicitacao2.asp).
+- `download_saj`: [Sistema SAJ (vários Tribunais Estaduais)](https://esaj.tjsp.jus.br/cjsg/imagemCaptcha.do).
+- `download_tjmg`: [Tribunal de Justiça de Minas Gerais](http://www4.tjmg.jus.br/juridico/sf/captcha.svl).
+- `download_tjrj`: [Tribunal de Justiça do Rio de Janeiro](http://www4.tjrj.jus.br/consultaProcessoWebV2/captcha).
+- `download_tjrs`: [Tribunal de Justiça do Rio Grande do Sul](http://www.tjrs.jus.br/site_php/consulta/human_check/humancheck_showcode.php).
+- `download_trt`: [Tribunais Regionais do Trabalho](https://pje.trt3.jus.br/consultaprocessual/seam/resource/captcha).
+
+Nesses casos, os únicos parâmetros são `dest=` e `n=`. Exemplo:
+
+```{r eval=FALSE}
+library(decryptr)
+download_tjmg('img/tjmg', n = 5) # salva arquivo em ./img/tjmg/captcha<id>.jpeg
+```
+
+## Visualização
+
+Para plotar um CAPTCHA basta ler o arquivo com `read_captcha()` e depois usar a função `plot()`. Exemplo:
+
+```{r fig.height=1.5, fig.width=4, fig.cap='CAPTCHA do TJMG.'}
+library(decryptr)
+'../../static/data/captcha-dados/tjmg/captcha4d2f1097adba_73301.jpeg' %>% 
+  read_captcha() %>% 
+  plot()
+```
+
+Vale mencionar que esse não é um `ggplot()` então nem tente somar layers nesse gráfico `r emo::ji('smile')`.
+
+## Classificação
+
+A classificação manual de CAPTCHAs é importante para possibilitar o treino de modelos preditivos. Para classificar um CAPTCHA você pode utilizar a função `classify()`, assim:
+
+```{r eval=FALSE}
+'img/tjmg/captcha4d2f795d4e4_92522.jpeg' %>% 
+  read_captcha() %>% 
+  classify()
+```
+
+Essa função fará duas coisas:
+
+- Plota o CAPTCHA na tela.
+- Abre um console para o usuário digitar o valor do CAPTCHA manualmente.
+
+Ao escrever o valor o CAPTCHA, pressione `<enter>`. Após isso, a função `classify()` irá adicionar sua classificação após o nome da imagem, como no exemplo acima: `_92522`. A função `classify()` gera uma cópia para que seja impossível de perder a imagem original.
+
+Algumas opções do `classify()`:
+
+- `dest=` colocar uma pasta para classificar os CAPTCHAs. Por padrão é a pasta onde os originais estão.
+- `answer=` adicionar uma resposta ao invés de esperar abrir o console. Essa opção é útil quando as classficações são feitas automaticamente (e.g., por um quebrador de CAPTCHAs que usa o áudio no lugar da imagem.)
+
+## Wrap-up
+
+- Baixar com `download()` ou `download_*()`.
+- Visualizar com `read_captcha()` pipe `plot()`.
+- Classificar com `read_captcha()` pipe `classify()`.
+
+Caso encontre problemas, [adicione issues no repositório do pacote](https://github.com/decryptr/decryptr/issues).
+
+É isso. Happy coding ;)

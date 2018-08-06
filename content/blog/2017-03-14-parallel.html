@@ -1,0 +1,56 @@
+---
+title: "Paralelização no R"
+date: "2017-03-19T13:07:31+02:00"
+tags: ["paralelização"]
+categories: ["tutoriais", "r"]
+banner: "img/banners/banner-parallel.png"
+author: ["Julio"]
+summary: "Programadores eficientes não precisam escrever algoritmos que rodam rápido. Recomendo fortemente a leitura do livro Efficient R, que discute eficiência com o R de forma exaustiva. Também gosto muito da primeira parte dessa palestra do Hadley, onde ele defende que o cientista de dados deve usar seu tempo pensando no problema e não na forma que vai escrever seu código..."
+---
+
+
+
+<p>Programadores eficientes não precisam escrever algoritmos que rodam rápido. Recomendo fortemente a leitura do livro <a href="https://csgillespie.github.io/efficientR/">Efficient R</a>, que discute eficiência com o R de forma exaustiva. Também gosto muito da primeira parte <a href="https://www.youtube.com/watch?v=wki0BqlztCo">dessa palestra do Hadley</a>, onde ele defende que o cientista de dados deve usar seu tempo pensando no problema e não na forma que vai escrever seu código.</p>
+<p>Com isso em mente, vamos investigar o tema <em>paralelização</em>. Quando rodamos coisas em paralelo, mandamos os núcleos de processamento da máquina calcularem coisas diferentes ao mesmo tempo. A vantagem disso é que o tempo de execução dos algoritmos é dividido pelo número de núcleos disponíveis, sem exigir grandes mudanças no código utilizado.</p>
+<p>Vamos mostrar como paralelizar um código usando a função <code>llply()</code> do pacote <code>plyr</code>. Essa função funciona de forma idêntica ao <code>lapply()</code>, ou seja, recebe uma lista ou vetor como input, aplica uma função em cada elemento, e retorna os resultados numa lista com o mesmo comprimento.</p>
+<p>A função <code>dormir()</code> manda o R esperar <code>seg</code> segundos antes de concluir, retornando <code>seg</code>.</p>
+<pre class="r"><code>dormir &lt;- function(seg = 1) {
+  Sys.sleep(seg)
+  return(seg)
+}</code></pre>
+<p>É intuitivo afirmar que o tempo de execução de <code>dormir()</code> é compatível com <code>seg</code>.</p>
+<pre class="r"><code>system.time({
+  dormir()
+})
+##    user  system elapsed 
+##   0.000   0.000   1.005</code></pre>
+<p>Nosso interesse é aplicar <code>dormir()</code> em cada elemento do vetor <code>c(1, 2)</code>. Esse algoritmo demora <code>1 + 2 = 3</code> segundos.</p>
+<pre class="r"><code>segundos &lt;- c(1, 2)
+system.time({
+  plyr::llply(segundos, dormir)
+})
+##    user  system elapsed 
+##   0.008   0.001   3.017</code></pre>
+<p>Agora vamos executar o mesmo código usando paralelização. Antes, precisamos</p>
+<ol style="list-style-type: decimal">
+<li>criar e registrar as cópias de R que rodam em paralelo; e</li>
+<li>adicionar o parâmetro <code>.parallel = TRUE</code> no <code>llply()</code></li>
+</ol>
+<p>O primeiro passo é resolvido com os pacotes <code>parallel</code> e <code>doParallel</code>. Veja como fica o código:</p>
+<pre class="r"><code>cl &lt;- parallel::makePSOCKcluster(2) # cria as cópias do R que rodam em paralelo
+doParallel::registerDoParallel(cl)  # registra as cópias do R para serem usadas no plyr
+
+system.time({
+  plyr::llply(segundos, dormir, .parallel = TRUE)
+})
+##    user  system elapsed 
+##   0.148   0.005   2.332</code></pre>
+<p>O tempo total de execução foi de ~2.2 segundos, um pouco mais do que <code>dormir(2)</code>. Os dois décimos de segundo adicionais são necessários para preparar o terreno da paralelização. Inclusive, se você rodar o código em paralelo novamente, o tempo adicional cai para quase nada:</p>
+<pre class="r"><code>system.time({
+  plyr::llply(segundos, dormir, .parallel = TRUE)
+})
+##    user  system elapsed 
+##   0.150   0.004   2.204</code></pre>
+<p>Se quiser parar de rodar coisas em paralelo, basta rodar <code>stopCluster()</code>:</p>
+<pre class="r"><code>parallel::stopCluster(cl) # para de rodar coisas em paralelo</code></pre>
+<p>E é isso, caros errantes. Rappy coding :)</p>

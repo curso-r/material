@@ -1,0 +1,191 @@
+---
+title: "Aquele 1% é Deep Learning - Gerando letras do Wesley Safadão"
+date: "2017-08-28T23:26:00+03:00"
+tags: ["estatística"]
+categories: ["análises", "r"]
+banner: "img/banners/wesley.png"
+author: ["Julio"]
+summary: "Nesse funal de semana decidi assistir alguns vídeos do YouTube do Siraj Raval e acompanhar o curso do Andrew Ng. Depois de aprender várias coisas interessantes, fiquei com uma vontade insana de implementar um modelo pra gerar músicas aleatórias do Wesley Safadão. Eis o ..."
+---
+
+
+
+<p>Nesse final de semana decidi assistir a alguns vídeos do YouTube do <a href="https://www.youtube.com/channel/UCWN3xxRkmTPmbKwht9FuE5A">Siraj Raval</a> e ao curso do <a href="https://www.coursera.org/learn/nlp-sequence-models">Andrew Ng sobre deep learning</a>. Após assistir alguns vídeos, fiquei com uma vontade insana de implementar um modelo pra gerar músicas aleatórias do <a href="https://pt.wikipedia.org/wiki/Wesley_Safad%C3%A3o">Wesley Safadão</a>!</p>
+<p>Na minha opinião, o resultado ficou bem mais ou menos. Acho que tem muito o que melhorar ainda. Vejam o que acham!</p>
+<p>Instruções de uso:</p>
+<ol type="1">
+<li>Aperte o botão.</li>
+<li><strong>ESPERE UM POUCO</strong>. Meu código é lento e botei num serviço gratuito do <a href="https://www.opencpu.org/">OpenCPU</a>, então tenham paciência, por favor.</li>
+<li>Veja o texto que aparece. O texto até o <code>|</code> é original, e o resto é gerado automaticamente. Quando o tamanho do texto fica grande demais, adicionamos um <code>&lt;truncated&gt;</code></li>
+</ol>
+<script>
+  $(document).ready(function() {
+    $('#MyButton').click(function() {
+       $('#safadao').css('background-color' , '#DEDEDE');
+       $.post('http://jtrecenti.ocpu.io/safadao/R/gen/json', { rand : Math.random() }, function(data) {
+          $("#safadao").val(data);
+       });
+       $('#safadao').css('background-color' , '#FFFFFF');
+    });
+  });
+</script>
+<input type="button" value="E aquele 1%?" id="MyButton" >
+<textarea id="safadao" class="form-control" style="height:400px;">
+</textarea>
+<section id="comofas" class="level1">
+<h1>#comofas</h1>
+<p>O trabalho foi feito em 3 passos: download, modelagem e implantação. Descrevemos cada um dos passos a seguir.</p>
+<section id="download" class="level2">
+<h2>Download</h2>
+<p>As letras foram baixadas do <a href="https://www.letras.mus.br">letras.mus.br</a>. Primeiro, rodamos um script que lista os links de todas as músicas a partir da página do Wesley Safadão. O CSS path esquisito abaixo foi a forma mais compacta que encontrei de acessar os links diretamente.</p>
+<pre class="r"><code>library(magrittr)
+link_base &lt;- &#39;https://www.letras.mus.br&#39;
+# listando os links
+ws_links &lt;- paste0(link_base, &#39;/wesley-safadao/&#39;) %&gt;% 
+  rvest::html_session() %&gt;% 
+  rvest::html_nodes(&#39;.cnt-list--alp &gt; ul &gt; li &gt; a&#39;) %&gt;% 
+  rvest::html_attr(&#39;href&#39;)</code></pre>
+<p>Em seguida, criamos uma função que pega a letra a partir de uma página.</p>
+<pre class="r"><code>pegar_letra &lt;- function(link) {
+  # do link até a parte que tem o conteúdo
+  result &lt;- paste0(link_base, link) %&gt;% 
+    rvest::html_session() %&gt;% 
+    rvest::html_nodes(&#39;.cnt-letra &gt; article &gt; p&#39;) %&gt;% 
+    # Peguei o texto com as tags html para pegar os \n
+    as.character() %&gt;% 
+    stringr::str_replace_all(&#39;&lt;[brp/]+&gt;&#39;, &#39;\n&#39;) %&gt;% 
+    paste(collapse = &#39;\n\n&#39;) %&gt;% 
+    # Limpeza do texto
+    limpar_musica() %&gt;% 
+    tokenizers::tokenize_characters(strip_non_alphanum = FALSE, simplify = TRUE)
+  c(result, &#39;@&#39;) # Adicionando @ no final
+}</code></pre>
+<p>E usamos o maravilhoso combo <code>purrr::map</code> com <code>progress::progress</code>, que já tem um <a href="http://curso-r.com/blog/2017/04/10/2017-04-08-progress/">post dedicado no nosso blog</a>.</p>
+<pre class="r"><code># baixando todas as listas
+p &lt;- progress::progress_bar$new(total = length(ws_links))
+ws_letras &lt;- unlist(purrr::map(ws_links, ~{
+  p$tick()
+  pegar_letra(.x)
+}))</code></pre>
+<p>Note que eu escondi de vocês a função <code>limpar_musica()</code>. Essa função aplica uma série de <a href="http://material.curso-r.com/stringr/">expressões regulares</a> para limpar os textos.</p>
+<pre class="r"><code>limpar_musica &lt;- function(txt) {
+  txt %&gt;% 
+    stringr::str_trim() %&gt;% 
+    stringr::str_to_lower() %&gt;% 
+    stringr::str_replace_all(&#39;[^a-z0-9êâôáéíóúãõàç;,!?: \n-]&#39;, &#39;&#39;) %&gt;%
+    stringr::str_replace_all(&#39;[0-9]+x| bis&#39;, &#39;&#39;) %&gt;%
+    stringr::str_replace_all(&#39;([ ,?!])+&#39;, &#39;\\1&#39;) %&gt;% 
+    stringr::str_replace_all(&#39; ([;,!?:-])&#39;, &#39;\\1&#39;) %&gt;%
+    stringr::str_replace_all(&#39;\n{3,}&#39;, &#39;\n\n&#39;)
+}</code></pre>
+<p>O resultado é o objeto <code>ws_letras</code>: um vetor tamanho 557459 em que cada elemento é um caractere, que pode ser uma letra, número, espaço e até uma pulada de linha. Cada música é separada pelo caractere <code>@</code>. Aqui está a primeira delas:</p>
+<pre class="r"><code>cat(head(ws_letras, which(ws_letras == &#39;@&#39;)[1] - 1), sep = &#39;&#39;)
+## assim é o nosso amor
+## io io io io io iooo
+## 100 amor
+## io io io io io iooo
+## 
+## só a gente se olhar que coração dispara
+## e as bocas calam
+## e o desejo fala por nós dois
+## 
+## canalisando o nosso amor,
+## nada se compara
+## é fogo é tara,
+## no antes durante e depois
+## 
+## coisa rara bonito de ver
+## o mundo pára pra eu e você
+## é um conto de fadas a nossa paixão
+## duas vidas em um só coração</code></pre>
+</section>
+<section id="modelagem" class="level2">
+<h2>Modelagem</h2>
+<p>Não vou entrar em detalhes na parte estatística, mas basicamente utilizei uma rede LSTM (Long Short-Term Memory) e apenas uma camada oculta, copiada covardemente de um <a href="https://rstudio.github.io/keras/articles/examples/lstm_text_generation.html">código feito pelo Daniel Falbel nos tutoriais do Keras para o R</a>. O modelo serve para classificar <strong>caracteres</strong> (não palavras) e considera uma janela de passado máximo de 40 caracteres para realizar suas predições. Por esse motivo as letras geradas podem ter erros gramaticais feios (e.g. palavras iniciadas em <code>ç</code>).</p>
+<p>Por simplicidade, omiti o código que faz a preparação dos dados para ajustar no keras. Assim que eu tiver mais domínio sobre LSTM e Recurrent Neural Networks (RNNs) em geral farei um post dedicado.</p>
+<p>A especificação do modelo é simples: i) adicionamos apenas uma camada LSTM com 128 unidades, ii) adicionamos uma camada oculta com o número de unidades igual ao total de caracteres distintos presentes no texto e iii) aplicamos uma ativação <code>softmax</code>, que dá as probabilidades de cada candidato a próximo caractere.</p>
+<p>Consideramos como função de custo a <em>Categorical Cross Entropy</em>, a mesma da regressão logística. Como otimizador usamos o Adam, que faz basicamente uma descida de gradiente, mas aplica médias móveis com o passo anterior e com a derivada obtida via <em>back propagation</em>, realizando atualizações mais suaves.</p>
+<p>No final, ajustamos o modelo com mini-batches de 256 observações e cinco épocas. Isso significa que fazemos 5 passos gigantes da descida de gradiente usando toda a base de dados, separados em diversos passinhos com 256 observações cada.</p>
+<p>Na prática, eu rodei o <code>fit</code> algumas vezes, reduzindo manualmente a taxa de aprendizado <code>lr</code> para fazer um ajuste mais fino. Cada época demorava aproximadamente 6 minutos no meu notebook, que não tem GPU.</p>
+<pre class="r"><code>library(keras)
+model &lt;- keras_model_sequential()
+model %&gt;%
+  layer_lstm(128, input_shape = c(maxlen, length(chars))) %&gt;%
+  layer_dense(length(chars)) %&gt;%
+  layer_activation(&quot;softmax&quot;)
+# custo e otimizador
+model %&gt;% compile(
+  loss = &quot;categorical_crossentropy&quot;, 
+  optimizer = optimizer_adam(lr = 0.0001)
+)
+# ajuste
+model %&gt;% fit(
+  keras_data$X, keras_data$y, 
+  batch_size = 256, epochs = 5
+)</code></pre>
+<p>Também temos duas funções interessantes a serem discutidas. A primeira é a <code>sample_mod()</code>, uma função que recebe as probabilidades de cada letra e gera uma nova letra com essas probabilidades. O parâmetro <code>diversity=</code> aumenta ou diminui manualmente todas essas probabilidades, fazendo o modelo alterar um pouco seu comportamento. Quando maior esse parâmetro, maior a chance de saírem caracteres inesperados e, quanto menor, maior a chance de sair um texto completamente repetitivo.</p>
+<pre class="r"><code>sample_mod &lt;- function(preds, diversity = 1) {
+  preds &lt;- log(preds) / diversity
+  exp_preds &lt;- exp(preds)
+  preds &lt;- exp_preds / sum(exp_preds)
+  which.max(as.integer(rmultinom(1, 1, preds)))
+}</code></pre>
+<p>A outra função é <code>gerar_txt()</code>, nosso gerador de textos. Essa função recebe o modelo do Wesley Safadão e retorna um novo texto. O algoritmo funciona assim:</p>
+<ol type="1">
+<li><strong>Posicionamento</strong>. Escolhemos aleatoriamente uma posição do texto de entrada que tenha um <code>@</code> (<code>start_index</code>). Lembre-se, o <code>@</code> delimita o final ou início de uma letra.</li>
+<li><strong>Inicialização</strong>. Pegamos os 40 caracteres seguintes, indicados por <code>maxlen=</code> e guardamos no vetor <code>sentence</code>.</li>
+<li><strong>Geração de caracteres</strong>. Em seguida, entramos no seguinte laço: enquanto o modelo não gera um <code>@</code> (final da canção), criamos um novo caractere com <code>sample_mod()</code> e adicionamos à nossa sentença final. Para garantir que o código termina de rodar num tempo finito, paramos o laço se criarmos mais de <code>limit=</code> sem aparecer um <code>@</code>.</li>
+<li><strong>Impressão</strong>. Na hora de imprimir o texto, adicionamos um <code>|</code> como separador para indicar qual parte foi extraída da base real e qual parte é gerada automaticamente. Também adicionamos um <code>&lt;truncated&gt;</code> no final caso a fase anterior tenha passado do <code>limit=</code>.</li>
+</ol>
+<pre class="r"><code>gerar_txt &lt;- function(model, txt, diversity = 1.0, limit = 1000, maxlen = 40) {
+  # parte 1 - posicionamento
+  chars &lt;- sort(unique(txt))
+  txt_index &lt;- which(txt[-length(txt)] == &#39;@&#39;)
+  start_index &lt;- sample(txt_index, size = 1) + 1L
+  id_txt &lt;- which(txt_index == start_index)
+  # parte 2 - inicialização
+  sentence &lt;- txt[start_index:(start_index + maxlen - 1)]
+  generated &lt;- paste0(c(sentence, &#39;|&#39;), collapse = &quot;&quot;)
+  next_char &lt;- &quot;&quot;
+  total_chars &lt;- 0
+  # parte 3 - geração de caracteres
+  while (next_char != &#39;@&#39; &amp;&amp; total_chars &lt; limit) {
+    x &lt;- sapply(chars, function(x) {as.integer(x == sentence)})
+    dim(x) &lt;- c(1, dim(x))
+    next_index &lt;- sample_mod(predict(model, x), diversity)
+    next_char &lt;- chars[next_index]
+    generated &lt;- paste0(generated, next_char, collapse = &quot;&quot;)
+    sentence &lt;- c(sentence[-1], next_char)
+    total_chars &lt;- total_chars + 1
+  }
+  # parte 4 - impressão
+  s_final &lt;- stringr::str_sub(generated, 1, -2)
+  if (total_chars == limit) s_final &lt;- paste0(s_final, &#39;\n&lt;truncated&gt;&#39;)
+  s_final
+}</code></pre>
+</section>
+<section id="implantacao" class="level2">
+<h2>Implantação</h2>
+<p>Para deixar o modelo acessível pela internet, utilizei o maravilhoso <code>OpenCPU</code>. Trata-se de um pacote em R e também um software para transformar códigos R em API. Basicamente, o que fazemos é:</p>
+<ol type="1">
+<li><strong>Criar um pacote</strong> do R com as funções que temos interesse. No nosso caso, temos o pacote <a href="https://github.com/jtrecenti/safadao"><code>safadao</code></a>, que foi criado para guardar o modelo ajustado e a função que gera as letras, definida acima.</li>
+<li><strong>Instalar o OpenCPU</strong> em um servidor na nuvem.</li>
+<li><strong>Informar ao OpenCPU</strong> que queremos servir um pacote específico.</li>
+</ol>
+<p>Felizmente, só precisei realizar de fato o primeiro passo dessa lista. O <code>Jeroen Ooms</code>, autor dessa solução, nos dá uma vantagem a mais: ele <a href="https://www.opencpu.org/cloud.html">mantém um servidor na nuvem</a> onde qualquer usuário pode subir seu próprio pacote, totalmente de graça. Ou seja, podemos criar APIs com nossos modelos preferidos, de graça e sem esforço. Acesse <a href="https://www.opencpu.org/cloud.html">esse link</a> para instruções mais detalhadas de como fazer a implantação.</p>
+<p>No nosso caso, a API é acessível pelo link abaixo.</p>
+<pre><code>http://jtrecenti.ocpu.io/safadao/R/gen/json</code></pre>
+<p>Basta fazer uma requisição POST para esse link e ele retornará uma letra do Wesley Safadão.</p>
+</section>
+<section id="wrap-up" class="level2">
+<h2>Wrap-up</h2>
+<ul>
+<li>Vimos aqui mais uma aplicação da estatística que parece um pouco fora da caixa mas que na verdade é bem pé no chão.</li>
+<li>Para trabalhar com esse tipo de dados, usualmente usamos redes neurais LSTM, adequada para dados em sequência.</li>
+<li>O modelo ainda tem muito a melhorar, tanto com ajustes na modelagem quanto na melhoria ao tratamento dos dados.</li>
+<li>Agora você pode criar o gerador de músicas do seu artista preferido. Tente replicar para outro artista!</li>
+</ul>
+<p>É isso. Happy coding ;)</p>
+<p>PS: Também montei um <strong>gerador de salmos</strong> (da bíblia) aleatório, usando a mesma técnica, mas ainda não estou feliz com o resultado. Quando estiver, posto aqui também :P</p>
+</section>
+</section>

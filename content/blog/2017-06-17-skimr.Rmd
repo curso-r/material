@@ -1,0 +1,91 @@
+---
+title: "Skimr: estatísticas básicas com ❤️"
+date: "2017-06-17T13:07:31+02:00"
+tags: ["pacotes", "skimr"]
+categories: ["tutoriais", "r"]
+banner: "img/banners/skimr.png"
+author: ["Julio"]
+draft: false
+summary: "Uma coisa muito legal da ROpenSci Unconf 2017 é que ela funcionou como uma hackathon mega produtiva. Dentre os novos pacotes que olhei, o que mais me chamou atenção foi o skimr..."
+---
+
+```{r include=FALSE}
+knitr::opts_chunk$set(warning=FALSE, message=FALSE, 
+                      collapse=TRUE, cache = TRUE)
+```
+
+Entre os dias 25 e 27 de maio aconteceu a [ROpenSci Unconf 2017](http://unconf17.ropensci.org/). O encontro reuniu vários pop stars da comunidade R como [Hadley Wickham](http://hadley.nz), [Joe Cheng](https://github.com/jcheng5) (criador do shiny), [Jeroen Ooms](https://github.com/jeroen) (criador do OpenCPU e autor de vários pacotes bacanas), [Jenny Bryan](https://github.com/jennybc) (autora de vários pacotes bacanas como `googlesheets`), várias pessoas do [#R-Ladies](http://rladies.org/) e muito mais.
+
+Uma coisa muito legal dessa conferência é que ela funcionou como uma hackathon. Foi criada uma nova organização no github chamada [ROpenSci Labs](https://github.com/ropenscilabs), e os presentes simplesmente começaram a subir pacotes fantásticos lá dentro. Recomendo muito dar uma olhada.
+
+Dentre os pacotes que olhei, o que mais me chamou atenção foi o [`skimr`](https://github.com/ropenscilabs/skimr) e por isso estou fazendo esse post! O propósito do `skimr` é simples: fazer algumas estatísticas básicas univariadas de uma base de dados.
+
+O `skimr` ainda não está no CRAN, então para instalar recomendamos utilizar o `devtools` para instalar direto do GitHub, conforme código abaixo. Note que também será necessário instalar o pacote `colformat` do Hadley.
+
+```{r eval=F}
+devtools::install_github("hadley/colformat")
+devtools::install_github("ropenscilabs/skimr")
+```
+
+
+A função `skim()` calcula estatísticas básicas das variáveis e imprime no seu console. Note que a função separa estatísticas para variáveis numéricas ou fatores.
+
+```{r}
+library(tidyverse)
+library(skimr)
+skim(iris)
+```
+
+E tem mais! O mais legal do `skimr` é que ele usa a função `colformat::spark_bar()` para desenhar histogramas direto no seu console!
+
+```{r }
+skim(iris) %>% 
+  filter(stat == 'hist') %>% 
+  knitr::kable(caption = 'HISTOGRAMA NA TABELA PORQUE SIM!')
+```
+
+O `skimr` também possui padrões de estatísticas básicas para cada tipo de variável. Você pode checar esses tipos com `show_skimmers()`:
+
+```{r}
+show_skimmers() %>% 
+  map_df(enframe, .id = 'tipo') %>% 
+  group_by(tipo) %>% 
+  summarise(stats = glue::collapse(value, sep = ', ')) %>% 
+  knitr::kable(caption = 'Estatísticas básicas para cada tipo de variável.')
+```
+
+## Criando suas próprias funções
+
+Você também pode usar funções próprias com o `skimr`. Por exemplo, digamos que você queira calcular o coeficiente de variação. Primeiro, adicione sua função dentro de uma lista:
+
+```{r}
+funs <- list(cv = function(x) sd(x, na.rm = TRUE) / mean(x, na.rm = TRUE))
+```
+
+e depois aplique a função `skim_with()`:
+
+```{r}
+# append adiciona as suas funcoes nas existentes
+skim_with(numeric = funs, append = TRUE)
+```
+
+E pronto! Agora você pode rodar `skim()` novamente:
+
+```{r}
+skim(iris) %>% 
+  filter(stat %in% c('hist', 'cv')) %>% 
+  knitr::kable(caption = 'Histograma e coeficiente de variação.')
+```
+
+Para retornar ao `skim()` padrão, rode `skim_with_defaults()`.
+
+## Wrap up
+
+- Instale usando `devtools::install_github()`
+- Rode a função `skim()`. Use `dplyr::filter()` para filtrar as estatísticas de interesse.
+- Você pode adicionar suas próprias estatísticas com `skim_with()`.
+- Acompanhe a evolução do `skimr` [nesta página](https://github.com/ropenscilabs/skimr).
+
+O pacote ainda vai evoluir muito e não duvido nada que seja um bom candidado a entrar no `tidyverse`. O que vocês acham? Escrevam nos comentários!
+
+É isso. Happy coding ;)

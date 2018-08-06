@@ -1,0 +1,126 @@
+---
+title: "Quebrando CAPTCHAs - Parte II: O pacote decryptr"
+date: "2017-07-10T13:07:31+02:00"
+tags: ["r", "captcha"]
+categories: ["r"]
+banner: "img/banners/captcha_02.png"
+author: ["Julio"]
+draft: false
+summary: "No último post sobre CAPTCHAs anunciei uma série de posts sobre CAPTCHAs. Uma da nossas iniciativas principais nesse tema é a criação do pacote decryptr, um framework completo para modelagem de CAPTCHAs. Hoje veremos como..."
+---
+
+<script src="/rmarkdown-libs/htmlwidgets/htmlwidgets.js"></script>
+<script src="/rmarkdown-libs/viz/viz.js"></script>
+<link href="/rmarkdown-libs/DiagrammeR-styles/styles.css" rel="stylesheet" />
+<script src="/rmarkdown-libs/grViz-binding/grViz.js"></script>
+
+
+<p>No meu último post anunciei que começaríamos uma série sobre CAPTCHAs. Uma da nossas iniciativas principais nesse tema é a criação do <a href="https://github.com/decryptr/decryptr">pacote decryptr</a>. Hoje veremos como usar algumas das funções principais desse pacote.</p>
+<section id="suposicoes-do-decryptr" class="level2">
+<h2>Suposições do <code>decryptr</code></h2>
+<p>Ao criar o <code>decryptr</code> reduzimos um pouco o escopo de CAPTCHAs que gostaríamos de incluir. Fizemos isso para não ficarmos malucos, pois existem diversos tipos de testes disponíveis na web!</p>
+<p>As suposições são:</p>
+<ol type="1">
+<li>Apenas imagens <code>jpg</code> ou <code>png</code>.</li>
+<li>Uma imagem possui apenas números e letras.</li>
+<li>A quantidade de caracteres de um CAPTCHA é fixa.</li>
+<li>Dois CAPTCHAs de mesma origem têm sempre as mesmas dimensões.</li>
+<li>Não conseguimos nem queremos quebrar o <a href="https://www.google.com/recaptcha/intro/invisible.html">reCAPTCHA</a>.</li>
+</ol>
+</section>
+<section id="instalacao" class="level2">
+<h2>Instalação</h2>
+<p>O <code>decryptr</code> ainda não está no CRAN. Isso significa que para instalá-lo você precisará do <code>devtools</code>:</p>
+<pre class="r"><code>if (!require(devtools)) install.packages(&#39;devtools&#39;)
+devtools::install_github(&#39;decryptr/decryptr&#39;)</code></pre>
+<p>As funções principais do <code>decryptr</code> são</p>
+<ul>
+<li><code>download()</code>: baixar imagens da web.</li>
+<li><code>read_captcha()</code>: adiciona metadados úteis a uma string com o caminho do CAPTCHA.</li>
+<li><code>load_captcha()</code>: carrega a imagem na memória.</li>
+<li><code>plot.captcha()</code>: método <code>S3</code> para desenhar o CAPTCHA na tela.</li>
+<li><code>classify.captcha()</code>: método <code>S3</code> para classificar CAPTCHAs manualmente.</li>
+<li><code>prepare.captcha()</code>: método <code>S3</code> para carregar CAPTCHAs em um formato adequado para modelagem usando o Keras.</li>
+<li><code>model.captcha()</code>: método <code>S3</code> para modelar os CAPTCHAs.</li>
+<li><code>predict.captcha()</code>: método <code>S3</code> para classificar um CAPTCHA a partir de um modelo ajustado e um caminho de imagem.</li>
+</ul>
+<section id="fluxo-de-utilizacao" class="level3">
+<h3>Fluxo de utilização</h3>
+<p>O modo de uso planejado do <code>decryptr</code> está descrito na Figura <a href="#fig:fluxo">1</a>.</p>
+<div class="figure"><span id="fig:fluxo"></span>
+<div id="htmlwidget-1" style="width:750px;height:400px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-1">{"x":{"diagram":"\ndigraph rmarkdown {\ngraph [layout = circo]\ndownload->read\nread->plot\nread->classify\nread->prepare\nprepare->model\nmodel->predict\nread->predict\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<p class="caption">
+Figure 1: Fluxo de utilização do pacote <code>decryptr</code>.
+</p>
+</div>
+<p>Como ainda não temos a teoria completa para ajuste de modelos, nesse post vamos ficar com a utilização das funções de download, visualização e classificação.</p>
+</section>
+</section>
+<section id="download" class="level2">
+<h2>Download</h2>
+<p>A função <code>download()</code> tem cinco parâmetros:</p>
+<ul>
+<li><code>url=</code> o link do CAPTCHA que queremos baixar.</li>
+<li><code>dest=</code> a pasta que queremos salvar a imagem.</li>
+<li><code>n=</code> a quantidade de CAPTCHAs a serem baixados.</li>
+<li><code>secure=</code> se <code>TRUE</code>, fará o download com a opção <code>ssl_verifypeer = FALSE</code> (<a href="http://curso-r.com/blog/2017/03/31/2017-03-31-ssl/">veja esse post</a>)</li>
+<li><code>type=</code> extensão do arquivo (<code>jpg</code>/<code>jpeg</code> ou <code>png</code>).</li>
+</ul>
+<p>Essa não é uma das funções mais seguras do mundo, já que dependemos de uma boa conexão com o servidor de onde os CAPTCHAs serão baixados. A função também não trata de problemas com bloqueio de IP.</p>
+<p>Para facilitar a utilização do <code>decryptr</code>, adicionamos algumas funções do tipo <code>download_*()</code>, que já contêm os padrões para download de alguns sites específicos:</p>
+<ul>
+<li><code>download_rfb</code>: <a href="http://www.receita.fazenda.gov.br/pessoajuridica/cnpj/cnpjreva/cnpjreva_solicitacao2.asp">Consulta de CNPJ da Receita federal</a>.</li>
+<li><code>download_saj</code>: <a href="https://esaj.tjsp.jus.br/cjsg/imagemCaptcha.do">Sistema SAJ (vários Tribunais Estaduais)</a>.</li>
+<li><code>download_tjmg</code>: <a href="http://www4.tjmg.jus.br/juridico/sf/captcha.svl">Tribunal de Justiça de Minas Gerais</a>.</li>
+<li><code>download_tjrj</code>: <a href="http://www4.tjrj.jus.br/consultaProcessoWebV2/captcha">Tribunal de Justiça do Rio de Janeiro</a>.</li>
+<li><code>download_tjrs</code>: <a href="http://www.tjrs.jus.br/site_php/consulta/human_check/humancheck_showcode.php">Tribunal de Justiça do Rio Grande do Sul</a>.</li>
+<li><code>download_trt</code>: <a href="https://pje.trt3.jus.br/consultaprocessual/seam/resource/captcha">Tribunais Regionais do Trabalho</a>.</li>
+</ul>
+<p>Nesses casos, os únicos parâmetros são <code>dest=</code> e <code>n=</code>. Exemplo:</p>
+<pre class="r"><code>library(decryptr)
+download_tjmg(&#39;img/tjmg&#39;, n = 5) # salva arquivo em ./img/tjmg/captcha&lt;id&gt;.jpeg</code></pre>
+</section>
+<section id="visualizacao" class="level2">
+<h2>Visualização</h2>
+<p>Para plotar um CAPTCHA basta ler o arquivo com <code>read_captcha()</code> e depois usar a função <code>plot()</code>. Exemplo:</p>
+<pre class="r"><code>library(decryptr)
+&#39;../../static/data/captcha-dados/tjmg/captcha4d2f1097adba_73301.jpeg&#39; %&gt;% 
+  read_captcha() %&gt;% 
+  plot()</code></pre>
+<div class="figure"><span id="fig:unnamed-chunk-3"></span>
+<img src="/blog/2017-06-29-captcha-decryptr_files/figure-html/unnamed-chunk-3-1.png" alt="CAPTCHA do TJMG." width="384" />
+<p class="caption">
+Figure 2: CAPTCHA do TJMG.
+</p>
+</div>
+<p>Vale mencionar que esse não é um <code>ggplot()</code> então nem tente somar layers nesse gráfico 😄.</p>
+</section>
+<section id="classificacao" class="level2">
+<h2>Classificação</h2>
+<p>A classificação manual de CAPTCHAs é importante para possibilitar o treino de modelos preditivos. Para classificar um CAPTCHA você pode utilizar a função <code>classify()</code>, assim:</p>
+<pre class="r"><code>&#39;img/tjmg/captcha4d2f795d4e4_92522.jpeg&#39; %&gt;% 
+  read_captcha() %&gt;% 
+  classify()</code></pre>
+<p>Essa função fará duas coisas:</p>
+<ul>
+<li>Plota o CAPTCHA na tela.</li>
+<li>Abre um console para o usuário digitar o valor do CAPTCHA manualmente.</li>
+</ul>
+<p>Ao escrever o valor o CAPTCHA, pressione <code>&lt;enter&gt;</code>. Após isso, a função <code>classify()</code> irá adicionar sua classificação após o nome da imagem, como no exemplo acima: <code>_92522</code>. A função <code>classify()</code> gera uma cópia para que seja impossível de perder a imagem original.</p>
+<p>Algumas opções do <code>classify()</code>:</p>
+<ul>
+<li><code>dest=</code> colocar uma pasta para classificar os CAPTCHAs. Por padrão é a pasta onde os originais estão.</li>
+<li><code>answer=</code> adicionar uma resposta ao invés de esperar abrir o console. Essa opção é útil quando as classficações são feitas automaticamente (e.g., por um quebrador de CAPTCHAs que usa o áudio no lugar da imagem.)</li>
+</ul>
+</section>
+<section id="wrap-up" class="level2">
+<h2>Wrap-up</h2>
+<ul>
+<li>Baixar com <code>download()</code> ou <code>download_*()</code>.</li>
+<li>Visualizar com <code>read_captcha()</code> pipe <code>plot()</code>.</li>
+<li>Classificar com <code>read_captcha()</code> pipe <code>classify()</code>.</li>
+</ul>
+<p>Caso encontre problemas, <a href="https://github.com/decryptr/decryptr/issues">adicione issues no repositório do pacote</a>.</p>
+<p>É isso. Happy coding ;)</p>
+</section>

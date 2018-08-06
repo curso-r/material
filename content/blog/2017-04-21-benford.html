@@ -1,0 +1,116 @@
+---
+title: "Lei de Benford"
+date: "2017-04-20T13:07:31+02:00"
+tags: ["erro", "r"]
+categories: ["r"]
+banner: "img/banners/error.jpg"
+author: ["Julio"]
+draft: true
+summary: "Tratar erros no R é importante para identificar problemas nos códigos e evitar retrabalho. Quem nunca rodou um algoritmo pesadíssimo que deu errado na última iteração? Nesse artigo, veremos como trabalhar com erros no R e a versão tidy dessas soluções."
+---
+
+
+
+<div id="lei-de-benford" class="section level2">
+<h2>Lei de Benford</h2>
+</div>
+<div id="relatorios-do-tesouro-nacional" class="section level2">
+<h2>Relatórios do Tesouro Nacional</h2>
+</div>
+<div id="coleta-dos-dados" class="section level2">
+<h2>Coleta dos dados</h2>
+<pre class="r"><code>library(magrittr)
+link_tesouro &lt;- &#39;http://www.tesouro.fazenda.gov.br/-/relatorio-de-gestao-fiscal&#39;
+pagina &lt;- httr::GET(link_tesouro)
+
+links_pdf &lt;- pagina %&gt;% 
+  httr::content(&#39;text&#39;) %&gt;% 
+  xml2::read_html() %&gt;% 
+  rvest::html_node(&#39;.artigo &gt; table&#39;) %&gt;% 
+  rvest::html_nodes(&#39;a&#39;) %&gt;% 
+  rvest::html_attr(&#39;href&#39;) %&gt;% 
+  purrr::keep(~stringr::str_detect(.x, &#39;onsolid|\\.doc|Portaria&#39;))
+
+links_nomes &lt;- links_pdf %&gt;% 
+  stringr::str_match(&#39;/([^/]+\\.pdf)&#39;) %&gt;% 
+  magrittr::extract(TRUE, 2)
+
+dir.create(&#39;pdf&#39;, showWarnings = FALSE)
+purrr::walk2(links_pdf, links_nomes, ~{
+  url &lt;- glue::glue(&#39;http://www.tesouro.fazenda.gov.br/{.x}&#39;)
+  arq &lt;- glue::glue(&#39;pdf/{.y}&#39;)
+  httr::GET(url, httr::write_disk(arq, overwrite = TRUE))
+})</code></pre>
+<pre class="r"><code>d_txt &lt;- dir(&#39;pdf&#39;, full.names = TRUE) %&gt;% 
+  tibble::enframe(&#39;id&#39;, &#39;arq&#39;) %&gt;% 
+  dplyr::mutate(txt = purrr::map(arq, pdftools::pdf_text))
+
+pegar_numeros &lt;- function(txt) {
+  txt %&gt;% 
+    unlist() %&gt;% 
+    # ([[:space:]+-]|^)
+    stringr::str_extract_all(&#39;[0-9.,]+&#39;) %&gt;% 
+    purrr::flatten() %&gt;% 
+    stringr::str_trim() %&gt;% 
+    stringr::str_replace_all(&#39;[^0-9]&#39;, &#39;&#39;) %&gt;% 
+    stringr::str_replace_all(&#39;^20[01][0-9]&#39;, &#39;&#39;) %&gt;% 
+    stringr::str_replace_all(&#39;^0+&#39;, &#39;&#39;) %&gt;% 
+    stringr::str_subset(&#39;^[0-9]&#39;)
+}
+
+pegar_digs &lt;- function(numeros, digs = 2) {
+  numeros %&gt;% 
+    stringr::str_sub(1L, digs) %&gt;% 
+    tibble::enframe(&#39;id&#39;, &#39;digito&#39;) %&gt;% 
+    dplyr::filter(stringr::str_length(digito) == digs) %&gt;% 
+    dplyr::select(-id)
+}
+
+d_val &lt;- d_txt %&gt;% 
+  dplyr::mutate(numeros = purrr::map(txt, pegar_numeros)) %&gt;% 
+  dplyr::mutate(dig1 = purrr::map(numeros, pegar_digs)) %&gt;% 
+  dplyr::select(arq, dig1) %&gt;% 
+  tidyr::unnest(dig1)</code></pre>
+</div>
+<div id="resultados" class="section level2">
+<h2>Resultados</h2>
+<pre class="r"><code>library(ggplot2)
+dbenford &lt;- function(x) {
+  log10(1 + 1 / x)
+}
+
+p &lt;- d_val %&gt;% 
+  dplyr::filter(digito != &#39;21&#39;) %&gt;% 
+  dplyr::count(arq, digito) %&gt;% 
+  dplyr::mutate(prop = n / sum(n)) %&gt;% 
+  dplyr::ungroup() %&gt;% 
+  dplyr::mutate(digito = as.numeric(digito)) %&gt;% 
+  dplyr::mutate(nm = tools::file_path_sans_ext(basename(arq)),
+                quadrimestre = stringr::str_extract(nm, &#39;[1-3]Q&#39;),
+                ano = stringr::str_match(nm, &#39;(20[01][0-9])([_xX+]|$)&#39;)[,2]) %&gt;% 
+  ggplot(aes(x = digito, y = prop, colour = quadrimestre)) +
+  geom_line() +
+  facet_wrap(~ano, scales = &quot;free_y&quot;) +
+  stat_function(fun = dbenford, colour = &#39;blue&#39;) +
+  scale_x_continuous(breaks = 1:9 * 10) +
+  scale_y_continuous(labels = scales::percent) +
+  theme_bw(15)
+p</code></pre>
+<pre class="r"><code>p2 &lt;- d_val %&gt;% 
+  # dplyr::count(arq, digito) %&gt;% 
+  # dplyr::mutate(prop = n / sum(n)) %&gt;% 
+  # dplyr::ungroup() %&gt;% 
+  dplyr::mutate(digito = as.numeric(digito)) %&gt;% 
+  dplyr::mutate(nm = tools::file_path_sans_ext(basename(arq)),
+                quadrimestre = stringr::str_extract(nm, &#39;[1-3]Q&#39;),
+                ano = stringr::str_match(nm, &#39;(20[01][0-9])([_xX]|$)&#39;)[,2]) %&gt;% 
+  ggplot(aes(x = digito)) +
+  geom_histogram(aes(y = ..density..), bins = 10) +
+  facet_wrap(~ano, scales = &quot;free_y&quot;) +
+  stat_function(fun = dbenford, colour = &#39;blue&#39;) +
+  scale_y_continuous(labels = scales::percent) +
+  theme_bw(15)
+p2</code></pre>
+<pre class="r"><code>library(benford.analysis)
+data(corporate.payment)</code></pre>
+</div>

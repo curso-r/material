@@ -1,0 +1,101 @@
+---
+title: "Instalando Anaconda + TensorFlow + Keras para R no Ubuntu 16.04 Server"
+date: "2017-06-08T21:12:00+03:00"
+tags: ["deep learning", "tensorflow", "keras"]
+categories: ["tutoriais", "r"]
+banner: "img/banners/keras_no_ubuntu2.png"
+author: ["Athos"]
+summary: "Passo a passo de como preparar o Keras para R no Ubuntu 16.04 em cima do Anaconda."
+---
+  
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, 
+                      warning = FALSE, comment = FALSE,
+                      eval=FALSE, cache = TRUE)
+```
+
+Compilei um passo a passo mais simplificado dos posts que usei pra conseguir usar o Keras num servidor Ubuntu. 
+
+Esse tutorial ensinará como instalar o [Anaconda](https://docs.continuum.io/) com Python 3.5 em um servidor Ubuntu 16.04 + Keras para R. Então ao final desse post você terá o Keras direto do seu R pronto para abalar os profundos mares da aprendizagem de máquinas.
+
+## Pré-requisitos
+
+O tutorial supõe que você possui um servidor Ubuntu 16.04 com R 3.4.0 ou versão superior instalado.
+
+## Instalando Anaconda com Python 3.5
+
+O Keras só funciona com o Python 2.7 ou 3.5, por isso temos que instalar o Anaconda 4.2.0 que é a versão que vem com o Python 3.5.
+
+**Passo 1)** Primeiro, sugiro que vá ao diretório `/tmp` para baixar o arquivo bash do Anaconda.
+
+```{bash}
+cd /tmp
+```
+
+**Passo 2)** Agora faça o download do bash do Anaconda 4.2.0.
+
+```{bash}
+curl -O https://repo.continuum.io/archive/Anaconda3-4.2.0-Linux-x86_64.sh
+```
+
+**Passo 3)** Execute o bash.
+
+```{bash}
+bash Anaconda3-4.2.0-Linux-x86_64.sh
+```
+
+**Passo 4)** Você verá a seguinte saída. Aperta ENTER para continuar.
+
+```{bash}
+Welcome to Anaconda3 4.2.0 (by Continuum Analytics, Inc.)
+
+In order to continue the installation process, please review the license
+agreement.
+Please, press ENTER to continue
+```
+
+**Passo 5)** Daí vai apertando mais ENTER para ir até o final dos termos de uso. Quando chegar lá embaixo, vai perguntar se vc aceita o termos. 
+
+```{bash}
+Do you approve the license terms? [yes|no]
+```
+
+**Passo 6)** Escreva `yes` para aceitar os termos. Deve aparecer um prompt como o mostrado abaixo: hora de escolha o local de instalação. Solte um ENTER caso goste do local padrão oferecido. 
+
+```{bash}
+Anaconda3 will now be installed into this location:
+  /home/athos/anaconda3
+
+- Press ENTER to confirm the location
+- Press CTRL-C to abort the installation
+- Or specify a different location below
+
+[/home/athos/anaconda3] >>> 
+```
+
+**Passo 7)** Daí a pergunta seguinte é para saber se você gostaria de fazer o comando `conda` funcionar quando for chamado no terminal. Pode aceitar.
+
+```{bash}
+...
+installation finished.
+Do you wish the installer to prepend the Anaconda3 install location
+to PATH in your /home/athos/.bashrc ? [yes|no]
+[no] >>> 
+```
+Neste momento você terá o Anaconda 4.2.0 pronto para rodar. 
+
+**Agora, ao R!**
+  
+## instalação do Keras no R
+  
+**Passo 8)** Essa parte é fácil. Rode os códigos abaixo para para instalar o pacote Keras e o [Tensorflow](https://www.tensorflow.org/).
+
+```{r}
+devtools::install_github("rstudio/keras") # instalar o pacote do Keras para R
+keras::install_tensorflow() # instalar o Tensorflow
+```
+
+Pronto! Agora é só ser impressionante e destruir no DeepLearning. No [github do Keras](https://rstudio.github.io/keras/) tem a documentação completa pra você aprender mais sobre como usá-lo.
+
+Aquele axé.
+

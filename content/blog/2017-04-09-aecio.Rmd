@@ -1,0 +1,144 @@
+---
+title: "Análise das emoções de Aécio Neves"
+date: "2017-04-15T13:07:31+02:00"
+tags: ["emoções", "API"]
+categories: ["análises", "r"]
+banner: "img/banners/aecio.jpg"
+author: ["Julio"]
+draft: false
+summary: "Aécio Neves é um político importante no Brasil. Por muito pouco não foi eleito Presidente da República em 2014 e é certamente um nome bem influente na atualidade. Mas sério, toda vez que eu vejo esse cara falando, não dou a mínima para quem ele é. Eu apenas fico pensando: 'Por quê ele sempre faz tanta cara de dor?'"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, cache = TRUE)
+```
+
+Aécio Neves é um político importante no Brasil. Por muito pouco não foi eleito Presidente da República em 2014 e é certamente um nome bem influente na atualidade. Mas sério, toda vez que eu vejo esse cara falando, não dou a mínima para quem ele é. Eu apenas fico pensando: 'Por que ele sempre faz tanta cara de dor?'
+
+Pensando nisso, decidi pegar algumas fotos famosas dele e aplicar um algoritmo de Inteligência Artificial para reconhecimento de emoções. Se minha hipótese estiver correta, provavelmente esse algoritmo retornaria emoções como "dor", "tristeza" ou "descontentamento". 
+
+A API escolhida para essa tarefa foi a [Microsoft Emotions API](https://www.microsoft.com/cognitive-services/en-us/emotion-api). O motivo por trás da escolha não é nada especial: foi o primeiro resultado que apareceu no Google para mim!
+
+As imagens utilizadas para testar o algoritmo contra minha hipótese são essas aqui:
+
+```{r fotos, echo=FALSE, out.width = '33%'}
+u_imagens <- c(
+  'http://s2.glbimg.com/h0g_J2Z8TTPdapWZFq5kb_9A81k=/0x0:300x225/300x225/s.glbimg.com/jo/g1/f/original/2014/05/30/aecio.jpg',
+  'http://www.esmeraldanoticias.com.br/wp-content/uploads/2014/11/aecio-neves.jpg',
+  'http://www.revistaforum.com.br/wp-content/uploads/2014/12/a%C3%A9cio-neves-viomundo.jpg',
+  'http://psdb-mg.org.br/sitenovo/wp-content/uploads/2016/01/Aecio-Neves-entrevista-.jpg',
+  'https://conteudo.imguol.com.br/c/noticias/6a/2016/10/03/3out2016---em-belo-horizonte-mg-o-presidente-nacional-do-psdb-e-senador-aecio-neves-faz-um-balanco-do-desempenho-do-partido-no-primeiro-turno-das-eleicoes-municipais-de-2016-aecio-se-disse-a-favor-de-1475526309974_615x300.jpg',
+  'http://www.revistaforum.com.br/wp-content/uploads/2013/05/neves.jpg'
+)
+p_imagens <- dir('../../static/img/blog/aecio/', full.names = TRUE, pattern = 'aecio')
+# knitr::include_graphics(p_imagens)
+plyr::l_ply(p_imagens, function(x) plot(magick::image_read(x)))
+```
+
+## Obtenção das emoções
+
+Pacotes carregados para essa análise:
+
+```{r pkgs, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(httr)
+library(forcats)
+library(grid)
+library(gridExtra)
+```
+
+Para obter os resultados, foi necessário entrar na [página de APIs de visão da Microsoft](https://www.microsoft.com/cognitive-services/en-us/emotion-api) e obter uma chave de acesso, guardando-a no objeto `key`. Depois disso, montei a função `pegar_emocoes()`, que recebe a URL de uma imagem da internet e uma chave de acesso, e retorna uma `tibble` com as proporções das emoções em cada coluna.
+
+```{r funcao}
+pegar_emocoes <- function(u_img, key) {
+  u_api <- 'https://westus.api.cognitive.microsoft.com/emotion/v1.0/recognize'
+  result <- httr::POST(
+    url = u_api,
+    httr::content_type('application/json'), 
+    httr::add_headers(.headers = c('Ocp-Apim-Subscription-Key' = key)),
+    body = list(url = u_img),
+    encode = 'json'
+  )
+  tibble::as_tibble(httr::content(result, 'parsed')[[1]]$scores)
+}
+```
+
+Finalmente, apliquei a função num vetor de links usando o funcional `purrr::map_df`. Como resultado, temos essa base de dados:
+
+```{r dados, warning=FALSE, message=FALSE, eval=FALSE}
+d_emocoes <- map_df(u_imagens, pegar_emocoes, key = key, .id = 'id')
+```
+
+```{r keys, echo = FALSE}
+## recomendo adicionar a API key no arquivo ~/.Renviron
+## EMOTION_API=<sua_key>
+## (necessário pular linha no final do arquivo)
+key <- Sys.getenv('EMOTION_API')
+
+## comentei esse código e salvei o df para não precisar ficar rodando toda vez.
+# d_emocoes <- map_df(u_imagens, pegar_emocoes, key = key, .id = 'id')
+# saveRDS(d_emocoes, 'd_emocoes.rds')
+d_emocoes <- readRDS('../../static/data/aecio/d_emocoes.rds')
+```
+
+```{r echo=F}
+knitr::kable(d_emocoes)
+```
+
+## Resultados
+
+A Figura \@ref(fig:media) mostra a média de cada emoção nas seis fotos. Para minha surpresa, a emoção com maior proporção média foi "neutro", com peso de quase 50%. As emoções seguintes são "felicidade", "raiva" e "desdém". A emoção "tristeza", que achei que seria frequente por conta da cara de dor do Aécio, ficou com uma proporção média de apenas 5,5%.
+
+```{r media, fig.width=9, fig.height=4, echo=FALSE, fig.align = 'center', fig.cap='Média de cada emoção nas seis fotos baixadas.'}
+d_plot_sum <- d_emocoes %>% 
+  gather(emotion, val, -id) %>% 
+  group_by(emotion) %>% 
+  summarise(prop = mean(val)) %>% 
+  mutate(emotion = fct_reorder(emotion, prop))
+p <- d_plot_sum %>% 
+  ggplot(aes(x = emotion, y = prop, fill = emotion)) +
+  geom_col() +
+  theme_bw(14) +
+  labs(x = 'Emoção', y = 'Proporção') +
+  scale_y_continuous(labels = scales::percent) +
+  guides(fill = FALSE) +
+  coord_flip()
+p
+```
+
+A Figura \@ref(fig:grafinal) mostra os resultados individuais das imagens. O primeiro resultado faz sentido, já que o Aécio está nitidamente rindo. Em todos os casos, é possível interpretar os resultados olhando a imagem. Por exemplo, o caso com "tristeza" mais alto é o que observamos as sombrancelhas mais caídas.
+
+```{r each, fig.height=8, fig.width=7, fig.align = 'center', echo=FALSE, eval=FALSE}
+plotar_img <- function(d, i) {
+  # img <- httr::content(httr::GET(u_imagens[i]))
+  img <- jpeg::readJPEG(p_imagens[i])
+  g <- grid::rasterGrob(img, interpolate = TRUE)
+  d_plot <- d %>% 
+    gather(emotion, val, -id) %>% 
+    filter(id == as.character(i)) %>% 
+    mutate(emotion = emotion %>%
+             as.factor() %>% 
+             lvls_reorder(c(4, 8, 3, 7, 2, 1, 5, 6)))
+  d_plot %>% 
+    ggplot(aes(x = emotion, y = val, fill = emotion)) +
+    geom_col() +
+    scale_y_continuous(labels = scales::percent, limits = c(0, 1)) +
+    guides(fill = FALSE) +
+    coord_flip() +
+    annotation_custom(g, xmin = 0, ymin = .4, xmax = 5, ymax = 1.0) +
+    theme_minimal(15) +
+    theme(axis.title = element_blank())
+}
+plots <- map(1:6, ~plotar_img(d_emocoes, .x))
+gridExtra::grid.arrange(grobs = plots, ncol = 2)
+```
+
+```{r grafinal, out.width="70%", echo=FALSE, fig.align="center", fig.cap='Emoções do Aécio em cada imagem.'}
+knitr::include_graphics("/img/blog/aecio/aecgrafs.png")
+```
+
+## Conclusão
+
+Aparentemente minha hipótese estava errada. Aécio é um cara neutro e feliz, com acessos raiva de vez em quando (por favor, não interprete isso seriamente, é uma brincadeira!). Mas, sinceramente, achei que faltou na API uma emoção "cara de dor" para captar perfeitamente a expressão do Aécio. De qualquer forma, foi uma análise rápida e muito divertida de fazer. Se quiser replicá-la para outras imagens, acesse o [código fonte no repositório do GitHub que gera esse site](https://github.com/curso-r/site).
+
+É isso. Happy coding ;)

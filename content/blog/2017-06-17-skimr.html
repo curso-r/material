@@ -1,0 +1,267 @@
+---
+title: "Skimr: estatísticas básicas com ❤️"
+date: "2017-06-17T13:07:31+02:00"
+tags: ["pacotes", "skimr"]
+categories: ["tutoriais", "r"]
+banner: "img/banners/skimr.png"
+author: ["Julio"]
+draft: false
+summary: "Uma coisa muito legal da ROpenSci Unconf 2017 é que ela funcionou como uma hackathon mega produtiva. Dentre os novos pacotes que olhei, o que mais me chamou atenção foi o skimr..."
+---
+
+
+
+<p>Entre os dias 25 e 27 de maio aconteceu a <a href="http://unconf17.ropensci.org/">ROpenSci Unconf 2017</a>. O encontro reuniu vários pop stars da comunidade R como <a href="http://hadley.nz">Hadley Wickham</a>, <a href="https://github.com/jcheng5">Joe Cheng</a> (criador do shiny), <a href="https://github.com/jeroen">Jeroen Ooms</a> (criador do OpenCPU e autor de vários pacotes bacanas), <a href="https://github.com/jennybc">Jenny Bryan</a> (autora de vários pacotes bacanas como <code>googlesheets</code>), várias pessoas do <a href="http://rladies.org/">#R-Ladies</a> e muito mais.</p>
+<p>Uma coisa muito legal dessa conferência é que ela funcionou como uma hackathon. Foi criada uma nova organização no github chamada <a href="https://github.com/ropenscilabs">ROpenSci Labs</a>, e os presentes simplesmente começaram a subir pacotes fantásticos lá dentro. Recomendo muito dar uma olhada.</p>
+<p>Dentre os pacotes que olhei, o que mais me chamou atenção foi o <a href="https://github.com/ropenscilabs/skimr"><code>skimr</code></a> e por isso estou fazendo esse post! O propósito do <code>skimr</code> é simples: fazer algumas estatísticas básicas univariadas de uma base de dados.</p>
+<p>O <code>skimr</code> ainda não está no CRAN, então para instalar recomendamos utilizar o <code>devtools</code> para instalar direto do GitHub, conforme código abaixo. Note que também será necessário instalar o pacote <code>colformat</code> do Hadley.</p>
+<pre class="r"><code>devtools::install_github(&quot;hadley/colformat&quot;)
+devtools::install_github(&quot;ropenscilabs/skimr&quot;)</code></pre>
+<p>A função <code>skim()</code> calcula estatísticas básicas das variáveis e imprime no seu console. Note que a função separa estatísticas para variáveis numéricas ou fatores.</p>
+<pre class="r"><code>library(tidyverse)
+library(skimr)
+skim(iris)
+## Skim summary statistics
+##  n obs: 150 
+##  n variables: 5 
+## 
+## Variable type: factor 
+##  variable missing complete   n n_unique                       top_counts
+##   Species       0      150 150        3 set: 50, ver: 50, vir: 50, NA: 0
+##  ordered
+##    FALSE
+## 
+## Variable type: numeric 
+##      variable missing complete   n mean   sd  p0 p25 median p75 p100
+##  Petal.Length       0      150 150 3.76 1.77 1   1.6   4.35 5.1  6.9
+##   Petal.Width       0      150 150 1.2  0.76 0.1 0.3   1.3  1.8  2.5
+##  Sepal.Length       0      150 150 5.84 0.83 4.3 5.1   5.8  6.4  7.9
+##   Sepal.Width       0      150 150 3.06 0.44 2   2.8   3    3.3  4.4
+##      hist
+##  ▇▁▁▂▅▅▃▁
+##  ▇▁▁▅▃▃▂▂
+##  ▂▇▅▇▆▅▂▂
+##  ▁▂▅▇▃▂▁▁</code></pre>
+<p>E tem mais! O mais legal do <code>skimr</code> é que ele usa a função <code>colformat::spark_bar()</code> para desenhar histogramas direto no seu console!</p>
+<pre class="r"><code>skim(iris) %&gt;% 
+  filter(stat == &#39;hist&#39;) %&gt;% 
+  knitr::kable(caption = &#39;HISTOGRAMA NA TABELA PORQUE SIM!&#39;)</code></pre>
+<table>
+<caption><span id="tab:unnamed-chunk-4">Table 1: </span>HISTOGRAMA NA TABELA PORQUE SIM!</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">variable</th>
+<th style="text-align: left;">type</th>
+<th style="text-align: left;">stat</th>
+<th style="text-align: left;">level</th>
+<th style="text-align: right;">value</th>
+<th style="text-align: left;">formatted</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Sepal.Length</td>
+<td style="text-align: left;">numeric</td>
+<td style="text-align: left;">hist</td>
+<td style="text-align: left;">.all</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">▂▇▅▇▆▅▂▂</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Sepal.Width</td>
+<td style="text-align: left;">numeric</td>
+<td style="text-align: left;">hist</td>
+<td style="text-align: left;">.all</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">▁▂▅▇▃▂▁▁</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Petal.Length</td>
+<td style="text-align: left;">numeric</td>
+<td style="text-align: left;">hist</td>
+<td style="text-align: left;">.all</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">▇▁▁▂▅▅▃▁</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Petal.Width</td>
+<td style="text-align: left;">numeric</td>
+<td style="text-align: left;">hist</td>
+<td style="text-align: left;">.all</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">▇▁▁▅▃▃▂▂</td>
+</tr>
+</tbody>
+</table>
+<p>O <code>skimr</code> também possui padrões de estatísticas básicas para cada tipo de variável. Você pode checar esses tipos com <code>show_skimmers()</code>:</p>
+<pre class="r"><code>show_skimmers() %&gt;% 
+  map_df(enframe, .id = &#39;tipo&#39;) %&gt;% 
+  group_by(tipo) %&gt;% 
+  summarise(stats = glue::collapse(value, sep = &#39;, &#39;)) %&gt;% 
+  knitr::kable(caption = &#39;Estatísticas básicas para cada tipo de variável.&#39;)</code></pre>
+<table>
+<caption><span id="tab:unnamed-chunk-5">Table 2: </span>Estatísticas básicas para cada tipo de variável.</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">tipo</th>
+<th style="text-align: left;">stats</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">AsIs</td>
+<td style="text-align: left;">missing, complete, n, n_unique, min_length, max_length</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">character</td>
+<td style="text-align: left;">missing, complete, n, min, max, empty, n_unique</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">complex</td>
+<td style="text-align: left;">missing, complete, n</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">date</td>
+<td style="text-align: left;">missing, complete, n, min, max, median, n_unique</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Date</td>
+<td style="text-align: left;">missing, complete, n, min, max, median, n_unique</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">difftime</td>
+<td style="text-align: left;">missing, complete, n, min, max, median, n_unique</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">factor</td>
+<td style="text-align: left;">missing, complete, n, n_unique, top_counts, ordered</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">integer</td>
+<td style="text-align: left;">missing, complete, n, mean, sd, p0, p25, median, p75, p100, hist</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">list</td>
+<td style="text-align: left;">missing, complete, n, n_unique, min_length, median_length, max_length</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">logical</td>
+<td style="text-align: left;">missing, complete, n, mean, count</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">numeric</td>
+<td style="text-align: left;">missing, complete, n, mean, sd, p0, p25, median, p75, p100, hist</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">POSIXct</td>
+<td style="text-align: left;">missing, complete, n, min, max, median, n_unique</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ts</td>
+<td style="text-align: left;">missing, complete, n, start, end, frequency, deltat, mean, sd, min, max, median, line_graph</td>
+</tr>
+</tbody>
+</table>
+<section id="criando-suas-proprias-funcoes" class="level2">
+<h2>Criando suas próprias funções</h2>
+<p>Você também pode usar funções próprias com o <code>skimr</code>. Por exemplo, digamos que você queira calcular o coeficiente de variação. Primeiro, adicione sua função dentro de uma lista:</p>
+<pre class="r"><code>funs &lt;- list(cv = function(x) sd(x, na.rm = TRUE) / mean(x, na.rm = TRUE))</code></pre>
+<p>e depois aplique a função <code>skim_with()</code>:</p>
+<pre class="r"><code># append adiciona as suas funcoes nas existentes
+skim_with(numeric = funs, append = TRUE)</code></pre>
+<p>E pronto! Agora você pode rodar <code>skim()</code> novamente:</p>
+<pre class="r"><code>skim(iris) %&gt;% 
+  filter(stat %in% c(&#39;hist&#39;, &#39;cv&#39;)) %&gt;% 
+  knitr::kable(caption = &#39;Histograma e coeficiente de variação.&#39;)</code></pre>
+<table>
+<caption><span id="tab:unnamed-chunk-8">Table 3: </span>Histograma e coeficiente de variação.</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">variable</th>
+<th style="text-align: left;">type</th>
+<th style="text-align: left;">stat</th>
+<th style="text-align: left;">level</th>
+<th style="text-align: right;">value</th>
+<th style="text-align: left;">formatted</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Sepal.Length</td>
+<td style="text-align: left;">numeric</td>
+<td style="text-align: left;">hist</td>
+<td style="text-align: left;">.all</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">▂▇▅▇▆▅▂▂</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Sepal.Length</td>
+<td style="text-align: left;">numeric</td>
+<td style="text-align: left;">cv</td>
+<td style="text-align: left;">.all</td>
+<td style="text-align: right;">0.1417113</td>
+<td style="text-align: left;">0.14</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Sepal.Width</td>
+<td style="text-align: left;">numeric</td>
+<td style="text-align: left;">hist</td>
+<td style="text-align: left;">.all</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">▁▂▅▇▃▂▁▁</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Sepal.Width</td>
+<td style="text-align: left;">numeric</td>
+<td style="text-align: left;">cv</td>
+<td style="text-align: left;">.all</td>
+<td style="text-align: right;">0.1425642</td>
+<td style="text-align: left;">0.14</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Petal.Length</td>
+<td style="text-align: left;">numeric</td>
+<td style="text-align: left;">hist</td>
+<td style="text-align: left;">.all</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">▇▁▁▂▅▅▃▁</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Petal.Length</td>
+<td style="text-align: left;">numeric</td>
+<td style="text-align: left;">cv</td>
+<td style="text-align: left;">.all</td>
+<td style="text-align: right;">0.4697441</td>
+<td style="text-align: left;">0.47</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Petal.Width</td>
+<td style="text-align: left;">numeric</td>
+<td style="text-align: left;">hist</td>
+<td style="text-align: left;">.all</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;">▇▁▁▅▃▃▂▂</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Petal.Width</td>
+<td style="text-align: left;">numeric</td>
+<td style="text-align: left;">cv</td>
+<td style="text-align: left;">.all</td>
+<td style="text-align: right;">0.6355511</td>
+<td style="text-align: left;">0.64</td>
+</tr>
+</tbody>
+</table>
+<p>Para retornar ao <code>skim()</code> padrão, rode <code>skim_with_defaults()</code>.</p>
+</section>
+<section id="wrap-up" class="level2">
+<h2>Wrap up</h2>
+<ul>
+<li>Instale usando <code>devtools::install_github()</code></li>
+<li>Rode a função <code>skim()</code>. Use <code>dplyr::filter()</code> para filtrar as estatísticas de interesse.</li>
+<li>Você pode adicionar suas próprias estatísticas com <code>skim_with()</code>.</li>
+<li>Acompanhe a evolução do <code>skimr</code> <a href="https://github.com/ropenscilabs/skimr">nesta página</a>.</li>
+</ul>
+<p>O pacote ainda vai evoluir muito e não duvido nada que seja um bom candidado a entrar no <code>tidyverse</code>. O que vocês acham? Escrevam nos comentários!</p>
+<p>É isso. Happy coding ;)</p>
+</section>

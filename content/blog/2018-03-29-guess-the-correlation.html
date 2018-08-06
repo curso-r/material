@@ -1,0 +1,113 @@
+---
+title: "Chamada pra briga - Competição Kaggle Guess The Correlation"
+date: "2018-03-29"
+tags: ["kaggle", "deep learning"]
+categories: ["divulgação"]
+banner: "img/banners/guess-the-correlation.jpg"
+author: ["Athos"]
+summary: "Criamos uma competição no Kaggle para aprender a máquina adivinhar a correlação de um scatterplot. Desafio lançado!"
+---
+
+
+
+<p>Alô alôww Comunidade</p>
+<p>Lançamos <a href="https://www.kaggle.com/c/guess-the-correlation/">uma competição Kaggle</a> e agora é a hora de você mostrar que é Jedi em DATA SCIENCE! =D</p>
+<p>Link: <a href="https://www.kaggle.com/c/guess-the-correlation/" class="uri">https://www.kaggle.com/c/guess-the-correlation/</a></p>
+<p>A gente fez isso por esporte, favor não tentar achar utilidade nessa aplicação =P.</p>
+<div id="o-jogo" class="section level2">
+<h2>O Jogo</h2>
+<p>O site <a href="http://guessthecorrelation.com/">Guess The Correlation</a> coloca o ser humano frente a frente com um gráfico de dispersão em que é em seguida desafiado a adivinhar a respectiva a correlação linear.</p>
+<p>No nosso desafio Kaggle, desafio similar foi construído. Por exemplo: quanto você chutaria que é a correlação entre os dados da figura abaixo?</p>
+<center>
+<img src="/img/blog/2018-03-29-guess-the-correlation/exemplo_img.png" />
+</center>
+<p>Foram geradas 200 mil imagens em png como a figura acima e cada uma delas tem a sua correleção anotada para treinarmos um modelinho.</p>
+</div>
+<div id="objetivo" class="section level2">
+<h2>Objetivo</h2>
+<p>O objetivo é simples e direto: construir um robô que calcula a correlação (linear) apenas vendo o gráfico de dispersão.</p>
+<p>Em <em>machine lârnês</em>, queremos</p>
+<center>
+<img src="/img/blog/2018-03-29-guess-the-correlation/f_img_92.png" />
+</center>
+<p>em que essa <strong>f</strong> seja digna de ser <strong>f</strong> de <strong>F@!#</strong>.</p>
+</div>
+<div id="chute-inicial" class="section level2">
+<h2>Chute inicial</h2>
+<p>O <a href="https://github.com/jtrecenti">Julião</a> já andou trabalhando nesse problema e deu um chute inicial nos códigos pra vocês se inspirarem. Aliás, “inicial” numas, porque ele já saiu fazendo um CNN com a ajuda do pacote <a href="https://github.com/decryptr/decryptr">decryptr</a>:</p>
+<pre class="r"><code>library(keras)
+library(tidyverse)
+library(decryptr)
+
+path &lt;- &quot;.&quot;
+arqs &lt;- dir(paste0(path,  &quot;/train_imgs&quot;), full.names = TRUE)
+resp &lt;- readr::read_csv(paste0(path,  &quot;/train_responses.csv&quot;))
+
+i_train &lt;- sample(1:nrow(resp), 10000)
+arqs_train &lt;- arqs[i_train]
+arqs_test &lt;- arqs[-i_train]
+
+gen &lt;- function(batch_size = 100, arqs = arqs_train) {
+  f &lt;- function() {
+    a &lt;- sort(sample(arqs, batch_size))
+    imgs &lt;- decryptr::read_captcha(a)
+    captchas_t &lt;- purrr::transpose(imgs)
+    xs &lt;- captchas_t$x
+    xs &lt;- abind::abind(xs, along = 0.1)
+    a_clean &lt;- a %&gt;% 
+      basename() %&gt;% 
+      tools::file_path_sans_ext() %&gt;% 
+      tolower()
+    corr &lt;- resp %&gt;% 
+      filter(id %in% a_clean) %&gt;% 
+      arrange(id) %&gt;% 
+      pull(corr)
+    data &lt;- list(xs, corr)
+    data
+  }
+  f
+}
+
+
+# Create model
+model &lt;- keras_model_sequential()
+model %&gt;%
+  layer_conv_2d(
+    input_shape = c(150, 150, 1),
+    filters = 16, kernel_size = c(3, 3),
+    padding = &quot;same&quot;,
+    activation = &quot;relu&quot;) %&gt;%
+  layer_max_pooling_2d() %&gt;%
+  layer_conv_2d(
+    filters = 32, kernel_size = c(3, 3),
+    padding = &quot;same&quot;,
+    activation = &quot;relu&quot;) %&gt;%
+  layer_max_pooling_2d() %&gt;%
+  layer_conv_2d(
+    filters = 64, kernel_size = c(3, 3),
+    padding = &quot;same&quot;,
+    activation = &quot;relu&quot;) %&gt;%
+  layer_max_pooling_2d() %&gt;%
+  layer_flatten() %&gt;%
+  layer_dense(units = 300) %&gt;%
+  layer_dropout(.1) %&gt;%
+  layer_dense(units = 1, activation = &quot;tanh&quot;)
+
+
+# Compile and fit model
+model %&gt;%
+  compile(
+    optimizer = &quot;sgd&quot;,
+    loss = &quot;mean_squared_error&quot;,
+    metrics = &quot;mean_squared_error&quot;)
+
+model %&gt;%
+  fit_generator(
+    gen(100, arqs_train),
+    steps_per_epoch = 100,
+    validation_data = gen(100, arqs_test),
+    validation_steps = 10
+  )</code></pre>
+<p>E aí? Será que dá pra acertar 100%? Ou será impossível?</p>
+<p>Boa R’ada!</p>
+</div>

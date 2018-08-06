@@ -1,0 +1,146 @@
+---
+title: "Análise das emoções de Aécio Neves"
+date: "2017-04-15T13:07:31+02:00"
+tags: ["emoções", "API"]
+categories: ["análises", "r"]
+banner: "img/banners/aecio.jpg"
+author: ["Julio"]
+draft: false
+summary: "Aécio Neves é um político importante no Brasil. Por muito pouco não foi eleito Presidente da República em 2014 e é certamente um nome bem influente na atualidade. Mas sério, toda vez que eu vejo esse cara falando, não dou a mínima para quem ele é. Eu apenas fico pensando: 'Por quê ele sempre faz tanta cara de dor?'"
+---
+
+
+
+<p>Aécio Neves é um político importante no Brasil. Por muito pouco não foi eleito Presidente da República em 2014 e é certamente um nome bem influente na atualidade. Mas sério, toda vez que eu vejo esse cara falando, não dou a mínima para quem ele é. Eu apenas fico pensando: ‘Por que ele sempre faz tanta cara de dor?’</p>
+<p>Pensando nisso, decidi pegar algumas fotos famosas dele e aplicar um algoritmo de Inteligência Artificial para reconhecimento de emoções. Se minha hipótese estiver correta, provavelmente esse algoritmo retornaria emoções como “dor”, “tristeza” ou “descontentamento”.</p>
+<p>A API escolhida para essa tarefa foi a <a href="https://www.microsoft.com/cognitive-services/en-us/emotion-api">Microsoft Emotions API</a>. O motivo por trás da escolha não é nada especial: foi o primeiro resultado que apareceu no Google para mim!</p>
+<p>As imagens utilizadas para testar o algoritmo contra minha hipótese são essas aqui:</p>
+<p><img src="/blog/2017-04-09-aecio_files/figure-html/fotos-1.png" width="33%" /><img src="/blog/2017-04-09-aecio_files/figure-html/fotos-2.png" width="33%" /><img src="/blog/2017-04-09-aecio_files/figure-html/fotos-3.png" width="33%" /><img src="/blog/2017-04-09-aecio_files/figure-html/fotos-4.png" width="33%" /><img src="/blog/2017-04-09-aecio_files/figure-html/fotos-5.png" width="33%" /><img src="/blog/2017-04-09-aecio_files/figure-html/fotos-6.png" width="33%" /></p>
+<div id="obtencao-das-emocoes" class="section level2">
+<h2>Obtenção das emoções</h2>
+<p>Pacotes carregados para essa análise:</p>
+<pre class="r"><code>library(tidyverse)
+library(httr)
+library(forcats)
+library(grid)
+library(gridExtra)</code></pre>
+<p>Para obter os resultados, foi necessário entrar na <a href="https://www.microsoft.com/cognitive-services/en-us/emotion-api">página de APIs de visão da Microsoft</a> e obter uma chave de acesso, guardando-a no objeto <code>key</code>. Depois disso, montei a função <code>pegar_emocoes()</code>, que recebe a URL de uma imagem da internet e uma chave de acesso, e retorna uma <code>tibble</code> com as proporções das emoções em cada coluna.</p>
+<pre class="r"><code>pegar_emocoes &lt;- function(u_img, key) {
+  u_api &lt;- &#39;https://westus.api.cognitive.microsoft.com/emotion/v1.0/recognize&#39;
+  result &lt;- httr::POST(
+    url = u_api,
+    httr::content_type(&#39;application/json&#39;), 
+    httr::add_headers(.headers = c(&#39;Ocp-Apim-Subscription-Key&#39; = key)),
+    body = list(url = u_img),
+    encode = &#39;json&#39;
+  )
+  tibble::as_tibble(httr::content(result, &#39;parsed&#39;)[[1]]$scores)
+}</code></pre>
+<p>Finalmente, apliquei a função num vetor de links usando o funcional <code>purrr::map_df</code>. Como resultado, temos essa base de dados:</p>
+<pre class="r"><code>d_emocoes &lt;- map_df(u_imagens, pegar_emocoes, key = key, .id = &#39;id&#39;)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">id</th>
+<th align="right">anger</th>
+<th align="right">contempt</th>
+<th align="right">disgust</th>
+<th align="right">fear</th>
+<th align="right">happiness</th>
+<th align="right">neutral</th>
+<th align="right">sadness</th>
+<th align="right">surprise</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">1</td>
+<td align="right">0.0004080</td>
+<td align="right">0.0000004</td>
+<td align="right">0.0000960</td>
+<td align="right">0.0000001</td>
+<td align="right">0.9994901</td>
+<td align="right">0.0000018</td>
+<td align="right">0.0000025</td>
+<td align="right">0.0000011</td>
+</tr>
+<tr class="even">
+<td align="left">2</td>
+<td align="right">0.1466579</td>
+<td align="right">0.1385524</td>
+<td align="right">0.1392320</td>
+<td align="right">0.0000411</td>
+<td align="right">0.2569676</td>
+<td align="right">0.3143989</td>
+<td align="right">0.0032987</td>
+<td align="right">0.0008515</td>
+</tr>
+<tr class="odd">
+<td align="left">3</td>
+<td align="right">0.0759952</td>
+<td align="right">0.0321533</td>
+<td align="right">0.0072514</td>
+<td align="right">0.0000727</td>
+<td align="right">0.0007214</td>
+<td align="right">0.6251250</td>
+<td align="right">0.2585501</td>
+<td align="right">0.0001311</td>
+</tr>
+<tr class="even">
+<td align="left">4</td>
+<td align="right">0.0772784</td>
+<td align="right">0.1994352</td>
+<td align="right">0.0216270</td>
+<td align="right">0.0008681</td>
+<td align="right">0.0124632</td>
+<td align="right">0.6709319</td>
+<td align="right">0.0042846</td>
+<td align="right">0.0131115</td>
+</tr>
+<tr class="odd">
+<td align="left">5</td>
+<td align="right">0.0476197</td>
+<td align="right">0.0467561</td>
+<td align="right">0.0026372</td>
+<td align="right">0.0000568</td>
+<td align="right">0.0008743</td>
+<td align="right">0.8483697</td>
+<td align="right">0.0532359</td>
+<td align="right">0.0004504</td>
+</tr>
+<tr class="even">
+<td align="left">6</td>
+<td align="right">0.2786264</td>
+<td align="right">0.0922678</td>
+<td align="right">0.0087203</td>
+<td align="right">0.0119777</td>
+<td align="right">0.0000222</td>
+<td align="right">0.4820632</td>
+<td align="right">0.0069891</td>
+<td align="right">0.1193333</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="resultados" class="section level2">
+<h2>Resultados</h2>
+<p>A Figura <a href="#fig:media">1</a> mostra a média de cada emoção nas seis fotos. Para minha surpresa, a emoção com maior proporção média foi “neutro”, com peso de quase 50%. As emoções seguintes são “felicidade”, “raiva” e “desdém”. A emoção “tristeza”, que achei que seria frequente por conta da cara de dor do Aécio, ficou com uma proporção média de apenas 5,5%.</p>
+<div class="figure" style="text-align: center"><span id="fig:media"></span>
+<img src="/blog/2017-04-09-aecio_files/figure-html/media-1.png" alt="Média de cada emoção nas seis fotos baixadas." width="864" />
+<p class="caption">
+Figure 1: Média de cada emoção nas seis fotos baixadas.
+</p>
+</div>
+<p>A Figura <a href="#fig:grafinal">2</a> mostra os resultados individuais das imagens. O primeiro resultado faz sentido, já que o Aécio está nitidamente rindo. Em todos os casos, é possível interpretar os resultados olhando a imagem. Por exemplo, o caso com “tristeza” mais alto é o que observamos as sombrancelhas mais caídas.</p>
+<div class="figure" style="text-align: center"><span id="fig:grafinal"></span>
+<img src="/img/blog/aecio/aecgrafs.png" alt="Emoções do Aécio em cada imagem." width="70%" />
+<p class="caption">
+Figure 2: Emoções do Aécio em cada imagem.
+</p>
+</div>
+</div>
+<div id="conclusao" class="section level2">
+<h2>Conclusão</h2>
+<p>Aparentemente minha hipótese estava errada. Aécio é um cara neutro e feliz, com acessos raiva de vez em quando (por favor, não interprete isso seriamente, é uma brincadeira!). Mas, sinceramente, achei que faltou na API uma emoção “cara de dor” para captar perfeitamente a expressão do Aécio. De qualquer forma, foi uma análise rápida e muito divertida de fazer. Se quiser replicá-la para outras imagens, acesse o <a href="https://github.com/curso-r/site">código fonte no repositório do GitHub que gera esse site</a>.</p>
+<p>É isso. Happy coding ;)</p>
+</div>

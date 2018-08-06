@@ -1,0 +1,36 @@
+<!doctype html5>
+<html>
+<head>
+  {{ partial "head.html" . }}
+</head>
+  <body data-spy="scroll" data-target="#toc">
+    {{ partial "header.html" . }}
+    
+    <div class="container">
+      
+      <div class="row justify-content-md-center" id="article-title">
+        <h1 data-toc-skip>{{ .Title }}</h1>
+      </div>  
+      
+      <div class="row">
+        
+        <div class="col-sm-3">
+          <nav id="toc" data-toggle="toc" class="sticky-top"></nav>
+        </div>
+        
+        <div class="col-sm-9" id="article">
+          {{.Content}}
+        </div>  
+        
+      </div>
+      
+      {{ partial "footer.html" . }}
+      
+    </div>
+    
+  </body>
+  
+  {{ partial "scripts.html" .}}
+  {{ partial "toc.html" . }}
+  
+</html>

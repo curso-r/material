@@ -1,0 +1,144 @@
+---
+title: "Pacotes miojo - como fazer um pacote no R em 3 minutos"
+date: "2017-09-07T23:26:00+03:00"
+tags: ["miojo"]
+categories: ["tutoriais", "r"]
+banner: "img/banners/package.png"
+author: ["Julio"]
+summary: "Veja como fazer um pacote em R e fazer seus códigos voarem na velocidade da luz"
+draft: false
+---
+
+```{r include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, cache = TRUE)
+```
+
+
+Nesse post vou mostrar como fazer um pacote em R muito, muito rápido. Tirei várias coisas que costumo fazer nos pacotes, com dor no coração, tudo pela velocidade, mantendo só o essencial.
+
+Duas restrições que usei são
+
+1. O pacote precisa ficar disponível no GitHub.
+2. O pacote precisa ter pelo menos uma função.
+
+Essa é a solução que eu acho mais segura e rápida. Você também pode [usar o próprio RStudio para criar pacotes ou clonar coisas do github](http://curso-r.com/blog/2017/07/17/2017-07-17-rstudio-e-github/), mas isso pode dar alguns bugs.
+
+## Passo 1: Crie um repositório no Github
+
+Clique no link: https://github.com/new
+
+- Escreva o nome do seu pacote. O nome do pacote não pode ter espaços, underline (`_`) nem hífen (`-`) nem começar com números.
+- Tique a opção **Initialize this repository with a README**.
+- Clique em **Create repository**.
+
+## Passo 2: Clonar o repositório
+
+Recomendo clonar repositórios abrindo um terminal e digitando
+
+```
+$ git clone https://github.com/usuario/nomeDoPacote
+```
+
+Você pode clonar de outras formas, inclusive dentro do RStudio. Se você usar o RStudio, **saia do projeto** e delete o arquivo `.RProj` criado automaticamente, pois ele terá metadados inapropriados para criar pacotes.
+
+## Passo 3: usar `devtools::setup()`
+
+1. Abra uma nova sessão R em qualquer lugar.
+2. Rode `devtools::setup("caminho/da/pasta/clonada/nomeDoPacote")`.
+
+## Passo 4: Crie sua função
+
+Exemplo:
+
+```{r eval=FALSE}
+#' Soma 2
+#' 
+#' Recebe um vetor de números e retorna um vetor de números somando dois
+#' 
+#' @param x vetor de números.
+#'
+#' @export
+soma_2 <- function(x) {
+  x + 2
+}
+```
+
+1. Crie a função dentro de um arquivo com extensão `.R` na pasta `R`
+2. As informações que começam com `#'` acima da função servem para documentar. Nesse caso,
+    - a primeira linha é o título
+    - a segunda linha é a descrição
+    - a parte que começa com `@param` descreve o que é o parâmetro de entrada
+    - a parte que começa com `@export` diz para o pacote que essa função deve estar disponível para o usuário quando ele rodar `library(nomeDoPacote)`.
+
+## Passo 5: document, commit e push!
+
+1. Rode `devtools::document()`.
+1. Commite suas alterações.
+2. Dê um push!
+
+Se não saba o que é commitar e pushar, veja o artigo do [Athos](http://curso-r.com/author/athos/) sobre [o uso do git e do  GitHub](http://curso-r.com/blog/2017/07/17/2017-07-17-rstudio-e-github/).
+
+## Passo 6: Instalar o pacote em outra máquina
+
+1. Mande o nome do seu usuário do GitHub e o nome do seu pacote para sua migue.
+1. Peça para ela rodar:
+
+```{r eval=FALSE}
+devtools::install_github('usuario/nomeDoPacote')
+```
+
+1. Agora ela poderá usar sua função!
+
+```{r eval=FALSE}
+library(nomeDoPacote)
+soma_2(1:10)
+# [1]  3  4  5  6  7  8  9 10 11 12
+```
+
+Você também pode ver o help da função com `?soma_2`:
+
+![](/img/blog/pacote-miojo/documentacao.png)
+
+```{r echo=FALSE, eval=FALSE}
+library(magick)
+library(magrittr)
+image_read('~/2017-09-07-180619_1920x1080_scrot.png') %>%
+  image_crop('600x300+0+40') %>%
+  image_write('documentacao.png')
+```
+
+FIM!
+
+## Conclusões
+
+- Agora você não tem desculpa para não empacotar suas soluções em R.
+- Esse tutorial é incompleto! Para acessar mais detalhes, veja http://r-pkgs.had.co.nz, elaborado por você sabe quem.
+
+```{r, fig.width=5, fig.height=4.4, echo=FALSE, fig.align='center'}
+# templates <- meme::get_templates("imgflip")
+# allthethings <- meme::create_meme(templates[[9]], "Now", "It's your turn",
+#                                   username = 'jtrecenti', password = 'XXX')
+# saveRDS(allthethings, 'dicaprio.rds')
+meme:::plot.meme(readRDS('../../static/data/pacote-miojo/allthehings.rds'))
+```
+
+## Outras pequenas dicas práticas
+
+- Use sempre `devtools::check()` para checar se seu pacote está 100% bem construído.
+- Use `devtools::use_package()` para usar funções de outros pacotes. 
+- Sempre use os `::` para chamar as funções e nunca rode `library()` ou `require()` dentro de um pacote.
+- Use `devtools::use_mit_license()` para adicionar um arquivo `LICENSE` ao seu pacote.
+- Use `abjutils::use_pipe()` para poder usar o `%>%` nos seus pacotes.
+- Use `devtools::use_data()` para adicionar dados ao seu pacote.
+- Use `devtools::use_vignettes()` para escrever um tutorial sobre seu pacote, [igual a esse do dplyr, por exemplo](https://cran.r-project.org/web/packages/dplyr/vignettes/dplyr.html).
+
+
+```{r, fig.width=5, fig.height=4.4, echo=FALSE, fig.align='center'}
+# allthethings <- meme::create_meme(templates[[17]], "Package", "All the things!",
+#                                   username = 'jtrecenti', password = 'XXX')
+# saveRDS(allthethings, 'allthehings.rds')
+meme:::plot.meme(readRDS('../../static/data/pacote-miojo/dicaprio.rds'))
+```
+
+
+É isso. Happy coding ;)

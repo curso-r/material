@@ -1,0 +1,140 @@
+---
+title: "Usando o cronR para Agendar Scripts"
+date: "2017-11-13T14:25:00+03:00"
+tags: ["cron"]
+categories: ["tutoriais", "r"]
+banner: "img/banners/cron-clock.jpg"
+author: ["Caio"]
+summary: "Como agendar a execução de scripts usando o pacote cronR."
+---
+
+Nem sempre os dados que precisamos para uma análise podem ser encontrados em
+uma base consolidada. Muitas vezes as informações que queremos não estão
+imediatamente disponíveis e precisam ser coletadas com o tempo através de um
+processo lento e monótono.
+
+Imagine, por exemplo, que quiséssemos baixar os dados meteorológicos das
+maiores cidades do mundo a cada 12 horas para uma análise sobre previsões do
+tempo. Um programador desavisado talvez criasse alarmes em seu relógio e
+para baixar as tabelas necessárias quando eles tocassem.
+
+Mas isso não parece uma boa estratégia, certo?
+
+## DarkSky
+
+Para demonstrar uma alternativa a este método, vamos usar um serviço de
+previsões do tempo chamado [DarkSky](https://darksky.net/). Esta plataforma
+ficou conhecida recentemente pela sua precisão incrível e pelo seu
+[aplicativo](https://play.google.com/store/apps/details?id=net.darksky.darksky&hl=en)
+extremamente bem feito, mas uma coisa que poucos sabem é que a DarkSky também
+disponibiliza uma API para qualquer um interessado em dados meteorológicos.
+
+Para a nossa sorte, o [hrbrmstr](https://github.com/hrbrmstr) já criou uma
+[interface em R](https://github.com/hrbrmstr/darksky) para essa API que pode ser
+instalada facilmente com o comando abaixo:
+
+```r
+# install.packages("devtools")
+devtools::install_github("hrbrmstr/darksky")
+```
+
+Depois de instalado o pacote, vá para o [portal do desenvolvedor](https://darksky.net/dev)
+da DarkSky, crie uma conta e obtenha uma chave secreta para acessar a API.
+
+```r
+Sys.setenv(DARKSKY_API_KEY = "SUA CHAVE SECRETA")
+```
+
+## Baixando os dados
+
+O primeiro passo da nossa análise é determinar as latitudes e longitudes das
+maiores cidades do mundo para que possamos pedir as previsões do tempo
+destas coordenadas.
+
+Com o pacote `maps` podemos fazer isso de uma maneira bastante simples:
+
+```r
+forecasts <- maps::world.cities %>%
+  dplyr::as_tibble() %>%
+  dplyr::filter(pop > 2000000) %>%
+  dplyr::rename(country = country.etc) %>%
+  dplyr::select(name, country, lat, long) %>%
+  dplyr::mutate(
+    currently = list(""),
+    hourly = list(""),
+    daily = list(""))
+```
+
+No trecho de código acima pegamos todas as cidades com mais de 2 milhões de
+habitantes (juntamente com suas localizações) da base `maps::world.cities`.
+As últimas 4 linhas são uma preparação para a obtenção das previsões do tempo
+que faremos logo a seguir:
+
+```r
+for (i in 1:nrow(forecasts)) {
+  forecast <- darksky::get_current_forecast(forecasts$lat[i], forecasts$long[i])
+  forecasts$currently[i] <- forecast$currently %>% dplyr::as_tibble() %>% list()
+  forecasts$hourly[i] <- forecast$hourly %>% dplyr::as_tibble() %>% list()
+  forecasts$daily[i] <- forecast$daily %>% dplyr::as_tibble() %>% list()
+}
+```
+
+Na coluna `currently` guardamos o estado meteorológico atual da cidade, enquanto
+em `hourly` e `daily` colocamos as previsões do tempo para as próximas 48 horas
+e para os próximos 7 dias respectivamente. Agora só resta salvar isso tudo em um
+arquivo RDS:
+
+```r
+file <- lubridate::now() %>%
+  lubridate::ymd_hms() %>%
+  as.character() %>%
+  stringr::str_replace_all("[-: ]", "_") %>%
+  stringr::str_c(".rds") 
+
+readr::write_rds(forecasts, stringr::str_c("DIRETÓRIO DOS ARQUIVOS", file))
+```
+
+## cronR
+
+Perceba que o script descrito na seção anterior não depende de nenhum input do
+programador e pode ser rodado automaticamente. Agora só nos resta automatizar
+essa execução, tarefa que realizaremos com o pacote `cronR`. Ele funciona nas
+plataformas Mac e Linux e pode ser instalado com o comando a seguir:
+
+```r
+install.packages("cronR")
+```
+
+Esse pacote nos permite agendar a
+execução de qualquer comando para que ela ocorra a cada tantos minutos/horas/dias/...
+Certifique-se de que você está em uma máquina ou servidor que não será desligado,
+[verifique se o cron daemon está ativo](https://en.wikipedia.org/wiki/Cron) e
+agende a execução do nosso script:
+
+```r
+cmd <- cronR::cron_rscript("CAMINHO PARA SCRIPT")
+
+cronR::cron_add(cmd, "daily", "12AM")
+cronR::cron_add(cmd, "daily", "12PM")
+```
+
+E isso é tudo! No meu caso, agendei o script para executar diariamente às 00:00
+e às 12:00, mas a frequência das chamadas fica a seu critério (lembrando apenas
+que o plano gratuito da API do DarkSky só permite 1000 chamadas por dia). Para
+saber mais sobre como mudar a frequência das execuções, consulte a
+[documentação do cronR](https://github.com/bnosac/cronR).
+
+## Conclusão
+
+Como vimos, não é difícil agendar a execução de um script. A maior parte do
+nosso trabalho é criar um código que funcione independentemente do programador
+(por exemplo nomeando os arquivos gerados automaticamente), mas depois disso
+é só chamar `cronR::cron_rscript()` e `cronR::cron_add()`.
+
+No meu próximo post usarei os dados baixados com esse tutorial para uma análise
+sobre previsões meteorológicas, então fique ligado na parte dois!
+
+P.S.: Se você quiser o código completo do meu arquivo `get_forecasts.R`,
+disponibilizei ele como [um Gist](https://gist.github.com/ctlente/997f603f05883fcda573d96e310dad69).
+Além disso, também disponibilizei uma versão em inglês deste post no
+[meu blog pessoal](http://ctlente.com/en/cloudy-cron/). Abraços!

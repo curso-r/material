@@ -1,0 +1,125 @@
+---
+title: "Colando textos"
+date: "2017-04-17T13:07:31+02:00"
+tags: ["strings", "pacotes", "glue"]
+categories: ["tutoriais", "r"]
+banner: "img/banners/glue.png"
+author: ["Julio"]
+draft: false
+summary: "Uma tarefa muito comum no R é colar textos. As funções mais importantes para isso são paste() e sprintf(), que vêm com o pacote base. Nesse artigo, vamos falar dessas duas funções e de um novo pacote do tidyverse, o glue."
+---
+
+
+
+<p>Uma tarefa muito comum no <code>R</code> é colar textos. As funções mais importantes para isso são <code>paste()</code> e <code>sprintf()</code>, que vêm com o pacote <code>base</code>. Nesse artigo, vamos falar dessas duas funções e de um novo pacote do <code>tidyverse</code>, o <code>glue</code>.</p>
+<div id="paste" class="section level2">
+<h2><code>paste()</code></h2>
+<p>A função <code>paste()</code> recebe um conjunto indeterminado de objetos como argumento através do <code>...</code> e vai colando os objetos passados elemento a elemento. Isso significa que se você passar dois vetores de tamanho <code>n</code>, a função <code>paste()</code> retornará um vetor de tamanho <code>n</code> sendo cada posição a colagem dos dois vetores nessa posição. Por padrão, a colagem é feita com um separador de espaço simples (<code>&quot; &quot;</code>). Exemplo:</p>
+<pre class="r"><code>paste(c(1, 2, 3), c(4, 5, 6))
+## [1] &quot;1 4&quot; &quot;2 5&quot; &quot;3 6&quot;</code></pre>
+<p>É possível alterar o separador pelo argumento <code>sep =</code>. Um atalho útil para o separador vazio (<code>&quot;&quot;</code>) é a função <code>paste0</code>:</p>
+<pre class="r"><code>paste0(c(1, 2, 3), c(4, 5, 6))
+## [1] &quot;14&quot; &quot;25&quot; &quot;36&quot;</code></pre>
+<p>Algumas vezes nosso interesse não é juntar vetores elemento a elemento, mas sim passar um vetor e colar todos seus elementos. Isso é feito com o parâmetro <code>collapse =</code>:</p>
+<pre class="r"><code>paste(c(1, 2, 3, 4, 5, 6), collapse = &#39;@&#39;)
+## [1] &quot;1@2@3@4@5@6&quot;</code></pre>
+<p>Se você passar mais de um vetor e mandar colapsar os elementos, o <code>paste()</code> vai primeiro colar e depois colapsar:</p>
+<pre class="r"><code>paste(c(1, 2, 3), c(4, 5, 6), collapse = &#39;@&#39;)
+## [1] &quot;1 4@2 5@3 6&quot;</code></pre>
+<div id="cuidado" class="section level3">
+<h3>Cuidado</h3>
+<p>Tenha muito cuidado ao passar vetores com <strong>comprimentos diferentes</strong> no <code>paste()</code>! Assim como muitas funções do R, o <code>paste()</code> faz reciclagem, ou seja, ele copia os elementos do menor vetor até ele ficar com o comprimento do maior vetor<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>. O problema é que o <code>paste()</code> faz isso silenciosamente e não avisa se você inserir um vetor com comprimento que não é múltiplo dos demais. Veja que resultado bizarro:</p>
+<pre class="r"><code>paste(5:9, 1:3, 4:5)
+## [1] &quot;5 1 4&quot; &quot;6 2 5&quot; &quot;7 3 4&quot; &quot;8 1 5&quot; &quot;9 2 4&quot;</code></pre>
+<p>Por essas e outras que dizemos que às vezes o R funciona bem demais…</p>
+</div>
+</div>
+<div id="sprintf" class="section level2">
+<h2><code>sprintf()</code></h2>
+<p>O <code>sprintf()</code> é similar ao <code>printf</code> do <code>C</code>. Primeiro escrevemos um texto com <code>%s</code> no lugar das coisas que queremos substituir. Depois colocamos esses objetos nos outros argumentos da função, na ordem em que eles aparecem no texto.</p>
+<pre class="r"><code>sprintf(&#39;Aba%ste&#39;, &#39;ca&#39;)
+## [1] &quot;Abacate&quot;</code></pre>
+<p>Quando o argumento é um vetor, a função retorna um vetor com as substituições ponto a ponto.</p>
+<pre class="r"><code>sprintf(&#39;Aba%ste&#39;, c(&#39;ca&#39;, &#39;ixas&#39;))
+## [1] &quot;Abacate&quot;   &quot;Abaixaste&quot;</code></pre>
+<p>Se o texto contém mais de um <code>%s</code> e os objetos correspondentes são vetores, o <code>sprintf()</code> tenta <em>reciclar</em> os vetores para ficarem do mesmo tamanho. Isso só funciona quando todos os objetos têm comprimentos que são múltiplos do comprimento do maior objeto.</p>
+<p>Isso funciona:</p>
+<pre class="r"><code>sprintf(&#39;Aba%s%s&#39;, c(&#39;ca&#39;), c(&#39;xi&#39;, &#39;te&#39;)) # ca foi reciclado
+## [1] &quot;Abacaxi&quot; &quot;Abacate&quot;</code></pre>
+<p>Isso não funciona:</p>
+<pre class="r"><code>sprintf(&#39;Aba%s%s&#39;, c(&#39;ca&#39;, &#39;ixaste&#39;), c(&#39;xi&#39;, &#39;te&#39;, &#39;.&#39;))
+## Error in sprintf(&quot;Aba%s%s&quot;, c(&quot;ca&quot;, &quot;ixaste&quot;), c(&quot;xi&quot;, &quot;te&quot;, &quot;.&quot;)): arguments cannot be recycled to the same length</code></pre>
+<p>Nem sempre queremos substituir pedaços do nosso texto por outros textos. No lugar do <code>%s</code>, é possível colocar padrões para números, por exemplo. Eu uso bastante o <code>%d</code>, que recebe inteiros. Uma funcionalidade legal do <code>%d</code> é a possibilidade de adicionar zeros à esquerda quando um número não atinge certa quantidade de dígitos. Assim, quando ordenamos um vetor de textos que começa com números, a ordenação é a mesma da versão numérica do vetor.</p>
+<p>Exemplo:</p>
+<pre class="r"><code>nums &lt;- 1:11
+sort(as.character(nums))    # ordenado pela string: 10 vem antes de 2
+##  [1] &quot;1&quot;  &quot;10&quot; &quot;11&quot; &quot;2&quot;  &quot;3&quot;  &quot;4&quot;  &quot;5&quot;  &quot;6&quot;  &quot;7&quot;  &quot;8&quot;  &quot;9&quot;
+sort(sprintf(&#39;%02d&#39;, nums)) # ordenado pela string: 02 vem antes de 10
+##  [1] &quot;01&quot; &quot;02&quot; &quot;03&quot; &quot;04&quot; &quot;05&quot; &quot;06&quot; &quot;07&quot; &quot;08&quot; &quot;09&quot; &quot;10&quot; &quot;11&quot;</code></pre>
+</div>
+<div id="glue" class="section level2">
+<h2><code>glue</code></h2>
+<p>O <a href="https://github.com/tidyverse/glue"><code>glue</code></a> é um pacote recente. Sua primeira aparição no GitHub foi em 23/12/2016! Isso significa que é provável que algumas coisas mudem, mas isso não nos impede de aproveitar o que a ferramenta tem de bom.</p>
+<p>A função <code>glue()</code> é uma generalização do <code>sprintf()</code> que permite chamar objetos do R diretamente ao invés de utilizar o <code>%s</code>. Os objetos podem estar no <em>global environment</em> ou descritos por meio de objetos nomeados nos argumentos do <code>glue()</code>. Basta inserir os objetos entre chaves <code>{}</code>:</p>
+<pre class="r"><code>library(glue)
+planeta &lt;- &#39;mundo&#39;
+glue(&#39;Olá {planeta} pela {y}a vez&#39;, y = 1)
+## Olá mundo pela 1a vez</code></pre>
+<p>Tembém é possível adicionar expressões dentro das chaves:</p>
+<pre class="r"><code>p &lt;- 1.123123123
+glue(&#39;{p * 100}% das pessoas adoram R.&#39;)
+## 112.3123123% das pessoas adoram R.</code></pre>
+<pre class="r"><code>glue(&#39;{scales::percent(p)} das pessoas adoram R.&#39;)
+## 112% das pessoas adoram R.</code></pre>
+<p>A função <code>collapse()</code> é parecida com o <code>paste()</code> quando <code>collapse = ''</code>, mas só aceita um objeto como entrada:</p>
+<pre class="r"><code>x &lt;- collapse(1:10)
+x
+## 12345678910
+all.equal(x, paste(1:10, collapse = &#39;&#39;))
+## [1] &quot;Attributes: &lt; Modes: list, NULL &gt;&quot;                   
+## [2] &quot;Attributes: &lt; Lengths: 1, 0 &gt;&quot;                       
+## [3] &quot;Attributes: &lt; names for target but not for current &gt;&quot;
+## [4] &quot;Attributes: &lt; current is not list-like &gt;&quot;            
+## [5] &quot;target is glue, current is character&quot;</code></pre>
+<p>Se quiser colar os objetos elemento a elemento e depois colapsar, faça isso explicitamente em duas operações:</p>
+<pre class="r"><code>glue(&#39;{letters}/{LETTERS}&#39;) %&gt;% 
+  collapse(&#39;, &#39;)
+## a/A, b/B, c/C, d/D, e/E, f/F, g/G, h/H, i/I, j/J, k/K, l/L, m/M, n/N, o/O, p/P, q/Q, r/R, s/S, t/T, u/U, v/V, w/W, x/X, y/Y, z/Z</code></pre>
+<p>O <code>glue</code> também tem uma função extra para trabalhar melhor com o <code>%&gt;%</code>, o <code>glue_data()</code>. O primeiro argumento dessa função é uma lista ou <code>data.frame</code>, e seus nomes são utilizados como variáveis para alimentar as chaves das strings. Use o <code>.</code> para fazer operações com toda a base de dados:</p>
+<pre class="r"><code>mtcars %&gt;% 
+  head() %&gt;% 
+  glue_data(&#39;O carro {row.names(.)} rende {mpg} milhas por galão.&#39;)
+## O carro Mazda RX4 rende 21 milhas por galão.
+## O carro Mazda RX4 Wag rende 21 milhas por galão.
+## O carro Datsun 710 rende 22.8 milhas por galão.
+## O carro Hornet 4 Drive rende 21.4 milhas por galão.
+## O carro Hornet Sportabout rende 18.7 milhas por galão.
+## O carro Valiant rende 18.1 milhas por galão.</code></pre>
+</div>
+<div id="resumo" class="section level2">
+<h2>Resumo</h2>
+<ul>
+<li>Use <code>paste()</code> para colar ou colapsar elementos usando um separador fixado.</li>
+<li>Use <code>sprintf()</code> quando quiser colocar objetos dentro de um texto complexo.</li>
+<li>Em todos os casos existe uma solução usando <code>glue</code>.</li>
+</ul>
+<p>Atualmente sempre que tenho um problema desse tipo uso o <code>glue</code>. Até o momento, não encontrei nenhum problema ou dificuldade. A vida do cientista de dados é mais feliz no <code>tidyverse</code>!</p>
+<p>É isso. Happy coding ;)</p>
+</div>
+<div id="extra" class="section level2">
+<h2>Extra:</h2>
+<p>O <a href="https://github.com/duarteguilherme">Guilherme Jardim Duarte</a> fez uma ótima sugestão logo após a publicação deste artigo. No pacote <code>stringi</code> existe um operador <code>%s+%</code> que cola textos iterativamente, com uma sintaxe similar à linguagem <code>python</code>, que permite a colagem de textos usando um simples <code>+</code>. Exemplo:</p>
+<pre class="r"><code>library(stringi)
+&#39;a&#39; %s+%
+  &#39;ba&#39; %s+%
+  &#39;ca&#39; %s+%
+  &#39;xi&#39;
+## [1] &quot;abacaxi&quot;</code></pre>
+<p>Você pode adicionar esse operador como um atalho no RStudio, análogo ao <code>Ctrl+Shift+M</code> que usamos para escrever o <code>%&gt;%</code>. Para isso, veja <a href="https://rstudio.github.io/rstudioaddins/">esse tutorial sobre RStudio Addins</a>.</p>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>Mais sobre isso no livro <a href="http://www.burns-stat.com/pages/Tutor/R_inferno.pdf">R inferno</a><a href="#fnref1">↩</a></p></li>
+</ol>
+</div>

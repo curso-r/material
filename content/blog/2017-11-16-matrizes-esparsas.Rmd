@@ -1,0 +1,95 @@
+---
+title: "Matrizes Esparsas no R"
+date: "2017-11-16T14:25:00+03:00"
+tags: ["matriz", "esparsa"]
+categories: ["tutoriais", "r"]
+banner: "img/banners/banner-sparse-matrix.jpg"
+author: ["Daniel"]
+summary: "Matrizes esparsas são matrizes em que a maior parte dos elementos é igual a zero. Existem maneiras muito eficientes de lidar com esse tipo de matrizes no R e é disso que vamos falar neste post."
+---
+
+```{r include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, cache = TRUE)
+```
+
+
+Matrizes esparsas são matrizes em que a maior parte dos elementos é igual a zero.
+Matrizes dessa forma surgem em diversos problemas relacionados a Machine Learning e análise de dados.
+
+Por exemplo, é comum em *text mining* representar os documentos usando o chamado [*Bag of Words* ](https://en.wikipedia.org/wiki/Bag-of-words_model). *Bag of Words* nada mais é do que listar as palavras que aparecem em todos os documentos e em seguida criar uma matriz em que cada linha é um documento e cada coluna é uma palavra que foi listada anteriormente. Cada elemento $(i,j)$ desssa matriz é 1 se a palavra $j$ aparace no documento $i$ e 0 caso contrário. Naturalmente, o número de palavras que podem aparecer é muito maior do que o número de palavras que de fato aparecem em um documento, por isso a maioria dos elementos dessa matriz será 0.
+
+Matrizes esparsas também aparecem muito em problemas de recomendação. Nesse tipo de aplciação representamos as transações em uma matriz em que cada linha é um cliente e cada coluna um produto que ele poderia ter comprado. Para recomendar filmes no Netflix, por exemplo, cada linha seria um cliente e cada coluna um filme que está no catálogo do Netflix. Em seguida marcaríamos cada elemento $(i,j)$ dessa matriz com 1 se o cliente $i$ assistiu o filme $j$ e 0 caso contrário. Como o catálogo de filmes é muito grande, a mairoia dos elementos dessa matriz será 0.
+
+Essa [pergunta do Quora](https://www.quora.com/What-is-the-significance-of-sparse-matrices-What-are-some-common-applications-in-computer-science) tem mais algumas aplicações importantes de matrizes esparsas.
+
+Note que nos problemas que eu mencionei, encontramos dimensões muito altas. O número de palavras distintas em um conjunto de documentos pode facilmente passar de 20.000. O número de filmes no catálogo do netflix pode passar de 100.000. Agora vamos definir uma matriz como esta no R da forma usual. Vou preenchê-la aleatoriamente com 0's e 1's, sendo 1's aproximadamente 1%. Considere que essa matriz seria utilizada em um problema de classificação de textos com 1 milhão de documentos com apenas 500 palavras distintas. Veja que aqui estou reduzindo bastante o número de palavras possíveis, na prática esse número é muito maior.
+
+```{r, eval = FALSE}
+nrow <- 1e6
+ncol <- 500
+x <- matrix(sample(c(0,1), size = nrow*ncol, replace = TRUE,prob = c(0.99, 0.1)), nrow = nrow, ncol = ncol)
+```
+
+Se você tiver um computador com bastante RAM, talvez consiga rodar isso, mas provavelmente você
+terá um erro do tipo `Error: cannot allocate vector of size 74.5 Gb`. 
+
+De fato, essa matriz ocupa bastante memória:
+
+```{r, eval = FALSE}
+pryr::object_size(x)
+#> 4 GB
+```
+
+Será que existe uma forma mais eficiente de representar essa matriz na memória do computador? 
+A resposta é sim! E no R vamos usar o pacote `Matrix`. 
+
+Existem diversas formas de transformar a matriz `x` em uma matriz esparsa, a forma mais simples é:
+
+```{r, eval = FALSE}
+library(Matrix)
+x_s <- Matrix(x)
+pryr::object_size(x_s)
+#> 550 MB
+```
+
+Ou seja, a matriz esparsa ocupa quase 1/8 menos memória do que a matriz densa. A maioria dos métodos 
+para matrizes no R estão também implementados para matrizes esparsas. Isso quer dizer que você pode fazer 
+`x*y`, `x+y`, `x/y`, `x%*%y`, `x[1,1]`, etc. como se fossem matrizes normais. Na prática o pacote `Matrix`
+representa as matrizes esparsas internamente de uma forma muito mais inteligente, sem gastar memória com os valores nulos. 
+
+Uma outra grande vantagem é que muitos pacotes possuem implementações mais eficientes (tanto em tempo de execução quanto em memória utilizada) para matrizes esparsas, 
+por exemplo o [`glmnet`](https://cran.r-project.org/web/packages/glmnet/) muito usado para fazer regressão do 
+tipo LASSO. O [`recommenderlab`](https://github.com/mhahsler/recommenderlab) que implementa alguns
+algoritmos de recomendação também é inteiramente baseado em matrizes esparsas.
+O pacote [`text2vec`](http://text2vec.org/index.html) que implementa algoritmos como GloVe também usa muito esse tipo de matrizes.
+
+Vale lembrar que na maioria das vezes você possui uma base *transacional* que precisa ser representada como uma matriz.
+Algo mais ou menos assim:
+
+```{r}
+bd <- data.frame(
+  cliente = c(1,1,1,2,2,3,3,4,5,6,7,7,8,8,8,8,9,9,9,9),
+  itens = sample(1:50, 20)
+  )
+```
+
+```{r, echo = FALSE}
+knitr::kable(bd)
+```
+
+Nesse caso, faz mais sentido criar a matriz esparsa usando a função `sparseMatrix`. Assim, você só especifica as coordenadas da matriz que têm algum 1.
+
+```{r}
+library(Matrix)
+sparseMatrix(bd$cliente, bd$itens)
+```
+
+Outra função importante é a `sparse.model.matrix`. Ela é equivalente à função `model.matrix` mas cria uma matriz de modelo esparsa o que pode ser útil quando você tem um fator que possui muitos níveis no seu modelo. A vignette 
+[*Sparse Model Matrices*](https://cran.r-project.org/web/packages/Matrix/vignettes/sparseModels.pdf) fala sobre isso.
+
+Também é possível programar em Rcpp usando matrizes esparsas usando o RcppArmadillo, veja [esse exemplo](http://gallery.rcpp.org/articles/armadillo-sparse-matrix/) para mais detalhes.
+
+Para saber mais leia as vignettes do pacote [Matrix](https://cran.r-project.org/web/packages/Matrix/index.html).
+Em especial, vale a pena ler as seguintes [2nd Introduction to the Matrix Package](https://cran.r-project.org/web/packages/Matrix/vignettes/Intro2Matrix.pdf).
+
+PS: a inspiração para esse texto foi [esse post](http://www.johnmyleswhite.com/notebook/2011/10/31/using-sparse-matrices-in-r/) de 2011 do John Myles White

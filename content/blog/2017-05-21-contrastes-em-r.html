@@ -1,0 +1,32 @@
+---
+title: "Contrastes no R: um guia de como domar e interpretar seus parâmetros"
+date: "2017-05-22T21:12:00+03:00"
+tags: ["r", "contrastes", "formula", "interpretação"]
+categories: ["r"]
+banner: "img/banners/contrastes.png"
+author: ["Athos"]
+draft: true
+summary: "Na modelagem estatística, muitas vezes brigamos com os parâmetros em vez de compreendê-los. Nesse post iremos aprender a interpretá-los e a domá-los para usá-los em nosso benefício."
+---
+
+
+
+<div id="exemplo" class="section level2">
+<h2>Exemplo:</h2>
+<pre class="r"><code>n = 4
+contr.helmert(n, contrasts = TRUE, sparse = FALSE)
+contr.poly(n, scores = 1:n, contrasts = TRUE, sparse = FALSE)
+contr.sum(n, contrasts = TRUE, sparse = FALSE)
+contr.treatment(n, base = 1, contrasts = TRUE, sparse = FALSE)
+contr.SAS(n, contrasts = TRUE, sparse = FALSE)
+
+
+contr.helmert(n, contrasts = FALSE, sparse = FALSE)
+contr.poly(n, scores = 1:n, contrasts = FALSE, sparse = FALSE)
+contr.sum(n, contrasts = FALSE, sparse = FALSE)
+contr.treatment(n, base = 1, contrasts = FALSE, sparse = FALSE)
+contr.SAS(n, contrasts = FALSE, sparse = FALSE)</code></pre>
+</div>
+<div id="os-tweaks" class="section level2">
+<h2>Os tweaks</h2>
+</div>

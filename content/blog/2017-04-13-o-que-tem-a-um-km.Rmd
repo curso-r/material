@@ -1,0 +1,192 @@
+---
+title: "Você está a menos de 1 km de um Hambúrguer?"
+date: "2017-04-10T23:26:00+03:00"
+tags: ["GoogleMaps", "API", "leaflet"]
+categories: ["análises", "r"]
+banner: "img/banners/man-with-a-map.jpg"
+author: ["William"]
+summary: "Neste post, veremos como utilizar uma das APIs do Google Maps para obter informações de geolocalização a partir de uma pesquisa simples. Em seguida, vamos utilizar o pacote `leaflet` para criar mapas com os dados coletados e descobrir se estamos a menos de 1 km de hospitais, delagacias, corpos de bombeiros e, o mais importante, de uma hamburgueria."
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, cache = TRUE)
+```
+
+Se você estiver no centro de São Paulo, quanto será que você precisa andar para achar uma hamburgueria? Será que a sua casa fica a menos de 1 km de hospitais, delagacias ou corpo de bombeiros? Neste post, veremos como utilizar uma das APIs do Google Maps para obter informações de geolocalização a partir de uma pesquisa simples. Em seguida, vamos gerar mapas com o pacote `leaflet` para visualizar os dados coletados e responder essas perguntas.
+
+## Passo 1: configurar a API do Google Places
+
+A API que vamos utilizar para acessar os dados do Google Maps é a [Google Places](https://developers.google.com/places/web-service/?hl=pt-br). Para configurá-la, você precisa fazer o seguinte:
+
+1. criar um projeto no [Google APIs](https://console.developers.google.com/iam-admin/projects);
+2. adicionar a **Google Places API Web Service** à sua biblioteca de APIs;
+3. obter uma [chave de API](https://support.google.com/googleapi/answer/6158862); e
+4. enviar uma requisição.
+
+Para mais informações sobre os itens 1, 2 e 3, bastar acessar os links acima. Aqui, vamos focar em como fazer o item 4.
+
+## Passo 2: baixar os dados da API
+
+A API do Google Places permite fazer [alguns tipos de buscas](https://developers.google.com/places/web-service/search), como estabelecimentos específicos próximos a um local ou dentro de uma região pré-delimitada. Nosso objetivo aqui é requisitar os dados de todos os estabelecimentos, como hospitais, delegacias, supermercados, escolas etc, dentro de um raio de busca em torno de um ponto específico. Neste contexto, a requisição deve ser feita a partir de um link da forma
+
+> https://maps.googleapis.com/maps/api/place/radarsearch/output?parameters
+
+substituindo *output* pelo formato da saída, `xml` ou `json`, e *parameters* pelos parâmetros de busca. Utilizaremos aqui o formato `json`, *Javascript Object Notation*. Para mais informações sobre JSON, consulte [este link](http://www.devmedia.com.br/introducao-ao-formato-json/25275).
+
+Utilizaremos as seguintes bibliotecas nesta análise:
+
+```{r, eval = FALSE}
+library(tibble)
+library(magrittr)
+library(dplyr)
+library(stringr)
+library(purrr)
+library(RCurl)
+library(jsonlite)
+library(leaflet)
+```
+
+
+O que precisamos fazer é criar a url de requisição, acessá-la, guardar os dados no formato `json` em um objeto e convertê-lo para um data frame. A função `get_googlemaps_data()` abaixo faz exatamente isso. Mais especificamente, ela recebe os parâmetros de busca, uma chave de API e retorna um data frame com os dados de geolocalização (latitude e longitude) dos resultados encontrados.
+
+- O argumento `keyword=` recebe o termo a ser pesquisado, isto é, se estivermos pesquisando por escolas, esse argumento receberá a string `'escola'`.
+- O argumento `type=` recebe um termo para filtrar os estabelecimentos pesquisados. Por exemplo: `keyword = 'restaurante'` e `type = 'vegetariano'`.
+- Os argumentos `central_lat=` e `central_log=` representam, respectivamente, a latitude e a longitude do ponto central da busca. Os valores *default* são os do centro da cidade de São Paulo.
+- O argumento `radius=` indica o raio máximo de busca. O *default* é 15 Km.
+- O argumento `key=` deve receber a sua chave de API.
+
+
+```{r, eval = F}
+get_googlemaps_data <- function(keyword, type = "", central_lat = -23.55052, 
+                                central_log = -46.63331, radius = 15000, key) {
+  
+  basic_url = "https://maps.googleapis.com/maps/api/place/radarsearch/json?"
+  
+  if(type != "") {
+    
+    type %<>%
+      str_replace_all(" ", "+") %>%  # Os espaços precisam ser 
+      str_c("&type=", .)             # substituídos por '+'.
+  }
+  
+  complete_url <- str_c(basic_url,        # Criando a url de requisição
+                       "location=",       # com os parâmetros de busca.
+                       central_lat,
+                       ",",
+                       central_log,
+                       "&radius=",
+                       radius,
+                       type,
+                       "&keyword=",
+                       str_replace_all(keyword, " ", "+"),
+                       "&key=",
+                       key)
+  
+  json <- RCurl::getURL(complete_url)            # Acessando a URL.
+  list_info <- jsonlite::fromJSON(json)   # Transformando json em lista.
+  
+  
+  
+  # Guardando a latitude e longitude em um df, assim como o lugar pesquisado.
+  df <- tibble::tibble(lat = list_info$results$geometry$location$lat,
+               long = list_info$results$geometry$location$lng,
+               place = keyword)
+   
+  return(df)
+}
+
+```
+
+Com a função `get_googlemaps_data()` em mão, basta rodar o código `get_googlemaps_data("mercado", key = sua_API_key)` para obter a geolocalização de até 200 mercados em um raio de até 15 Km do centro de São Paulo. Sim, o limite é de 200 resultados. Não encontrei maneiras de aumentar esse limite.
+
+Também podemos utilizar a função `purrr:map_df()` para gerar um data frame com várias buscas. A função *map* mapeia uma determinada função em cada elemento de um vetor/lista, retornando um data frame. Ainda não estamos construindo os mapas.
+
+```{r, eval = F}
+places <- c("pronto socorro", "delegacia", "bombeiros", "hamburguer", "pizza")
+
+df_places <- places %>% 
+  purrr::map_df(.f = get_googlemaps_data, key = key)
+```
+
+Às vezes, a requisição pode retornar com algum erro. Não consegui descobrir o porquê isso acontece. Nestes casos, a função `get_googlemaps_data()` também retornará um erro, provavelmente na construção do data frame. Se isso acontecer, basta rodar a função novamente, gerando uma nova requisição.
+
+## Passo 3: os mapas
+
+Para construir os mapas, vamos utilizar a função `leaflet::leaflet()`. A ideia é, para cada ponto da pesquisa, adicionar um círculo de raio igual a 1 Km. Dessa forma, se você estiver fora desses círculos, quer dizer que você estará a mais de um quilômetro de um dos estabelecimentos pesquisados. Veja os exemplos a seguir.
+
+```{r, echo = F, warning = F, message = F}
+library(tibble)
+library(magrittr)
+library(dplyr)
+
+load("../../static/data/o-que-tem-a-um-km/o-que-tem-a-um-km.RData")
+```
+
+
+### Hospitais
+
+Eu pesquisei por "pronto socorro" porque a pesquisa hospitais também resulta em hospitais veterinários. Um desafio para quem for reproduzir a análise: coletar apenas a geolocalização de hospitais públicos.
+
+```{r, cache = FALSE}
+library(leaflet)
+df_places %>% 
+  dplyr::filter(place == "pronto socorro") %>% 
+  leaflet %>% 
+  addTiles() %>%
+  addCircles(lng = ~long, lat = ~lat, weight = 5,
+             radius = 1000, color = "blue", fillOpacity = 0.5)
+```
+
+
+### Delegacias
+
+```{r, cache = FALSE}
+df_places %>% 
+  dplyr::filter(place == "delegacia") %>% 
+  leaflet %>% 
+  addTiles() %>%
+  addCircles(lng = ~long, lat = ~lat, weight = 5,
+             radius = 1000, color = "blue", fillOpacity = 0.5)
+```
+
+### Bombeiros
+
+```{r, cache = FALSE}
+df_places %>% 
+  dplyr::filter(place == "delegacia") %>% 
+  leaflet %>% 
+  addTiles() %>%
+  addCircles(lng = ~long, lat = ~lat, weight = 5,
+             radius = 1000, color = "blue", fillOpacity = 0.5)
+```
+
+### Hamburguerias
+
+Repare que o único local na região mais central de SP em que você pode ficar a mais de um quilômetro de uma hamburgueria é no meio do parque Ibirapuera.
+
+```{r, cache = FALSE}
+df_places %>% 
+  dplyr::filter(place == "hamburguer") %>% 
+  leaflet %>% 
+  addTiles() %>%
+  addCircles(lng = ~long, lat = ~lat, weight = 5,
+             radius = 1000, color = "blue", fillOpacity = 0.5)
+```
+
+### Pizzarias
+
+Se a busca devolvesse todos os resultados possíveis, esse mapa teria um círculo azul com ~15 km de raio formado por milhares de círculos menores. =D
+
+```{r, cache = FALSE}
+df_places %>% 
+  dplyr::filter(place == "pizza") %>% 
+  leaflet %>% 
+  addTiles() %>%
+  addCircles(lng = ~long, lat = ~lat, weight = 5,
+             radius = 1000, color = "blue", fillOpacity = 0.5)
+```
+
+
+Sem dúvidas, a utilização dos dados aqui foi bem superficial, apenas ilustrativa. O ideal seria juntar essas informações de geolocalização com dados de criminalidade, saúde pública, socioeconômicos, consumo etc. Dependendo da disponibilidade de dados, há espaço para muitas análises interessantes utilizando essas informações do Google Maps. Com certeza voltaremos neste assunto em posts futuros. =)
+
+Comentários? Sugestões? Críticas? Você está a menos de um quilômetro dos comentários! Deixe a sua mensagem! 

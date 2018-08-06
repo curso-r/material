@@ -1,0 +1,34 @@
+---
+title: "Markov Augmented Ordinary Network with R (moanr)"
+date: "2018-03-19T14:25:00+03:00"
+tags: ["R", "pacote"]  
+categories: ["tutoriais", "r"]
+banner: "img/banners/moanr.jpg"
+author: ["Julio", "Athos", "William", "Daniel", "Caio"]
+summary: "O pacote que você estava esperando."
+draft: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, cache = TRUE, eval = FALSE)
+```
+
+Quer zoar o amiguinho no dia da mentira? Peça para ele instalar o pacote `moanr`!
+
+Fizemos esse pacote durante uma de nossas Datathon's. Ao ser carregado, o pacote faz algo especial.
+
+Para instalar, rode
+
+```{r eval=FALSE}
+devtools::install_github("datathonbr/moanr")
+library(moanr)
+```
+
+Em seguida, aguarde. No momento que você menos esperar, surpresinha!
+
+
+
+
+
+
+

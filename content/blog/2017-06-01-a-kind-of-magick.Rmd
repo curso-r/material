@@ -1,0 +1,198 @@
+---
+title: "A kind of magick"
+date: "2017-06-01T23:26:00+03:00"
+tags: ["imagens", "pacotes", "magick"]
+categories: ["tutoriais", "r"]
+banner: "img/banners/freddie-mercury.jpeg"
+author: ["William"]
+summary: "Já vimos como o Rstudio se torna uma ferramanta poderosa quando combinado com certos pacotes, como o knitr e shiny, ou outros recursos, como o markdown e o git. Hoje, veremos como transformar o Rstudio em um elegante e interativo editor de imagens utilizando o pacote magick."
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, cache = TRUE)
+```
+
+Já vimos como o Rstudio se torna uma ferramenta poderosa quando combinado com certos pacotes, como o `knitr` e `shiny`, ou outros recursos, como o *markdown* e o *git*. Hoje, veremos como transformar o Rstudio num elegante e interativo editor de imagens utilizando o pacote `magick`.
+
+Este *post* é um breve resumo das funcionalidades do `magick`. Para uma apresentação completa, visite o [vignette do pacote](https://cran.r-project.org/web/packages/magick/vignettes/intro.html).
+
+Já usamos o magick em outros posts do blog (às vezes por trás das cortinas) para tratar imagens. Esse pacote é um *wrapper* da biblioteca [ImageMagick](https://www.imagemagick.org/Magick++/STL.html), provavelmente a biblioteca *open-source* para processamento de imagens mais amigável disponível hoje em dia.
+
+## Instalação
+
+No Windows ou OS-X, instale via CRAN:
+
+```{r, eval = FALSE}
+install.packages("magick")
+```
+
+No Linux, consulte o [vignette do Magick](https://cran.r-project.org/web/packages/magick/vignettes/intro.html#build_from_source) para mais informações.
+
+
+## Lendo e escrevendo imagens
+
+Para começar a usar as funções do `magick`, carregue o pacote.
+
+```{r}
+library(magick)
+library(magrittr)
+```
+
+Vamos utilizar a seguinte imagem como exemplo neste post:
+
+```{r, echo = FALSE, fig.width = 8, fig.height = 7, eval = TRUE}
+plot(image_read('../../static/img/blog/a-kind-of-magick/freddie-mercury.jpeg'))
+```
+
+A função `image_read()` lê imagens de arquivos, como `.jpg` ou `png`. Diversas outras extensões são suportadas. Utilize `str(magick::magick_config())` para verificar quais formatos estão disponíveis na sua versão do ImageMagick.
+
+```{r, echo = FALSE, fig.width = 8, fig.height = 7, eval = TRUE}
+freddie <- image_read('../../static/img/blog/a-kind-of-magick/freddie-mercury.jpeg')
+image_info(freddie)
+```
+
+A função `image_write()` exporta imagens em qualquer um dos formatos suportados.
+
+```{r, eval = F}
+image_write(freddie, path = "freddie_png.png", format = "png")
+```
+
+**Dica**: no Rstudio, pasta rodar o objeto `freddie` para visualizar a imagem no painel *Viewer*.
+
+# Convertendo
+
+Ao ler uma imagem com o magick, ela é guardada em memória em seu formato original. Para converter essa imagem, utilizamos a função `image_convert()`.
+
+```{r}
+freddie_png <- image_convert(freddie, "png")
+image_info(freddie_png)
+```
+
+Neste ponto você já deve ter reparado que as (principais) funções do pacote `magick` utilizam o prefixo `image_`.
+
+# Cortando e editando
+
+A maioria das transformações que você pode fazer com as imagens utilizará um parâmetro `geometry`. Esse parâmetro requer uma sintaxe especial, da forma AXB+C+D, sendo que cada elemento (A, B, C e D) é opcional. Veja alguns exemplos:
+
+- `image_crop(image, "100x150+50+20")`: recorta uma região de tamanho 100px x 150px, começando +50px da esquerda para a direita e +20px de cima para baixo;
+- `image_scale(image, "200")`: redimensiona proporcionalmente ao comprimento: 200px;
+- `image_scale(image, "x200")`: redimensiona proporcionalmente à altura: 200px;
+- `image_border(frink, "red", "20x10")`: adiciona uma borda de 20px (esquerda/direita) e 10px (cima/baixo)
+
+Para mais detalhes sobre essa sintaxe, consulte [este link](http://www.imagemagick.org/Magick++/Geometry.html).
+
+
+Vamos testar essas funções na nossa imagem! 
+
+Começaremos a redimensionando para facilitar o uso e a visualização de algumas funções.
+
+```{r}
+freddie_resized <- image_scale(freddie, "500")
+image_info(freddie_resized)
+```
+
+Agora, vamos recortar um pedaço.
+
+```{r, eval = F}
+image_crop(freddie_resized, "100x150+280+30")
+```
+
+```{r, echo = FALSE, fig.width = 4, fig.height = 3}
+image_read(path = "../../static/img/blog/a-kind-of-magick/freddie_1.jpg") %>% plot
+```
+
+Colocar uma borda.
+
+```{r, eval = F}
+image_border(freddie_resized, "purple", "20x10")
+```
+
+```{r, echo = FALSE, fig.width = 8, fig.height = 7}
+image_read(path = "../../static/img/blog/a-kind-of-magick/freddie_2.jpg") %>% plot
+```
+
+Girá-la de ponta-cabeça.
+
+```{r, eval = FALSE}
+image_flip(freddie_resized)
+```
+
+```{r, echo = FALSE, fig.width = 8, fig.height = 7}
+image_read(path = "../../static/img/blog/a-kind-of-magick/freddie_3.jpg") %>% plot
+```
+
+E inverter a direção.
+
+```{r, eval = FALSE}
+image_flop(freddie_resized)
+```
+
+```{r, echo = FALSE, fig.width = 8, fig.height = 7}
+image_read(path = "../../static/img/blog/a-kind-of-magick/freddie_4.jpg") %>% plot
+```
+
+Com o pipe, fica fácil aplicar todas as funções ao mesmo tempo.
+
+```{r, eval = FALSE}
+freddie_resized %>% 
+  image_crop("100x150+280+30") %>% 
+  image_border("purple", "20x10") %>% 
+  image_flip %>% 
+  image_flop
+```
+
+```{r, echo = FALSE, fig.width = 4, fig.height = 3}
+image_read(path = "../../static/img/blog/a-kind-of-magick/freddie_5.jpg") %>% plot
+```
+
+# Filtros e efeitos
+
+Agora vamos aplicar alguns filtros e efeitos.
+
+```{r, eval = FALSE}
+image_blur(freddie_resized, 10, 5)
+```
+
+```{r, echo = FALSE, fig.width = 7, fig.height = 5}
+image_read(path = "../../static/img/blog/a-kind-of-magick/freddie_6.jpg")  %>% plot
+```
+
+```{r, eval = FALSE}
+image_noise(freddie_resized)
+```
+
+```{r, echo = FALSE, fig.width = 7, fig.height = 5}
+image_read(path = "../../static/img/blog/a-kind-of-magick/freddie_7.jpg") %>% plot
+```
+
+
+```{r, eval = FALSE}
+image_annotate(freddie_resized, "Farrokh Bulsara", size = 30, color = "red", 
+               boxcolor = "white", degrees = 9, location = "+60+30")
+```
+
+```{r, echo = FALSE, fig.width = 7, fig.height = 5}
+image_read(path = "../../static/img/blog/a-kind-of-magick/freddie_9.jpg") %>% plot
+```
+
+# O que mais dá para fazer?
+
+Realmente recomendamos uma leitura do Vignette do magick para ter uma boa ideia de tudo o que ele permite fazer. Além de várias outras ferramentas de edição para imagens estáticas, ainda é possível mexer com GIFs e animações! Ou fazer coisas como:
+
+```{r, eval = FALSE}
+library(ggplot2)
+library(grid)
+
+qplot(speed, dist, data = cars, geom = c("point", "smooth"))
+grid.raster(freddie_cropped, width = 0.15, height = 0.3,
+            hjust = -2, vjust = 1)
+```
+
+```{r, echo = FALSE}
+library(ggplot2)
+library(grid)
+qplot(speed, dist, data = cars, geom = c("point", "smooth"))
+image_read(path = "../../static/img/blog/a-kind-of-magick/freddie_1.jpg") %>%
+  grid.raster(width = 0.15, height = 0.3, hjust = -2, vjust = 1)
+```
+

@@ -1,0 +1,209 @@
+---
+title: "Por que usar o %>%"
+date: "2018-07-03T20:13:00+03:00"
+tags: ["pipe"]
+categories: ["tutoriais", "r", "tidyverse"]
+banner: "img/banners/pipe.jpg"
+author: ["Caio"]
+summary: "De onde vem e como funciona o operador pipe."
+---
+
+
+Provavelmente você já ouviu falar do operador pipe (`%>%`). Muita gente acha
+que ele é uma sequência mágica de símbolos que muda completamente o visual do
+seu código, mas na verdade ele não passa de uma função como outra qualquer.
+
+Nesse post vou explorar um pouco da história do pipe, como ele funciona e
+por que utilizá-lo.
+
+## Origem
+
+O conceito de pipe existe pelo menos desde os anos 1970. De acordo com seu
+criador, o operador foi concebido em "uma noite febril" e tinha o objetivo de
+simplificar comandos cujos resultados deveriam ser passados para outros
+comandos.
+
+```sh
+ls | cat
+#> Desktop
+#> Documents
+#> Downloads
+#> Music
+#> Pictures
+#> Public
+#> Templates
+#> Videos
+```
+
+Por essa descrição já conseguimos ter uma ideia de onde vem o seu nome: _pipe_
+em inglês significa "cano", referindo-se ao transporte das saídas dos comandos.
+Em portugês o termo é traduzido como "canalização" ou "encadeamento", mas
+no dia-a-dia é mais comum usar o termo em inglês.
+
+A partir daí o pipe tem aparecido nas mais diversas aplicações, desde HTML até
+o nosso tão querido R. Ele pode ter múltiplos disfarces, mas o seu objetivo
+é sempre o mesmo: transportar resultados.
+
+## Como funciona
+
+Em R o pipe tem uma cara meio estranha (`%>%`), mas no fundo ele não passa
+de uma função infixa, ou seja, uma função que aparece entre os seus argumentos
+(como `a + b` ou `a %in% b`). Na verdade é por isso mesmo que ele tem
+porcentagens antes e depois: porque no R uma função infixa só pode ser
+declarada assim.
+
+Vamos começar demonstrando sua funcionalidade básica. Carregue o pacote
+`magrittr` e declare o pipe usando *Ctrl + Shift + M*.
+
+```r
+library(magrittr)
+
+`%>%`("oi", print)
+#> [1] "oi"
+```
+
+Não ligue para os acentos graves em volta do pipe, o comando acima só serve
+para demonstrar que ele não é nada mais que uma função; perceba que o seu
+primeiro argumento (`"oi"`) virou a entrada do seu segundo argumento (`print`).
+
+```r
+"oi" %>% print()
+#> [1] "oi"
+```
+
+Observe agora o comando abaixo. Queremos primeiro somar 3 a uma sequência de
+números e depois dividí-los por 2:
+
+```r
+mais_tres <- function(x) { x + 3 }
+sobre_dois <- function(x) { x / 2 }
+
+x <- 1:3
+
+sobre_dois(mais_tres(x))
+#> [1] 2.0 2.5 3.0
+```
+
+Perceba como fica difícil de entender o que está acontecendo primeiro? A linha
+relevante começa com a divisão por 2, depois vem a soma com 3 e, por fim, os
+valores de entrada.
+
+Nesse tipo de situação é mais legível usar a notação de
+[composição de funções](https://pt.wikipedia.org/wiki/Composi%C3%A7%C3%A3o_de_fun%C3%A7%C3%B5es),
+com as funções sendo exibidas na ordem em que serão aplicadas: $f \circ g$.
+
+Isso pode ser realizado se tivermos uma função que passa o resultado do que está
+à sua esquerda para a função que está à sua direita...
+
+```r
+x %>% mais_tres() %>% sobre_dois()
+#> [1] 2.0 2.5 3.0
+```
+
+No comando acima fica evidente que pegamos o objeto `x`, somamos 3 e dividimos
+por 2.
+
+Você pode já ter notado isso, mas a entrada (esquerda) de um pipe sempre é
+passada como o _primeiro_ argumento agumento da sua saída (direita). Isso não
+impede que as funções utilizadas em uma sequência de pipes tenham outros
+argumentos.
+
+```r
+mais_n <- function(x, n) { x + n }
+
+x %>% mais_n(4) %>% sobre_dois()
+#> [1] 2.5 3.0 3.5
+```
+
+## Vantagens
+
+A grande vantagem do pipe não é só enxergar quais funções são aplicadas
+primeiro, mas sim nos ajudar a programar pipelines ("encanamento" em inglês)
+de tratamentos de dados.
+
+```r
+library(dplyr)
+
+starwars %>% 
+  mutate(bmi = mass/((height/100)^2)) %>%
+  select(name, bmi, species) %>%
+  group_by(species) %>%
+  summarise(bmi = mean(bmi))
+#> # A tibble: 38 x 2
+#>    species     bmi
+#>    <chr>     <dbl>
+#>  1 Aleena     24.0
+#>  2 Besalisk   26.0
+#>  3 Cerean     20.9
+#>  4 Chagrian   NA  
+#>  5 Clawdite   19.5
+#>  6 Droid      NA  
+#>  7 Dug        31.9
+#>  8 Ewok       25.8
+#>  9 Geonosian  23.9
+#> 10 Gungan     NA  
+#> # ... with 28 more rows
+```
+Acima fica extremamente claro o que está acontecendo em cada passo da pipeline.
+Partindo da base `starwars`, primeiro transformamos, depois selecionamos,
+agrupamos e resumimos; em cada linha temos uma operação e elas são executadas
+em sequência.
+
+Isso não melhora só a legibilidade do código, mas também a sua _debugabilidade_!
+Se tivermos encontrado um bug na pipeline, basta executar linha a linha do
+encadeamento até que encontremos a linha problemática. Com o pipe podemos
+programar de forma mais compacta, legível e correta.
+
+Todos os exemplos acima envolvem passar a entrada do pipe como o primeiro
+argumento da função à direita, mas não é uma obrigatoriedade. Com um operador
+placeholder `.` podemos indicar exatamente onde deve ser colocado o valor
+que chega no pipe:
+
+```r
+y_menos_x <- function(x, y) { y - x }
+
+x %>%
+  mais_tres() %>%
+  purrr::map2(4:6, ., y_menos_x)
+# [[1]]
+# [1] 0
+# 
+# [[2]]
+# [1] 0
+# 
+# [[3]]
+# [1] 0
+```
+
+## Bônus
+
+Agora que você já sabe dos usos mais comuns do pipe, aqui está uma outra
+funcionalidade interessante: funções unárias. Se você estiver familiarizado
+com o [pacote `purrr`](http://ctlente.com/pt/purrr-magic/), esse é um jeito
+bastante simples de criar funções descartáveis.
+
+
+```r
+m3_s2 <- . %>%
+  mais_tres() %>%
+  sobre_dois()
+
+m3_s2(x)
+#> [1] 2.0 2.5 3.0
+```
+
+Usando novamente o `.` definimos uma função que recebe apenas um argumento
+com uma sequência de aplicações de outras funções.
+
+## Conclusão
+
+O pipe não é apenas algo que deve ser usado pelos fãs do
+[tidyverse](https://www.tidyverse.org/). Ele é uma função extremamente útil
+que ajuda na legibilidade e programação de código, independentemente de
+quais pacotes utilizamos.
+
+Se quiser saber mais sobre o mundo do pipe, leia
+[este post](http://curso-r.com/blog/2017/02/15/2017-02-16-manifesto-tidy/)
+do Daniel sobre o Manifesto Tidy e o
+[nosso tutorial](http://material.curso-r.com/pipe/) mais aprofundado sobre o
+próprio pipe.

@@ -1,0 +1,87 @@
+---
+title: "Quebrando CAPTCHAs - Parte IV: Trabalhando com a imagem completa"
+date: "2017-07-31T13:07:31+02:00"
+tags: ["r", "captcha"]
+categories: ["r"]
+banner: "img/banners/captcha_04.png"
+author: ["Julio"]
+draft: false
+summary: "No último post sobre CAPTCHAs nós vimos que a segmentação das imagens é um problema complicado. O Daniel nos disse que estava trabalhando no pacote do Keras e que existia uma forma de trabalhar com a imagem completa, sem segmentar. Foi só quando ele mostrou um acerto de 100% em um CAPTCHA que fomos convencidos, e passamos a chamar esse modelo de..."
+---
+
+```{r include=FALSE, warning = FALSE, message = FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, 
+                      collapse = TRUE, cache = TRUE)
+```
+
+> Esse post assume uma versão mais antiga do `decryptr` para instalar a versão usada use: `devtools::install_github("decryptr/decryptr@05bfd48")`
+
+No último post sobre [CAPTCHAs](http://curso-r.com/tags/captcha/) nós vimos que a segmentação das imagens (separar uma imagem em várias imagens, uma para cada caractere) é um problema complicado. Definir uma largura fixa ou utilizar outros métodos ad-hoc para segmentar as imagens pode dar bons frutos, mas não é o suficiente para quebrar CAPTCHAs mais complexos, como o da Receita Federal.
+
+Alguns meses atrás, tentamos resolver esse problema de várias formas. Uma delas foi utilizar algoritmos de agrupamento ($k$-médias) ou de identificação de conjuntos conectados. Esses algoritmos se mostraram instáveis e não aumentaram muito o poder preditivo. Outra ideia que tentamos foi criar vários critérios de corte fixos e incluir todas as colunas geradas na base de dados. Mas isso deixou nos deixou com uma dimensão muito grande pra tratar, e parecia que os modelos precisavam de muito mais dados pra começarem a funcionar.
+
+Foi aí que o Daniel nos disse que estava trabalhando no pacote do Keras e que existia uma forma de trabalhar com a imagem completa, sem segmentar. A tarefa de segmentação seria "parametrizada" num modelão complexo de deep learning e conseguiríamos resolver o problema **sem pré-processamento**.
+
+Inicialmente, eu e o Athos ficamos perplexos com a ideia. Foi só quando o Daniel mostrou um modelo que **acertava 100% dos CAPTCHAs do TJMG** que fomos convencidos, e passamos a chamar esse modelo de "magia negra".
+
+Nesse post, vamos discutir como montar a base para fazer a magia negra.
+
+### Resposta
+
+Nossa resposta não é mais uma categoria, e sim uma matriz. A matriz tem $k$ linhas (número de letras em um CAPTCHA) $p$ colunas (número de valores possíveis de um caractere). O elemento $(i,j)$ vale `1` se na posição $i$ aparece a letra relativa à posição $j$.
+
+Assim, 
+
+```
+a49f36
+```
+
+vira isso: (substituí `0` por `'.'` para ficar mais fácil de ver)
+
+```{r echo=FALSE}
+library(tidyverse)
+m <- decryptr:::create_response("a49f36", c(0:9, letters))
+m[m == 0] <- '.'
+as_tibble(m) %>% rownames_to_column('posicao') %>% knitr::kable()
+```
+
+Isso para uma imagem. Vamos precisar de uma terceira dimensão, que são as "linhas" de nossa resposta (uma para cada CAPTCHA).
+
+Nosso `y` final é um array de dimensões $n \times k \times p$. Achou estranho? Estamos só começando!
+
+### Explicativas
+
+Uma imagem nada mais é do que uma matriz de pixels. Cada elemento da matriz é um número entre zero e um indicando o quanto de cor há nesse pixel. Assim, zero significa preto (ausência de cor), e um significa branco (todas as cores). Valores intermediários dão escala de cinza. Para representar imagens com cores, é necessária uma terceira dimensão de tamanho 3, indicando os pesos de `R` (*red*) `G` (*green*) e `B` (*blue*).
+
+Assim, nossa base de dados de explicativas é um array de dimensões $n \times h \times w \times 3$, em que $h$ e $w$ são a altura e a largura da imagem, respectivamente.
+
+### Função `prepare`
+
+Para facilitar a vida, criamos uma função `prepare` que prepara os arquivos de imagem num formato adequado para ajuste dos modelos usando o Keras.
+
+Veja um exemplo com 30 CAPTCHAs do TJMG. Aqui temos apenas cinco números por imagem, então $k=5$ e $p=10$.
+
+```{r}
+library(decryptr)
+arqs <- dir('../../static/data/captcha-dados/tjmg', full.names = TRUE)
+
+d_captcha <- arqs %>% 
+  read_captcha() %>%
+  prepare()
+
+str(d_captcha)
+```
+
+### Wrap-up
+
+- Segmentar as imagens é complicado
+- Vamos trabalhar com a imagem completa, mas precisamos de uma estrutura de dados adequada.
+- Nossa resposta será um array de dimensão `#captchas` x `#caracteres` x `#categorias`, preenchidas sempre com zeros e uns.
+- Nossa explicativa será um array de dimensão `#captchas` x `altura` x `largura` x `3`, preenchidas com números entre zero e um, com os pesos de vermelho, verde e azul.
+- Use a função `decryptr::prepare()` num vetor de caminhos de arquivos classificados para montar a base de forma adequada.
+
+### Next
+
+No próximo post sobre esse tema, vamos falar um pouco das redes neurais profundas que vamos ajustar.
+
+É isso. Happy coding ;)

@@ -1,0 +1,130 @@
+---
+title: "Componentes Principais - Intuição"
+date: "2017-06-24T10:12:00+03:00"
+tags: ["pca", "componentes principais", "plotly"]
+categories: ["conceitos", "r"]
+banner: "img/banners/componentes_principais.png"
+author: ["Athos"]
+summary: "Uma ilustração gráfica simples para dar intuição sobre o que uma Análise de Componentes Principais faz."
+---
+  
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, 
+                      warning = FALSE, comment = FALSE,
+                      eval=TRUE, cache = TRUE)
+```
+
+Componentes principais são bastante utilizados em modelagem estatística, mas a sua definição matemática rigorosa faz com que a ACP pareça um conceito mais abstrato do que somos capazes de compreender, em particular quando falam **“maximizar a variância total”** e **“diminuir a dimensionalidade”**. A primeira reação é um grande “HEIN?”.
+
+Abaixo tem alguns gráficos em 3 dimensões que dão uma boa ilustração sobre o que essas duas afirmativas querem dizer e, mesmo sendo um exemplo simples, irão ajudar a extrapolar a ideia para problemas mais complexos. 
+
+1) O primeiro gráfico é a representação com **100% da informação** em três dimensões. 
+2) O segundo gráfico é como fica a representação do mesmo conjunto de dados, mas com uma dimensão a menos (**redução de dimensionalidade**).
+3) Ao diminuir uma dimensão, perdemos informação (não é mais **100% da variância total**) e essa perda é mensurada pela variância explicada pelas dimensões que deixamos para trás.
+4) As duas primeiras dimensões projetam os dados de forma que apresentam a **máxima a variância total** possível em apenas duas dimensões.
+
+
+**pacotes para os exemplos**
+
+```{r}
+library(magrittr)
+library(tidyr)
+library(dplyr)
+```
+
+OBS: não esqueça de girar os gráficos! =)
+
+## Exemplo 1 - Tetraedro
+
+```{r}
+a <- 1
+tetraedro <- data.frame( x = c(a * sqrt(3)/3, - a * sqrt(3)/6, - a * sqrt(3)/6, 0),
+                         y = c(0, - a/2, a/2, 0),
+                         z = c(0, 0, 0, a * sqrt(6)/3),
+                         cor = c("a", "b", "c", "d"),
+                         id = 1:4)
+
+tetraedro_linhas <- combn(x = tetraedro$id, m = 2) %>%
+  t %>%
+  as.data.frame.matrix %>%
+  set_names(c("id1", "id2")) %>%
+  mutate(id_par = 1:n()) %>%
+  gather(id_ordem, id, id1, id2) %>%
+  left_join(tetraedro, by = "id") %>%
+  arrange(id_ordem)
+```
+
+**Contribuição dos componentes na variância total**
+```{r}
+tetraedro_pc <- prcomp(tetraedro %>% dplyr::select(x, y, z)) # PCA acontece aqui
+knitr::kable(summary(tetraedro_pc)$importance)
+```
+
+**3 dimensões (100% da variância)**
+
+```{r, cache = FALSE}
+library(plotly)
+
+plot_ly(tetraedro_linhas, x = ~x, y = ~y, z = ~z) %>%
+  add_lines() %>%
+  add_markers()
+  
+```
+
+**2 dimensões (67% da variância)**
+
+```{r, cache = FALSE}
+tetraedro_pc_pred <- tetraedro_pc %>% predict %>% as.data.frame
+plot_ly(tetraedro_pc_pred, x = ~PC2, y = ~PC3, z = ~PC3) %>%
+  add_lines() %>%
+  add_markers()
+```
+
+
+## Exemplo 2 - Uma forma legal
+
+```{r}
+x <- c()
+y <- c()
+z <- c()
+c <- c()
+
+for (i in 1:62) {
+  r <- 20 * cos(i / 20)
+  x <- c(x, r * cos(i))
+  y <- c(y, r * sin(i))
+  z <- c(z, i)
+  c <- c(c, i)
+}  
+
+forma_legal <- data.frame(x, y, z, c)
+```
+
+**Contribuição dos componentes na variância total**
+```{r}
+forma_legal_pc <- prcomp(forma_legal %>% dplyr::select(x, y, z)) # PCA acontece aqui
+knitr::kable(summary(forma_legal_pc)$importance)
+```
+
+**3 dimensões (100% da variância)**
+```{r, cache = FALSE}
+plot_ly(forma_legal, x = ~x, y = ~y, z = ~z, type = "scatter3d", mode = "markers+lines",
+        line = list(width = 6, color = ~c, colorscale = 'Viridis'),
+        marker = list(size = 3.5, color = ~c, colorscale = 'Greens', 
+                      cmin = -20, cmax = 50))
+```
+
+**2 dimensões (82% da variância)**
+```{r, cache = FALSE}
+forma_legal_pc_pred <- forma_legal_pc %>% predict %>% as.data.frame
+plot_ly(forma_legal_pc_pred, x = ~PC1, y = ~PC2, z = 1, type = 'scatter3d', mode = 'lines+markers',
+        line = list(width = 6, color = ~c, colorscale = 'Viridis'),
+        marker = list(size = 3.5, color = ~c, colorscale = 'Greens', 
+                      cmin = -20, cmax = 50))
+```
+
+## Para saber mais
+
+Meu livro predileto sobre esse assunto (e para muitos outros) é o [An Introduction to Statistical Learning](http://www-bcf.usc.edu/~gareth/ISL/ISLR%20Seventh%20Printing.pdf).
+
+abs

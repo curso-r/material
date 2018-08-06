@@ -1,0 +1,45 @@
+---
+title: "Desafio de Dados - PesqEle (parte I)"
+date: "2018-07-26T00:00:00+00:00"
+tags: ["app", "pacotes"]
+categories: ["desafio-de-dados", "r"]
+banner: "img/desafio-dados/1-pesqele.png"
+author: ["Daniel", "Bruna Wundervald"]
+summary: "Nessa primeira edição do Desafio de Dados vamos analisar a base de dados do pesqEle e criar um mapa da distribuição do número de pesquisas por estado."
+draft: false
+---
+
+Bem vindos à primeira edição do [Desafio de Dados](/desafio-dados/).
+
+O pesqEle é o repositório oficial de pesquisas eleitorais disponibilizado pelo Tribunal Superior Eleitoral (TSE). Lá podemos encontrar diversas informações sobre as pesquisas registradas. Dá até para ver os questionários aplicados e a metodologia de coleta.
+
+O CONRE3 fez um [pacote para o R](https://github.com/conre3/pesqEle) que permite acessar esses dados de forma mais organizada. Leia mais sobre o pacote neste [post do blog](http://curso-r.com/blog/2018/05/30/2018-05-30-pesqele/). 
+
+Junto com o pacote, o CONRE3 fez também um aplicativo em shiny, disponível [neste link](http://pesqele.conre3.org.br/app/). 
+
+A ideia dessa primeira edição do Desafio de Dados é replicar o mapa da página inicial do aplicativo que mostra a distribuição de pesquisas eleitorais por estado do Brasil.
+
+![](/img/desafio-dados/1-pesqele.png)
+
+Os dados podem ser obtidos rodando o trecho de código abaixo:
+
+```
+# devtools::install_github("conre3/pesqEle") # instalação do pacote;
+library(pesqEle)
+pe <- pesqEle_2018
+dplyr::glimpse(pe)
+```
+
+O shapefile do mapa está disponível no pacote `ufshapes`:
+
+```
+# devtools::install_github('jtrecenti/ufshape') # instalação do pacote;
+df_uf <- ufshape::df_uf
+```
+
+**Links sugeridos**:
+  
+* [Gráficos Miojo: Mapas temáticos do Brasil em 3 minutos ou menos](http://curso-r.com/blog/2017/05/04/2017-05-04-mapas-tematicos-3-minutos/)
+* [Material Curso-R](http://material.curso-r.com/manip/)
+
+O post com a solução será publicado no dia 09-08-18.

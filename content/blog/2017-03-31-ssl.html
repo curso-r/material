@@ -1,0 +1,43 @@
+---
+title: "Requisições seguras"
+date: "2017-03-31"
+tags: ["Web scraping", "SSL"]
+categories: ["conceitos", "r"]
+banner: "img/banners/ssl-error.png"
+author: ["Julio"]
+summary: "No mundo do web scraping, muitas vezes precisamos acessar sites HTTPS, a versão segura do HTTP (Hyper Text Transfer Protocol). Esse protocolo é utilizado para encriptar as mensagens trocadas por usuário e servidor. O pacote httr utiliza um padrão SSL (Secure Sockets Layer) para lidar com HTTPS..."
+---
+
+
+
+<p>No mundo do web scraping, muitas vezes precisamos acessar sites <code>HTTPS</code>, a versão <code>S</code>egura do <code>HTTP</code> (Hyper Text Transfer Protocol). Esse protocolo é utilizado para encriptar as mensagens trocadas por usuário e servidor.</p>
+<p>O pacote <code>httr</code> utiliza um padrão <code>SSL</code> (Secure Sockets Layer) para lidar com <code>HTTPS</code>. O SSL nada mais é que uma forma de informar ao servidor que você é você, garantindo que suas mensagens só possam ser interpretadas por esse servidor, e vice-versa. O padrão do <code>httr</code> funciona bem para a maioria dos sites, permitindo o acesso sem sofrimento.</p>
+<p>No entanto, alguns sites dão o seguinte erro:</p>
+<pre class="r"><code>httr::GET(&quot;https://esaj.tjsp.jus.br&quot;)
+## Error in curl::curl_fetch_memory(url, handle = handle): SSL certificate problem: unable to get local issuer certificate</code></pre>
+<p>A solução para esse problema é bem simples. Basta mandar o <code>httr</code> ignorar o protocolo <code>SSL</code> usando a função <code>httr::config()</code>. Ignorar o SSL costuma ser uma má ideia, pois faz com que as mensagens entre usuário e servidor voltem a ser em texto puro, como se fosse <code>HTTP</code>. Mas no web scraping isso não é exatamente um problema.</p>
+<p>Para solucionar o problema acima, rode:</p>
+<pre class="r"><code>httr::GET(&quot;https://esaj.tjsp.jus.br&quot;, httr::config(ssl_verifypeer = FALSE))
+## Response [https://esaj.tjsp.jus.br/esaj/portal.do?servico=740000]
+##   Date: 2018-02-03 19:12
+##   Status: 200
+##   Content-Type: text/html;charset=ISO-8859-1
+##   Size: 38.5 kB
+## 
+## 
+## 
+## 
+## 
+## 
+## 
+## 
+## &lt;!DOCTYPE html PUBLIC &quot;-//W3C//DTD XHTML 1.0 Transitional//EN&quot; &quot;http://w...
+## 
+## ...</code></pre>
+<p>E… Feliz web scraping!</p>
+<p><strong>OBS:</strong> Certa vez um amigo teve problema com SSL mesmo tentando a solução acima numa máquina com Ubuntu Resolvemos o problema reinstalando a biblioteca <code>libcurl4-openssl-dev</code> via <code>apt-get</code> e o pacote <code>curl</code> do R. Assim:</p>
+<p>No terminal:</p>
+<pre class="shell"><code>sudo apt-get update
+sudo apt-get install libcurl4-openssl-dev</code></pre>
+<p>No R:</p>
+<pre class="r"><code>install.packages(&#39;curl&#39;)</code></pre>

@@ -1,0 +1,188 @@
+---
+title: "RStudio e Github no dia a dia"
+date: "2017-07-17T00:26:00+03:00"
+tags: ["github", "rstudio", "git"]
+categories: ["tutoriais", "r"]
+banner: "img/banners/fluxo_github_rstudio2.png"
+author: ["Athos"]
+summary: "Versionamento de código é uma ferramenta que veio para ficar. Não dá para calcular o quanto de dor de cabeça, horas perdidas e frustrações ela economiza e já economizou na história da humanidade. Esse post mostra a rotina de um analista que usa Github no RStudio"
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
+```
+
+Versionamento de código é uma ferramenta que veio para ficar. Não dá para calcular o quanto de dor de cabeça, horas perdidas e frustrações ela economiza e já economizou na história da humanidade.
+
+Um dos programas que faz isso para a gente se chama [Git](https://git-scm.com/). E não confundir com  [Github](https://github.com/) (que vamos usar para exemplificar mais para frente) que é um serviço que hospeda repositórios "controlados" pelo Git.
+
+Ao final do post você estará apto(a) a trabalhar com Github no seu RStudio.
+
+## Motivos para usar Github nos seus projetos de R
+
+**1) Deixa seu código atualizado e acessível de qualquer computador.**
+
+Casa -> Trabalho, Trabalho -> Casa, por exemplo. Não há necessidade de carregar o laptop pra lá e pra cá caso você tenha vários Quartéis Generais.
+
+**2) Colaboradores conseguirão contribuir sempre a partir da versão mais atualizada.**
+
+Seu colega não vai mais precisar te pedir aquele versao_final_20170711.zip por email. Ele pode acessar o seu repositório quando quiser, mexer no código e depois pedir autorização para atualizar o projeto.
+
+**3) Recupere uma versão funcional em caso de imprevistos.**
+
+Arrumar um bugzinho singelo, salvar o código, dormir, acordar no dia seguinte, perceber que o programa não funciona mais. Uma história de terror, porém corriqueira. O Github consegue recuperar o seu código a partir de uma atualização anterior.
+
+**4) Seu projeto no ar.**
+
+Github é, além de tudo, uma rede social e é prática comum pessoas acessarem Githubs de projetos alheios para consumí-los. Além disso te fornece uma página em branco para você documentar e deixar seu trabalho para a posteridade. Existem pacotes de R que nem estão no CRAN, mas já estão no Github! A função `devtools::install_github()` existe para isso.
+
+## Pré-requisitos
+
+Você precisa ter instalado na sua máquina...
+
+- [R](https://cran.r-project.org/)/[RStudio](https://www.rstudio.com/products/rstudio/download/) (versões recentes para que tudo funcione direitinho)
+- [Git](https://git-scm.com/download/)
+- Uma conta no [Github](https://github.com/)
+
+## Preparação de um Projeto com RStudio e Github
+
+A vida com Github + RStudio segue a seguinte rotina (escreva esse fluxo num pedaço de papel e guarde na sua carteira):
+
+```{r, fig.align='center', fig.height = 5, echo=FALSE}
+knitr::include_graphics("/img/blog/rstudio-e-github/fluxo_github_rstudio.png")
+```
+
+
+### Passo 1 - Repositório: Criar repositório do projeto no Github
+
+Vá à sua conta do Github e crie um repositório com o nome do seu projeto.
+
+
+```{r, fig.align='center', fig.height = 5, echo=FALSE}
+knitr::include_graphics("/img/blog/rstudio-e-github/passo_1_criar_repo.gif")
+```
+
+
+
+No exemplo acima eu poderia acessar o conteúdo do meu projeto no link `https://github.com/athospd/projecao_de_precos`. Mas de modo geral, você acessaria o seu projeto no link `https://github.com/<nome-do-usuario>/<nome-do-projeto>`.
+
+Boas práticas:
+
+- Nomes sem espaço e sem caracteres estranhos. Deixe o nome bem simples! 
+
+    - RUIM: `projeção de preços`
+    - BOM: `projecao_de_precos`
+
+
+- Coloque uma descrição sucinta e direta sobre o seu projeto. Um link para um site com maiores detalhes também pode colocar aí.
+- Crie um README.md. Logo mais volto a tocar nesse assunto, mas no momento da criação do seu repositório, já deixe um engatilhado!
+
+OBS: Incluir uma licença open-source é opcional, mas é fácil colocar, deixa claro que as outras pessoas podem usar e deixa seu projeto parecendo profissa rs.
+
+
+
+
+
+### Passo 2 - .Rproj: Criação do Projeto no RStudio
+
+Agora precisamos criar um .Rproj que esteja atrelado ao seu repositório no Github. Por sorte, o RStudio já pensou em tudo e fez disso uma tarefa fácil.
+
+
+```{r, fig.align='center', fig.height = 5, echo=FALSE}
+knitr::include_graphics("/img/blog/rstudio-e-github/passo_2_criacao_do_rproj_pt2.gif")
+```
+
+O caminho é:
+
+> New Project > Version Control > Git > Copia e cola URL do repositório > Create Project
+
+Ao final do processo você terá todos os arquivos do prjeto no seu computador local.
+
+### Passo 3 - Commit: Editando e "Commitando" as mudanças no código
+
+Dar 'commit' é o que se faz quando você resolve aceitar as mudanças que você fez no seu código/projeto.
+
+Vamos montar uma história simulando duas mudanças no código, resultando em dois commits.
+
+**Mudança 1** Implementei a função `soma` e depois dei commit porque achei que já estava muito boa.
+
+
+```{r, fig.align='center', fig.height = 5, echo=FALSE}
+knitr::include_graphics("/img/blog/rstudio-e-github/passo_3_commit_1.gif")
+```
+
+
+**Mudança 2** Implementei a função `subtrai` e apesar de estar ainda com muitos bugs eu resolvi commitar porque precisava ir embora do Trabalho. Chegando em casa eu arrumo.
+
+```{r, fig.align='center', fig.height = 5, echo=FALSE}
+knitr::include_graphics("/img/blog/rstudio-e-github/passo_3_commit_2.gif")
+```
+
+
+Agora tem dois commits prontos para serem guardados no nosso repositório central do Github. Lembre-se que é no Github que todos os colaboradores vão continuar o projeto. Hora do PUSH!
+
+### Passo 4 - Push: Subindo os commits para o Github
+
+Push é tão fácil quanto apertar um botão. 
+
+```{r, fig.align='center', fig.height = 5, echo=FALSE}
+knitr::include_graphics("/img/blog/rstudio-e-github/passo_4_push.gif")
+```
+
+
+OBS: Nesse momento pode ser que seja pedido login e senha para autorizar o PUSH. Mas provavelmente só será solicitado na primeira vez porque ele vai colocar o seu computador como origem conhecida (e confiável). Caso continue solicitando é aconselhável configurar o SSH ([segue um tutorialzinho bacana](http://gabsferreira.com/instalando-o-git-e-configurando-github/)).
+
+No site do Github já vai estar as mudanças prontas para quem quiser ver.
+
+
+```{r, fig.align='center', fig.height = 15, echo=FALSE}
+knitr::include_graphics("/img/blog/rstudio-e-github/github_dps_do_push.png")
+```
+
+### Passo 5 - Pull: Baixando o estado atual do projeto
+
+Suponha que entre o trajeto do meu trabalho para a minha casa meu colega tenha aprimorado a função soma.
+
+Para eu continuar da onde ele parou eu devo dar um **PULL**, ou seja, puxar pra minha máquina o código que está lá no Github.
+
+```{r, fig.align='center', fig.height = 15, echo=FALSE}
+knitr::include_graphics("/img/blog/rstudio-e-github/passo_5_pull.gif")
+```
+
+Então, toda vez que abrir seu projeto, dê um PULL para voltar a ficar de onde parou.
+
+
+### Passo extra - Issues: Documentando e delegando problemas
+
+Issues são questões em aberto sobre seu projeto. Geralmente se descreve um bug a ser consertado ou uma ideia a ser implementada no futuro. O Github permite delegar essas tarefas a alguém e também classificá-las se quiser.
+
+```{r, fig.align='center', fig.height = 15, echo=FALSE}
+knitr::include_graphics("/img/blog/rstudio-e-github/passo_extra_issue.gif")
+```
+
+## Indo além
+
+O fluxo mostrado acima representa o dia a dia de um programador solitário com eventuais parceiros colaboradores, mas o mundo da programação colaborativa com Git e RStudio é vasto! Para você saber, algumas coisas que não cobrimos aqui, mas que são bem comuns:
+
+- Fork
+- Pull request
+- Branches
+- Gist
+
+## Programas similares
+
+Em relação a programas de versionamento, o RStudio também trabalha bem com o [SVN](https://subversion.apache.org/).
+
+Já serviços de hospedagem de repositórios, qualquer um funciona. O [Bitbucket](https://bitbucket.org/) é muito bom!
+
+## Resumão
+
+- Passo 1 - **Repositório:** Criar repositório do projeto no Github
+- Passo 2 - **.Rproj:** Criação do Projeto no RStudio
+- Passo 3 - **Commit:** Editando e "Commitando" as mudanças no código
+- Passo 4 - **Push:** Subindo os commits para o Github
+- Passo 5 - **Pull:** Baixando o estado atual do projeto
+- Passo extra - **Issues:** Documentando e delegando problemas
+
+Essa é uma prática que facilita a vida do analista e que nós incentivamos nos cursos que ministramos. Se houver dúvida o Curso-R.com está sempre a disposição!

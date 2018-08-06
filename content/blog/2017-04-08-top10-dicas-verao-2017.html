@@ -1,0 +1,141 @@
+---
+title: "Top 10 dicas do Curso R de verão 2017"
+date: "2017-04-08"
+tags: ["Curso-R"]
+categories: ["top 10", "r"]
+author: ["Athos"]
+banner: "img/banners/lampada-curso-r.png"
+---
+
+
+
+<p>Em fevereiro desse ano ministramos o Curso de R de Verão 2017, parte do programa dos Cursos de Verão do IME-USP. Abaixo segue um compilado das 10 melhores dicas dadas durante este curso.</p>
+<div id="conheca-e-domine-a-filosofia-por-tras-do-tidyverse" class="section level3">
+<h3>1. Conheça e domine a filosofia por trás do Tidyverse</h3>
+<p>O conceito “tidy” deu o oriente do curso de verão e não foi à toa: o <em>tidyverse</em>, carinhosamente chamado de “universo arrumadinho”, está intimamente associado ao dia-a-dia de um analista de dados e sua implementação em R é tida como uma pequena revolução para os R-eiros.</p>
+<p>A postagem <a href="http://curso-r.com/blog/2017/02/15/2017-02-16-manifesto-tidy/">Manifesto Tidy</a> resume bem os motivos pelos quais valem a pena aprender os princípios e os pacotes do <em>tidyverse</em>.</p>
+</div>
+<div id="r-shiny-e-uma-grande-alternativa-as-ferramentas-de-bi-e-dashboards" class="section level3">
+<h3>2. R + Shiny é uma grande alternativa às ferramentas de BI e Dashboards</h3>
+<p>Se você ainda tem alguma dúvida sobre o poder do R em montar dashboards interativos, se dê a chance de visitar alguns exemplos:</p>
+<ul>
+<li><a href="http://pollingdata.com.br/">Polling Data</a></li>
+<li><a href="http://shiny.platipus.com.br:3838/platipus/viscarf5">VisCARF</a></li>
+<li><a href="https://rich.shinyapps.io/college_map/">College Map</a></li>
+<li><a href="https://gallery.shinyapps.io/087-crandash/">CRAN Dash</a></li>
+</ul>
+<p>Esses exemplos mostram que é possível fazer desde simples gráficos de barras até sofisticados mapas a lá Google Maps. Esse potencial é imenso e tudo isso está a disposição de um mero mortal (e não mais apenas de um desenvolvedor de software especialista em web).</p>
+<p>E quando digo que o potencial é imenso, pode acreditar. O shiny coloca a disposição ao mesmo tempo inúmeros pacotes JavaScript de visualização e o R inteiro, interagindo entre si e aceitando receber informação de usuários em tempo real.</p>
+<p>PS: todos esses sites de exemplo foram feitos com R e apenas R, nenhum outro conhecimento foi pré-requisito.</p>
+<p>Se restou alguma dúvida se o R + Shiny é uma grande alternativa às ferramentas de BI e Dashboards, por favor jogue nos comentários para discutirmos!</p>
+</div>
+<div id="ggplot2-e-tidyr-tem-tudo-a-ver" class="section level3">
+<h3>3. ggplot2 e tidyr tem tudo a ver</h3>
+<p>A função <code>gather()</code> do pacote tidyr é frequentemente utilizada para deixar data.frames prontos para serem “plotados”. Veja um exemplo:</p>
+<p><strong>Correlação entre a variável <code>mpg</code> versus todas as outras do data.frame <code>mtcars</code>:</strong></p>
+<pre class="r"><code>library(tidyr)
+library(ggplot2)
+library(dplyr)
+
+mtcars_para_grafico &lt;- mtcars %&gt;%
+  gather(variavel, valor, -mpg)
+
+ggplot(mtcars_para_grafico, aes(x = valor, y = mpg)) +
+  geom_point(aes(colour = variavel), show.legend = FALSE) +
+  geom_smooth(se = FALSE) +
+  facet_wrap(~variavel, scales = &quot;free_x&quot;)</code></pre>
+<p><img src="/blog/2017-04-08-top10-dicas-verao-2017_files/figure-html/unnamed-chunk-1-1.png" width="864" /></p>
+<p>Frequentemente o que se quer é construir um gráfico do mesmo tipo para diferentes colunas, por isso o <code>gather()</code> é útil nesses casos. E o <code>facet_wrap()</code> do ggplot2 faz o serviço de construir um gráfico para cada coluna.</p>
+</div>
+<div id="web-scraping-e-uma-habilidade-visada-no-mercado" class="section level3">
+<h3>4. Web Scraping é uma habilidade visada no mercado</h3>
+<p>A internet é uma fonta riquíssima de dados e são as técnicas de <em>web scraping</em> que permite ao analista explorar seu potencial por inteiro. Em resumo, <em>Web scraping</em> é o ato de “raspar” dados disponíveis em sites da internet.</p>
+<p>Os dados são o principal ingrediente para um bom modelo estatístico e faz parte da responsabilidade do cientista de dados utilizar o máximo de informação disponível.</p>
+<p>Cada vez mais as empresas estão reconhecendo o valor que os dados disponíveis publicamente na internet têm. Há empresas especializadas nisso e não é raro encontrar freelances envolvendo extração e estruturação de dados espalhados na rede.</p>
+<p>Os profissinais capazes de encarar esses desafios ainda são escaços, então fica a dica! <a href="https://www.youtube.com/watch?v=o2fFUw8aSHE">Esse webinar</a> dado pelo nosso professor Julio Trecenti é um bom ponto de partida para aprender como fazer <em>web scraping</em> no R.</p>
+</div>
+<div id="avalie-muito-bem-o-problema-antes-de-decidir-que-se-trata-de-um-problema-de-big-data" class="section level3">
+<h3>5. Avalie muito bem o problema antes de decidir que se trata de um problema de BIG DATA</h3>
+<p>Big Data é um termo que ainda procura por uma definição oficial, mas já existe uma classe de obstáculos que são devidos a grandes volumes de dados. Então a pergunta primordial aqui é: como saber se seu problema é de Big Data?</p>
+<blockquote>
+<p>“Big data is extremely overhyped and not terribly well defined. Many people think they have big data, when they actually don’t.” - Hadley Wickham</p>
+</blockquote>
+<p>Como Hadley Wickham aponta, muitas pessoas acham que possuem um problema de big data quando na verdade não possuem. Ele resume o problema em três classes distintas:</p>
+<ol style="list-style-type: decimal">
+<li>Problema de Big Data que na verdade é um problema comum se for feita uma amostragem/sumarização apropriada.
+<ul>
+<li>Ferramentas apropriadas: hive, impala, terada, dplyr.</li>
+<li>90% dos problemas.</li>
+</ul></li>
+<li>Problema de Big Data que na verdade são vários problemas comuns. Exemplo: ajustar um modelo de regressão por indivíduo, para milhares ou milhões de indivíduos.
+<ul>
+<li>Paralelização é o que será necessário.</li>
+<li>Ferramentas: foreach, doParallel, doMC, Spark, Hadoop.</li>
+<li>9% dos problemas.</li>
+</ul></li>
+<li>Problemas de Big Data que realmente dependem de todos os dados juntos no mesmo lugar.
+<ul>
+<li>Exemplo: sistemas de recomendação em que se faz necessário a procura de relações bem raras e específicas entre transações.</li>
+<li>Ferramentas: geralmente sistemas dedicados e próprios para o problema.</li>
+<li>1% dos problemas.</li>
+</ul></li>
+</ol>
+<p>E quanto ao tamanho do dado propriamente dito, para nós usuários de R a regra de bolso é simples:</p>
+<ul>
+<li>Se seus dados cabem na memória, então é “small data”.</li>
+</ul>
+</div>
+<div id="saber-pedir-ajuda-e-o-topico-mais-importante" class="section level3">
+<h3>6. Saber pedir ajuda é o tópico mais importante</h3>
+<p>Por mais completo que seja um curso de R, nunca alguém chegará no ponto em que não restará dúvidas sobre como fazer alguma coisa no R, até porque há novidades a cada minuto no mundo do R. Por isso aprender a pedir ajuda é essencial. No curso foram passados os melhores jeitos de se obter ajuda:</p>
+<ul>
+<li>Help / documentação do R (comandos <code>help(funcao)</code> ou <code>?funcao</code>)</li>
+<li>Google</li>
+<li>Stack Overflow</li>
+<li>Coleginha</li>
+</ul>
+<p>Usem e abusem do fato de a comunidade R ser gigante e ativa.</p>
+</div>
+<div id="rmarkdown-e-github-vao-bem-no-dia-a-dia-do-r-eiro" class="section level3">
+<h3>7. RMarkdown e Github vão bem no dia a dia do R-eiro</h3>
+<p>A palavra de ordem aqui é <strong>Organização</strong>. RMarkdown ajuda a organizar melhor as ideias e conteúdos e o Github ajuda a organizar melhor os códigos.</p>
+<p>Referência para você aprender as ferramentas:</p>
+<p><a href="http://rmarkdown.rstudio.com/"><strong>RMarkdown</strong></a>, de autoria do nosso queridíssimo RStudio Inc., transforma rascunho de códigos em documentos apresentáveis. Como já dito antes, todas as postagens deste blog são feitas em RMarkdown.</p>
+<p><a href="http://github.com/"><strong>Github</strong></a> oferece uma inteligência sobre o versionamento dos códigos de um projeto. Isso permite que diversos colaboradores não se percam nas milhares de contribuições. Não existirão mais os <code>arquivos_final_final_v5_com_novas_analises_definitivo3.docx</code> e você ganhará no controle de quem, quando e o que foi alterado em cada uma das versões.</p>
+<p>Hoje em dia ele é amplamente utilizado por empresas de tecnologia e está sendo cada vez mais comum em equipes de empresas mais tradicionais.</p>
+</div>
+<div id="aprenda-regex" class="section level3">
+<h3>8. Aprenda Regex</h3>
+<p><strong>Reg</strong>ular <strong>Ex</strong>pressions servem para descrever padrões de textos. Por exemplo, para pedir para o R encontrar “todas as palavras que comecem com a letra A” em <em>regex</em> escrevemos <code>str_detect(palavras, &quot;^A&quot;)</code>. O pequeno pedaço de símbolos <code>&quot;^A&quot;</code> é a maneira de traduzir em regex o padrão “palavras que começam em A”.</p>
+<p>Para quem quiser se aprofundar no assunto, consulte a documentação do regex no R: <code>?regex</code>.</p>
+<p>Os pacotes <code>stringi</code> e <code>stringr</code> tiram proveito do <em>regex</em> e valem a pena serem explorados! Data mining passará a ser mamão com açúcar.</p>
+</div>
+<div id="de-preferencia-aos-funcionais-em-vez-de-fors" class="section level3">
+<h3>9. Dê preferência aos funcionais em vez de for’s</h3>
+<p>Na postagem <a href="http://curso-r.com/blog/2017/02/21/2017-02-21-top10-pacotes-para-data-science/">Top 10 pacotes para Data Science</a> foi destacado o pacote <code>purrr</code> e seu impacto ao fim do “for” nos códigos de R.</p>
+<p>“Usar funcionais” significa usar funções que aceitam funções como argumentos. Ambos os exemplos abaixo geram uma tabela para cada coluna do data.frame <code>iris</code>:</p>
+<p><strong>versão sem funcionais</strong></p>
+<pre class="r"><code>tabelas1 &lt;- list()
+nomes_iris &lt;- names(iris)
+for(i in 1:length(iris)){
+  tabelas1[[nomes_iris[i]]] &lt;- table(iris[,i])
+}</code></pre>
+<p><strong>versão com funcionais</strong></p>
+<pre class="r"><code>tabelas2 &lt;- purrr::map(iris, table)</code></pre>
+<p>Do exemplo acima notamos que:</p>
+<ul>
+<li>há um grande ganho de legibilidade do código usando o funcional <code>map()</code> em vez de um <code>for</code>.</li>
+<li>não foi preciso nenhum objeto auxiliar como <code>tabelas1 &lt;- list()</code> e <code>nomes_iris</code> no segundo exemplo.</li>
+<li>não há resquícios de índices como o <code>i</code> para percorrer vetores.</li>
+</ul>
+<p>Quanto mais aptidão em funcionais um usuário tiver, mais ágil e produtivo ele será. Então aprendam funcionais!</p>
+</div>
+<div id="coloque-seus-codigos-em-funcoes" class="section level3">
+<h3>10. Coloque seus códigos em funções</h3>
+<p>Colocar pedaços de códigos, longos ou curtos, beneficia o desenvolvimento, a leitura e a manutenção do código. No R, fazer função é simples e sem burocracia, então não há muito argumento para não fazer! Algumas dicas para identificar quando você precisa criar uma função:</p>
+<ul>
+<li>Excesso de CTRL+C/CTRL+V da mesma coisa no código, “só mudando umas coisinhas”. Essas “coisinhas” que mudam seriam os argumentos da sua função.</li>
+<li>Projetos distintos reutilizando partes de código de um projeto mais antigo.</li>
+<li>Um bloco de código faz uma tarefa muito bem definida e que daria para colocar um nome para ela. Por exemplo, suponha que <code>x &lt;- c(1:10)</code>. Seria melhor de entender <code>x %&gt;% eh_par</code> do que <code>x %% 2 == 0</code>.</li>
+</ul>
+</div>

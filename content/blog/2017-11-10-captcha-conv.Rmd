@@ -1,0 +1,734 @@
+---
+title: "Quebrando Captchas - Parte V: Fazendo redes convolucionais na mão"
+date: "2017-11-12T23:26:00+03:00"
+tags: ["captcha"]
+categories: ["análises", "r"]
+banner: "img/banners/captcha_05.png"
+author: ["Julio"]
+summary: "Nesse post vou mostrar como ajustar redes neurais convolucionais na mão. Muita mão na massa envolvida, muitos captchas e muita diversão. Vamos juntos desmistificar a magia negra do deep learning..."
+draft: false
+---
+
+```{r setup, include=FALSE, warning=FALSE, message=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, fig.align = "center", cache = TRUE)
+knitr::knit_hooks$set(
+  no.mar = function() par(mar = c(0,0,0,0)),
+  small.mar = function() par(mar = c(.1,.1,.1,.1))
+)
+load("../../static/data/captcha-conv/captcha_conv_env.rda")
+```
+
+Voltando aos saudosos captchas. Demorei para fazer esse post pois estava esperando o lançamento do [curso de redes neurais convolucionais do Andrew Ng](https://www.coursera.org/learn/convolutional-neural-networks). O curso foi muito bom, valeu à pena! E, como prometido, vamos agora trabalhar com modelagem dos captchas.
+
+## Objetivo
+
+Nosso objetivo é aprender a aplicar a **operação da convolução** em imagens, replicando o modelo já ajustado dos captchas. O jeito que fazemos para ajustar o modelo ficará para um próximo post. 
+
+### Pré-requisitos
+
+Na nossa jornada, utilizaremos o pacote `decryptr` e teremos como o base o captcha da Receita Federal. Para baixar um captcha e plotar na sua tela, rode o código abaixo. Utilizaremos o caminho do arquivo em `arq` várias vezes no decorrer do post. Instale também o pacote `decryptrModels` para carregar o modelo ajustado do captcha da receita.
+
+```{r eval=FALSE}
+# devtools::install_github("decryptr/decryptr")
+# devtools::install_github("decryptr/decryptrModels")
+library(decryptr)
+arq <- captcha_download_rfb(dest = "img")
+arq %>% 
+  read_captcha() %>% 
+  plot()
+```
+
+
+```{r, fig.height=1, fig.width=3, echo=FALSE}
+library(decryptr)
+arq <- "../../static/data/captcha-segment/captcha9202d1c210b.png"
+arq %>% 
+  read_captcha() %>% 
+  plot()
+```
+
+Também precisaremos do [`keras`](https://keras.rstudio.com/), um pacote maravilhoso feito pela turma do [RStudio](https://rstudio.com), com contribuições do [Daniel Falbel](http://curso-r.com/author/daniel/). Não esqueça de fazer o `tensorflow` funcionar na sua máquina! [Esse post](http://curso-r.com/blog/2017/06/08/2017-06-08-keras-no-ubuntu/) do [Athos Damiani](http://curso-r.com/author/athos/) pode ajudar.
+
+```{r eval=FALSE}
+# install.packages("keras")
+library(keras)
+```
+
+Para os retoques finais nas imagens, vamos usar o pacote `magick`. Meu intuito inicial era usar a função `image_convolve()` desse pacote, mas infelizmente essa operação é limitada. Acabei usando apenas funções para juntar imagens e fazer gifs. Se quiser mais detalhes sobre o `magick`, veja o excelente post [A kind of magick](http://curso-r.com/blog/2017/06/01/2017-06-01-a-kind-of-magick/), feito pelo [William Amorim](http://curso-r.com/author/william/).
+
+```{r}
+# install.packages("magick")
+library(magick)
+```
+
+## O que é convolução, afinal?
+
+```{r, out.width="50%", echo=FALSE}
+knitr::include_graphics("/img/blog/captcha-conv/vivalaconv.jpg")
+```
+
+Convolução é uma técnica usada há muito tempo na área de *visão computacional* para aplicar filtros em imagens e detectar padrões. Basicamente, o que ela faz é calcular um novo valor para um pixel da imagem com base nos pixels da vizinhança. Por exemplo, você pode fazer com que o pixel $(i,j)$ da sua imagem seja atualizado pela soma ponderada dos valores dos pixels na vizinhança.
+
+> Se você não está entendendo nada, Veja o vídeo abaixo para entender o que são pixels. No nosso caso, teremos uma matriz com valores entre zero e um, sendo zero = preto e um = branco.
+
+<iframe width="400" height="225" src="https://www.youtube.com/embed/m8c1CAT2zEI" frameborder="0" allowfullscreen></iframe>
+
+Uma forma esperta de fazer essa soma ponderada é criando uma matriz de pesos: dessa forma, você não precisa ficar procurando os pontos da vizinhança. Para cada ponto $(i,j)$, você pega o subset da matriz de vizinhança, multiplica pontualmente pela matriz de pesos e soma todos os valores. Isso é *exatamente* o que a convolução faz.
+
+Daqui em diante, chamaremos essa matriz de pesos de **kernel**. Considere esse exemplo 3x3:
+
+```{r}
+kern_horizontal <- rbind(c(-1,-1,-1),
+                         c( 0, 0, 0),
+                         c( 1, 1, 1))
+kern_horizontal
+```
+
+E considere essa imagem super complexa:
+
+```{r, out.width="30%", echo=FALSE, no.mar=TRUE}
+# "img/emoji2.png" %>% 
+#   image_read() %>% 
+#   image_background("white") %>% 
+#   image_scale("24x24") %>% 
+#   image_write("img/emoji3.png")
+
+"../../static/img/blog/captcha-conv/emoji3.png" %>% 
+  image_read() %>% 
+  plot()
+```
+
+Na prática, essa imagem é isso aqui (tirei algumas linhas e colunas):
+
+```{r}
+emoji <- load_image("../../static/img/blog/captcha-conv/emoji3.png")[,,1] 
+round(emoji, 1)[1:10, 1:12]
+```
+
+Tome por exemplo o ponto $(i,j) = (12,16)$. A vizinhança 3x3 em torno desse ponto é dada por
+
+```{r}
+emoji[12 + (-1):1, 16 + (-1):1]
+```
+
+A operação de convolução é feita da seguinte forma: 
+
+```{r}
+sum(emoji[12 + (-1):1, 16 + (-1):1] * kern_horizontal)
+```
+
+Pronto, esse é o valor a ser colocado no ponto $(i,j)$. Fazemos isso para todos os outros pontos. Algumas dúvidas que podem rolar nesse ponto:
+
+**Q**: Mas os números não devem variar de 0 a 1?
+
+**R**: Não! Para visualizar a imagem, você poderia normalizar essas quantidades (por exemplo, dividindo pelo máximo). Mas quem disse que o resultado da sua operação precisa ser visualizável? O resultado pode até ser negativo. Sem problemas.
+
+> Para visualização, por padrão os valores menores que zero são substituídos por zero (preto) e valores maiores que um são substituídos por um (branco). 
+
+**Q**: Mas e no canto da imagem, o que fazemos?
+
+**R**: Nos cantos, você tem duas opções: 1) considerar apenas os pixels *válidos*, ou seja, pixels em que você consegue encaixar a matriz `kernel` inteira, resultando numa matriz de tamanho menor; ou 2) criar uma borda na imagem, preenchendo com zeros, para que toda a imagem fique com pixels válidos. Por isso que o `keras` disponibiliza as opções *valid* (apenas os válidos) e *same* (mantém a mesma dimensão).
+
+**Q**: E se a imagem for colorida?
+
+**R**: Boa pergunta! Se a imagem for colorida, você pode considerar um `kernel` diferente para cada cor, e depois você soma todos os valores. Mais pra frente, chamaremos as cores de *canais*, pois teremos muito mais do que 3 kernels.
+
+Com base nisso, montei um algoritmo que faz a conta para todos os pixels, já criando uma borda na imagem:
+
+```{r}
+convolve <- function(img, kern) {
+  # monta a bordinha na imagem. A borda deve ter (tamanho kernel) / 2,
+  # de tamanho, arredondando para baixo
+  pad <- floor(dim(kern)[1] / 2)
+  img_pad <- matrix(0, nrow = nrow(img) + 2 * pad, ncol = ncol(img) + 2 * pad)
+  img_pad[pad + 1:nrow(img), pad + 1:ncol(img)] <- img[,,1]
+  # aplica a convolução nos pontos da imagem
+  for (i in seq_len(nrow(img))) {
+    for (j in seq_len(ncol(img))) {
+      img[i, j, 1] <- sum(img_pad[i + 0:(2 * pad), j + 0:(2 * pad)] * kern)
+    }
+  }
+  img[,,2] <- img[,,3] <- img[,,1]
+  img
+}
+```
+
+(desculpe aos amigos por usar `for`. Shame on me...)
+
+Voltando para nossa imagem agora. No nosso caso, o resultado fica assim:
+
+```{r, no.mar=TRUE, out.width="30%"}
+"../../static/img/blog/captcha-conv/emoji3.png" %>% 
+  load_image() %>% 
+  convolve(kern_horizontal) %>% 
+  image_read() %>% 
+  plot()
+```
+
+Ficou um pouco assustador, não? Essa matriz não foi escolhida por acaso. Ela serve para destacar padrões horizontais da imagem. Como a primeira linha é formada `-1`s e a última é formada por `1`s, a matriz fica com valor alto se a parte de cima do pixel for preta e a parte de baixo for branca (`grande * 1 + pequeno * (-1)`). A parte destacada da imagem acabou sendo os olhos (pois temos maior concentração de pixels pretos ali), além das extremidades superior e inferior do rosto.
+
+Com esse kernel aqui (vertical), a parte destacada do rosto são as extremidades dos lados:
+
+```{r, no.mar=TRUE, out.width="30%"}
+kern_vertical <- rbind(c(-1, 0, 1),
+                       c(-1, 0, 1),
+                       c(-1, 0, 1))
+kern_vertical
+
+"../../static/img/blog/captcha-conv/emoji3.png" %>% 
+  load_image() %>% 
+  convolve(kern_vertical) %>% 
+  image_read() %>% 
+  plot()
+```
+
+<hline />
+
+## Aplicando nos captchas
+
+Não tem segredo! Basta reaplicar o que já vimos. Vou apenas introduzir uma nova função chamada `add_bias()`, que simplesmente adiciona uma constante numérica para a matriz. Isso pode auxiliar na visualização, pois controlamos melhor os valores que ficam dentro do intervalo `[0,1]`. Lá na frente você entenderá o porquê do "bias".
+
+```{r}
+add_bias <- function (x, b) x + b
+```
+
+Esse é o resultado de adicionar o kernel vertical e bias de `0.8`.
+
+```{r, fig.height=1, fig.width=3.6, no.mar=TRUE}
+arq %>% 
+  load_image() %>% 
+  convolve(kern_vertical) %>% 
+  add_bias(.8) %>% 
+  image_read() %>% 
+  plot()
+```
+
+Agora o kernel na horizontal. Note que identificamos padrões das linhas horizontais que tentam atrapalhar a visão das letras.
+
+```{r, fig.height=1, fig.width=3.6, no.mar=TRUE}
+arq %>% 
+  load_image() %>% 
+  convolve(kern_horizontal) %>% 
+  add_bias(.8) %>% 
+  image_read() %>% 
+  plot()
+```
+
+Colocando um após o outro, temos um resultado bem esquisito:
+
+```{r, fig.height=1, fig.width=3.6, no.mar=TRUE}
+arq %>% 
+  load_image() %>% 
+  convolve(kern_horizontal) %>% 
+  convolve(kern_vertical) %>% 
+  add_bias(.7) %>% 
+  image_read() %>% 
+  plot()
+```
+
+Também vou introduzir uma função chamada `relu()` aqui. **ReLu** significa *Restricted Linear Unit* e é uma função bem simples que zera tudo aquilo que é negativo e mantém tudo aquilo que é positivo. Assim, temos:
+
+```{r}
+relu <- function(x) (x + abs(x)) / 2
+relu(-1)
+relu( 3)
+```
+
+Para visualização, essa função não serve para muita coisa, pois já fazemos a substituição de valores negativos por zero. No entanto, podemos fazer combos com a aplicação de várias convoluções. O resultado dos combos não seria possível somente com somas e multiplicações. Na prática, o que estou afirmando é que com a aplicação de convoluções, bias e ReLu, podemos montar operações **não lineares** para extrair componentes da imagem.
+
+Olhe o exemplo abaixo. Parece que consegui identificar bem as coisas que são inúteis na imagem. Isso pode ser útil... ou não.
+
+```{r, fig.height=1, fig.width=3.6, no.mar=TRUE}
+arq %>% 
+  load_image() %>% 
+  # primeira convolucao
+  convolve(kern_horizontal) %>%
+  add_bias(-.25) %>% 
+  relu() %>% 
+  # segunda convolucao
+  convolve(kern_vertical) %>% 
+  add_bias(.1) %>% 
+  image_read() %>% 
+  plot()
+```
+
+Isso tudo nos leva a pensar: será que eu consigo pensar em kernels que me ajudem a identificar as letras de uma forma razoável?
+
+<hline />
+
+## E se pudermos usar kernels treinados?
+
+A revolução da convolução aparece quando conseguimos obter kernels úteis por métodos estatísticos. Podemos pensar na matriz abaixo
+
+$$
+W = \left[\begin{array}{ccccc}
+w_{11} & w_{12} & w_{13} & w_{14} & w_{15} \\
+w_{21} & w_{22} & w_{23} & w_{24} & w_{25} \\
+w_{31} & w_{32} & w_{33} & w_{34} & w_{35} \\
+w_{41} & w_{42} & w_{43} & w_{44} & w_{45} \\
+w_{51} & w_{52} & w_{53} & w_{54} & w_{55}
+\end{array}\right]
+$$
+
+e tentar encontrar os valores de $W$ que minimizem alguma função de interesse. Podemos pensar que esses são os $\beta$'s de uma regressão logística, e queremos encontrar os valores que minimizam uma *Loss* ou maximizam uma *verossimilhança*. Para ver mais sobre isso, recomendo o excelente post do Athos sobre [a menor deep learning do mundo](http://curso-r.com/blog/2017/07/29/2017-07-29-segundo-menor-dl/). Nós também podemos fazer vários $W$ como esse, sendo que cada um extrai alguma coisa de importante da imagem.
+
+Nosso super modelo de magia negra nada mais é do que isso: a aplicação consecutiva de `convolve()`, `add_bias()` e `relu()`, mas com pesos escolhidos a dedo (ou por um moedor de carne super-poderoso como o `keras`).
+
+Agora podemos ver nosso modelo atual da Receita Federal:
+
+```{r eval=FALSE}
+m <- decryptrModels::read_model("rfb")
+m$model
+```
+
+```
+Model
+____________________________________________________________________________________________________
+Layer (type)                                 Output Shape                            Param #        
+====================================================================================================
+conv2d_4 (Conv2D)                            (None, 50, 180, 12)                     312            
+____________________________________________________________________________________________________
+max_pooling2d_4 (MaxPooling2D)               (None, 25, 90, 12)                      0              
+____________________________________________________________________________________________________
+conv2d_5 (Conv2D)                            (None, 25, 90, 48)                      14448          
+____________________________________________________________________________________________________
+max_pooling2d_5 (MaxPooling2D)               (None, 12, 45, 48)                      0              
+____________________________________________________________________________________________________
+conv2d_6 (Conv2D)                            (None, 12, 45, 96)                      115296         
+____________________________________________________________________________________________________
+max_pooling2d_6 (MaxPooling2D)               (None, 6, 22, 96)                       0              
+____________________________________________________________________________________________________
+flatten_2 (Flatten)                          (None, 12672)                           0              
+____________________________________________________________________________________________________
+dense_3 (Dense)                              (None, 32)                              405536         
+____________________________________________________________________________________________________
+dropout_2 (Dropout)                          (None, 32)                              0              
+____________________________________________________________________________________________________
+dense_4 (Dense)                              (None, 210)                             6930           
+____________________________________________________________________________________________________
+reshape_2 (Reshape)                          (None, 6, 35)                           0              
+____________________________________________________________________________________________________
+activation_2 (Activation)                    (None, 6, 35)                           0              
+====================================================================================================
+Total params: 542,522
+Trainable params: 542,522
+Non-trainable params: 0
+____________________________________________________________________________________________________
+```
+
+O modelo aplica convolução 3 vezes consecutivas e faz algumas contas que não entendemos. Explico agora:
+
+1. `conv2d_`: são as convoluções. As aplicações de `add_bias()` e `relu()` estão escondidas aí dentro.
+1. `max_pooling2d_`: serve para simplificar a imagem. Isso ajuda a fazer computações mais rápido e ajuda a pegar mais relações entre partes da imagem, sem precisar mudar o tamanho dos kernels.
+1. `dropout_`: é utilizado para regularização. Serve para evitar que seu modelo quebre apenas o captcha que você tem na base, e não novos captchas que chegam. Na prática, o *dropout* joga fora uma parte dos $W$ obtidos. Se você consegue prever coisas bem sem esses $W$, isso significa que eles não são tão úteis assim.
+1. `flatten_` e `reshape_`: não fazem nada demais, só reorganizam os parâmetros de matriz para um vetor ou de vetor para matriz. Isso é útil pois i) depois de aplicar os kernels, nós misturamos todos os parâmetros resultantes e ii) no final, precisamos prever 6 letras, então precisamos deixar as probabilidades numa matriz, [como vimos no post anterior sobre captchas](http://curso-r.com/blog/2017/07/31/2017-06-29-captcha-dados/).
+1. `dense_`: são camadas de redes neurais comuns como as do [post do Athos](http://curso-r.com/blog/2017/07/29/2017-07-29-segundo-menor-dl/).
+
+
+**NÃO ME ABANDONE AQUI!!!** Se você não estiver entendendo direito, saiba apenas que a execução de um modelo de deep learning envolve somente
+
+1. Pegar o input (imagem).
+1. Multiplicar (convoluir) por alguns pesos $W$.
+1. Adicionar um viés (ou bias, ou intercepto) $b$.
+1. Aplicar uma função não linear, por exemplo ReLu.
+1. Voltar para 2 várias vezes (o deep vem daí).
+1. Pegar os pesos finais e normalizar (usando, por exemplo, *softmax*) para obter probabilidades dos resultados.
+
+No nosso caso, repetimos o passo 2 três vezes, aplicando três convoluções seguidas.
+
+### Primeira convolução
+
+Para obter os valores de kernels ajustados pelo modelo, podemos usar a função `get_weights()` do `keras`. Nessa primeira parte, utilizamos 12 kernels 5x5. 
+
+```{r warning=FALSE, message=FALSE, eval=FALSE}
+w <- keras::get_weights(m$model$layers[[1]])[[1]]
+w_list <- purrr::map(seq_len(dim(w)[4]), ~w[,,1,.x])
+bias <- keras::get_weights(m$model$layers[[1]])[[2]]
+w_list[[1]]
+```
+
+```
+            [,1]        [,2]        [,3]        [,4]        [,5]
+[1,] -0.00889198  0.04569587  0.11906113  0.08591988 -0.09028889
+[2,] -0.05898214  0.20692091 -0.13479255 -0.15641896 -0.10511240
+[3,]  0.02517573 -0.63352644 -3.81658459 -4.39883375 -1.05918467
+[4,] -0.22003661 -1.80763698 -3.13373542 -1.73096466 -0.01640752
+[5,] -0.02915078 -0.11879896 -0.07475707  0.06014036  0.15733875
+```
+
+
+Os doze valores de `bias` estimados pelo modelo (um para cada matriz) são dados por
+
+```{r, eval=FALSE}
+round(bias, 3)
+```
+
+```
+[1]  0.150  0.013  0.181 -0.275  0.179  0.040 -0.128 -0.036  0.030  0.042  0.201  0.043
+```
+
+Para cada um dos doze kernels, calculamos uma matriz convoluída. Esses os resultados que o modelo entende serem úteis para prever o captcha.
+
+O código abaixo aplica `convolve()`, `add_bias()` e `relu()` para todos os kernels. Para isso usamos o `purrr`. Se você não entende `purrr`, leia [este maravilhoso post do Caio Lente](http://ctlente.com/pt/purrr-magic/).
+
+```{r, fig.height=2.5, fig.width=9, eval=FALSE}
+conv1 <- purrr::map2(w_list, bias, ~{
+  arq %>% 
+    load_image() %>% 
+    convolve(.x) %>% 
+    add_bias(.y) %>% 
+    relu()
+})
+```
+
+E como será que ficam essas imagens? Abaixo, temos o resultado da aplicação dos doze kernels. A maioria parece estar extraindo partes das letras. A sétima (posição `(2,3)`) parece estar pegando o ruído e a quarta parece guardar a imagem original.
+
+```{r, fig.height=2, fig.width=9, small.mar=TRUE, echo=FALSE}
+conv1_img <- purrr::map(conv1, image_read)
+par(mfrow = c(3, 4), mar = c(.1,.1,.1,.1))
+purrr::walk(conv1_img, plot)
+```
+
+O gif animado abaixo mostra a aplicação do oitavo kernel da nossa lista. Com esse kernel dá pra pegar bem o padrão das letras, não é?
+
+```{r animacao, echo=FALSE, eval=FALSE}
+convolve_image <- function(img, kern) {
+  pad <- floor(dim(kern)[1] / 2)
+  img_pad <- matrix(0, nrow = nrow(img) + 2 * pad, ncol = ncol(img) + 2 * pad)
+  img_pad[pad + 1:nrow(img), pad + 1:ncol(img)] <- img[,,1]
+  d <- tibble::tibble(i = 0, j = 0, img = list())
+  for (i in seq_len(nrow(img))) {
+    for(j in seq_len(ncol(img))) {
+      img[i,j,1] <- sum(img_pad[i + 0:(2 * pad), j + 0:(2 * pad)] * kern)
+    }
+    img[,,2] <- img[,,3] <- img[,,1]
+    d <- tibble::add_row(d, i = i, j = j, 
+                         img = list(image_read(img) %>% 
+                                      image_scale("300%")))
+  }
+  d
+}
+arq %>% 
+  load_image() %>%
+  convolve_image(w_list[[8]]) %>% 
+  with(img) %>% 
+  image_join() %>% 
+  image_animate(fps = 100) %>% 
+  image_write("img/captcha_conv.gif")
+```
+
+![](/img/blog/captcha-conv/captcha_conv.gif)
+
+No próximo nível, vamos convoluir mais 48 kernels. Essa operação será feita com todos os doze filtros atuais, ou seja, é uma contaiada que não acaba mais. Para simplificar as contas e para permitir a obtenção de padrões diferentes, faz sentido simplificar a imagem. Para isso, usamos o *max pooling*.
+
+#### Aplicando max pooling
+
+O max pooling simplesmente pega o pixel de maior valor dentro de uma janela. No caso, estamos usando uma janela 2x2 e aplicamos ela igualzinho convolução, só que ao invés de pegar a soma ponderada dos pixels, pegamos o pixel máximo. Outra diferença é que ao invés de andar o pixel de 1 em 1, andamos de 2 em 2. Assim cada janelinha é considerada apenas uma vez (esse é o conceito de *strides*, que não vou discutir aqui).
+
+Montei esse algoritmo que faz max pooling:
+
+```{r}
+max_pool <- function(img) {
+  # monta a matriz com metade da resolução
+  x_new <- matrix(0.0, nrow = floor(nrow(img) / 2), ncol = floor(ncol(img) / 2))
+  # adiciona uma bordinha para o caso da matriz ter um número ímpar de pixels
+  # por exemplo, se ela é 51x181, daria bug se não adicionar a bordinha
+  img <- cbind(rbind(img[,,1], 0), 0)
+  # percorre a matrix pegando o máximo das janelinhas
+  for (i in 1:nrow(x_new)) {
+    for (j in 1:ncol(x_new)) {
+      x_new[i, j] <- max(img[i * 2 - 1 + 0:1, j * 2 - 1 + 0:1])
+    }
+  }
+  array(x_new, c(dim(x_new), 3))
+}
+```
+
+A aplicação da primeira convolução com max pooling é feita igual anteriormente:
+
+```{r eval=FALSE}
+result_conv1 <- purrr::map2(w_list, bias, ~{
+  arq %>% 
+    load_image() %>% 
+    convolve(.x) %>% 
+    add_bias(.y) %>%
+    relu() %>% 
+    max_pool()
+})
+```
+
+No final, temos essas imagens com resolução `25x90` (as originais são `50x180`).
+
+```{r, fig.height=2, fig.width=9, echo=FALSE}
+par(mfrow = c(3, 4), mar = c(.1,.1,.1,.1))
+result_conv1 %>% 
+  purrr::walk(~plot(image_read(.x)))
+```
+
+Ficou bem parecido com o anterior! 
+
+Ao final da convolução, é como se tivéssemos uma nova imagem, menor e alterada, mas com 12 cores. Como não faz muito sentido pensar em 12 cores primárias, vamos chamá-las de canais.
+
+<hline />
+
+### Segunda convolução
+
+Os parâmetros da segunda convolução são obtidos novamente pelo `keras`. Sugiro que você dê uma olhada nesses índices para entender o que exatamente estamos pegando.
+
+```{r eval=FALSE}
+w2 <- keras::get_weights(m$model$layers[[3]])[[1]]
+bias2 <- keras::get_weights(m$model$layers[[3]])[[2]]
+
+dim(w2)
+```
+```
+[1]  5  5 12 48
+```
+
+Agora temos `12 * 48` kernels 5x5 a serem aplicados. Precisamos seguir essas operações:
+
+1. Para cada uma das 48 matrizes:
+    1. Faça a convolução das 12 matrizes obtidos na convolução anterior pelos 12 kernels atuais e **some** os valores obtidos.
+    1. Adicione o bias.
+    1. Faça a ativação com ReLu.
+    1. Aplique o max pooling.
+
+Logo, temos 2 laços. O código para fazer isso fica assim:
+
+```{r eval=FALSE}
+result_conv2 <- purrr::map(1:dim(w2)[4], ~{
+  kern <- w2[,,,.x] %>% 
+    plyr::alply(3, identity) %>% 
+    purrr::map(as.matrix)
+  actual_bias <- bias2[[.x]]
+  purrr::map2(result_conv1, kern, convolve) %>% 
+    purrr::reduce(magrittr::add) %>% 
+    add_bias(actual_bias) %>%
+    relu() %>% 
+    max_pool()
+})
+```
+
+Plotamos os 48 resultados abaixo. Alguns resultados foram completamente zerados (eles devem ser úteis em outros captchas mais esquisitos), enquanto os demais pegam pedaços da imagem anterior que mal lembram o captcha original. A imagem da posição `(4,1)` é uma das únicas que mostra o captcha claramente. Isso mostra uma coisa comum do deep learning: quanto mais profundo vamos, menos entendemos o que de fato o modelo está fazendo. Recomendo fortemente a leitura [desse blog do distill](https://distill.pub/2017/feature-visualization/), que discute o assunto detalhadamente
+
+```{r, fig.height=3.5, fig.width=9, echo=FALSE}
+par(mfrow = c(8, 6), mar = c(.1,.1,.1,.1))
+purrr::walk(result_conv2, ~plot(image_read(.x)))
+```
+
+Agora temos 48 canais de uma imagem com dimensões `12x45`. Vamos em frente.
+
+### Terceira convolução
+
+A terceira convolução é feita de forma idêntica à segunda. A única diferença é que teremos no final 96 canais, pois estamos ajustando essa quantidade de kernels para cada canal.
+
+```{r eval=FALSE}
+w3 <- keras::get_weights(m$model$layers[[5]])[[1]]
+bias3 <- keras::get_weights(m$model$layers[[5]])[[2]]
+
+dim(w3)
+```
+
+```
+[1]  5  5 48 96
+```
+Revisando o algoritmo:
+
+```{r eval=FALSE}
+result_conv3 <- purrr::map(1:dim(w3)[4], ~{
+  kern <- w3[,,,.x] %>% 
+    plyr::alply(3, identity) %>% 
+    purrr::map(as.matrix)
+  actual_bias <- bias3[[.x]]
+  purrr::map2(result_conv2, kern, convolve) %>% 
+    purrr::reduce(magrittr::add) %>% 
+    add_bias(actual_bias) %>%
+    relu() %>% 
+    max_pool()
+})
+```
+
+Plotando os resultados, temos
+
+```{r, fig.height=4, fig.width=9, echo=FALSE}
+par(mfrow = c(12, 8), mar = c(.1,.1,.1,.1))
+purrr::walk(result_conv3, ~plot(image_read(.x)))
+```
+
+No final, ficamos com 96 imagens com resolução `6x22` cada. Várias imagens ficaram zeradas e as que não ficaram parecem apenas feixes de luz no meio do breu. Pode ser que a posição dessas luzes tenha a ver com a posição de pedaços importantes do captcha original, que por sua vez seriam importantes para determinar o valor do captcha.
+
+#### Verificando se funcionou mesmo
+
+Quando eu montei o post, não estava 100% seguro das contas que estava fazendo. Pode ser que tenha alguma coisa diferente dentro do `keras`, que é um canhão que usa `tensorflow` por trás, fazendo alguma otimização esquisita. Por isso, também aprendi a plotar os resultados parciais do modelo quebrador de captchas diretamente do `keras`.
+
+Podemos montar um modelo *parcial* do `keras` escolhendo qual o *layer* final do modelo.
+
+```{r eval=FALSE}
+m2 <- keras::keras_model(
+  inputs = m$model$input,
+  outputs = keras::get_layer(m$model, "max_pooling2d_6")$output
+)
+m2
+```
+
+```
+Model
+____________________________________________________________________________________________________
+Layer (type)                                 Output Shape                            Param #        
+====================================================================================================
+conv2d_4_input (InputLayer)                  (None, 50, 180, 1)                      0              
+____________________________________________________________________________________________________
+conv2d_4 (Conv2D)                            (None, 50, 180, 12)                     312            
+____________________________________________________________________________________________________
+max_pooling2d_4 (MaxPooling2D)               (None, 25, 90, 12)                      0              
+____________________________________________________________________________________________________
+conv2d_5 (Conv2D)                            (None, 25, 90, 48)                      14448          
+____________________________________________________________________________________________________
+max_pooling2d_5 (MaxPooling2D)               (None, 12, 45, 48)                      0              
+____________________________________________________________________________________________________
+conv2d_6 (Conv2D)                            (None, 12, 45, 96)                      115296         
+____________________________________________________________________________________________________
+max_pooling2d_6 (MaxPooling2D)               (None, 6, 22, 96)                       0              
+====================================================================================================
+Total params: 130,056
+Trainable params: 130,056
+Non-trainable params: 0
+____________________________________________________________________________________________________
+```
+
+Esse modelo é idêntico ao inicial, mas acaba no último max pooling. Para obter as imagens, utilizamos a função `predict` a partir da base de dados `X` montada com o `arq`, utilizando a função `prepare` do `decryptr`:
+
+```{r, fig.height=4, fig.width=9, eval=FALSE}
+X <- prepare(read_captcha(arq))$x
+res <- predict(m2, X)
+
+dim(res)
+```
+
+```
+[1]  1  6 22 96
+```
+
+
+O resultado pode ser plotado da seguinte forma:
+
+```{r, fig.height=4, fig.width=9}
+par(mfrow = c(12, 8), mar = c(.1,.1,.1,.1))
+purrr::walk(seq_len(dim(res)[4]), ~{
+  array(res[,,,.x], c(dim(res)[2:3], 3)) %>% 
+  image_read() %>% 
+  plot()
+})
+```
+
+Ufa, ficou igualzinho! 
+
+Apenas um check final: quero ver se os pesos obtidos são todos iguais. Para isso, ordeno todos os pesos obtidos diretamente pelo `keras` ou aplicando as minhas funções feitas no braço:
+
+```{r eval=FALSE}
+w_calculado <- unlist(purrr::map(result_conv3, ~.x[,,1]))
+all.equal(sort(res), sort(w_calculado), tolerance = 1e-6)
+```
+
+```
+[1] TRUE
+```
+
+UHUL!
+
+#### Visualizando na imagem original
+
+Aqui fiz um esforço para tentar entender de qual parte da imagem original esses resultados estão pegando informações. Para isso, re-escalei essas imagens de resolução mais baixa na última convolução para o tamanho original do captcha (`50x180`) e depois multipliquei os valores das matrizes pelos valores da imagem original. 
+
+O resultado foi esse gif. Cada imagem é um dos canais obtidos.
+
+```{r, fig.height=4, fig.width=9, echo=FALSE, eval=FALSE}
+mat_captcha <- 1 - load_image(arq)[,,1]
+imagens_alteradas <- purrr::imap(result_conv3, ~{
+  .x %>% 
+    image_read() %>% 
+    image_scale("180x!50") %>% 
+    as.raster() %>% {
+      apply(., 2, function(x) col2rgb(x)[1,]) / 255
+    } %>% 
+    magrittr::multiply_by(mat_captcha) %>% 
+    array(dim = c(dim(.), 3)) %>% 
+    image_read() %>% 
+    image_scale("400%") %>% 
+    image_annotate(as.character(.y), color = "white", size = 40)
+}) %>% 
+  image_join() %>% 
+  image_animate(fps = 1) %>% 
+  image_write("img/captcha_conv_final.gif")
+```
+
+![](/img/blog/captcha-conv/captcha_conv_final.gif)
+
+Parece que os filtros são capazes de pegar as curvas que as letras fazem no captcha. Mas não tenho opinião formada sobre isso. Digam aí nos comentários o que vocês acham!
+
+## Passos finais
+
+Para acabar a predição do captcha, nós pegamos os resultados das imagens anteriores e juntamos todos os pixels num vetorzão que junta tudo. Em estatistiquês, esse vetor nada mais é do que uma linha de um `data.frame`, que podemos usar numa regressão logística, por exemplo. Ou seja, essas convolucionais funcionam como um grande gerador automático de features importantes para prever os resultados do captcha. A vantagem é que essas features são obtidas de forma automática e são otimizadas dentro do processo de estimação. Por essas e outras que deep learning é realmente sensacional!
+
+Como já estamos no framework do `keras`, acabamos fazendo tudo lá dentro. Após jogar tudo no vetorzão, aplicamos mais dois layers de redes neurais comuns, que funcionam como a regressão logística. O único detalhe sensível é que, como estamos prevendo 6 letras ao mesmo tempo, precisamos novamente transformar esse vetor em uma matriz `35x6`, sendo `35` o total de letras possíveis por posição e `6` a quantidade de posições.
+
+Abaixo, montei uma tabelinha com as probabilidades de cada letra nas posições correspondentes. Substituí valores muito pequenos por `.` para ver melhor.
+
+```{r, fig.height=3.8, fig.width=8, eval=FALSE}
+res2 <- keras::predict_proba(m$model, X)
+probabilidades <- res2[1,,] %>% 
+  tibble::as_tibble() %>% 
+  purrr::set_names(m$labs) %>% 
+  tidyr::gather(letra, prob) %>% 
+  dplyr::group_by(letra) %>% 
+  dplyr::mutate(pos = 1:n()) %>% 
+  dplyr::ungroup() %>% 
+  dplyr::mutate(prob = dplyr::if_else(prob < 5e-5, ".", as.character(round(prob, 6))) ) %>% 
+  tidyr::spread(pos, prob, sep = "")
+```
+
+```{r echo=FALSE}
+knitr::kable(probabilidades)
+```
+
+Ficamos então com "o" na primeira posição, "g" na segunda posição, "7" na terceira posição, "v" na quarta posição, "5" na quinta posição e "q" na sexta posição. Ou seja, "og7v5q".
+
+Vamos ver a imagem novamente:
+
+```{r, fig.width=7, fig.height=2}
+arq %>% 
+  read_captcha() %>% 
+  plot()
+```
+
+```{r eval=FALSE, echo=FALSE}
+# save(w_list, bias, conv1, result_conv1, 
+#      w2, bias2, result_conv2,
+#      w3, bias3, result_conv3,
+#      res, probabilidades, file = "captcha_conv_env.rda")
+```
+
+Parece que funcionou!
+
+## Wrap-up
+
+Essa jornada foi longa, mas acho que aprendemos bastante coisa. Resumindo:
+
+- Convoluções são somas ponderadas dos valores da vizinhança de um pixel. Esses pesos são dados por uma matriz chamada kernel.
+- Aplicar redes neurais convolucionais consiste em i) aplicar convolução; ii) adicionar um bias; iii) aplicar uma função não linear (geralmente ReLu).
+- *max pooling* serve para simplificar a resolução da imagem.
+- Na prática, aplicamos vários kernels. O número de kernels de uma convolucional igual ao número de canais da operação anterior (input), multiplicado pelo número de canais que queremos de output. 
+- Para a convolução inicial, os canais são as cores: partimos de 1 canal se a imagem for preto e branco ou 3 canais se for colorida.
+- No nosso caso, aplicamos três convolucionais com kernels 5x5, sendo `1*12` no primeiro nível, `12*48` no segundo nível e `48*96` no terceiro nível.
+- Depois, pegamos as imagens resultantes e aplicamos o `flatten`, para trabalhar com esses números como se fossem a matriz `X` de uma regressão logística usual.
+- Como vimos, é possível implementar todas essas operações na mão sem muita dificuldade.
+
+Conseguimos! Mas resta uma dúvida... 
+
+Como é que, de fato, conseguimos esses valores mágicos de $W$? Na próxima vez provavelmente resolverei esse problema, mostrando como se faz o back-propagation em um modelo de deep learning.
+
+É isso. Happy coding :)
+
+
+
+

@@ -1,0 +1,39 @@
+---
+title: "Curso-R na aMostra de Estatística 2017"
+date: "2017-10-19T10:12:00+03:00"
+tags: ["curso-r"]
+categories: ["tutoriais", "r"]
+banner: "img/banners/amostra-estat.jpg"
+author: ["Daniel"]
+summary: "Nas últimas semanas sumimos um pouco aqui do blog, pois estávamos ocupados na aMostra de Estatística no IME-USP. Veja neste post o que apresentamos."
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = F, 
+                      comment = FALSE, cache = TRUE)
+```
+
+Nas últimas semanas sumimos um pouco aqui do blog, pois estávamos ocupados na 
+[aMostra de Estatística no IME-USP](https://www.ime.usp.br/~amostra/). 
+
+O evento teve a organização impecável graças aos alunos do bacharelado em estatística
+Lucas Hamaguchi, Beatriz Vianna, Gabriela Uhrigshardt, Milene Farhat, Luíza Baratojo, 
+Rodrigo Marcel Araujo Oliveira e do Prof. Victor Fossaluza. Parabens a todos!
+
+A Curso-R participou do evento ministrando 3 oficinas abordando tópicos bem 
+distintos sobre programação em R. Graças à fantástica organização, todas as 
+palestras foram gravadas e agora podem ser revistas pelo [YouTube da aMostra](https://www.youtube.com/channel/UCargFh7dj6ZtDcCNlw30F-w/videos).
+
+No dia 02/10, o Fernando ministrou a oficina *WebScraping e Conexões*!
+Veja o vídeo [neste link](https://youtu.be/f8eFBCqIUWY).
+
+No dia 04/10 foi a vez do Julio ministrar a oficina sobre API's no R.
+O vídeo está disponível [neste link](https://youtu.be/A5Um70QBwMk).
+
+No dia 05/10 o AThos e eu ministramos a oficina de Introdução ao Machine Learning.
+Veja o vídeo [neste link](https://youtu.be/xa1-m0BB8dE).
+
+Claro que não fomos os únicos palestrantes e tem muita gente boa que participou 
+da aMostra. Vale muito a pena ver os demais vídeos do [canal da aMostra](https://www.youtube.com/channel/UCargFh7dj6ZtDcCNlw30F-w/videos).
+
+Aproveitem!

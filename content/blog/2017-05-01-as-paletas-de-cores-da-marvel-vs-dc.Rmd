@@ -1,0 +1,157 @@
+---
+title: "As cores da Marvel vs DC"
+date: "2017-05-01T23:26:00+03:00"
+tags: ["imagens", "cinema", "kmeans"]
+categories: ["análises", "r"]
+banner: "img/banners/marvel_vs_dc.jpg"
+author: ["William"]
+summary: "A cor é uma diferença notável entre os filmes da Marvel e da DC. Enquanto a Disney/Marvel Studios costuma lançar filmes com tons mais claros e alegres, a Warner tem optado por cenários escuros, com um aspecto mais sombrios. Neste post, vamos utilizar o Kmeans para obter a paleta de cores mais utilizadas por cada estúdio."
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, eval = FALSE, cache = TRUE)
+```
+
+A cor é uma diferença notável entre os filmes da Marvel e da DC. Enquanto a Disney/Marvel Studios costuma lançar filmes com tons mais claros e alegres, a Warner tem optado por cenários escuros, com um aspecto mais sombrios. Essas escolhas são um reflexo do clima das histórias de cada universo: aventuras engraçaralhas com um drama superficial vs seja lá o que passa na cabeça do [Zack Snyder](http://retalhoclub.com.br/wp-content/uploads/2017/03/03.jpg).
+
+Para estudar melhor a paleta de cores utilizadas nos filmes, vamos aplicar a análise introduzida pelo Dani [neste post](http://curso-r.com/blog/2017/04/22/2017-04-21-paleta-de-cores/), com pequenas alterações. Como amostra, selecionei 10 imagens de Batman vs Superman e 10 do Capitão América: guerra civil. Tentando deixar a análise o menos subjetiva possível, escolhi imagens de cenas emblemáticas e dos principais personagens. Abaixo as imagens que peguei de cada filme.
+
+```{r, echo=FALSE, fig.width=8, fig.height=7, eval = TRUE, message=FALSE}
+library(magick)
+x <- image_read('../../static/img/blog/as-paletas-de-cores-da-marvel-vs-dc/bvs.jpg')
+plot(x)
+```
+
+```{r, echo=FALSE, fig.width=8, fig.height=5, eval = TRUE}
+x <- image_read('../../static/img/blog/as-paletas-de-cores-da-marvel-vs-dc/cw.jpg')
+plot(x)
+```
+
+Seguindo a análise do Dani, vamos utilizar as seguintes bibliotecas para a análise.
+
+```{r}
+library(jpeg)
+library(tidyverse)
+library(glue)
+```
+
+Eu salvei as imagens em arquivos do tipo "bvs_n.jpg" e "cw_n.jpg", com n variando de 1 a 10. Isso facilitou a leitura desses arquivos. O código abaixo mostra como criar um vetor com o caminho das 10 imagens de cada filme. Se você quiser saber mais sobre a função `glue()`, visite [este post](http://curso-r.com/blog/2017/04/17/2017-04-08-glue/).
+
+```{r}
+arquivos_bvs <- glue("images/bvs_{n}.jpg", n = 1:10)
+arquivos_cw <- glue("images/cw_{n}.jpg", n = 1:10)
+```
+
+
+Como vamos trabalhar com mais de uma imagem, eu criei a função `ler_imagem()` para ler os arquivos.
+
+```{r}
+ler_imagem <- function(caminho) {
+  img <- readJPEG(caminho) %>% 
+    apply(3, as.numeric)
+  
+}
+```
+
+Podemos então usar a função `map()` para aplicá-la a todos os 10 arquivos. A função `reduce(rbind)` transforma as 10 matrizes de pixels em uma matriz só, como se as imagens estivessem coladas uma embaixo da outra.
+
+```{r}
+img_bvs <- map(arquivos_bvs, ler_imagem) %>% reduce(rbind)
+img_cw <- map(arquivos_cw, ler_imagem) %>% reduce(rbind)
+```
+
+Abaixo estão as funções `cria_paleta()` e `exibir()` do post do Dani. A única diferença aqui é que a função `cria_paleta()` já recebe a matriz representando a imagem.
+
+```{r}
+criar_paleta <- function(img_matrix, num_cores){
+  
+  km <- kmeans(img_matrix, centers = num_cores)
+  
+  img_df <- tibble(
+    r = img_matrix[,1], 
+    g = img_matrix[,2], 
+    b = img_matrix[,3],
+    cluster = km$cluster
+  )
+  
+  centroides <- img_df %>%
+    group_by(cluster) %>%
+    summarise_all(mean)
+
+  centroides <- centroides %>%
+    mutate(cor = rgb(r, g, b))
+
+  sort(centroides$cor)
+}
+
+exibir <- function(x) {
+  n <- length(x)
+  old <- par(mar = c(0.5, 0.5, 0.5, 0.5))
+  on.exit(par(old))
+  
+  image(1:n, 1, as.matrix(1:n), col = x,
+        ylab = "", xaxt = "n", yaxt = "n", bty = "n")
+}
+
+```
+
+Assim, basta aplicar essas funções aos objetos `img_bvs` e `img_cw` para obter as paletas. Primeiro para o Batman vs Superman:
+
+```{r}
+paleta_bvs <- criar_paleta(img_bvs, 10)
+exibir(paleta_bvs)
+```
+
+```{r, echo=FALSE, fig.width=8, fig.height=4, eval = TRUE}
+x <- image_read('../../static/img/blog/as-paletas-de-cores-da-marvel-vs-dc/paleta_bvs.jpeg')
+plot(x)
+```
+
+E agora para o Capitão América:
+
+```{r}
+paleta_cw <- criar_paleta(img_cw, 10)
+exibir(paleta_cw)
+```
+
+```{r, echo=FALSE, fig.width=8, fig.height=4, eval = TRUE}
+x <- image_read('../../static/img/blog/as-paletas-de-cores-da-marvel-vs-dc/paleta_cw.jpeg')
+plot(x)
+```
+
+Observe que o filme da DC tem cores mais escuras e fortes, com vários tons de azul, indicando as cenas noturnas e de chuva. Já a paleta da Marvel apresenta cores mais claras, com vários tons representando o céu pálido das cenas externas.
+
+Podemos fazer a análise agora para o pôster de cada filme (o que aparece no IMDB):
+
+```{r, echo=FALSE, fig.width=8, fig.height=5, eval = TRUE}
+x <- image_read('../../static/img/blog/as-paletas-de-cores-da-marvel-vs-dc/posteres.jpg')
+plot(x)
+```
+
+```{r}
+img_bvs <- ler_imagem("images/bvs_poster.jpg")
+paleta_bvs <- criar_paleta(img_bvs, 10)
+exibir(paleta_bvs)
+```
+
+```{r, echo=FALSE, fig.width=8, fig.height=4, eval = TRUE}
+x <- image_read('../../static/img/blog/as-paletas-de-cores-da-marvel-vs-dc/paleta_poster_bvs.jpeg')
+plot(x)
+```
+
+```{r}
+img_cw <- ler_imagem("images/cw_poster.jpg")
+paleta_cw <- criar_paleta(img_cw, 10)
+exibir(paleta_cw)
+```
+
+```{r, echo=FALSE, fig.width=8, fig.height=4, eval = TRUE}
+x <- image_read('../../static/img/blog/as-paletas-de-cores-da-marvel-vs-dc/paleta_poster_cw.jpeg')
+plot(x)
+```
+
+Veja que os diferentes tons de azul se repete no pôster do Batman vs Superman. Já o pôster do Capitão América é bem cinzento, com metade da paleta representando [tons de cinza](http://media.melty.com.br/article-6991-ratio265_1020/filme-50-tons-de-cinza-jamie-dornan-christian.jpg).
+
+Fica então o desafio de repetir a análise para outros filmes e compartilhar o resultado com a gente. Comentários? Sugestões? Críticas? Mande a sua opinião!
+
+

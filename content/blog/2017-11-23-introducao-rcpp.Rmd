@@ -1,0 +1,130 @@
+---
+title: "Fazendo o R Voar: uma Introdução ao Rcpp"
+date: "2017-11-23"
+tags: ["rcpp"]
+categories: ["tutoriais", "r"]
+banner: "img/banners/rcpp-rocket.jpg"
+author: ["Caio"]
+summary: "Uma breve introdução ao pacote Rcpp e como ele pode aumentar a eficiência do seu código."
+---
+
+O que fazer quando precisamos que o nosso script rode mais rápido? Geralmente a primeira ideia que temos é otimizar o código: reduzir a quantidade de laços, diminuir o tamanho das estruturas, utilizar programação paralela, etc... Mas quando se trata de R, temos a possibilidade de aumentar a velocidade do código sem alterar praticamente nada da sua estrutura.
+
+Neste post darei uma introdução básica ao pacote `Rcpp`, uma ferramenta que nos permite rodar código em C++ de dentro do R.
+
+O básico
+--------
+
+C++ é uma linguagem de programação muito famosa e versátil. Ela têm elementos de programação genérica, imperativa e orientada a objeto e também fornece uma interface para manipulação de memória de baixo nível.
+
+Uma característica interessante do C++ é que ele é *extremamente* veloz. Diferentemente do R, ela é uma linguagem compilada, com tipagem estática e que não fornece tantas abstrações de operações, permitindo que seu código execute com eficiência incrível.
+
+Para explorar os benefícios que o C++ pode trazer para o seu código R, instale e carregue o pacote `Rcpp` com os comandos abaixo:
+
+``` r
+install.packages("Rcpp")
+library(Rcpp)
+```
+
+Vejamos agora um exemplo simples de como chamar código C++ do R. O jeito mais fácil de fazer isso é através da função `cppFunction()`: ela recebe uma string que será interpretada como uma função em C++.
+
+``` r
+adicao_r <- function(x, y, z) {
+  sum = x + y + z
+  return(sum)
+}
+
+cppFunction(
+  "int adicao_c(int x, int y, int z) {
+    int sum = x + y + z;
+    return sum;
+  }")
+
+adicao_r(1, 2, 3)
+#> [1] 6
+
+adicao_c(1, 2, 3)
+#> [1] 6
+```
+
+Como podemos observar no exemplo acima, ambas as funções têm o mesmo comportamento apesar de algumas diferenças superficiais. Note como temos sempre que declarar os tipos das variáveis em C++! Usando a palavra-chave `int` deixamos claro para o compilador que uma variável terá o tipo inteiro e até mesmo que uma função deve retornar um valor de tipo inteiro. Outra coisa que é importante lembrar é que precisamos colocar um ponto-e-vírgula após cada comando C++.
+
+Vetores
+-------
+
+Normalmente o C++ teria diferenças enormes em relação ao R no seu tratamento de vetores, mas para a nossa sorte o `Rcpp` nos disponibiliza uma biblioteca de estruturas que abstraem o comportamento do R. No exemplo a seguir temos uma função que recebe um número e vetor numérico, computa a distância euclidiana entre o valor e o vetor e retorna um vetor numérico como saída.
+
+``` r
+dist_r <- function(x, ys) {
+  sqrt((x - ys) ^ 2)
+}
+
+cppFunction(
+  "NumericVector dist_c(double x, NumericVector ys) {
+    int n = ys.size();
+    NumericVector out(n);
+
+    for(int i = 0; i < n; i++) {
+      out[i] = sqrt(pow(ys[i] - x, 2.0));
+    }
+    return out;
+  }")
+
+dist_r(10, 20:25)
+#> [1] 10 11 12 13 14 15
+
+dist_c(10, 20:25)
+#> [1] 10 11 12 13 14 15
+```
+
+A estrutura `NumericVector` abstrai um vetor numérico do R, nos permitindo trabalhar com ele de uma maneira mais familiar. Com o método `.size()` obtemos o seu comprimento (equivalente a `length()`) e podemos declarar um novo com o construtor `NumericVector nome(comprimento);`. O único ponto de diferença fundamental entre o C++ e o R é que o primeiro não possui operações vetorizadas propriamente ditas, fazendo com que precisemos usar laços para toda e qualquer iteração.
+
+Velocidade máxima
+-----------------
+
+Certos aspectos da filosofia do R o tornam uma linguagem extremamente versátil, mas isso vem com certas desvantagens. Alguns pontos em que a performance do R deixa a desejar são laço não vetorizáveis (por uma iteração depender da anterior), funções recursivas e estruturas de dados complexas.
+
+Nestas e em muitas outras situações, usar C++ pode ser extremamente vantajoso. No exemplo a seguir veremos a diferença entre a performance de um laço em C++ e um em R; note que esta nem é uma das 3 situações listadas no parágrafo anterior e que mesmo assim o código em C++ é *6 vezes mais rápido*.
+
+``` r
+soma_r <- function(v) {
+  total <- 0
+  for (e in v) {
+    if (e < 0) { total = total - e }
+    else if (e > 0.75) { total = total + e/2 }
+    else { total = total + e }
+  }
+
+  return(total)
+}
+
+cppFunction(
+  "double soma_c(NumericVector v) {
+    double total = 0;
+    for (int i = 0; i < v.size(); i++) {
+      if (v[i] < 0) { total -= v[i]; }
+      else if (v[i] > 0.75) { total += v[i]/2; }
+      else { total += v[i]; }
+    }
+
+    return(total);
+  }")
+
+v <- runif(100000, -1, 1)
+microbenchmark::microbenchmark(soma_r(v), soma_c(v))
+#> Unit: milliseconds
+#>       expr      min       lq     mean   median       uq       max neval
+#>  soma_r(v) 6.105048 6.436608 6.911819 6.718456 7.183266 11.610624   100
+#>  soma_c(v) 1.045805 1.063956 1.161585 1.097920 1.210052  1.955702   100
+```
+
+**Obs.**: Os símbolos `+=` e `-=` são equivalentes a `a = a +/- b`, já o símbolo `++` é equivalente a `a = a + 1`.
+
+Conclusão
+---------
+
+Com o pacote `Rcpp`, podemos rodar código em C++ de dentro do próprio R. Através dessa técnica conseguimos otimizar nosso código ou mesmo ter acesso a estruturas de dados complexas disponibilizadas pelo C++.
+
+Para saber mais sobre o assunto, dê uma olhada no [tutorial](http://adv-r.had.co.nz/Rcpp.html) escrito por Hadley Wickham no livro *Advanced R*. Também recomendo a própria [página](http://www.rcpp.org/) do `Rcpp` e sua extensa [galeria de exemplos](http://gallery.rcpp.org/).
+
+P.S.: Se você quiser o código completo deste tutorial, disponibilizei ele em um [Gist](https://gist.github.com/ctlente/8d6c025a8e60319fdba63f247cef164a). Além disso, também escrevi uma versão em inglês deste post no meu [blog pessoal](http://ctlente.com/en/rcpp-intro/). Abraços!

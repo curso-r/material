@@ -1,0 +1,122 @@
+---
+title: "Filtros de Bloom em R"
+date: "2017-09-18T10:12:00+03:00"
+tags: ["algoritmos"]
+categories: ["tutoriais", "r"]
+banner: "img/banners/bloom-filter.png"
+author: ["Daniel"]
+summary: "Filtro de Bloom é um algoritmo muito interessante para verificar a presença de um elemento em um conjunto. Veja aqui como implementá-lo no R!"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = F, 
+                      comment = FALSE, cache = TRUE)
+```
+
+[Filtro de Bloom](https://en.wikipedia.org/wiki/Bloom_filter) é um algoritmo muito
+interessante para testar se um elemento pertence a um conjunto. Ele é considerado
+uma estrutura de dados probabilística, ou seja, o resultado pode não estar correto
+com alguma probabilidade. Especificamente para o filtro de bloom, existe a possibilidade
+de falsos positivos mas não de falsos negativos: o algoritmo pode dizer que o elemento 
+pertence ao conjunto, mas na verdade não pertencer, mas nunca dirá que ele não pertence
+sendo que ele pertence.
+
+Bloom Filters são úteis em diversas situações, geralmente relacionadas ao ganho 
+de velocidade e de espaço que o seu uso pode trazer. Muitos sistemas de bancos de
+dados usam bloom filters para reduzir o número de buscas no disco (ex. [Cassandra](https://docs.datastax.com/en/cassandra/2.1/cassandra/operations/ops_tuning_bloom_filters_c.html)). O [Medium](https://blog.medium.com/what-are-bloom-filters-1ec2a50c68ff) usa para evitar recomendar uma paǵina que você já leu. 
+Recentemente, encontraram até [aplicações para bloom filters em machine learning](https://arxiv.org/abs/1706.03993).
+
+Nesse post vamos implementar uma versão simplificada, nada otimizada dos filtros de
+Bloom em R. Mas antes disso, vale a pena ler o [verbete da Wikipedia sobre o assunto](https://en.wikipedia.org/wiki/Bloom_filter).
+
+Essencialmente, um filtro de bloom é um vetor de `TRUE`s e `FALSES` de tamanho $m$. 
+Inicializamos esse vetor com `FALSES`. Em seguida para cada elemento do conjunto
+que você deseja representar pelo filtro, repetimos o seguinte processo: Hasheamos
+o elemento usando $k$ funções de hash diferentes. Cada uma dessas funções indicará
+um elemento do vetor que deve ser marcado como `TRUE`. Armazenamos então esse vetor
+de bits. São os valores de $m$ e de $k$ que controlam a probabilidade de falsos
+positivos. 
+
+Veja como podemos criar uma função em R para fazer essas operações. Essa função
+inicializa o vetor de bits de tamanho $m$ com `FALSES` e em seguida, para cada
+uma das $k$ funções de hash (no caso apenas variamos a semente do hash MurMur32)
+e para cada elemento de `x` calculamos o elemento do vetor `vec` que deve se tornar
+`TRUE`. No final, ela retorna o vetor `vec`, onde armazenamos como atributos 
+os parâmetros usados na sua construção.
+
+```{r, eval = FALSE}
+library(digest)
+library(magrittr)
+
+criar_vetor_de_bits <- function(x, m = 1000, k = 7){
+  
+  vec <- rep(FALSE, m)
+  
+  for (i in 1:k) {
+    for (j in 1:length(x)) {
+      
+      hash <- digest(x[j], algo = "murmur32", serialize = FALSE, seed = i) %>%
+        Rmpfr::mpfr(base = 16) %% 
+        m %>% 
+        as.integer()
+      
+      vec[hash + 1] <- TRUE
+      
+    }
+  }
+  
+  # armazenamos os parâmetros usados na construção
+  attributes(vec) <- list(m = m, k= k)
+  
+  return(vec)
+}
+```
+
+Dado um conjunto de strings, podemos criar o vetor de bits que o representa.
+
+```{r, eval = FALSE}
+vect <- criar_vetor_de_bits(c("eu", "pertenco", "ao", "conjunto", "de",
+                              "strings"), m = 1000, k = 7)
+```
+
+Agora vamos definir uma função que verifica se uma string pertence ao conjunto, dada
+apenas a representação dos bits desse conjunto. Hasheamos o elemento que desejamos
+verificar a presença no conjunto com a primeira função de hash. Se ela indicar um
+elemento do vetor que já está marcado com `TRUE` então continuamos, se não, retorna 
+`FALSE` indicando que o elemento não pertence ao conjunto. Continuamos até acabarem
+as funções de hash ou até 1 `FALSE` ter sido retornado.
+
+```{r, eval = FALSE}
+verificar_presenca <- function(x, vetor_de_bits){
+  
+  k <- attr(vetor_de_bits, "k")
+  m <- attr(vetor_de_bits, "m")
+  
+  for(i in 1:k){
+    hash <- digest(x, algo = "murmur32", serialize = FALSE, seed = i) %>%
+        Rmpfr::mpfr(base = 16) %% 
+        m %>% 
+        as.integer()
+    
+    if(!vetor_de_bits[hash + 1]) {
+      return(FALSE)
+    }
+  }
+  return(TRUE)
+}
+
+verificar_presenca("nao", vect)
+verificar_presenca("eu", vect)
+verificar_presenca("abc", vect)
+```
+
+Com `m = 1000` e `k = 7` não consegui encontrar nenhum falso positivo, mas basta
+diminuir o tamanho de `m` e de `k` que encontraremos. No verbete da Wikipedia a 
+conta está bonitinha mas de fato a probabilidade de falsos positivos pode ser estimada
+em função dos parâmetros $k$ e $m$ e $n$ (tamanho do conjunto representado) é dada por
+
+$$(1 - e^{-kn/m})^k$$
+
+No caso apresentado, a probabilidade de colisão é de 1.991256e-10. 
+
+

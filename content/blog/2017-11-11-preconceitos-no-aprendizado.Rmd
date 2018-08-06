@@ -1,0 +1,35 @@
+---
+title: "Aprendendo assuntos difíceis"
+date: "2017-11-11T23:26:00+03:00"
+tags: ["estatística"]
+categories: ["discussões", "r"]
+banner: "img/banners/studying-hard.jpg"
+author: ["William"]
+summary: "Uma breve reflexão sobre o preconceito de estudar assuntos difíceis."
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
+```
+
+Volta e meia eu escuto as famosas frases
+
+```{r}
+paste("Eu sou de", c("Humanas", "Exatas", "Biológicas"))
+```
+
+de alguém tentando justificar por que não vai fazer alguma coisa.
+
+Muitas vezes, não passa de uma brincadeira na hora de dividir a conta do bar. Muitas outras, me soa como uma desculpa pronta para não encarar problemas complicados. Para mim, todo aprendizado é difícil, não acho que existe conhecimento de graça, então realmente importa se ele é de Humanas, Exatas ou Biológicas?
+
+A divisão do conhecimento nessas três grandes áreas tem a sua importância organizacional, mas acaba motivando muita gente a criar limitações que não existem de verdade. Por que alguém de Exatas não conseguiria assimilar as ideias de um texto filosófico? Ou por que alguém de Biológicas não conseguiria aprender Cálculo?
+
+Acredito que cada um de nós tem afinidade por uma das áreas e maior facilidade em estudar um tópico ou outro. Normal. Mas fico triste quando vejo pessoas inteligentes se diminuindo ao se declararem incapazes de aprender outras competências que não a delas. Sei que essa incapacidade não existe e enxergo apenas como uma forma sofisticada de dizer "Estou com preguiça".
+
+Uma das belezas da Estatística é nos fazer perder esse preconceito\footnote{Ou medo. Ou preguiça. Na verdade, ainda temos preguiça, mas sabemos que é só preguiça.}. Por mais que tenhamos nossos gostos, descobrimos que não estamos presos ao domínio de apenas uma área. Nós trabalhamos com pessoas que pensam e aprendem de formas diferentes de nossa e construímos juntos pontes para trocarmos conhecimento. Ser estatístico é não ter medo de estudar, seja lá o que for.
+
+Trazendo a reflexão aqui para o nosso mundinho, já ouvi muitas vezes colegas dizendo, principalmente na Graduação, que não usam o R porque ele é difícil ou porque não gostam de programar. A minha opinião sobre a primeira desculpa está nos parágrafos acima. Sobre a segunda, vou discutir no próximo e último post desta série: a relação entre Estatística e programação.
+
+Resumindo a ópera: sempre vamos apanhar aprendendo, e vamos apanhar mais ainda quando não gostamos do que estamos estudando, mas cedo ou tarde, com a quantidade certa de esforço, o conhecimento dá as caras. 
+
+E no bar, na hora de dividir a conta, o problema não é você ser de Humanas. O problema é a sua preguiça. :D

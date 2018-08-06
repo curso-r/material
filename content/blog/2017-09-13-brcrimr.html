@@ -1,0 +1,572 @@
+---
+title: "brcrimR"
+date: "2017-09-13T10:12:00+03:00"
+tags: ["web-scraping", "tidyverse", "r", "data.frames", "bds", "dados-abertos", "api"]
+categories: ["tutoriais", "r"]
+banner: "img/banners/ssp.jpg"
+author: ["Fernando"]
+summary: "brcrimR é um pacote para baixar e processar informações divulgadas pelas secretarias de segurança pública do Brasil. Neste post, apresentamos as funcionalidades do pacote aplicadas ao estado de São Paulo."
+---
+
+
+
+<p>Em maio deste ano, escrevi um <a href="http://curso-r.com/blog/2017/05/19/2017-05-19-scrapper-ssp/">post</a> sobre <em>web scraping</em> dos dados da secretaria de segurança pública de São Paulo. Como o título indica, o foco do texto é mostrar como se raspa a página de estatísticas da SSP, mas, mais do que isso, o texto também sugere um roteiro de construção de <em>web scrapers</em>.</p>
+<p>Neste post, venho divulgar uma expansão do conteúdo do post passado. Agora é possível acessar os dados da SSP diretamente no R usando o pacote <code>brcrimR</code>, mas a ideia é que no futuro todas as informações divulgadas por alguma Secretaria de Segurança fiquem disponíveis diretamente no R!</p>
+<pre class="r"><code>devtools::install_github(&quot;abjur/brcrimR&quot;)</code></pre>
+<p>O <code>brmcrimR</code> se propõe a resolver três problemas:</p>
+<ol type="1">
+<li><strong>Obter informações criminais brasileiras diretamente no R</strong> - Muitas análises interessantes seriam viabilizadas se fosse fácil e rápido carregar informações criminais históricas num <code>data_frame</code>. Fazer isso é a motivação principal do <code>brmcrimR</code>.</li>
+<li><strong>Consolidar tabelas em bases históricas</strong> - Assim como em São Paulo, muitas Secretarias de Segurança disponibilizam as informações filtradas por mês ou localidade. A segunda motivação principal do <code>brcrimR</code> é iterar por essas páginas.</li>
+<li><strong>Padronização</strong> - O objetivo menos direto do <code>brcrimR</code> é padronizar as informações disponibilizadas. Esse não é um problema simplesmente computacional, mas algumas rotinas de pré-processamento podem ajudar no processo.</li>
+</ol>
+<p>Para ilustrar o funcionamento do <code>brcrimR</code>, vamos olhar o que já está implementado em São Paulo.</p>
+<section id="informacoes-agregadas" class="level2">
+<h2>Informações agregadas</h2>
+<p>As tabelas de informações agregadas podem ser obtidas seguindo os passos que descrevi <a href="http://curso-r.com/blog/2017/05/19/2017-05-19-scrapper-ssp/">aqui</a>, mas a função <code>brmcrimR::get_summarized_table_sp</code> faz todo o trabalho por nós.</p>
+<pre class="r"><code>brcrimR::get_summarized_table_sp(year = &#39;2016&#39;, city = &#39;1&#39;) %&gt;% 
+  knitr::kable(caption = &quot;Contagem de boletins de ocorrência na cidade de Amparo.&quot;)</code></pre>
+<table>
+<caption><span id="tab:unnamed-chunk-2">Table 1: </span>Contagem de boletins de ocorrência na cidade de Amparo.</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Natureza</th>
+<th style="text-align: right;">Jan</th>
+<th style="text-align: right;">Fev</th>
+<th style="text-align: right;">Mar</th>
+<th style="text-align: right;">Abr</th>
+<th style="text-align: right;">Mai</th>
+<th style="text-align: right;">Jun</th>
+<th style="text-align: right;">Jul</th>
+<th style="text-align: right;">Ago</th>
+<th style="text-align: right;">Set</th>
+<th style="text-align: right;">Out</th>
+<th style="text-align: right;">Nov</th>
+<th style="text-align: right;">Dez</th>
+<th style="text-align: right;">Total</th>
+<th style="text-align: left;">municipio</th>
+<th style="text-align: left;">ano</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">HOMICÍDIO DOLOSO (2)</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">2016</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Nº DE VÍTIMAS EM HOMICÍDIO DOLOSO (3)</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">2016</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">HOMICÍDIO DOLOSO POR ACIDENTE DE TRÂNSITO</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">2016</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Nº DE VÍTIMAS EM HOMICÍDIO DOLOSO POR ACIDENTE DE TRÂNSITO</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">2016</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">HOMICÍDIO CULPOSO POR ACIDENTE DE TRÂNSITO</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">2016</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">HOMICÍDIO CULPOSO OUTROS</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">2016</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">TENTATIVA DE HOMICÍDIO</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">2016</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">LESÃO CORPORAL SEGUIDA DE MORTE</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">2016</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">LESÃO CORPORAL DOLOSA</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">13</td>
+<td style="text-align: right;">13</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">23</td>
+<td style="text-align: right;">23</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">171</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">2016</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">LESÃO CORPORAL CULPOSA POR ACIDENTE DE TRÂNSITO</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">21</td>
+<td style="text-align: right;">22</td>
+<td style="text-align: right;">13</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">17</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: right;">17</td>
+<td style="text-align: right;">191</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">2016</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">LESÃO CORPORAL CULPOSA - OUTRAS</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">2016</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">LATROCÍNIO</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">2016</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Nº DE VÍTIMAS EM LATROCÍNIO</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">2016</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ESTUPRO (4)</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">2016</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ESTUPRO DE VULNERÁVEL</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">2016</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ROUBO - OUTROS (1)</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">2016</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ROUBO DE VEÍCULO</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">2016</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ROUBO A BANCO</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">2016</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ROUBO DE CARGA</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">2016</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">FURTO - OUTROS</td>
+<td style="text-align: right;">17</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">20</td>
+<td style="text-align: right;">22</td>
+<td style="text-align: right;">13</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">23</td>
+<td style="text-align: right;">27</td>
+<td style="text-align: right;">17</td>
+<td style="text-align: right;">30</td>
+<td style="text-align: right;">222</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">2016</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">FURTO DE VEÍCULO</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">2016</td>
+</tr>
+</tbody>
+</table>
+<p>Para obter os dados históricos, basta usar a função <code>brcrimR::get_historical_summarized_table_sp</code>. Ela funciona da mesma maneira que <code>brcrimR::get_summarized_table_sp</code>, mas pode receber vetores como input. Nesse caso, ela organiza os parâmetros num <em>grid</em> e retorna uma tabela com todas as requisições empilhadas.</p>
+<pre class="r"><code>brcrimR::get_historical_summarized_table_sp(
+  y = c(&#39;2016&#39;, &#39;2017&#39;), c = &#39;1&#39;, ty = &#39;ctl00$conteudo$btnMensal&#39;) %&gt;% 
+  filter(Natureza == &quot;LESÃO CORPORAL CULPOSA POR ACIDENTE DE TRÂNSITO&quot;) %&gt;% 
+  set_names(c(&#39;Natureza&#39;, 1:12, &quot;Total&quot;, &quot;municipio&quot;, &quot;ano&quot;)) %&gt;% 
+  gather(mes, valor, -municipio, -ano, -Natureza, -Total) %&gt;% 
+  filter(!is.na(valor)) %&gt;% 
+  mutate(data_bo = lubridate::dmy(paste(&quot;01&quot;, mes, ano, sep = &quot;-&quot;))) %&gt;% 
+  ggplot(aes(x = data_bo, y = valor)) +
+  geom_bar(stat = &#39;identity&#39;, fill = &#39;royalblue&#39;) +
+  theme_minimal(15) +
+  labs(x = &#39;Mês&#39;, y = &quot;Número de BO&#39;s&quot;)</code></pre>
+<p><img src="/blog/2017-09-13-brcrimr_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+</section>
+<section id="informacoes-desagregadas" class="level2">
+<h2>Informações desagregadas</h2>
+<p>Além dos dados agregados, a partir do ano passado a SSP de São Paulo também passou a divulgar informações detalhadas sobre os BO’s da capital no <a href="http://www.ssp.sp.gov.br/transparenciassp/">portal da trasparência</a>. O <a href="https://github.com/jjesusfilho">José de Jesus</a> começou o <a href="https://gist.github.com/jjesusfilho/3b0f99f80a0bce019bda3fce54486b9d"><em>scraping</em> desses conteúdos</a> e eu só encapsulei tudo dentro de um pacote. Vejam só:</p>
+<pre class="r"><code>brcrimR::get_detailed_table_sp(folder = &#39;btnHomicicio&#39;, year = &#39;2017&#39;, month = &#39;1&#39;, department = &#39;0&#39;) %&gt;%
+  select(NUM_BO, BO_INICIADO, DATAOCORRENCIA, BO_AUTORIA, FLAGRANTE, LATITUDE, LONGITUDE) %&gt;% 
+  distinct(NUM_BO, .keep_all = T) %&gt;% 
+  head(10) %&gt;% 
+  knitr::kable(caption = &quot;Algumas colunas de dez BO&#39;s da tabela de boletins de ocorrência de homicídio de janeiro de 2017.&quot;)</code></pre>
+<table>
+<caption><span id="tab:unnamed-chunk-4">Table 2: </span>Algumas colunas de dez BO’s da tabela de boletins de ocorrência de homicídio de janeiro de 2017.</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;">NUM_BO</th>
+<th style="text-align: left;">BO_INICIADO</th>
+<th style="text-align: left;">DATAOCORRENCIA</th>
+<th style="text-align: left;">BO_AUTORIA</th>
+<th style="text-align: left;">FLAGRANTE</th>
+<th style="text-align: left;">LATITUDE</th>
+<th style="text-align: left;">LONGITUDE</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">11589</td>
+<td style="text-align: left;">31/12/2016 22:02:52</td>
+<td style="text-align: left;">31/12/2016</td>
+<td style="text-align: left;">Conhecida</td>
+<td style="text-align: left;">Não</td>
+<td style="text-align: left;">-23,6027829499999</td>
+<td style="text-align: left;">-46,516050348</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1761</td>
+<td style="text-align: left;">31/12/2016 21:02:50</td>
+<td style="text-align: left;">31/12/2016</td>
+<td style="text-align: left;">Conhecida</td>
+<td style="text-align: left;">Não</td>
+<td style="text-align: left;">-22,7974702349999</td>
+<td style="text-align: left;">-45,1786399879999</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">2915</td>
+<td style="text-align: left;">31/12/2016 23:33:16</td>
+<td style="text-align: left;">31/12/2016</td>
+<td style="text-align: left;">Conhecida</td>
+<td style="text-align: left;">Sim</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">3</td>
+<td style="text-align: left;">01/01/2017 03:45:42</td>
+<td style="text-align: left;">31/12/2016</td>
+<td style="text-align: left;">Conhecida</td>
+<td style="text-align: left;">Não</td>
+<td style="text-align: left;">-23,4663377281984</td>
+<td style="text-align: left;">-47,4644919148778</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">2</td>
+<td style="text-align: left;">01/01/2017 03:40:13</td>
+<td style="text-align: left;">01/01/2017</td>
+<td style="text-align: left;">Desconhecida</td>
+<td style="text-align: left;">Não</td>
+<td style="text-align: left;">-23,7062770598301</td>
+<td style="text-align: left;">-46,5997084663396</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">6</td>
+<td style="text-align: left;">01/01/2017 04:25:12</td>
+<td style="text-align: left;">01/01/2017</td>
+<td style="text-align: left;">Desconhecida</td>
+<td style="text-align: left;">Não</td>
+<td style="text-align: left;">-23,435339469</td>
+<td style="text-align: left;">-45,0776321386071</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">01/01/2017 02:30:11</td>
+<td style="text-align: left;">31/12/2016</td>
+<td style="text-align: left;">Conhecida</td>
+<td style="text-align: left;">Sim</td>
+<td style="text-align: left;">-23,838385412</td>
+<td style="text-align: left;">-46,5778088709999</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">4</td>
+<td style="text-align: left;">01/01/2017 04:53:21</td>
+<td style="text-align: left;">01/01/2017</td>
+<td style="text-align: left;">Desconhecida</td>
+<td style="text-align: left;">Não</td>
+<td style="text-align: left;">-23,6528390081698</td>
+<td style="text-align: left;">-46,4471844195849</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">859</td>
+<td style="text-align: left;">31/12/2016 21:35:30</td>
+<td style="text-align: left;">31/12/2016</td>
+<td style="text-align: left;">Conhecida</td>
+<td style="text-align: left;">Não</td>
+<td style="text-align: left;">-23,6027829499999</td>
+<td style="text-align: left;">-46,516050348</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">13933</td>
+<td style="text-align: left;">31/12/2016 21:09:59</td>
+<td style="text-align: left;">31/12/2016</td>
+<td style="text-align: left;">Conhecida</td>
+<td style="text-align: left;">Sim</td>
+<td style="text-align: left;">-23,6221113323333</td>
+<td style="text-align: left;">-46,4778365256666</td>
+</tr>
+</tbody>
+</table>
+<p>É fantástico que a gente tenha acesso a informações tão detalhadas como latitude e longitude de um crime, mas o formato não é lá essas coisas. Como os dados da SSP provavelmente estão armazenados em um banco de dados relacional, a tabela que baixamos parece ser um <code>inner_join</code> de várias tabelas do banco, pois existem repetições da chave primária <code>NUM_BO</code>. É claro que quem tem um pouco de experiência com esse tipo de coisa vai tirar de letra, mas esse certamente não é o melhor formato para a população em geral.</p>
+<p>De toda forma, mesmo nesse formato, é interessante loopar por todas as páginas rapidamente. Por isso, também implementamos a função <code>get_detailed_table_sp</code>, que funciona mais ou menos da mesma forma que a <code>get_historical_summarized_table_sp</code>.</p>
+<pre class="r"><code>brcrimR::get_historical_detailed_table_sp(f = &#39;btnHomicicio&#39;, y = &#39;2017&#39;, m = 1:8, d = &#39;0&#39;)</code></pre>
+</section>
+<section id="proximos-passos" class="level2">
+<h2>Próximos passos</h2>
+<p>Encerro aqui a apresentação do pacote, com os seus objetivos e funcionalidades básicas. Ele está longe de ser ideal e tem uma listinha de coisas que queremos implementar no futuro, mas como se trata de dados abertos, não vejo porque não contar com a comunidade para isso! Seguem abaixo algumas ideias:</p>
+<ul>
+<li><em>Helper functions</em> para os parâmetros das funções de <em>get</em> de São Paulo. Precisa existir uma função que pegue uma especificação de parâmetro do tipo “Homicídio” e transforme em “btnHomicicio”, que é o parâmetro que precisamos passar pro site do tribunal.</li>
+<li>Um “desacoplador” de tabelas do portal da transparência.</li>
+<li>Implementações de funções parecidas para outros estados.</li>
+</ul>
+<p>Por hoje é isso, pessoal. Happy coding!</p>
+</section>

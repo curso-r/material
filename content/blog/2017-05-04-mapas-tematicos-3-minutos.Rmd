@@ -1,0 +1,129 @@
+---
+title: "Gráficos miojo: Mapas temáticos do Brasil em 3 minutos ou menos"
+date: "2017-05-04T23:26:00+03:00"
+tags: ["mapas", "gráficos", "ggplot2"]
+categories: ["tutoriais", "r"]
+banner: "img/banners/mapas_tematicos_rapidos.png"
+author: ["Fernando"]
+summary: "Impressionar é muito mais fácil se você usa mapas. Neste post vamos aprender a construir mapas temáticos do Brasil com muita agilidade."
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, 
+                      warning = FALSE, comment = FALSE, cache = TRUE)
+```
+
+```{r, echo = F, message=FALSE, warning=FALSE, comment=FALSE}
+library(tidyverse)
+
+constroi_mapa_tematico <- function(dataset){
+  dataset %>% 
+  inner_join(abjData::br_uf_map) %>% {
+    ggplot(.) +
+    geom_map(aes(x = long, y = lat,
+                 map_id = id, fill = variavel),
+             color = 'gray30', map = ., data = .) + 
+    theme_void() +
+    coord_equal()
+  }
+}
+```
+
+
+De todas as visualizações, mapas são aquelas que impressionam mais. É muito mais fácil alguém se maravilhar com o mapa mais simples do que com o `ggplot2` mais complicado. Felizmente, considerando essa comparação, o R disponibiliza muitos recursos para construir mapas.
+
+Dentro do `tidyverse` é possível construir mapas usando a função `geom_map`, do pacote `ggplot2`, mas está fora do escopo deste post explicar como ela funciona. Aqui vamos apenas descobrir como usá-la para agilizar a construção de um gráfico simples.
+
+Na Associação Brasileira de Jurimetria, nós temos um tipo favorito de mapa. Tipicamente temos interesse em diferenciar as unidades da federação por alguma variável quantitativa, seja ela categorizada ou não, e a ferramenta certa para isso é um mapa temático dos estados. Essa necessidade é tão frequente que as ferramentas mais importantes para construção desses gráficos estão num pacote chamado `abjData`.
+
+As coisas estão dispostas de tal forma que, a partir de uma tabela que relaciona uma variavel e os estados brasileiros, construir um gráfico similar ao mapa abaixo pode ser feito chamando apenas uma função[^FBSP].
+
+[^FBSP]: Os dados foram levantados pelo Fórum Brasileiro de Segurança Pública e obtidos via download no seu site http://www.forumseguranca.org.br/estatisticas/introducao/.
+
+```{r, echo = FALSE, comment = FALSE, message = FALSE}
+dataset <- read_csv("../../static/data/mapas-tematicos-3-minutos/dados.csv")
+```
+
+```{r, eval = FALSE, echo = TRUE}
+dataset %>% 
+  constroi_mapa_tematico()
+```
+
+```{r, echo = FALSE, message=FALSE, comment=FALSE, warning=FALSE}
+dataset %>% 
+  constroi_mapa_tematico() +
+  ggtitle("Roubos de carro no Brasil em 2014") +
+  scale_fill_continuous(name = "Taxa/100 mil hab.")
+```
+
+Neste post, vamos construir a função `constroi_mapa_tematico` e aprender a implementar alguns `tweaks`.
+
+## A função
+
+O `geom_map` é uma função do `ggplot2` que renderiza coordenadas de mapas. Ela pega um data_frame especial que diz quais coordenadas usar (e como usá-las) e plota no gráfico. Esse mapa normalmente é obtido aplicando a função `fortify` em um conjunto de dados geospaciais. 
+
+Para os gráficos que vamos construir aqui, não vai ser necessário aplicar a função `fortify`, pois o resultado desse passo já está disponível no pacote `abjData` e ele é o data_frame `br_uf_map`. Tudo que vamos precisar fazer é pedir que o `geom_map` use esse cara.
+
+```{r, eval = FALSE}
+devtools::install_github('abjur/abjData')
+#instala o pacote
+```
+
+```{r, eval = FALSE}
+constroi_mapa_tematico <- function(dataset){
+  dataset %>% 
+  inner_join(abjData::br_uf_map) %>% {
+    ggplot(.) +
+    geom_map(aes(x = long, y = lat,
+                 map_id = id, fill = variavel),
+             color = 'gray30', map = ., data = .) + 
+    theme_void() +
+    coord_equal()
+  }
+}
+```
+
+O `input` da função é uma tabela `dataset` com duas colunas
+
+- `id`, que representa as unidades da federação abreviada;
+- `variavel`, variável numérica (ou fator) que vai colorir o gráfico.
+
+No exemplo acima essa tabela era:
+
+```{r}
+dataset %>% 
+  head(10)
+```
+
+## Os tweaks
+
+A função `constroi_mapa_tematico` devolve um `ggplot2`, então ainda dá pra mexer em alguns parâmetros estéticos após a construção do mapa. As três coisas que vamos aprender a fazer são
+
+1. Adicionar labels e títulos
+
+```{r}
+dataset %>% 
+  constroi_mapa_tematico() +
+  ggtitle("Roubos de carros no Brasil em 2014") +
+  scale_fill_continuous(name = "Taxa/100 mil hab.")
+```
+
+2. Alterar as cores da escala
+
+```{r}
+dataset %>% 
+  constroi_mapa_tematico() +
+  ggtitle("Roubos de carros no Brasil em 2014") +
+  scale_fill_continuous(name = "Taxa/100 mil hab.", low = 'white', high = 'red',
+                        na.value = 'white')
+```
+
+3. Alterar valores
+
+```{r}
+dataset %>% 
+  constroi_mapa_tematico() +
+  ggtitle("Roubos de carros no Brasil em 2014") +
+  scale_fill_continuous(name = "Taxa/100 mil hab.", low = 'green', high = 'red',
+                        na.value = 'white', breaks = seq(0,300,50))
+```

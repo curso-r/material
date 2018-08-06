@@ -1,0 +1,147 @@
+---
+title: "Arrumando BDs: o pacote janitor"
+date: "2017-07-24T23:26:00+03:00"
+tags: ["BDs", "pacotes", "janitor"]
+categories: ["tutoriais", "r"]
+banner: "img/banners/janitor.jpg"
+author: ["William"]
+summary: "Neste post, apresentaremos o pacote janitor, uma ótima alternativa na hora de dar aquele trato na base de dados."
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, cache = TRUE)
+```
+
+[No primeiro post](http://curso-r.com/blog/2017/07/12/2017-07-13-bds_nomes_variaveis/) sobre arrumação de base de dados, a gente viu como usar as funções do `stringr` para arrumar o nome das variáveis. Seguindo a dica do [Julio](https://www.facebook.com/julio.trecenti), o quebrador de captchas, vamos falar do pacote `janitor`, que traz algumas funções para dar aquele trato nas BDs.
+
+Antes de mais nada, instale e carregue o pacote:
+
+```{r, eval = F}
+install.packages("janitor")
+devtools::install_github("sfirke/janitor") # Versão de desenvolvimento
+```
+
+```{r, message=FALSE}
+library(tidyverse)
+library(janitor)
+```
+
+## Arrumando o nome das variáveis
+
+Assim como no post passado, utilizaremos a base com informações de pacientes com arritmia cardíaca, cujas variáveis selecionadas foram:
+
+```{r, include=FALSE}
+dados <- readxl::read_excel("../../static/data/bds_nomes_variaveis/dados_nomes_variaveis.xlsx") %>% 
+  mutate(ID = 1:n()) %>% 
+  select(ID, everything())
+```
+
+
+```{r}
+dados %>% names
+```
+
+Os nomes têm letras maiúsculas, acentos, parênteses, pontos e barras, o que atrapalha na hora da programação. Para resolver esse problema, usamos a função `clean_names()`.
+
+```{r}
+dados %>% 
+  clean_names() %>% 
+  names
+```
+
+Veja que a função removeu os parênteses, pontos e barras e substituiu os espaços por `_`. No entanto, ela não remove os acentos. Assim, podemos adicionar mais uma linha ao pipeline para chegar onde queremos.
+
+```{r}
+dados %>%
+  clean_names() %>% 
+  names %>% 
+  abjutils::rm_accent()
+```
+
+E para substituir na base.
+
+```{r}
+nomes <- dados %>%
+  clean_names() %>% 
+  names %>% 
+  abjutils::rm_accent()
+
+names(dados) <- nomes
+```
+
+## Removendo linhas e colunas vazias
+
+```{r, include = FALSE}
+dados[3,] <- NA
+dados[3,1] <- 3
+```
+
+Esse banco de dados também tinha outro problema: linhas vazias. Na verdade, elas não eram completamente vazias, pois havia algumas informações de identificação do paciente, mas nenhuma outra variável tinha sido computada.
+
+```{r}
+dados[3,]
+```
+
+Essa foi a solução que eu pensei para resolver o problema utilizando a função `remove_empty_row()`.
+
+```{r}
+dados %<>% 
+  as.data.frame %>% 
+  `row.names<-`(dados$id) %>%
+  select(-id) %>% 
+  remove_empty_rows() %>% 
+  mutate(id = row.names(.)) %>%
+  select(id, everything())
+
+dados %>% as_tibble()
+```
+
+Eu precisei converter para `data.frame` primeiro porque não é possível definir os nomes das linhas de uma `tibble`. Se a linha estivesse completamente vazia, bastaria usar diretamente a função `remove_empty_rows()`.
+
+Equivalentemente para colunas, existe a função `remove_empty_cols()`.
+
+## Identificando linhas duplicadas
+
+O pacote `janitor` possui uma função para identificar entradas duplicadas numa base de dados: `get_dupes()`. Vamos criar uma base genérica para testá-la.
+
+```{r}
+
+p_nome <- c("Athos", "Daniel", "Fernando", "Julio", "William")
+sobrenome <- c("Damiani", "Falbel", "Corrêa", "Trecenti", "Amorim")
+
+base_qualquer <- tibble(nome = sample(p_nome, 25, replace = T),
+                        sobrenome = sample(sobrenome, 25, replace = T),
+                        variavel_importante = rnorm(25))
+
+get_dupes(base_qualquer, nome, sobrenome)
+```
+
+Todas as linhas na `tibble` resultante representam uma combinação de nome-sobrenome repetida.
+
+## Outras funções
+
+Por fim, o `janitor` também tem funções equivalentes à `table()` para produzir tabelas de frequência:
+
+- `tabyl()` - similar a `table()`, mas pipe-ável e com mais recursos.
+- `crosstab()` - para tabelas de contingência.
+- `adorn_totals()` - acrescenta o total das linhas ou colunas.
+- `adorn_crosstab()` - deixa tabelas de contingência mais bonitas.
+
+
+```{r}
+mtcars %>% 
+  tabyl(cyl)
+
+mtcars %>% 
+  tabyl(cyl) %>% 
+  adorn_totals
+
+mtcars %>% 
+  crosstab(cyl, am)
+
+mtcars %>% 
+  crosstab(cyl, am) %>% 
+  adorn_crosstab
+```
+
+É isso! Espero que essas dicas e o pacote `janitor` ajudem a agilizar as suas análises. Dúvidas, críticas ou sugestões, deixe um comentário ou nos envie uma mensagem. :)

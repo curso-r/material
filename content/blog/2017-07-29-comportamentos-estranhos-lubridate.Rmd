@@ -1,0 +1,154 @@
+---
+title: "Comportamentos imprevisíveis do lubridate"
+date: "2017-09-02T10:12:00+03:00"
+tags: ["tidyverse", "strings", "r", "data.frames", "bds"]
+categories: ["conceitos", "r"]
+banner: "img/banners/detetive.jpeg"
+author: ["Fernando"]
+summary: "R é uma linguagem maravilhosa. Ela possibilita uma ampla gama de aplicações interessantes. O seu maior trunfo está no rico ecossistema de pacotes, que são desenvolvidos e mantidos pela comunidade, sempre criativa na hora de lidar com os problemas. Entretanto, toda essa facilidade cobra um preço. Neste post vamos aprender que às vezes os programas não fazem exatamente o que estão dizendo que fazem."
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
+
+```
+
+```{r include=FALSE}
+dates_vector_1 <- c("22/08/2016","29/08/2016","05/09/2016","12/09/2016")
+
+dates_vector_2 <- c(rep("1", 500), dates_vector_1)
+
+dates_vector_3 <- c(rep("1", 800), dates_vector_1)
+
+library(lubridate)
+
+dmy(dates_vector_1)
+dmy(dates_vector_2)
+dmy(dates_vector_3)
+```
+
+Manter-se atualizado na parte mais computacional é muito importante para um estatístico. Essa convicção é bastante razoável, mas costuma gerar polêmica em alguns ciclos acadêmicos. Quem nunca se questionou se "(eu) deveria implementar esse Newton-Raphson ou usar um pacote de procedência duvidosa?" ou "escrever a matriz de delineamento é mesmo importante? O R já solta pra mim!" que atire a primeira pedra.
+
+Na minha opinião, esse tipo de discussão nasce morta. Ao mesmo tempo em que é importante conhecer bem a teoria que se aplica, o mundo é vasto e grandioso demais pra gastar tempo estudando detalhes técnicos de implementação de todas as coisas. Isso é óbvio, mas por outro lado "um pouco" de conhecimento sobre a parte suja do trabalho também é essencial em algumas situações. Se a sua base ficou grande demais para o R, todo o seu conhecimento de estatística pode ser inútil, porque o que te separa do sucesso é um bom gerenciamento dos recursos computacionais.
+
+Precisa existir um equilíbrio entre "apertar botões" e "reinventar a roda". Isso é óbvio, mas a parte triste da discussão é que esse equilíbrio pode ser difícil de alcançar. 
+
+Existem muitas versões da discussão entre estatísticos-computeiros e estatísticos-papel-e-caneta. Uma delas, que será tema deste post, parte da questão "Eu deveria implementar todas as minhas funções ou usar as guloseimas tecnológicas disponíveis no CRAN?". De um lado, os apóstolos do `tidyverse`, como a própria `Curso-R`, defendem e divulgam os avanços proporcionados por ferramentas que computam em altíssimo nível. Os estatísticos mais caxias gostam de implementar todas as contas e funções que foram utilizar, o que provoca alguns hábitos estranhos. Os tipos mais radicais invertem matrizes em Fortran, não acreditam na função `quantile` e não raramente são afeitos à teorias da conspiração.
+
+Como sempre, nenhum dos dois lados está 100% correto, mas na última semana me deparei com um problema que me fez sentir mais próximo do mais radical dos xiitas.
+
+## O problema
+
+Considere que você precisa carregar um vetor de datas que vieram do Excel. Pulando a parte de leitura e as soluções que poderiam vir do bom uso de pacotes como `readxl` e `openxlsx`, considere que o problema prático consiste em converter, já no R, o seguinte vetor de textos num vetor de datas.
+
+```{r}
+
+exemplo_1 <- c("22/08/2016","29/08/2016", "05/09/2016","12/09/2016")
+
+```
+
+Quem usa o `tidyverse` faria isso usando a função `dmy` do pacote `lubridate`:
+
+```{r}
+
+lubridate::dmy(exemplo_1)
+
+```
+
+e o resultado seria exatamente o que a gente quer. O que aconteceu comigo, entretanto, foi um comportamento inesperado num exemplo muito parecido com esse. 
+
+Por conta da formatação irregular de um arquivo de Excel, me deparei com um vetor parecido com esse `o_que_observei`:
+
+```{r}
+
+repeticoes <- 800
+o_que_observei <- c(rep("39419", repeticoes), "22/08/2016","29/08/2016", "05/09/2016","12/09/2016")
+
+```
+
+Eu imaginava que, quando `repeticoes` valesse 800, o resultado fosse o mesmo que acontece quando `repeticoes` vale 1, mas esse não é o caso.
+
+Primeiro, vamos o que acontece quando `repeticoes` vale 1:
+
+```{r}
+
+exemplo_2 <- c("39419", "22/08/2016","29/08/2016", "05/09/2016","12/09/2016")
+
+```
+
+O `lubridate` não é esperto o suficiente para perceber que a primeira entrada representa uma data com origem no dia "30/12/1899" (a data padrão em Excel's de Windows), mas tudo aquilo que ele não sabe como converter vira um `NA`.
+
+```{r}
+lubridate::dmy(exemplo_2)
+```
+
+Agora, veja só o que acontece quando fazemos a mesma coisa no meu exemplo:
+
+```{r}
+lubridate::dmy(o_que_observei)
+```
+
+O resultado é bastante estranho. Embora as últimas entradas do vetor sejam datas num formato conhecido, não é isso que a função retorna.
+
+# A investigação
+
+Me perguntando sobre o que aconteceu, eu resolvi criar uma [issue](http://127.0.0.1:4321/blog/2017/07/29/2017-07-29-comportamentos-estranhos-lubridate/) no pacote `lubridate`.
+
+> Consider the following vectors: 
+> 
+> ```
+> dates_vector_1 <- c("22/08/2016","29/08/2016","05/09/2016","12/09/2016")
+> dates_vector_2 <- c(rep("1", 500), dates_vector_1)
+> dates_vector_3 <- c(rep("1", 800), dates_vector_1)
+> ```
+> 
+> `dmy` fails to detect formats on the third, even though it's capable of finding it on the second.
+> 
+> ```
+> library(lubridate)
+> 
+> dmy(dates_vector_1)
+> dmy(dates_vector_2)
+> dmy(dates_vector_3)
+> ```
+>
+> Is this supposed to happen? If it is, why?
+
+A resposta do `vspinu`, pricipal contribuidor do `lubridate` hoje, me respondeu muito rapidamente!
+
+> This is a consequence of guessing formats based on a deterministic sub-sample of the original vector. This issue was aleviated somewhat recently, but it's impossible to solve efficiently without dropping format guesser to C level. Not something which I would consider in the future.
+> 
+> See #307 #308. You can disable guesser with parse_date_time and train=FALSE.
+
+Case solved! O problema é a `parse_date_time`, que é usada por trás do `dmy`. Antes de converter, o `lubridate` adivinha quais são os formatos, que usa apenas [um pedaço do vetor](https://github.com/tidyverse/lubridate/issues/307).
+
+# A solução
+
+A solução proposta pelo `vspinu` não funcionou no meu caso.
+
+```{r, eval = F}
+
+parse_date_time(o_que_observei, train = T, orders = 'dmy')
+```
+
+O `parse_date_time` continua não reconhecendo as últimas entradas do meu vetor como datas, mesmo com o `train = FALSE`. 
+
+Para não gastar muito tempo, terminei fazendo um gato pra resolver o meu problema.
+
+```{r}
+novo <- c("01/01/2001", o_que_observei)
+
+solucao <- dmy(novo)[-1]
+
+solucao
+```
+
+# Conclusão
+
+A eterna disputa entre os que sabem exatamente o que acontece por trás dos programas e aqueles que não sabem vai continuar eternamente. Como disseram numa das issues que mencionei neste texto
+
+> Obviously there is no mathematical solution without inspecting the full vector that won't run into edge cases.
+
+Mas isso não deve ser motivo para se isolar numa caverna. Sempre podemos olhar com cuidado para as soluções que implementamos e entrar em contato com os desenvolvedores das nossas ferramentas.
+
+Por hoje, espero que esse problema específico sobre o `lubridate` esteja esclarecido e que ninguém fique com medo de usar a infinitude de pacotes de R. Como vimos aqui, mesmo que a princípios as coisas sejam obscuras, sempre podemos buscar mais informações sobre a implementação de uma função.

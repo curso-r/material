@@ -1,0 +1,237 @@
+---
+title: "PDF e OCR"
+date: "2017-05-28T13:07:31+02:00"
+tags: ["pdf", "pacotes", "ocr"]
+categories: ["tutoriais", "r"]
+banner: "img/banners/pdf-to-text.jpg"
+author: ["Julio"]
+draft: false
+summary: "Já precisou extrair dados de arquivos pdf? Bom, eu já. Eu trabalho com jurimetria e preciso extrair dados de diários oficiais, petições, sentenças, então já viu né... A primeira pergunta que você precisa fazer antes de ler um pdf é: o arquivo é digital ou digitalizado?"
+---
+
+
+
+<p>Já precisou extrair dados de arquivos pdf? Bom, eu já. Eu trabalho com <a href="http://abj.org.br">jurimetria</a> e preciso extrair dados de diários oficiais, petições, sentenças, então já viu né…</p>
+<p>A primeira pergunta que você precisa fazer antes de ler um pdf é: o arquivo é <em>digital</em> ou <em>digitalizado</em>?</p>
+<ul>
+<li>Se for digital, significa que ele pode ser transcrito diretamente para vários formatos: texto, html, xml e até mesmo <code>data.frame</code>s diretamente.</li>
+</ul>
+<p><a href="/data/ocr/pdf_digital.pdf">Vamos usar esse exemplo de PDF digital</a></p>
+<p>Se estiver no desktop, é possível ver o documento abaixo:</p>
+<object data="/data/ocr/pdf_digital.pdf" width="100%" height="375" type="application/pdf">
+</object>
+<ul>
+<li>Se for digitalizado, você precisará passar um algoritmo de OCR (Optical Character Recognition) para extrair os dados. Provavelmente seu output nesse caso será sempre texto.</li>
+</ul>
+<p><a href="/data/ocr/pdf_digitalizado.pdf">Vamos usar esse exemplo de PDF digitalizado</a></p>
+<p>Se estiver no desktop, é possível ver o documento abaixo:</p>
+<object data="/data/ocr/pdf_digitalizado.pdf" width="100%" height="375" type="application/pdf">
+</object>
+<p><strong>Obs:</strong> é possível que seu arquivo seja digitalizado, mas já com uma OCR passada no próprio arquivo. Nesse caso, você pode tratar o documento como digital.</p>
+<p>Os créditos dos pacotes abaixo vão todos para o <a href="https://github.com/jeroen">Jeroen Ooms</a>, um dos maiores autores de pacotes da comunidade <code>R</code> nos últimos dez anos. Sou fã desse cara!</p>
+<section id="pacote-pdftools-para-pdfs-digitais" class="level2">
+<h2>Pacote <code>pdftools</code> para PDFs digitais</h2>
+<p>Para instalar o <code>pdftools</code> no Windows e no Mac, basta rodar</p>
+<pre class="r"><code>install.packages(&quot;pdftools&quot;)</code></pre>
+<p>Para instalar no Linux, siga as instruções <a href="https://github.com/ropensci/pdftools">desse link</a>.</p>
+<section id="pdf-para-texto" class="level3">
+<h3>PDF para texto</h3>
+<pre class="r"><code>library(tidyverse)
+library(stringr)
+library(pdftools)
+pdf &lt;- &#39;../../static/data/ocr/pdf_digital.pdf&#39;
+txt &lt;- pdf_text(pdf)
+
+# imprimindo só os 500 primeiros caracteres da primeira página
+cat(str_trunc(txt[1], 500))
+## TJ/SP - Comarca de São Paulo
+## Movimento Judiciário
+## Referência: Janeiro de 2011
+## Foro: ADAMANTINA
+## Unidade: 02 CUMULATIVA
+## Planilha: CIVEL
+## Dados da Unidade
+## 1. Total de feitos em andamento                                           2756
+## 2. Precatórias                                                               6
+## 3. Processos
+##    3.1 Processos cíveis                                                   2078
+##      3.1.1 De Conhecimento                                                1111
+##    3.1.2 De Execu...</code></pre>
+</section>
+<section id="pdf-para-html-ou-xml" class="level3">
+<h3>PDF para HTML ou XML</h3>
+<p>Muitas vezes queremos pegar estruturas no texto que dependem da posição dos elementos. Por exemplo, o texto em um PDF pode estar dividido em várias colunas. Para isso, o ideal seria transformar o arquivo em dados semi-estruturados como HTML ou XML, que separam os elementos do conteúdo do PDF em <em>tags</em>.</p>
+<p>Infelizmente, o <code>pdftools</code> ainda não transforma em HTML nem XML. Para soltar um HTML, vamos montar uma função que chama <code>pdftohtml</code> do <code>poppler</code> por command line.</p>
+<pre class="r"><code>pdf_html &lt;- function(pdf) {
+  infos &lt;- pdf_info(pdf)              # pega infos do pdf
+  html &lt;- tempfile(fileext = &#39;.html&#39;) # cria arquivo temporário
+  
+  # monta comando a ser executado. 
+  # não sei se funciona em Windows ;)
+  command &lt;- sprintf(&#39;pdftohtml -f 1 -l %s -q -i -s -noframes %s %s&#39;, 
+                     infos$pages,
+                     normalizePath(pdf),
+                     html)
+  
+  system(command)                     # roda comando e salva
+  txt &lt;- readr::read_file(html)       # lê arquivo salvo
+  file.remove(html)                   # remove arquivo temporário
+  txt
+}</code></pre>
+<p>Você pode brincar com o HTML usando o pacote <code>rvest</code>:</p>
+<pre class="r"><code>library(rvest)</code></pre>
+<pre class="r"><code>html &lt;- pdf_html(pdf)</code></pre>
+<pre class="r"><code>html %&gt;% 
+  read_html() %&gt;% 
+  html_nodes(&#39;div&#39;) %&gt;% 
+  head()
+## {xml_nodeset (6)}
+## [1] &lt;div id=&quot;page1-div&quot; style=&quot;position:relative;width:1263px;height:892 ...
+## [2] &lt;div id=&quot;page2-div&quot; style=&quot;position:relative;width:1263px;height:892 ...
+## [3] &lt;div id=&quot;page3-div&quot; style=&quot;position:relative;width:1263px;height:892 ...
+## [4] &lt;div id=&quot;page4-div&quot; style=&quot;position:relative;width:1263px;height:892 ...
+## [5] &lt;div id=&quot;page5-div&quot; style=&quot;position:relative;width:1263px;height:892 ...
+## [6] &lt;div id=&quot;page6-div&quot; style=&quot;position:relative;width:1263px;height:892 ...</code></pre>
+</section>
+<section id="pdf-para-tabelas" class="level3">
+<h3>PDF para tabelas</h3>
+<p>Use o <code>tabulizer</code>! Apesar de depender do odiado <code>rJava</code> (que é um pacote chato de instalar e configurar) o <code>tabulizer</code> é capaz de extrair os dados diretamente para tabelas, de forma simples e intuitiva.</p>
+<p>Para instalar o <code>tabulizer</code>, siga as instruções <a href="https://github.com/ropensci/tabulizer">dessa página</a>. Já adianto que pode não ser uma tarefa fácil, principalmente por conta do <code>rJava</code>.</p>
+<p><strong>Exemplo</strong>: Uma vez montei esse código para estruturar um pdf contendo gastos em obras públicas. Além de usar o <code>tabulizer</code>, usei os pacotes usuais do <code>tidyverse</code> e a função <code>abjutils::rm_accent()</code> para tirar os acentos do texto.</p>
+<pre class="r"><code>library(tabulizer)</code></pre>
+<p>Vamos usar <a href="https://github.com/curso-r/site/raw/master/content/blog/2017-05-27-ocr/pdf_compras.pdf">esse pdf de exemplo</a>.</p>
+<p>Se estiver no desktop, é possível ver o documento abaixo:</p>
+<object data="/blog/2017-05-27-ocr/pdf_compras.pdf" width="100%" type="application/pdf" height="375">
+</object>
+<pre class="r"><code># No meu pc demorou 40 segundos.
+tab &lt;- extract_tables(&#39;../../static/data/ocr/pdf_compras.pdf&#39;)</code></pre>
+<p>Essa função serve para arrumar os nomes zoados que vêm no arquivo:</p>
+<pre class="r"><code>arrumar_nomes &lt;- function(x) {
+  x %&gt;% 
+    tolower() %&gt;% 
+    str_trim() %&gt;% 
+    str_replace_all(&#39;[[:space:]]+&#39;, &#39;_&#39;) %&gt;% 
+    str_replace_all(&#39;%&#39;, &#39;p&#39;) %&gt;% 
+    str_replace_all(&#39;r\\$&#39;, &#39;&#39;) %&gt;% 
+    abjutils::rm_accent()
+}</code></pre>
+<p>Agora veja a magia do <code>tidyverse</code> posta em prática:</p>
+<pre class="r"><code>tab_tidy &lt;- tab %&gt;% 
+  # transforma matrizes em tibbles
+  map(as_tibble) %&gt;% 
+  # empilha
+  bind_rows() %&gt;% 
+  # arruma nomes a partir da primeira linha
+  set_names(arrumar_nomes(.[1,])) %&gt;%
+  # tira primeira linha
+  slice(-1) %&gt;% 
+  # tira espaços extras
+  mutate_all(funs(str_replace_all(., &#39;[[:space:]]+&#39;, &#39; &#39;))) %&gt;% 
+  # tira espaços nas bordas
+  mutate_all(str_trim) </code></pre>
+<p>A Tabela <a href="#tab:tabela">1</a> mostra as primeiras cinco linhas do resultado.</p>
+<table>
+<caption><span id="tab:tabela">Table 1: </span>Base arrumada a partir de arquivo pdf, usando o pacote tabulizer.</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">uf</th>
+<th style="text-align: left;">municipios_atendidos</th>
+<th style="text-align: left;">tipo</th>
+<th style="text-align: left;">subtipo</th>
+<th style="text-align: left;">nome_do_empreendimento</th>
+<th style="text-align: left;">p_de_execucao</th>
+<th style="text-align: left;">total_pac__milhoes</th>
+<th style="text-align: left;">orgao</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">BA</td>
+<td style="text-align: left;">ILHÉUS/BA</td>
+<td style="text-align: left;">Aeroporto</td>
+<td style="text-align: left;">Terminal de Passageiros</td>
+<td style="text-align: left;">Aeroporto de Ilhéus - PROJETO DE INFRAESTRUTURA E IMPLANTAÇÃO DO MOP</td>
+<td style="text-align: left;">Menor que 50%</td>
+<td style="text-align: left;">2,1</td>
+<td style="text-align: left;">Empresa Brasileira de Infraestrutura Aeroportuária</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">PR</td>
+<td style="text-align: left;">LONDRINA/PR</td>
+<td style="text-align: left;">Aeroporto</td>
+<td style="text-align: left;">Terminal de Passageiros</td>
+<td style="text-align: left;">Aeroporto de Londrina - IMPLANTAÇÃO DO MÓDULO OPERACIONAL - MOP NO PROCESSAMENTO DE EMBARQUE</td>
+<td style="text-align: left;">Maior que 50%</td>
+<td style="text-align: left;">4,0</td>
+<td style="text-align: left;">Empresa Brasileira de Infraestrutura Aeroportuária</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">PA</td>
+<td style="text-align: left;">MARABÁ/PA</td>
+<td style="text-align: left;">Aeroporto</td>
+<td style="text-align: left;">Terminal de Passageiros</td>
+<td style="text-align: left;">Aeroporto de Marabá - REFORMA COM AMPLIAÇÃO DO TPS EXISTENTE</td>
+<td style="text-align: left;">Maior que 50%</td>
+<td style="text-align: left;">7,1</td>
+<td style="text-align: left;">Empresa Brasileira de Infraestrutura Aeroportuária</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">CE</td>
+<td style="text-align: left;">ACOPIARA/CE</td>
+<td style="text-align: left;">Centro de Artes e Esportes Unificados</td>
+<td style="text-align: left;">Modelo 3000m²</td>
+<td style="text-align: left;">Praças - Acopiara - CE - Modelo 3000m²</td>
+<td style="text-align: left;">Menor que 50%</td>
+<td style="text-align: left;">2,0</td>
+<td style="text-align: left;">Ministério da Cultura</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">SP</td>
+<td style="text-align: left;">AMERICANA/SP</td>
+<td style="text-align: left;">Centro de Artes e Esportes Unificados</td>
+<td style="text-align: left;">Modelo 3000m²</td>
+<td style="text-align: left;">Praças - Americana - SP - Modelo 3000m²</td>
+<td style="text-align: left;">Menor que 50%</td>
+<td style="text-align: left;">2,4</td>
+<td style="text-align: left;">Ministério da Cultura</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="pacote-tesseract-para-pdfs-digitalizados" class="level2">
+<h2>Pacote <code>tesseract</code> para PDFs digitalizados</h2>
+<p>O <code>tesseract</code> é uma biblioteca escrita em <code>C</code> e é uma das mais famosas ferramentas abertas para extração de textos a partir de imagens. O pacote em <code>R</code> de mesmo nome serve para usar essa biblioteca pelo <code>R</code> sem causar dores de cabeça.</p>
+<p>Para instalar o <code>tesseract</code> no Windows, basta rodar</p>
+<pre class="r"><code>install.packages(&#39;tesseract&#39;)</code></pre>
+<p>Para Mac e Linux, siga as instruções <a href="https://github.com/ropensci/tesseract">dessa página</a>.</p>
+<p>A principal função do pacote <code>tesseract</code> é a <code>ocr()</code>. Seu input é o caminho de uma imagem (pdf, jpeg, tiff, entre outras) e seu output é um texto. Logo, nosso primeiro passo é transformar o pdf em imagem.</p>
+<pre class="r"><code>pdf &lt;- &#39;../../static/data/ocr/pdf_digitalizado.pdf&#39;
+img &lt;- pdf_render_page(
+  pdf = pdf,    # caminho do arquivo
+  page = 1,     # índice da página
+  dpi = 300     # resolução (pontos por polegada)
+)
+
+# salvando imagem num arquivo png
+png::writePNG(img, &#39;../../static/data/ocr/pdf_digitalizado_img.png&#39;)</code></pre>
+<p>Se o PDF tiver mais páginas, você pode fazer um loop para salvar várias imagens. Agora, usamos a função <code>ocr()</code> no arquivo salvo.</p>
+<pre class="r"><code>library(tesseract)
+txt &lt;- ocr(&#39;../../static/data/ocr/pdf_digitalizado_img.png&#39;)
+
+# imprimindo só os 300 primeiros caracteres do resultado
+cat(str_trunc(txt, 300))</code></pre>
+<pre><code>## This is a sample document to test the PDF Image+Text OCR Engine.
+## This is a sample document to test the PDF Image+Text OCR Engine.
+## This is a sample document to test the PDF Image+Text OCR Engine.
+## This is a sample document to test the PDF Image+Text OCR Engine.
+## This is a sample document to test the...</code></pre>
+</section>
+<section id="wrap-up" class="level2">
+<h2>Wrap-up</h2>
+<ul>
+<li>Se seu pdf for digital, use <code>pdftools::pdf_text()</code>.</li>
+<li>Se seu pdf for digitalizado, use <code>pdftools::pdf_render_page()</code>, depois <code>png::writePNG()</code> e por fim <code>tesseract::ocr()</code>.</li>
+</ul>
+<p>É isso. Happy coding ;)</p>
+</section>

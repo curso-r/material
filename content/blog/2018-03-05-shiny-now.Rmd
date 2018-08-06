@@ -1,0 +1,151 @@
+---
+title: "Hospedando seu Shiny app no now"
+date: "2018-03-05T14:25:00+03:00"
+tags: ["shiny"]
+categories: ["tutoriais", "r"]
+banner: "img/banners/shiny-now.png"
+author: ["Daniel"]
+summary: "Neste post você aprenderá a hospedar o seu shiny app usando Docker e o serviço now.sh."
+draft: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, 
+                      cache = TRUE, 
+                      eval = FALSE)
+```
+
+Existem diversas formas de hospedar o seu app feito [em shiny](https://shiny.rstudio.com). A maneira mais simples é usando o [shinyapps.io](http://www.shinyapps.io), SaaS desenvolvido pela própria RStudio. No entanto, na versão Free o seu app fica com um logotipo do RStudio no canto e não é permitido configurar um domínio próprio, ou seja, a url do seu app sempre vai ser algo do tipo: `dfalbel.shinyapps.io/meuapp`.
+
+Uma alternativa gratuita e que não possui essas contra-partidas é usar o serviço [now.sh](https://zeit.co/now). O [now](https://zeit.co/now), originalmente, foi desenvolvido para hospedar aplicativos feitos em nodejs e javascript, mas recentemente eles possibilitaram a hospedagem de aplicativos feitos com [Docker](https://www.docker.com).
+
+Além dessas vantagens o now conta com infraestrutura, segundo os desenvolvedores "auto scaling ready", isto é o número de instâncias servindo o seu aplicativo pode variar de acordo com tráfego que o seu app está recebendo. No plano free o número de instâncias pode ser 0 ou 1, ou seja, seu app fica desligado se ninguém estiver usando. Nos [planos pagos](https://zeit.co/account/plan) você pode fazer esse número variar da forma que quiser. Tudo isso está na [documentação](https://zeit.co/docs/getting-started/scaling). 
+
+É difícil explicar o que é o [Docker](https://www.docker.com) em poucas palavras, mas ele é uma plataforma de containers que facilita a configuração e preparação do ambiente para a hospedagem de um app. Em outras palavras, você escreve em um arquivo chamado `Dockerfile` especificando como você quer que seja o ambiente, o que você precisa instalar, que arquivos você quer colocar lá dentro. Para este tutorial você só precisará fazer pequenas modificações no `Dockerfile` e não precisará entender profundamente como ele funciona.
+
+### Instalação:
+
+Para seguir o tutorial você precisa instalar o [now](https://zeit.co/now) e criar uma conta. Siga [este link](https://zeit.co/download) para instalação e configuração do [now](https://zeit.co/now).
+
+### Estrutura do projeto
+
+[Esse repositório](https://github.com/curso-r/shiny-now) contém um exemplo simples funcionando do que iremos detalhar agora. Crie uma pasta no seu computador ou um projeto no RStudio com a seguinte estrutura:
+
+```
+.
+├── Dockerfile
+├── app
+│   └── app.R
+├── app.R
+└── shiny-now.Rproj
+```
+
+`Dockerfile` é um arquivo de texto vazio por enquanto. Dentro da pasta `app` coloque o seu app shiny. No meu exemplo coloquei um shiny com apenas umarquivo `app.R`, mas nada impede você de colocar um shiny com a estrtura mais comum (um arquivo `ui.R` e um arquivo `server.R`).
+
+### Dockerfile
+
+`Dockerfile`s podem ser referenciados a outras imagens docker. Existe uma imagem chamada [rocker/shiny](https://hub.docker.com/r/rocker/shiny/) que já deixa quase tudo preparado para hospedar um app shiny, por isso em nosso Dockerfile vamos incluir a linha:
+
+```
+FROM rocker/shiny
+```
+
+Em seguida vamos indicar as instruções para instalação dos pacotes do R que são usados no shiny. No meu caso, como o app não faz praticamente nada, só usei o pacote `shinydashboard` por isso a próxima linha do meu `Dockerfile` é apenas:
+
+```
+RUN R -e "install.packages(c('shinydashboard'), repos='https://cran.rstudio.com/')"
+```
+
+Se você precisar instalar mais pacotes basta colocar o nome deles no comando acima, por exemplo:
+
+```
+RUN R -e "install.packages(c('shinydashboard', 'tidyverse'), repos='https://cran.rstudio.com/')"
+```
+
+Feito isso, o próximo comando do `Dockerfile` é o `COPY` que serve para indicar para o [Docker](https://www.docker.com) quais arquivos da pasta devem ser copiados para dentro do ambiente de hospedagem e para qual pasta dentro do novo ambiente eles devem copiados. No nosso caso, queremos copiar a pasta `app` para dentro da pasta `/srv/shiny-server/` (que é por padrão a pasta em que o Shiny Server procura por apps). Para fazer isso, adicionamos a linha:
+
+```
+COPY /app/ /srv/shiny-server/
+```
+
+No final, o nosso `Dockerfile` contém apenas 3 linhas:
+
+```
+FROM rocker/shiny
+RUN R -e "install.packages(c('shinydashboard'), repos='https://cran.rstudio.com/')"
+COPY /app/ /srv/shiny-server/
+```
+
+### App
+
+Dentro da pasta app, coloque o seu código shiny. A princípio, você não precisa fazer nenhuma modificação.
+No meu exemplo, coloquei o arquivo `app.R` contendo um aplicativo usando o [`shinydashboard` (copiado da documentação do pacote)](https://rstudio.github.io/shinydashboard/get_started.html).
+
+O conteúdo do arquivo do arquivo `app.R` está abaixo:
+
+```
+library(shinydashboard)
+
+ui <- dashboardPage(
+  dashboardHeader(title = "Basic dashboard"),
+  dashboardSidebar(),
+  dashboardBody(
+    # Boxes need to be put in a row (or column)
+    fluidRow(
+      box(plotOutput("plot1", height = 250)),
+      
+      box(
+        title = "Controls",
+        sliderInput("slider", "Number of observations:", 1, 100, 50)
+      )
+    )
+  )
+)
+
+server <- function(input, output) {
+  set.seed(122)
+  histdata <- rnorm(500)
+  
+  output$plot1 <- renderPlot({
+    data <- histdata[seq_len(input$slider)]
+    hist(data)
+  })
+}
+
+shinyApp(ui, server)
+```
+
+### Chamando o now
+
+Se você configurou o [now](https://zeit.co/now) corretamente essa será a parte mais fácil. Basta abrir um terminal e rodar `now`.
+
+Ele vai soltar uma mensagem parecida com a abaixo:
+
+```
+Daniels-MacBook-Air:shiny-now dfalbel$ now
+> Deploying ~/Documents/shiny-now under dfalbel@curso-r.com
+> Your deployment's code and logs will be publicly accessible because you are subscribed to the OSS plan.
+> > NOTE: You can use `now --public` or upgrade your plan (https://zeit.co/account/plan) to skip this prompt
+> Ready! https://shiny-now-zoyrrtdqwv.now.sh (copied to clipboard) [5s]
+> Synced 1 file (131B) [5s]
+> Initializing…
+> Building
+> ▲ docker build
+Sending build context to Docker daemon 6.656 kBkB
+> ▲ Deploying image
+> ▲ Container started
+> [2018-03-05T20:48:12.696] [INFO] shiny-server - Shiny Server v1.5.7.883 (Node.js v6.10.3)
+> [2018-03-05T20:48:12.701] [INFO] shiny-server - Using config file "/etc/shiny-server/shiny-server.conf"
+> [2018-03-05T20:48:12.780] [WARN] shiny-server - Running as root unnecessarily is a security risk! You could be running more securely as non-root.
+> [2018-03-05T20:48:12.788] [INFO] shiny-server - Starting listener on 0.0.0.0:3838
+> Deployment complete!
+```
+
+Na sexta linha dessa mensagem, temos o endereço do nosso aplicativo. Basta abrir essa url no navegador e ver o aplicativo funcionando. Por enquanto, o  [now](https://zeit.co/now) colocou um endereço para testes, mas tudo isso é configurável. 
+
+Para mudar a url do seu app você vai precisar usar o comando `now alias`. A documentação desse comando é muito boa e vai ser melhor do que qualquer coisa que eu escrever aqui. Vá para [este link](https://zeit.co/docs/features/aliases)!
+
+### Conclusão
+
+O [now](https://zeit.co/now) é um serviço gratuito que permite a hospedagem de containers [Docker](https://www.docker.com). Neste post configuramos um Dockerfile para instalar hospedar um app shiny e usando o comando `now` rapidamente enviamos o nosso aplicativo para o now e iniciamos a hospedagem. 
+

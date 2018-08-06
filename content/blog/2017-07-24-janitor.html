@@ -1,0 +1,166 @@
+---
+title: "Arrumando BDs: o pacote janitor"
+date: "2017-07-24T23:26:00+03:00"
+tags: ["BDs", "pacotes", "janitor"]
+categories: ["tutoriais", "r"]
+banner: "img/banners/janitor.jpg"
+author: ["William"]
+summary: "Neste post, apresentaremos o pacote janitor, uma ótima alternativa na hora de dar aquele trato na base de dados."
+---
+
+
+
+<p><a href="http://curso-r.com/blog/2017/07/12/2017-07-13-bds_nomes_variaveis/">No primeiro post</a> sobre arrumação de base de dados, a gente viu como usar as funções do <code>stringr</code> para arrumar o nome das variáveis. Seguindo a dica do <a href="https://www.facebook.com/julio.trecenti">Julio</a>, o quebrador de captchas, vamos falar do pacote <code>janitor</code>, que traz algumas funções para dar aquele trato nas BDs.</p>
+<p>Antes de mais nada, instale e carregue o pacote:</p>
+<pre class="r"><code>install.packages(&quot;janitor&quot;)
+devtools::install_github(&quot;sfirke/janitor&quot;) # Versão de desenvolvimento</code></pre>
+<pre class="r"><code>library(tidyverse)
+library(janitor)</code></pre>
+<section id="arrumando-o-nome-das-variaveis" class="level2">
+<h2>Arrumando o nome das variáveis</h2>
+<p>Assim como no post passado, utilizaremos a base com informações de pacientes com arritmia cardíaca, cujas variáveis selecionadas foram:</p>
+<pre class="r"><code>dados %&gt;% names
+##  [1] &quot;ID&quot;                   &quot;Sexo&quot;                 &quot;Nascimento&quot;          
+##  [4] &quot;Idade&quot;                &quot;Inclusão&quot;             &quot;Cor&quot;                 
+##  [7] &quot;Peso&quot;                 &quot;Altura&quot;               &quot;cintura&quot;             
+## [10] &quot;IMC&quot;                  &quot;Superfície corporal&quot;  &quot;Tabagismo&quot;           
+## [13] &quot;cg.tabag (cig/dia)&quot;   &quot;Alcool (dose/semana)&quot; &quot;Drogas ilícitas&quot;     
+## [16] &quot;Cafeína/dia&quot;          &quot;Refrig/dia&quot;           &quot;Sedentario&quot;          
+## [19] &quot;ativ. Fisica&quot;</code></pre>
+<p>Os nomes têm letras maiúsculas, acentos, parênteses, pontos e barras, o que atrapalha na hora da programação. Para resolver esse problema, usamos a função <code>clean_names()</code>.</p>
+<pre class="r"><code>dados %&gt;% 
+  clean_names() %&gt;% 
+  names
+##  [1] &quot;id&quot;                  &quot;sexo&quot;                &quot;nascimento&quot;         
+##  [4] &quot;idade&quot;               &quot;inclusão&quot;            &quot;cor&quot;                
+##  [7] &quot;peso&quot;                &quot;altura&quot;              &quot;cintura&quot;            
+## [10] &quot;imc&quot;                 &quot;superfície_corporal&quot; &quot;tabagismo&quot;          
+## [13] &quot;cg_tabag_cig_dia&quot;    &quot;alcool_dose_semana&quot;  &quot;drogas_ilícitas&quot;    
+## [16] &quot;cafeína_dia&quot;         &quot;refrig_dia&quot;          &quot;sedentario&quot;         
+## [19] &quot;ativ_fisica&quot;</code></pre>
+<p>Veja que a função removeu os parênteses, pontos e barras e substituiu os espaços por <code>_</code>. No entanto, ela não remove os acentos. Assim, podemos adicionar mais uma linha ao pipeline para chegar onde queremos.</p>
+<pre class="r"><code>dados %&gt;%
+  clean_names() %&gt;% 
+  names %&gt;% 
+  abjutils::rm_accent()
+##  [1] &quot;id&quot;                  &quot;sexo&quot;                &quot;nascimento&quot;         
+##  [4] &quot;idade&quot;               &quot;inclusao&quot;            &quot;cor&quot;                
+##  [7] &quot;peso&quot;                &quot;altura&quot;              &quot;cintura&quot;            
+## [10] &quot;imc&quot;                 &quot;superficie_corporal&quot; &quot;tabagismo&quot;          
+## [13] &quot;cg_tabag_cig_dia&quot;    &quot;alcool_dose_semana&quot;  &quot;drogas_ilicitas&quot;    
+## [16] &quot;cafeina_dia&quot;         &quot;refrig_dia&quot;          &quot;sedentario&quot;         
+## [19] &quot;ativ_fisica&quot;</code></pre>
+<p>E para substituir na base.</p>
+<pre class="r"><code>nomes &lt;- dados %&gt;%
+  clean_names() %&gt;% 
+  names %&gt;% 
+  abjutils::rm_accent()
+
+names(dados) &lt;- nomes</code></pre>
+</section>
+<section id="removendo-linhas-e-colunas-vazias" class="level2">
+<h2>Removendo linhas e colunas vazias</h2>
+<p>Esse banco de dados também tinha outro problema: linhas vazias. Na verdade, elas não eram completamente vazias, pois havia algumas informações de identificação do paciente, mas nenhuma outra variável tinha sido computada.</p>
+<pre class="r"><code>dados[3,]
+## # A tibble: 1 x 19
+##      id sexo  nascimento          idade inclusao            cor    peso
+##   &lt;dbl&gt; &lt;chr&gt; &lt;dttm&gt;              &lt;dbl&gt; &lt;dttm&gt;              &lt;chr&gt; &lt;dbl&gt;
+## 1  3.00 &lt;NA&gt;  NA                     NA NA                  &lt;NA&gt;     NA
+## # ... with 12 more variables: altura &lt;dbl&gt;, cintura &lt;chr&gt;, imc &lt;dbl&gt;,
+## #   superficie_corporal &lt;chr&gt;, tabagismo &lt;chr&gt;, cg_tabag_cig_dia &lt;dbl&gt;,
+## #   alcool_dose_semana &lt;dbl&gt;, drogas_ilicitas &lt;chr&gt;, cafeina_dia &lt;dbl&gt;,
+## #   refrig_dia &lt;dbl&gt;, sedentario &lt;chr&gt;, ativ_fisica &lt;chr&gt;</code></pre>
+<p>Essa foi a solução que eu pensei para resolver o problema utilizando a função <code>remove_empty_row()</code>.</p>
+<pre class="r"><code>dados %&lt;&gt;% 
+  as.data.frame %&gt;% 
+  `row.names&lt;-`(dados$id) %&gt;%
+  select(-id) %&gt;% 
+  remove_empty_rows() %&gt;% 
+  mutate(id = row.names(.)) %&gt;%
+  select(id, everything())
+
+dados %&gt;% as_tibble()
+## # A tibble: 4 x 19
+##   id    sexo  nascimento          idade inclusao            cor     peso
+##   &lt;chr&gt; &lt;chr&gt; &lt;dttm&gt;              &lt;dbl&gt; &lt;dttm&gt;              &lt;chr&gt;  &lt;dbl&gt;
+## 1 1     F     1964-01-31 00:00:00  41.0 2006-02-17 00:00:00 branca  75.0
+## 2 2     M     1959-01-28 00:00:00  45.0 2005-11-29 00:00:00 negra   71.0
+## 3 4     M     1957-09-13 00:00:00  50.0 2008-02-13 00:00:00 NT      80.0
+## 4 5     F     1938-02-06 00:00:00  71.0 2009-06-25 00:00:00 parda   56.0
+## # ... with 12 more variables: altura &lt;dbl&gt;, cintura &lt;chr&gt;, imc &lt;dbl&gt;,
+## #   superficie_corporal &lt;chr&gt;, tabagismo &lt;chr&gt;, cg_tabag_cig_dia &lt;dbl&gt;,
+## #   alcool_dose_semana &lt;dbl&gt;, drogas_ilicitas &lt;chr&gt;, cafeina_dia &lt;dbl&gt;,
+## #   refrig_dia &lt;dbl&gt;, sedentario &lt;chr&gt;, ativ_fisica &lt;chr&gt;</code></pre>
+<p>Eu precisei converter para <code>data.frame</code> primeiro porque não é possível definir os nomes das linhas de uma <code>tibble</code>. Se a linha estivesse completamente vazia, bastaria usar diretamente a função <code>remove_empty_rows()</code>.</p>
+<p>Equivalentemente para colunas, existe a função <code>remove_empty_cols()</code>.</p>
+</section>
+<section id="identificando-linhas-duplicadas" class="level2">
+<h2>Identificando linhas duplicadas</h2>
+<p>O pacote <code>janitor</code> possui uma função para identificar entradas duplicadas numa base de dados: <code>get_dupes()</code>. Vamos criar uma base genérica para testá-la.</p>
+<pre class="r"><code>
+p_nome &lt;- c(&quot;Athos&quot;, &quot;Daniel&quot;, &quot;Fernando&quot;, &quot;Julio&quot;, &quot;William&quot;)
+sobrenome &lt;- c(&quot;Damiani&quot;, &quot;Falbel&quot;, &quot;Corrêa&quot;, &quot;Trecenti&quot;, &quot;Amorim&quot;)
+
+base_qualquer &lt;- tibble(nome = sample(p_nome, 25, replace = T),
+                        sobrenome = sample(sobrenome, 25, replace = T),
+                        variavel_importante = rnorm(25))
+
+get_dupes(base_qualquer, nome, sobrenome)
+## # A tibble: 12 x 4
+##    nome     sobrenome dupe_count variavel_importante
+##    &lt;chr&gt;    &lt;chr&gt;          &lt;int&gt;               &lt;dbl&gt;
+##  1 Fernando Corrêa             2              -0.896
+##  2 Fernando Corrêa             2              -0.432
+##  3 Julio    Amorim             3              -0.968
+##  4 Julio    Amorim             3              -1.69 
+##  5 Julio    Amorim             3              -0.466
+##  6 Julio    Corrêa             2              -1.62 
+##  7 Julio    Corrêa             2              -0.646
+##  8 Julio    Falbel             3              -1.54 
+##  9 Julio    Falbel             3              -1.05 
+## 10 Julio    Falbel             3               1.25 
+## 11 Julio    Trecenti           2               1.02 
+## 12 Julio    Trecenti           2              -0.292</code></pre>
+<p>Todas as linhas na <code>tibble</code> resultante representam uma combinação de nome-sobrenome repetida.</p>
+</section>
+<section id="outras-funcoes" class="level2">
+<h2>Outras funções</h2>
+<p>Por fim, o <code>janitor</code> também tem funções equivalentes à <code>table()</code> para produzir tabelas de frequência:</p>
+<ul>
+<li><code>tabyl()</code> - similar a <code>table()</code>, mas pipe-ável e com mais recursos.</li>
+<li><code>crosstab()</code> - para tabelas de contingência.</li>
+<li><code>adorn_totals()</code> - acrescenta o total das linhas ou colunas.</li>
+<li><code>adorn_crosstab()</code> - deixa tabelas de contingência mais bonitas.</li>
+</ul>
+<pre class="r"><code>mtcars %&gt;% 
+  tabyl(cyl)
+##   cyl  n percent
+## 1   4 11 0.34375
+## 2   6  7 0.21875
+## 3   8 14 0.43750
+
+mtcars %&gt;% 
+  tabyl(cyl) %&gt;% 
+  adorn_totals
+##     cyl  n percent    Total
+## 1     4 11 0.34375 11.34375
+## 2     6  7 0.21875  7.21875
+## 3     8 14 0.43750 14.43750
+## 4 Total 32 1.00000 33.00000
+
+mtcars %&gt;% 
+  crosstab(cyl, am)
+##   cyl  0 1
+## 1   4  3 8
+## 2   6  4 3
+## 3   8 12 2
+
+mtcars %&gt;% 
+  crosstab(cyl, am) %&gt;% 
+  adorn_crosstab
+##   cyl          0         1
+## 1   4 27.3%  (3) 72.7% (8)
+## 2   6 57.1%  (4) 42.9% (3)
+## 3   8 85.7% (12) 14.3% (2)</code></pre>
+<p>É isso! Espero que essas dicas e o pacote <code>janitor</code> ajudem a agilizar as suas análises. Dúvidas, críticas ou sugestões, deixe um comentário ou nos envie uma mensagem. :)</p>
+</section>

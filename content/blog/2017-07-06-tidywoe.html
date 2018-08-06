@@ -1,0 +1,236 @@
+---
+title: "WoE em R com tidywoe"
+date: "2017-07-06T10:12:00+03:00"
+tags: ["woe"]
+categories: ["tutoriais", "r"]
+banner: "img/banners/tidywoe_hex2.png"
+author: ["Athos"]
+summary: "WoE (weight of evidence) é uma ferramenta bastante usada em aplicações de regressão logística, principalmente na área de score de crédito. O pacote tidywoe oferece uma interface simples para facilitar essa tarefa."
+---
+
+
+
+<p>WoE (weight of evidence) é uma ferramenta bastante usada em aplicações de regressão logística, principalmente na área de score de crédito. Simploriamente falando, ele transforma categorias em números que refletem a diferença entre elas pelo critério de separação do <strong>Y = 1</strong> e <strong>Y = 0</strong>.</p>
+<p>Se você ainda não sabe o que é ou quer ler mais sobre o assunto, um texto que eu gostei de ler:</p>
+<ul>
+<li><a href="http://multithreaded.stitchfix.com/blog/2015/08/13/weight-of-evidence/">Data Exploration with Weight of Evidence and Information Value in R</a></li>
+</ul>
+<p>O autor desse texto é o Kim Larsen, criador do pacote <a href="https://cran.r-project.org/web/packages/Information/index.html">Information</a> que é completo e cheio de ferramentas sofisticadas em torno do WoE. Porém, no dia a dia do meu trabalho volta e meia eu tinha que construir rotinas próprias para fazer as versões em WoE das minhas variáveis, mesmo com vários pacotes completos disponíveis. A principal motivação era que eles não eram muito práticos e não se encaixavam na filosofia do tidyverse. Daí acabei juntando essas rotinas num pacote chamado <code>tidywoe</code> e deixando no ar. A ideia é que ela faça o analista ganhar em tempo, legibilidade e reprodutibilidade. Abaixo segue como usar.</p>
+<section id="instalacao" class="level2">
+<h2>Instalação</h2>
+<p>Para instalar, basta rodar abaixo.</p>
+<pre class="r"><code># install.packages(&quot;devtools&quot;)
+devtools::install_github(&quot;athospd/tidywoe&quot;)</code></pre>
+</section>
+<section id="dados-e-pacotes-para-os-exemplos" class="level2">
+<h2>Dados e pacotes para os exemplos</h2>
+<pre class="r"><code>library(forcats)
+library(ggplot2)
+library(dplyr)
+library(tidywoe)
+
+# install.packages(&quot;FactoMineR&quot;)
+data(tea, package = &quot;FactoMineR&quot;)
+tea_mini &lt;- tea %&gt;% select(breakfast, how, where, price)</code></pre>
+</section>
+<section id="como-usar" class="level2">
+<h2>Como usar</h2>
+<p>Tem duas funções que importam: - <code>add_woe()</code> - adiciona os woe’s num data frame. - <code>woe_dictionary()</code> - cria dicionário que mapeia as categorias com os woe’s.</p>
+<section id="add_woe" class="level3">
+<h3>add_woe()</h3>
+<p>A função <code>add_woe()</code> serve para adicionar as versões WoE’s das variáveis em sua amostra de dados.</p>
+<pre class="r"><code>tea_mini %&gt;% add_woe(breakfast)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">breakfast</th>
+<th style="text-align: left;">how</th>
+<th style="text-align: left;">where</th>
+<th style="text-align: left;">price</th>
+<th style="text-align: right;">how_woe</th>
+<th style="text-align: right;">where_woe</th>
+<th style="text-align: right;">price_woe</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">breakfast</td>
+<td style="text-align: left;">tea bag</td>
+<td style="text-align: left;">chain store</td>
+<td style="text-align: left;">p_unknown</td>
+<td style="text-align: right;">-0.0377403</td>
+<td style="text-align: right;">-0.0451204</td>
+<td style="text-align: right;">-0.2564295</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">breakfast</td>
+<td style="text-align: left;">tea bag</td>
+<td style="text-align: left;">chain store</td>
+<td style="text-align: left;">p_variable</td>
+<td style="text-align: right;">-0.0377403</td>
+<td style="text-align: right;">-0.0451204</td>
+<td style="text-align: right;">0.1872882</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Not.breakfast</td>
+<td style="text-align: left;">tea bag</td>
+<td style="text-align: left;">chain store</td>
+<td style="text-align: left;">p_variable</td>
+<td style="text-align: right;">-0.0377403</td>
+<td style="text-align: right;">-0.0451204</td>
+<td style="text-align: right;">0.1872882</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Not.breakfast</td>
+<td style="text-align: left;">tea bag</td>
+<td style="text-align: left;">chain store</td>
+<td style="text-align: left;">p_variable</td>
+<td style="text-align: right;">-0.0377403</td>
+<td style="text-align: right;">-0.0451204</td>
+<td style="text-align: right;">0.1872882</td>
+</tr>
+</tbody>
+</table>
+<p>Você pode selecionar as variáveis que vc quiser selecionando-as como se fosse no <code>dplyr::select()</code>.</p>
+<pre class="r"><code>tea_mini %&gt;% add_woe(breakfast, where:price)</code></pre>
+</section>
+<section id="woe_dictionary" class="level3">
+<h3>woe_dictionary()</h3>
+<p>A função <code>woe_dictionary()</code> é uma das duas partes necessárias para fazer o <code>add_woe()</code> funcionar (a outra parte são os dados). Ele constrói o dicionário de categorias e seus respectivos woe’s.</p>
+<pre class="r"><code>tea_mini %&gt;% woe_dictionary(breakfast)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">variable</th>
+<th style="text-align: left;">explanatory</th>
+<th style="text-align: right;">n_tot</th>
+<th style="text-align: right;">n_breakfast</th>
+<th style="text-align: right;">n_Not.breakfast</th>
+<th style="text-align: right;">p_breakfast</th>
+<th style="text-align: right;">p_Not.breakfast</th>
+<th style="text-align: right;">woe</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">how</td>
+<td style="text-align: left;">tea bag</td>
+<td style="text-align: right;">170</td>
+<td style="text-align: right;">80</td>
+<td style="text-align: right;">90</td>
+<td style="text-align: right;">0.5555556</td>
+<td style="text-align: right;">0.5769231</td>
+<td style="text-align: right;">-0.0377403</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">how</td>
+<td style="text-align: left;">tea bag+unpackaged</td>
+<td style="text-align: right;">94</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">44</td>
+<td style="text-align: right;">0.3472222</td>
+<td style="text-align: right;">0.2820513</td>
+<td style="text-align: right;">0.2078761</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">how</td>
+<td style="text-align: left;">unpackaged</td>
+<td style="text-align: right;">36</td>
+<td style="text-align: right;">14</td>
+<td style="text-align: right;">22</td>
+<td style="text-align: right;">0.0972222</td>
+<td style="text-align: right;">0.1410256</td>
+<td style="text-align: right;">-0.3719424</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">where</td>
+<td style="text-align: left;">chain store</td>
+<td style="text-align: right;">192</td>
+<td style="text-align: right;">90</td>
+<td style="text-align: right;">102</td>
+<td style="text-align: right;">0.6250000</td>
+<td style="text-align: right;">0.6538462</td>
+<td style="text-align: right;">-0.0451204</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="usando-um-dicionario-customizado" class="level3">
+<h3>Usando um dicionário customizado</h3>
+<p>Muitas vezes há o interesse em ajustar na mão alguns valores de woe para consertar a ordem dos efeitos de uma dada variável ordinal. Esse é o motivo de o <code>add_woe()</code> poder receber um dicionário passado pelo usuário. Isso se faz por meio do argumento <code>.woe_dictionary</code>.</p>
+<p>A maneira mais fácil de se fazer isso é montar um dicionário inicial com o <code>woe_dictionary()</code> e depois alterar os valores nele para alcançar os ajustes desejados. Exemplo:</p>
+<pre class="r"><code># Construa um dicionário inicial
+tea_mini_woe_dic &lt;- tea_mini %&gt;% woe_dictionary(breakfast)
+
+# Mexa um pouquinho nos woes
+tea_mini_woe_dic_arrumado &lt;- tea_mini_woe_dic %&gt;% mutate(woe = if_else(explanatory == &quot;p_unknown&quot;, 0, woe))
+
+# Passe esse dicionário para o add_woe()
+tea_mini %&gt;% add_woe(breakfast, .woe_dictionary = tea_mini_woe_dic_arrumado)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">breakfast</th>
+<th style="text-align: left;">how</th>
+<th style="text-align: left;">where</th>
+<th style="text-align: left;">price</th>
+<th style="text-align: right;">how_woe</th>
+<th style="text-align: right;">where_woe</th>
+<th style="text-align: right;">price_woe</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">breakfast</td>
+<td style="text-align: left;">tea bag</td>
+<td style="text-align: left;">chain store</td>
+<td style="text-align: left;">p_unknown</td>
+<td style="text-align: right;">-0.0377403</td>
+<td style="text-align: right;">-0.0451204</td>
+<td style="text-align: right;">0.0000000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">breakfast</td>
+<td style="text-align: left;">tea bag</td>
+<td style="text-align: left;">chain store</td>
+<td style="text-align: left;">p_variable</td>
+<td style="text-align: right;">-0.0377403</td>
+<td style="text-align: right;">-0.0451204</td>
+<td style="text-align: right;">0.1872882</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Not.breakfast</td>
+<td style="text-align: left;">tea bag</td>
+<td style="text-align: left;">chain store</td>
+<td style="text-align: left;">p_variable</td>
+<td style="text-align: right;">-0.0377403</td>
+<td style="text-align: right;">-0.0451204</td>
+<td style="text-align: right;">0.1872882</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Not.breakfast</td>
+<td style="text-align: left;">tea bag</td>
+<td style="text-align: left;">chain store</td>
+<td style="text-align: left;">p_variable</td>
+<td style="text-align: right;">-0.0377403</td>
+<td style="text-align: right;">-0.0451204</td>
+<td style="text-align: right;">0.1872882</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="exemplo-de-exploracao" class="level2">
+<h2>Exemplo de exploração</h2>
+<p>O <code>woe_dictionary()</code> devolve uma tabela arrumada, bem conveniente para explorar mais. Por exemplo, a tabela está pronta para o ggplot.</p>
+<pre class="r"><code>tea_mini_woe_dic_arrumado %&gt;%
+  mutate(explanatory = explanatory %&gt;% as.factor %&gt;% fct_reorder(woe)) %&gt;%
+  filter(variable %in% c(&quot;price&quot;, &quot;how&quot;)) %&gt;%
+  ggplot() +
+    geom_bar(aes(x = explanatory, y = woe), stat = &quot;identity&quot;) +
+    facet_wrap(~variable, scales = &quot;free_x&quot;) +
+  theme(axis.text.x = element_text(angle = 30))</code></pre>
+<p><img src="/blog/2017-07-06-tidywoe_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<p>Aqui está o <a href="https://github.com/Athospd/tidywoe">github do pacote</a> para contribuições. Pretendo colocar bastante coisa nova no pacote ainda.</p>
+<p>Abs</p>
+</section>

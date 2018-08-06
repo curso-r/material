@@ -1,0 +1,121 @@
+---
+title: "Pacote reticulate"
+date: "2017-11-20T14:25:00+03:00"
+tags: ["reticulate", "python"]
+categories: ["tutoriais", "r"]
+banner: "img/banners/reticulate.png"
+author: ["Gabriela Lima Borges (convidada)"]
+summary: "Imagine se você pudesse aproveitar da quantidade e da variedade enorme de módulos e bibliotecas do Python no ambiente amigável do RStudio? Graças ao pacote..."
+draft: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE, collapse = TRUE)
+library(magrittr)
+```
+
+> Se você também quiser escrever um post como convidada, entre em contato a gente em contato@curso-r.com!
+
+## Pacote Reticulate
+
+Imagine se você pudesse aproveitar da quantidade e da variedade enorme de módulos e bibliotecas do Python no ambiente amigável do RStudio? Graças ao pacote [`reticulate`](https://rstudio.github.io/reticulate/) isso é possível de uma maneira familiar para quem quem já é usuário do R.
+
+O `reticulate` é um pacote que proporciona a integração Python & R via R e pode ser bastante útil se você quiser fazer todas as análises no ambiente do Rstudio. Os módulos, classes e funções do Python importados podem ser utilizados como se fossem funções nativas do R. 
+
+Para utilizar o pacote são necessárias a instalação do Python com versão superior a 2.7, a instalação dos módulos do Python que serão utilizados durante a análise e a instalação do pacote via `install.packages()`.
+
+
+```{r}
+# install.packages("reticulate")
+library(reticulate)
+```
+
+Quando for utilizada uma função do Python em um objeto do R, ele será convertido para seu formato equivalente do Python e vice-versa. Os tipos de conversões de objetos são explicitadas [neste link](https://rstudio.github.io/reticulate/articles/introduction.html).
+
+
+```{r}
+## Data frame do R é convertido em Dict do Python
+a <- r_to_py(mtcars)
+class(a)
+
+## Dict do Python é convertido em List do R
+class(py_to_r(a))
+```
+
+## Importando módulos
+
+A importação de módulos do Python para o R é bem simples. Basta usar a função `import()` do pacote `reticulate` e o nome do módulo que você quer importar, em seguida guardar isso em um objeto no R.
+
+```{r}
+np <- import("numpy")
+pandas <- import("pandas")
+os <- import("os")
+```
+
+Use a função `py_module_available()` pra checar se um módulo do Python está disponível no seu computador.
+
+```{r}
+py_module_available("matplotlib")
+```
+
+As funções que estão dentro de módulos ou classes do Python podem ser acessadas utilizando o operador `$`:
+
+```{r}
+os$getcwd()
+np$abs(-1)
+```
+
+E podemos misturar funções do R e do python:
+
+```{r}
+library(magrittr)
+
+rnorm(10) %>% 
+  np$abs() %>% 
+  np$cumproduct() %>% 
+  plot()
+```
+
+# Exemplo
+
+Para ilustrar a integração Python & R via R, vamos usar o Astropy, que é uma biblioteca do Python desenvolvida para a astronomia. Vamos tentar reproduzir [esse exemplo que foi implementado no python](http://docs.astropy.org/en/stable/generated/examples/io/plot_fits-image.html#sphx-glr-generated-examples-io-plot-fits-image-py). Primeiro, precisamos instalar o módulo:
+
+```
+pip install astropy
+```
+
+No ambiente do RStudio, vamos importar os módulos do Astropy que usaremos.
+
+```{r}
+down <- import("astropy.utils.data")
+fits <- import("astropy.io.fits")
+```
+
+Em seguida, vamos baixar a imagem em arquivo FITS e verificar se está tudo ok usando a função info do Python que está no pacote Astropy.io.fits.
+
+```{r, eval=FALSE}
+url <- "https://astropy.stsci.edu/data/tutorials/FITS-images/HorseHead.fits"
+im.file <- down$download_file(url, cache=TRUE)
+fits$info(im.file)
+```
+
+```
+Filename: ~/.astropy/cache/download/py2/2c9202ae878ecfcb60878ceb63837f5f
+No.    Name      Ver    Type      Cards   Dimensions   Format
+  0  PRIMARY       1 PrimaryHDU     161   (891, 893)   int16   
+  1  er.mask       1 TableHDU        25   1600R x 4C   [F6.2, F6.2, F6.2, F6.2]
+```
+
+Agora vamos transformar nossa imagem em uma matriz de pixels e plotar com a função image do R.
+
+```{r, eval = FALSE}
+im.data <- fits$getdata(im.file)
+im.data %>% 
+  t() %>% 
+  image(col = gray(seq(0, 1, length = 256)))
+```
+
+![](/img/blog/reticulate/Rplot.png)
+
+
+

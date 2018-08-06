@@ -1,0 +1,117 @@
+---
+title: "bR Bloggers está no ar"
+date: "2017-06-19T13:07:31+02:00"
+tags: ["curso-R", "br bloggers"]
+categories: ["divulgação", "r"]
+banner: "img/banners/banner-brbloggers.png"
+author: ["Daniel"]
+---
+
+```{r echo=F}
+knitr::opts_chunk$set(collapse = TRUE, cache = TRUE)
+```
+
+Está no ar o [bR Bloggers](https://brbloggers.com.br)! bR Bloggers é um agregador
+de blogs sobre R escritos em língua portuguesa. 
+
+Atualmente uma das melhores formas de aprender R e de ficar a par da comunidade R é
+ler o [R-Bloggers](https://www.r-bloggers.com/). O R-Bloggers é um agregador que 
+conta com mais de 700 blogs, que escrevem aproximadamente 300 posts por mês. Lendo
+tudo isso, não tem como você não aprender muito R! 
+
+No entanto, para muitas pessoas, uma barreira para ler os posts do R-Bloggers pode 
+ser o fato de que todos os posts estão em inglês. Por isso, a criação do bR Bloggers.
+
+A ideia de um agregador de blogs para o português não é original, hoje mesmo descobri 
+esse link: https://www.r-bloggers.com/lang/-/portuguese: Uma versão do R-Bloggers
+em português mantida pelo próprio criador do R-Bloggers. No entanto, a última postagem
+data de 2012: 5 anos atrás. Ainda não existia nem o `dplyr`(que é de Jan/2014).
+Não se falava em `tidyverse` e nem nada disso também. Pelo menos o `ggplot2` já tinha
+seus 5 anos. Ou seja, tudo no R era diferente, menos a melhor forma de fazer os
+seus gráficos. 
+
+Recentemente o [Sillas Gonzaga](https://github.com/sillasgonzaga) autor do [Paixão por Dados](https://sillasgonzaga.github.io/) criou o 
+[R-Bloggers BR](https://github.com/sillasgonzaga/rbloggers-BR) um bot do twitter
+que "twita" toda vez que algum blog da lista tem um novo post. Também temos uma [lista de blogs](https://github.com/marcosvital/blogs-de-R-no-Brasil) de R em 
+português mantida pelo [Marcos Vital](https://github.com/marcosvital) do 
+[Cantinho do R](https://cantinhodor.wordpress.com/).
+
+Esses foram bons avanços para a comunidade R brasileira, mas ainda assim, dado o sucesso
+do R-Bloggers, sentíamos falta de um agregador no mesmo estilo para blogs em português.
+Por isso surgiu o [bR Bloggers](https://brbloggers.com.br).
+
+Esperamos que o bR Bloggers incentive a comunidade a escrever bastante conteúdo 
+sobre R em português! Que ele seja uma vitrine para que todos possam mostrar os 
+seus trabalhos e que ajude muitas pessoas a aprender R.
+
+# Como funciona?
+
+O br Bloggers foi feito em R. E todo o código fonte está disponível em uma organização
+do Github: https://github.com/brbloggers. São dois repositórios:
+
+* `brbloggers`: armazena o código front-end do site. Basicamente é um tema do Hugo.
+* `brloggers-backend`: armazena o código responsável por atualizar os posts.
+
+Dentro do `brbloggers-backend` o principal arquivo é o `main.R`, que contém toda a 
+lógica para obter os novos posts e salvá-los no seu diretório `content`. 
+
+Esse script `main.R` é chamado pelo script `run.sh` que controla o processo de atualização
+do site: 
+
+* faz pull do repositório `brbloggers-backend`
+* roda o `main.R`
+* faz commits e push desse repositório
+* atualiza o  repo `brbloggers`
+
+O `run.sh` é por sua vez chamado de 30 em 30 minutos por meio de um `cronjob` que foi
+definido em um servidor na Google Cloud Platform. Esse servidor é uma instância 
+micro do GCP com R instalado para rodar esses códigos. Ou seja, o backend do brbloggers
+custa U$5,00 por mês para ficar no ar.
+
+Já o repositório `brbloggers` está linkado com um serviço chamado [Netlify](https://www.netlify.com/).
+Basicamente o Netlify recebe o código do front-end a cada novo commit no repositório do site e *builda* 
+o site estático usando o Hugo. O Netlify também hospeda o site estático.
+
+# O logo do bR Bloggers
+
+O logo do bR Bloggers foio criado pelo [Julio](http://curso-r.com/author/julio) usando
+o R. O código está disponível abaixo:
+
+```{r warning=F, message=F}
+library(tidyverse)
+library(ggforce)
+# https://pt.wikipedia.org/wiki/Bandeira_do_Brasil#Cores
+cores_br <- list(verde = '#009C3B', 
+                 amarelo = '#FFDF00', 
+                 azul = '#002776', 
+                 branco = "#FFFFFF")
+
+p <- tibble(x = 1, y = 1, lab1 = 'b', lab2 = 'R') %>% 
+  ggplot(aes(x0 = x, y0 = y, r = y)) +
+  geom_circle(size = 5, 
+              n = 5.5, 
+              fill = 'transparent', 
+              color = cores_br$verde, 
+              linetype = 1) +
+  geom_circle(size = 4, 
+              n = 5.5, 
+              fill = 'transparent', 
+              color = cores_br$amarelo, 
+              linetype = 2) +
+  geom_text(aes(x, y, label = lab1),
+            family = "Ubuntu", 
+            size = 45, 
+            nudge_x = -.3, 
+            nudge_y = -.1, 
+            colour = cores_br$azul) +
+  geom_text(aes(x, y, label = lab2),
+            family = "Century", 
+            size = 60, 
+            nudge_x = .3, 
+            colour = cores_br$azul,
+            fontface = 'bold') +
+  coord_equal() +
+  theme_minimal(0)
+p
+```
+

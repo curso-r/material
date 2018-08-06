@@ -1,0 +1,73 @@
+---
+title: "Keras: colocando deep learning no pipeline"
+date: "2017-06-05T13:07:31+02:00"
+tags: ["r", "deep learning", "keras"]
+categories: ["divulgação", "r"]
+banner: "img/banners/keras.jpg"
+author: ["Julio"]
+draft: false
+summary: "O keras é um novo pacote do R feito para ajustar modelos de redes neurais profundas. Esse é o primeiro de uma série de posts sobre o assunto. Primeiro, vamos falar dos autores desse pacote..."
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, cache = TRUE)
+```
+
+
+Esse é o [Daniel Falbel](http://curso-r.com/author/daniel/), um dos sócios da Curso-R e autor de diversos posts no nosso blog. Boa pinta, não?
+
+![](/img/blog/keras/dfalbel.jpg)
+
+Mas esse não é só um rostinho bonito. Recente, o Dani fez uma contribuição PROFUNDA para a comunidade R: ele é um dos responsáveis pelo pacote [keras](https://github.com/rstudio/keras), que faz uma interface com a [biblioteca de mesmo nome](https://keras.io/) utilizada para ajustar modelos de *deep learning* usando [TensorFlow](https://www.tensorflow.org/).
+
+Veja o arquivo DESCRIPTION (metadados) desse pacote:
+
+```
+Package: keras
+Type: Package
+Title: R Interface to Keras
+Version: 0.3.6
+Authors@R: c(
+  person("JJ", "Allaire", role = c("aut", "cre"), email = "jj@rstudio.com"),
+  person("François", "Chollet", role = c("aut", "cph")),
+  person("RStudio", role = c("cph", "fnd")),
+  person(family = "Google", role = c("ctb", "cph", "fnd")),
+  person("Yuan", "Tang", role = c("ctb", "cph")),
+  person("Daniel", "Falbel", role = c("ctb", "cph"))
+  )
+Description: Interface to 'Keras', a high-level neural networks API which 
+  runs on top of TensorFlow. 'Keras' was developed with a focus on enabling
+  fast experimentation, supports both convolutional networks and recurrent
+  networks (as well as combinations of the two), and seamlessly on both CPUs
+  and GPUs.
+...
+```
+
+Além do Daniel, temos como autores desse pacote nada menos que [JJ Allaire (CEO do RStudio)](https://en.wikipedia.org/wiki/Joseph_J._Allaire), [Yuan Tang (um dos principais desenvolvedores do TensorFlow)](https://github.com/tensorflow/tensorflow/graphs/contributors) e [François Chollet](http://www.esade.edu/faculty/francois.collet), o próprio [RStudio](https://rstudio.com) e a Google (essa não precisa de link).
+
+Muito orgulho de ter esse cara como amigo e sócio na Curso-R. Parabéns!
+
+No futuro, postaremos tutoriais sobre o `keras` e mostraremos como estamos utilizando o pacote para quebrar CAPTCHAs usando métodos bastante inovadores. Enquanto isso, você pode olhar um [tutorial para o pacote `keras` nesse link](https://rstudio.github.io/keras/).
+
+É isso. Happy coding ;)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

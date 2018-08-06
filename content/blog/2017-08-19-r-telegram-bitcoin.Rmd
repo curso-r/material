@@ -1,0 +1,218 @@
+---
+title: "Como fazer o R avisar pelo telegram que bitcoin tá barato"
+date: "2017-08-19T10:26:00+03:00"
+tags: ["telegram", "bitcoin"]
+categories: ["tutoriais", "r"]
+banner: "img/banners/r_telegram_bitcoin.png"
+author: ["Athos"]
+summary: "Uma brincadeira de fazer o R enviar uma mensagem ao seu celular via Telegram quando o preço da bitcoin subir ou cair muito!"
+---
+
+```{r include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, cache = TRUE)
+```
+
+
+O ponto máximo da história é o R mandando mensagem pro Telegram. Só para motivar, vou contar o que fiz de divertido usando telegram e preços de bitcoin.
+
+```{r, fig.align='center', echo=FALSE}
+knitr::include_graphics("/img/blog/r-telegram-bitcoin/r_telegram.gif")
+```
+
+Herói do dia: [Luca Biglia](https://github.com/lbraglia), autor do pacote `telegram` do R.
+
+# O que faremos
+
+Como mencionei, Vou construir um **Acompanhador de bitcoin** pra ilustrar e ao fim do post teremos feito o R mandar um telegram quando o preço da bitcoin atingir um dado patamar.
+
+```{r, fig.align='center', echo=FALSE}
+knitr::include_graphics("/img/blog/r-telegram-bitcoin/serie_bitcoin.png")
+```
+
+## Ingredientes
+
+Na arte de hoje vamos precisar de:
+
+- Um [bot do telegram](https://core.telegram.org/bots)
+- O pacote do R `library(telegram)`
+- A API da [BlinkTrade](https://blinktrade.com/docs/)
+- Barbante e um tubo de cola
+
+Os passos que precisamos seguir para alcançar isso são:
+
+1) Criar um .Rproj (projeto do RStudio).
+2) instalar e carregar o pacote `telegram` do R.
+3) Criar um bot do telegram com a ajuda do [BotFather](https://telegram.me/botfather).
+4) Conectar o R com o bot.
+5) Consultar e guardar os preços da bitcoin de 30 em 30 segundos.
+6) criar um loop infinito no R para acompanhar os preços sem parar.
+7) Fazer o R mandar mensagem pra gente quando o preço da bitcoin for maior que X, por exemplo.
+8) (extra) Pensar em ideias mirabolantes do que fazer com telegram + R.
+
+## Introdução aos componentes
+
+Antes de mais nada, uma breve introdução às coisas que aparecerão por aqui:
+
+- [telegram](https://telegram.org/): é igual ao Whatsapp, mas melhorado.
+- [BotFather](https://telegram.me/botfather): um contato do seu celular (no telegram) que te ajuda a criar um bot do telegram.
+- [bitcoin](https://en.wikipedia.org/wiki/Bitcoin): moeda digital de sucesso. 
+- [BlinkTrade](https://blinktrade.com/docs/): dentre outras coisas, fornece API para valores da bitcoin em tempo real.
+
+## Acompanhador de bitcoin
+
+Já crie o seu .Rproj, rode `install.packages("telegram");library(telegram)` e vamos direto ao terceiro passo.
+
+### Passo 3: Bot do telegram - Criar um bot
+
+Bot é como se fosse uma pessoa a mais na sua lista de contato do telegram, mas que são máquinas em vez de humanos e respondem a comandos específicos. A graça é que você pode customizar esses comandos do jeito que quiser! Basta ter um propósito e saber programá-lo.
+
+O README que tá no [github do pacote](https://github.com/lbraglia/telegram) é muito bom! Vou resumir com pequenas mudanças o que está lá:
+
+1) Vá ao seu telegram e procure pelo BotFather como se estivesse procurando uma pessoa da sua lista de contato. Abra uma conversa com ele!
+2) Envie o texto "/start" e em seguida "/newbot". Dê um nome ao seu bot (pode ser um nome fofo) e depois um nome de usuário para o seu bot que necessariamente termina em *bot*.
+3) Agora copie e cole o token que o BotFather te enviou no `.Renviron`. O meu bot tem o username `AthosDamianiBot`, então eu devo colocar o nome da variável assim:
+
+```{r, fig.align='center', echo=FALSE}
+knitr::include_graphics("/img/blog/r-telegram-bitcoin/Renvirom_1.png")
+```
+
+Se você usar essa convenção de nome você poderá usar a função `bot_token()` pra pegar o seu token. Caso contrário vai ter que apelar para a `Sys.getenv()`.
+
+**OBS:** Reinicie o R para o `.Renviron` ficar configurado.
+
+### Passo 4: Bot do telegram - Conectar ao R
+
+1) Carregue o pacote e crie um objeto `TGBot` para o seu bot criando anteriormente:
+
+```{r, eval=FALSE}
+library(telegram)
+
+bot <- TGBot$new(token = bot_token('AthosDamianiBot'))
+
+bot$getMe()
+```
+
+2) Agora precisamos do `chat_id`. Para isso, no seu telegram, procure o seu bot como se fosse um contato (que nem você fez com o BotFather) e comece uma conversa com ele. 
+
+3) No R, chame o método `bot$getUpdates()` para pegar no R as mensagens que você enviou a ele e, finalmente, encontre o `chat_id` escondido no `msgs`.
+
+```{r, eval=FALSE}
+msgs <- bot$getUpdates()
+
+msgs$message$chat$id[1]
+
+[1] 135717340
+```
+
+4) Com o `chat_id` em mãos, configure ele como `chat_id` padrão.
+
+```{r, eval=FALSE, eval=FALSE}
+bot$set_default_chat_id(135717340)
+```
+
+Neste momento já estamos prontos para interagir com o nosso bot!
+
+### Passo 5: Consultar preços da bitcoin
+
+Os preços da bitcoin são fornecidos pela API da [BlinkTrade](https://blinktrade.com/docs/) que é bem simples usar: basta pegar o json que a url do código abaixo solta. Aproveito e dou um tapinha para deixar em forma de data.frame e com a data de consulta junto.
+
+```{r, eval=FALSE}
+library(jsonlite)
+library(tidyverse)
+
+safe_fromJSON <- safely(fromJSON, as.numeric(NA)) 
+nova_consulta_list <- safe_fromJSON("https://api.blinktrade.com/api/v1/BRL/ticker?crypto_currency=BTC") 
+
+nova_consulta <- nova_consulta_list$result %>% 
+        as.tibble %>%
+        mutate(timestamp = lubridate::now())
+
+nova_consulta
+# A tibble: 1 x 9
+      high      vol      buy  last      low   pair  sell vol_brl           timestamp
+     <dbl>    <dbl>    <dbl> <dbl>    <dbl>  <chr> <dbl>   <dbl>              <dttm>
+1 14438.21 511.5911 14077.01 14200 13801.04 BTCBRL 14200 7257317 2017-08-18 17:09:44
+```
+
+**OBS:** Usei o advérbio `safely()` porque a API pode engasgar a qualquer momento, fazendo assim o R retornar um erro que interromperia o acompanhamento do preço.
+
+### Passo 6: Loop infinito para acompanhar os preços
+
+O esqueleto do acompanhador é composto por um loop infinito (`while(TRUE)`), um data.frame `historico.RData`, um tempo entre uma consulta e outra (30 segundos por padrão) e a consulta propriamente dita.
+
+```{r, eval = FALSE}
+# inicializa o historico.RData
+# historico <- nova_consulta
+# save(historico, file = "historico.RData")
+
+acompanhar_bitcoin <- function(frequencia = 30) {
+  load("historico.RData")
+  
+  # loop infinito
+  while(TRUE) {
+    # pega a cotação do bitcoin brasil (BTCBRL) da API do blinktrade
+    nova_consulta_list <- safe_fromJSON("https://api.blinktrade.com/api/v1/BRL/ticker?crypto_currency=BTC") 
+    
+    # verifica se a API retornou uma lista 
+    if("list" %in% class(nova_consulta_list$result)) {
+      nova_consulta <- nova_consulta_list$result %>% 
+        as.tibble %>%
+        mutate(timestamp = lubridate::now())
+      
+      
+      # ---------------------
+      #
+      # espaço reservado para as regras!
+      #
+      # ---------------------
+      
+      # guarda a consulta
+      historico <- bind_rows(historico, nova_consulta)
+      save(historico, file = "historico.RData")
+    }
+  }
+  Sys.sleep(frequencia)
+}
+```
+
+### Passo 7: Regras para mensagens de telegram 
+
+Agora é a hora de decidir o que o bot deve nos avisar! Deixei dois exemplos simples abaixo usando o método `bot$sendMessage()`, que como o nome sugere faz o bot enviar mensagem pra gente. Agora, toda vez que o preço da bitcoin valer menos que R\$13.600 ou valer mais que R\$14.600 eu vou ficar sabendo na hora!
+
+```{r, eval=FALSE}
+# caso o valor da cotação atinja algum critério, envia uma mensagem via telegram.
+if(nova_consulta$buy < 13600 & nova_consulta$last > 13900) {
+  bot$sendMessage('baixa!')
+  bot$sendMessage(nova_consulta$buy)
+}
+
+# ...
+
+if(nova_consulta$buy > 14600 & nova_consulta$last < 14500) {
+  bot$sendMessage('alta!')
+  bot$sendMessage(nova_consulta$buy)
+}
+```
+
+### Passo Extra: Ideias mirabolantes do que fazer com telegram + R
+
+Aqui reina a criatividade. Dá pra mandar gráficos, sons, stickers e qualquer tipo de mídia. Eu fiz um ggplot para ficar vendo a tendência, daí poderia pedir para ver o gráfico ao meu bot a qualquer momento.
+
+```{r, eval=FALSE}
+# ... isso vai dentro da funcao acompanhar_bitcoin()
+p <- ggplot(historico %>%
+              gather(indicador, valor, high, low, buy, sell, last)) +
+  geom_line(aes(x = timestamp, y = valor, colour = indicador))
+print(p)
+```
+
+Também é possível programar comandos para serem passados ao Bot para que ele construa algo para a gente, por exemplo, vc poderia criar um comando para comprar ou vender bitcoins em tempo real!
+
+O Julio uma vez criou um bot que era praticamente o próprio R, vc enviava código como mensagem e ele retornava o output do R! Depois vou pedir pra ele postar algo sobre isso.
+
+Enfim, dá pra ser engenhoso aí. Basta ter aquela ideia de chuveiro genial.
+
+Exercício para casa:
+- Enviar o gemidão do zap para 3 amigos via linha de código.
+
+abs!

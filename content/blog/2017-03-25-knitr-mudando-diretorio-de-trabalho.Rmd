@@ -1,0 +1,38 @@
+---
+title: "Knitr: mudando o diretório de trabalho"
+pubdate: "2017-03-25T23:26:00+03:00"
+date: "2017-03-25T23:26:00+03:00"
+tags: ["R Markdown", "knitr"]
+categories: ["tutoriais", "r"]
+banner: "img/banners/cat-balls-of-wool.jpg"
+author: ["William"]
+summary: "O pacote `knitr` é um mecanismo rápido, elegante e flexível para gerar relatórios dinâmicos no R. Ele trabalha lado a lado com o `rmarkdown` para transformar arquivos `.Rmd` em diversos formatos, como html, pdf e até mesmo word. Quando estamos trabalhando com arquivos Rmarkdown no Rstudio, mudar o diretório de trabalho pode levar a resultados inesperados se não for feito da maneira correta."
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, cache = TRUE)
+```
+
+O pacote `knitr` é um mecanismo rápido, elegante e flexível para gerar relatórios dinâmicos no R. Ele trabalha lado a lado com o `rmarkdown` para transformar arquivos `.Rmd` em diversos formatos, como html, pdf e até mesmo word. Misturando *chunks* de código em R com texto puro, LaTeX e html, a tarefa de criar outputs para análises estatísticas no R ficou muito mais simples.
+
+Quando estamos trabalhando com arquivos Rmarkdown no Rstudio, o diretório de trabalho é a própria pasta onde o `Rmd` está salvo. Assim, se o nosso relatório tem algum input (banco de dados, arquivos com código em R ou imagens, por exemplo), esses arquivos precisam estar nessa pasta. Isso pode ser uma chateação se você está dentro de um projeto e organizou os arquivos de forma diferente: banco de dados em uma pasta, `.R` em outra, imagens em outra, outputs em outra...
+
+A primeira ideia que vem à cabeça é usar a função `setwd()` dentro de algum chunk para mudar o diretório de trabalho dentro do arquivo `Rmd`. No entanto, se fizermos isso, o diretório de trabalho será mudado para aquele chunk, mas voltará a ser a pasta do arquivo `.Rmd` após a sua execução. Veja o `warning` abaixo.
+
+```{r}
+setwd('../')
+
+# Warning message: you changed the working directory 
+# to C:/novo_diretorio (probably via setwd()). 
+# It will be restored to C:/diretorio_do_Rdm. 
+# See the Note section in ?knitr::knit.
+```
+
+Lendo a seção "Note" do `?knitr:knit`, verificamos que mudar o diretório de trabalho via `setwd()` pode levar a **terríveis consequências**. Basicamente, figuras e arquivos de cache podem ser salvos no lugar errado, e o seu relatório não será gerado corretamente. Ainda lendo a seção "Note", encontramos a maneira correta de mudar o diretório de trabalho: setar a opção `opts_knit$set(root.dir = ...)`.
+
+```{r, eval = F}
+opts_knit$set(root.dir = '../')
+```
+
+Vale ainda ressaltar que a mudança do diretório só vai ser definida para os chunks seguintes, isto é, se você fizer a mudança `opts_knit$set(root.dir = '../')` e, no mesmo chunk, tentar ler um arquivo no diretório pai (`source(input.R)`, por exemplo), o arquivo não vai ser encontrado.
+

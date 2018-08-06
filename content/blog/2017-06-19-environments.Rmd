@@ -1,0 +1,199 @@
+---
+title: "Environments"
+date: "2017-06-19T23:26:00+03:00"
+tags: ["environments"]
+categories: ["conceitos", "r"]
+banner: "img/banners/parallel-universe.jpg"
+author: ["William"]
+summary: "Se você já utilizou o R algumas vezes, com certeza já se deparou com o termo environment. Neste post, vamos tentar responder as três perguntas básicas para entendermos alguma coisa no R: 1. o que é? 2. para que serve? e 3. como NÃO usar?"
+---
+
+```{r include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, cache = TRUE)
+```
+
+
+Se você utiliza o R regularmente, com certeza já se deparou com o termo *environment*. Ele aparece como um painel do RStudio, quando acessamos o código de uma função e (implicitamente) quando carregamos pacotes. Neste post, vamos tentar responder as três perguntas básicas sobre qualquer coisa no R: 1. o que é? 2. para que serve? e 3. como NÃO usar?
+
+## O que é?
+
+Definindo de uma maneira bem simples, *environments* são locais onde objetos são armazenados, isto é, conjuntos de ligações entre símbolos e valores. Por exemplo, quando fazemos a atribuição abaixo,
+
+```{r}
+a <- 4
+```
+
+estamos criando uma associação do símbolo `a` ao valor `4`, que, por padrão, é guardada dentro do *global environment*.
+
+```{r}
+ls(globalenv())
+```
+
+Assim, quando rodarmos o símbolo `a`, o R, por padrão, vai procurar dentro desse *environment* um valor para devolver. No caso, o valor `4`.
+
+```{r}
+a
+```
+
+Mais formalmente, *environments* podem ser definidos como a junção de duas coisas: um conjunto de pares (símbolo, valor); e um ponteiro para um outro *environment*. Quando o R não encontra um valor para um símbolo no *environment* em que está procurando, ele passa a procurar no próximo, o *environment* para qual o primeiro está apontando, chamado de *environment pai*. Assim, os *environments* se estruturam como uma árvore, cuja raiz é um *environment* vazio.
+
+```{r}
+emptyenv()
+```
+
+## O que faz?
+
+É possível criar novos *environments* com a função `new.env()`
+
+```{r}
+magrathea <- new.env()
+```
+
+e criar objetos dentro desse *environments* com a função `assign()`
+
+```{r}
+assign("a", 8, envir = magrathea)
+```
+
+```{r}
+ls(magrathea)
+```
+
+Agora temos um objeto chamado `a` no *global environment* e no *magrathea*, que nós criamos. Note que o R inicia a busca no *global environment*.
+
+```{r}
+a
+```
+
+Vamos agora criar outro objeto dentro de *magrathea*.
+
+```{r}
+assign("b", 15, envir = magrathea)
+```
+
+Observe que se procurarmos simplesmente por `b`, o R não vai encontrar um valor para associar.
+
+```{r, eval = F}
+b
+```
+
+Acontece que `magrathea` é um *environment* "abaixo" do *global* na hierarquia, e o R só estende a sua busca para *environments* acima (sim, estou pensando numa árvore de ponta-cabeça).
+
+```{r}
+parent.env(magrathea)
+```
+
+Se criarmos agora um objeto no *global*
+
+```{r}
+c <- 16
+```
+
+e usarmos a função `get()` para procurá-lo no *environment* que criamos, o R irá encontrá-lo porque o *global* é o *environment* pai de *magrathea*.
+
+```{r}
+get("c", envir = magrathea)
+```
+
+Essa estrutura é muito útil na hora de utilizar funções. Sempre que uma função é chamada, um novo *environment* é criado, o *environment* de avaliação, que contém os objetos usados como argumento da função, os objetos criados dentro da função e aponta para o *environment* onde a função foi criada (geralmente o *global*).
+
+```{r}
+f <- function(a, b) {
+  
+  c <- a + b
+  
+  return(c)
+  
+}
+
+environment(f)
+```
+
+Esse comportamento nos permite fazer duas coisas. Primeiro, os cálculos realizados dentro das funções não modificam os objetos do *global*.
+
+```{r}
+f(23, 42)
+
+c
+```
+
+Segundo, podemos utilizar objetos dentro da função sem defini-los lá dentro.
+
+```{r}
+f <- function(b) { 
+
+  return(a + b)
+    
+}
+
+f(108)
+```
+
+Neste caso, como o R não encontrou o símbolo `a` dentro do *environment* de avaliação, ele foi buscar no pai, o *global*.
+
+## Como não usar?
+
+Agora que temos uma visão ao menos superficial da estrutura de *environments*, podemos entender melhor porque usar a função `attach()` é uma prática não recomendada ao programar em R. 
+
+Se utilizarmos a função `search()`, ela nos devolverá o "caminho" de *environments*, começando do *global* (*magrathea* não será exibido). 
+
+```{r}
+search()
+```
+
+
+Repare que os pacotes carregados geram um novo *environment* na árvore.
+
+```{r}
+library(ggplot2)
+search()
+```
+
+É por isso que, ao carregar um pacote, podemos utilizar as suas funções sem a necessidade de escrever coisas do tipo `ggplot2::geom_point()`. Agora, veja o que acontece quando usamos a função `attach()`
+
+```{r}
+mighty <- list("Jason" = "vermelho", "Zach" = "Preto", "Billy" = "Azul", 
+     "Trini" = "Amarela", "Kimberly" = "Rosa", "Thomas" = "Verde")
+
+attach(mighty)
+search()
+```
+
+Um novo *environment mighty* é criado acima do *global*! Isso quer dizer que se você não tiver total conhecimento dos objetos que estão sendo anexados, você estará criando uma lista de objetos "invisíveis" que podem ser avaliados mesmo dentro de funções. E veja o que acontece quando carregamos mais pacotes
+
+```{r}
+library(dplyr)
+search()
+```
+
+O *environment* do pacote `dplyr` aparece antes do `mighty`. Isso quer dizer que os objetos do *mighty* podem ser mascarados por todos os pacotes que você carregar a seguir. Veja um simples exemplo de como as coisas podem dar errado.
+
+
+```{r}
+dados <- tibble::tibble(paciente = 1:30, 
+                        cancer = rbinom(30, size = 1, prob = 0.5))
+
+attach(dados)
+cancer
+```
+
+Com o código acima, criamos um banco de dados representando 30 pacientes com (1) ou sem (0) um certo tipo de câncer. As variáveis `paciente` e `cancer` foram anexadas ao rodarmos `attach(dados)`.
+
+Agora, imagine se esse banco de dados tiver informações de tempo até a remissão do câncer e quisermos rodar modelos de sobrevivência. Um passo natural seria carregar a biblioteca `survival`.
+
+```{r}
+library(survival)
+search()
+```
+
+O pacote `survival` também tem um objeto chamado *cancer*. Assim, ao carregá-lo, o *environment survival* ficará na frente do *environment dados* na árvore e, se não prestarmos atenção com o *warning*, esse será o nosso novo objeto `cancer`.
+
+```{r}
+head(cancer)
+```
+
+Assim, se for utilizar a função `attach()` é preciso ter muito cuidado com o que se está fazendo. E a melhor dica é **não use**.
+
+Esse post foi apenas uma introdução sobre como os *environments* funcionam. Ainda existe muito mais coisa por trás, como o conceito de *namespaces*. Se você quiser saber mais, recomendo como primeira parada [esse post](https://www.r-bloggers.com/environments-in-r/), do qual tirei boa parte das informações passadas aqui. Também vale a pena dar uma olhada nas definições [nesse link](https://cran.r-project.org/doc/manuals/R-lang.html#Environment-objects).
+
+Sugestões, dúvidas e críticas, deixe um comentário!

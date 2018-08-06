@@ -1,0 +1,64 @@
+---
+title: "Quebrando CAPTCHAs - Parte V: Redes Neurais"
+date: "2017-06-05T13:07:31+02:00"
+tags: ["r", "captcha"]
+categories: ["r"]
+banner: "img/banners/keras.jpg"
+author: ["Julio"]
+draft: true
+summary: "No último post sobre CAPTCHAs anunciei uma série de posts sobre CAPTCHAs. Uma da nossas iniciativas principais nesse tema é a criação do pacote decryptr, um framework completo para modelagem de CAPTCHAs. Hoje veremos como..."
+---
+
+
+
+<p>Nesse post tentarei falar da parte teórica por trás dos modelos</p>
+<div id="definicao" class="section level2">
+<h2>Definição</h2>
+</div>
+<div id="sequence-labelling" class="section level2">
+<h2>Sequence labelling</h2>
+<p>O objetivo da classificação sequencial é atribuir sequências de valores obtidos de um alfabeto finito. As aplicações mais comuns dessa área são classificação de áudio (<em>speech recognition</em>) e leitura de textos escritos à mão (usando imagens).</p>
+<p>O nosso caso é muito similar com a leitura de textos escritos à mão, com a diferença de que os caracteres são independentes.</p>
+<p>A tarefa de classificação sequencial se subdivide em três tipos:</p>
+<ol style="list-style-type: decimal">
+<li>Classificação de sequência: cada sequência tem uma categoria própria.</li>
+<li>Classificação de segmentos: existe um número fixo de segmentos no <em>input</em> e cada segmento recebe uma classificação.</li>
+<li>Classificação temporal: os segumentos do <em>input</em> não são fixos.</li>
+</ol>
+<p>Nosso interesse reside em (2).</p>
+</div>
+<div id="redes-neurais" class="section level2">
+<h2>Redes neurais</h2>
+<p>Dois tipos</p>
+<ul>
+<li>Feed-forward NN -&gt; perceptron</li>
+<li>Recurrent NN</li>
+</ul>
+</div>
+<div id="perceptron" class="section level2">
+<h2>Perceptron</h2>
+<div id="exemplo" class="section level3">
+<h3>Exemplo</h3>
+</div>
+</div>
+<div id="layers-utilizados-no-modelo" class="section level2">
+<h2>Layers utilizados no modelo</h2>
+<div id="dense-layer" class="section level3">
+<h3>Dense layer</h3>
+<div id="ativacao" class="section level4">
+<h4>Ativação</h4>
+</div>
+</div>
+<div id="redes-convolucionais" class="section level3">
+<h3>Redes convolucionais</h3>
+</div>
+<div id="redes-de-memoria-longa" class="section level3">
+<h3>Redes de memória longa</h3>
+</div>
+<div id="bidirecional" class="section level3">
+<h3>Bidirecional</h3>
+</div>
+</div>
+<div id="otimizacao" class="section level2">
+<h2>Otimização</h2>
+</div>

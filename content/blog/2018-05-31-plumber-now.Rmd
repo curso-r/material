@@ -1,0 +1,37 @@
+---
+title: "Hospede a sua API plumber com o now"
+date: "2018-05-31T00:00:00+00:00"
+tags: ["r", "api"]
+categories: ["r", "tutoriais"]
+banner: "img/banners/pesqEle.png"
+author: ["Daniel"]
+summary: ""
+draft: false
+---
+
+Neste tutorial vamos contruir uma API usando o pacote [`plumber`](https://github.com/trestletech/plumber) e disponibilizá-la na web usando o [now](https://zeit.co/now). Esse post foi inspirado pela dúvida do @Tadeufelipe neste tweet:
+
+```{r echo=FALSE}
+blogdown::shortcode("tweet", "1001912284090912768")
+```
+
+A ideia do que vamos fazer aqui é exatamente a mesma que fizemos no post [*Hospedando seu Shiny app no now*](http://curso-r.com/blog/2018/03/05/2018-03-05-shiny-now/), a única diferença é que ao invés hospedar um Shiny, vamos hospedar uma API feita com plumber. Para quem não leu o post anterior e para recapitular para quem leu, abaixo copiei a explicação simples do que é o [now](https://zeit.co/now) e o [Docker](https://www.docker.com).
+
+O [now](https://zeit.co/now), originalmente, foi desenvolvido para hospedar aplicativos feitos em nodejs e javascript, mas recentemente eles possibilitaram a hospedagem de aplicativos baseados em [Docker](https://www.docker.com). 
+
+É difícil explicar o que é o [Docker](https://www.docker.com) em poucas palavras, mas ele é uma plataforma de containers que facilita a configuração e preparação do ambiente para a hospedagem de um app. Em outras palavras, você escreve em um arquivo chamado `Dockerfile` especificando como você quer que seja o ambiente, o que você precisa instalar, que arquivos você quer colocar lá dentro. Para este tutorial você só precisará fazer pequenas modificações no `Dockerfile` e não precisará entender profundamente como ele funciona.
+
+## O que é uma API?
+
+API é um termo bem 
+
+
+
+
+
+
+
+
+
+
+

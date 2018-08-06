@@ -1,0 +1,72 @@
+---
+title: "Whatsapp"
+date: "2017-11-24T14:25:00+03:00"
+tags: ["sf", "tidyverse"]
+categories: ["tutoriais", "r"]
+banner: "img/banners/sf.png"
+author: ["Julio"]
+summary: "Hoje mais uma vez fui salvo por uma feature pensada no universo tidy. Dessa vez, o grande culpado foi o sf, um pacote ainda em estágio de desenvolvimento mas que já considero pacas..."
+draft: true
+---
+
+
+
+<pre class="r"><code>txt_tidy &lt;- txt %&gt;% 
+  mutate(message = message %&gt;% 
+           str_replace_all(&quot;(.)\\1{2,}&quot;, &quot;\\1&quot;) %&gt;% 
+           abjutils::rm_accent() %&gt;% 
+           str_to_lower() %&gt;% 
+           str_replace_all(&quot;[^a-z ]&quot;, &quot;&quot;) %&gt;% 
+           str_trim() %&gt;% 
+           str_replace_all(&quot; +&quot;, &quot; &quot;)) %&gt;% 
+  filter(message != &quot;midia omitida&quot;)</code></pre>
+<pre class="r"><code>txt_tidy %&gt;% 
+  mutate(words = str_split(message, &quot; &quot;)) %&gt;% 
+  unnest(words) %&gt;%
+  mutate(words = case_when(
+    words %in% c(&quot;k&quot;, &quot;kk&quot;) ~ &quot;kkk&quot;,
+    words %in% c(&quot;vc&quot;, &quot;vcs&quot;) ~ &quot;vc&quot;,
+    words %in% c(&quot;mto&quot;, &quot;muito&quot;) ~ &quot;muito&quot;,
+    words %in% c(&quot;perigoso&quot;, &quot;pirigoso&quot;) ~ &quot;pirigoso&quot;,
+    str_detect(words, &quot;haha&quot;) ~ &quot;hahaha&quot;,
+    str_detect(words, &quot;pastek&quot;) ~ &quot;pasteko&quot;,
+    words %in% c(&quot;hj&quot;, &quot;hoje&quot;) ~ &quot;hoje&quot;,
+    TRUE ~ words
+  )) %&gt;% 
+  count(words) %&gt;% 
+  filter(!words %in% c(&quot;hahaha&quot;, &quot;kkk&quot;)) %&gt;% 
+  filter(!words %in% c(&quot;&quot;, &quot;ai&quot;, &quot;pra&quot;, &quot;q&quot;, &quot;vou&quot;, &quot;vai&quot;, &quot;ta&quot;, &quot;to&quot;, &quot;pq&quot;), 
+         str_length(words) &gt; 1,
+         !words %in% abjutils::rm_accent(tm::stopwords(&quot;pt&quot;)),
+         n &gt; 30) %&gt;% 
+  with(d3wordcloud::d3wordcloud(words, n))
+  </code></pre>
+<pre class="r"><code>txt_tidy %&gt;% 
+  mutate(person = case_when(
+    person == &quot;Julio Trecenti&quot; ~ &quot;Julio&quot;,
+    person == &quot;Bruno Nápole&quot; ~ &quot;Bruno&quot;,
+    person == &quot;Marcos Nona&quot; ~ &quot;Nona&quot;,
+    person == &quot;Willian Hiroshi&quot; ~ &quot;Hiroshi&quot;,
+    person == &quot;Jader Cel&quot; ~ &quot;Jader&quot;,
+    person == &quot;Letícia Lima&quot; ~ &quot;Letícia&quot;,
+    person == &quot;Leandro Liberti&quot; ~ &quot;Leandro&quot;,
+    person == &quot;Leo Marcos&quot; ~ &quot;Leonardo&quot;,
+    person == &quot;Alessandra Andrade&quot; ~ &quot;Alessandra&quot;,
+    person == &quot;Fezinha&quot; ~ &quot;Fernanda&quot;,
+    person == &quot;Fabio Neri&quot; ~ &quot;Fabio&quot;,
+    TRUE ~ person
+  )) %&gt;% 
+  mutate(person = fct_rev(fct_infreq(person))) %&gt;% {
+    pct &lt;- count(., person) %&gt;% 
+      mutate(p = scales::percent(n / sum(n)))
+    ggplot(., aes(x = person, fill = person)) +
+      geom_bar() +
+      guides(fill = FALSE) +
+      coord_flip() +
+      theme_minimal(16) +
+      geom_text(aes(label = p, y = n), data = pct, hjust = -0.1) +
+      labs(x = &quot;Pessoa&quot;, y = &quot;Mensagens&quot;) +
+      ggtitle(&quot;Quantidade de mensagens por pessoa&quot;) +
+      scale_y_continuous(limits = c(0, 4000), breaks = 0:10 * 500)
+  }
+  </code></pre>

@@ -1,0 +1,77 @@
+---
+title: "Medidas-resumo no tidyverse"
+date: "2017-03-11T13:07:31+02:00"
+tags: ["tidyverse", "dplyr", "purrr"]
+categories: ["tutoriais", "r"]
+banner: "img/banners/quartis.png"
+author: ["Julio"]
+draft: false
+summary: "Hoje estava fazendo uma análise exploratória e precisava estudar os quartis de uma variável contínua. A solução usando o tidyverse é tão elegante que valeu um post no blog."
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, cache = TRUE)
+```
+
+Hoje estava fazendo uma análise exploratória e precisava estudar os quartis de uma variável contínua. A solução usando o `tidyverse` é tão elegante que valeu um post no blog.
+
+Usaremos os pacotes `tibble`, `dplyr`, `tidyr` e `purrr`:
+
+```{r warning=FALSE, message=FALSE}
+library(tibble)
+library(dplyr)
+library(tidyr)
+library(purrr)
+```
+
+Nesse exemplo, usamos a famosa base `mtcars`
+
+```{r}
+tab <- mtcars %>% 
+  group_by(am, vs) %>% 
+  nest() %>% 
+  mutate(quartis = map(data, ~enframe(quantile(.x$mpg, 1:3 / 4)))) %>% 
+  unnest(quartis) %>% 
+  spread(name, value)
+tab
+```
+
+- A função `dplyr::group_by()` faz um grupo para cada combinação de `am` e `vs`.
+- A função `tidyr::nest()` guarda os dados de cada grupo numa *list-column* chamada `data`.
+- A função `purrr::map()` aplica elegantemente a função `quantile()` para cada grupo de datas, sendo ajudada pela função `tibble::enframe()`, que coloca o resultado de `quantile()` em uma `tibble`.
+- A função `tidyr::unnest()` coloca os resultados de volta em colunas-vetores.
+- Terminamos com `tidyr::spread()` para espalhar os quartis nas colunas.
+
+O resultado pode ser jogado diretamente numa tabela:
+
+```{r}
+knitr::kable(tab)
+```
+
+É possível mudar esse código para ter outras medidas-resumo, por exemplo. Para isso, podemos usar a função `summary()`, por exemplo, ou criar nossa própria função.
+
+```{r}
+mtcars %>%
+  group_by(am, vs) %>% 
+  nest() %>% 
+  mutate(s = map(data, ~enframe(summary(.x$mpg)))) %>% 
+  unnest(s) %>% 
+  spread(name, value) %>% 
+  knitr::kable()
+```
+
+Como você resolveria essa task? Escreva nos comentários!
+
+**OBS**: Outra solução para a mesma task, mais concisa, usando `dplyr::do()`:
+
+```{r}
+mtcars %>% 
+  group_by(am, vs) %>% 
+  do(enframe(summary(.$mpg))) %>% 
+  spread(name, value) %>% 
+  knitr::kable()
+```
+
+Mas: tome cuidado! Se o Hadley diz...
+
+![](http://lsru.github.io/r_workshop/img/purrr_do.png)

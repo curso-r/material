@@ -1,0 +1,270 @@
+---
+title: "São Paulo e o problema da mochila"
+date: "2017-08-12T13:07:31+02:00"
+tags: ["r"]
+categories: ["análises", "r"]
+banner: "img/banners/pug_knapsack.png"
+author: ["Julio"]
+draft: false
+summary: "São Paulo tem 12 milhões de habitantes! Nesse post, discutiremos como fazer São Paulo caber numa mochila cheia de municípios."
+---
+
+```{r echo=F}
+knitr::opts_chunk$set(collapse = TRUE, cache = TRUE)
+```
+
+São Paulo é a minha cidade preferida. Não só porque moro aqui, mas também porque é uma cidade cheia de diversidade, boa gastronomia e oportunidades. Para sentir um pouco dessa *vibe*, recomendo passear na avenida Paulista aos domingos. É sensacional!
+
+Mas a cidade da diversidade só é o que é porque temos muita, muita gente nela. O município tem 12 milhões de habitantes. Esse número é tão grande que temos um paulistano para cada 17 brasileiros! Se São Paulo fosse um país, [seria o 77 do mundo](https://en.wikipedia.org/wiki/List_of_countries_and_dependencies_by_population), ganhando de países como a Bélgica, Grécia, Portugal, Bolívia e muitas outras.
+
+Outro dia eu estava pensando na seguinte problemática: qual é a área do Brasil ocupada pela população de São Paulo? Ou seja, se pegarmos os municípios com grandes áreas, quanto do país conseguiríamos preencher com 12 milhões de habitantes?
+
+O interessante é que essa questão recai exatamente no *problema da mochila*, que é um famoso desafio de programação inteira. Depois de [estudar profundamente no wikipedia](https://en.wikipedia.org/wiki/Knapsack_problem) (`r emo::ji('laugh')`), vi que o problema não é tão trivial como parece.
+
+## O problema da mochila
+
+Considere o seguinte contexto: você tem uma mochila com capacidade de 15kg e precisa carregar a combinação de itens com maior valor, com cada item possuindo valores e pesos diferentes. 
+
+```{r, fig.cap='Knapsack problem. Retirado do [Wikipedia](https://en.wikipedia.org/wiki/Knapsack_problem#/media/File:Knapsack.svg).', echo=FALSE}
+# knitr::include_graphics('img/knapsack.svg')
+knitr::include_graphics('https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/Knapsack.svg/250px-Knapsack.svg.png')
+```
+
+Outra forma de pensar nesse problema é com um cardápio de restaurante:
+
+```{r echo=FALSE, fig.cap='XKCD sobre o knapsack problem.'}
+knitr::include_graphics('https://imgs.xkcd.com/comics/np_complete.png')
+```
+
+Em linguagem matemática, o que temos é a task:
+
+$$
+\begin{aligned}
+& \text{maximizar } \sum_{i=1}^n v_i x_i \\ 
+& \text{sujeito à } \sum_{i=1}^n w_i x_i \leq W, \text{ com } x_i \in\{0,1\}\\ 
+\end{aligned}
+$$
+
+No nosso caso essas letras significam isso aqui:
+
+- $n$ é o número de municípios no Brasil (5570).
+- $v_i$ é a área do município $i$.
+- $w_i$ é a população do município $i$.
+- $W$ é a população de São Paulo (12 milhões).
+- $x=(x_1,\dots,x_n)^\top$ é o vetor que seleciona os municípios. Se o município $i$ faz parte da solução $x_i=1$ e, caso contrário, $x_i=0$. 
+
+Ou seja, queremos escolher municípios para colocar na mochila tentando maximizar a área, mas o máximo de população que podemos contemplar é 12 milhões.
+
+O problema da mochila é muito interessante pois trata-se de um problema NP-difícil, ou seja, não existe um algoritmo de polinomial capaz de resolvê-lo. Se $w_i > 0, \forall i\in1,\dots,n$ então a solução pode ser encontrada com um algoritmo pseudo-polinomial.
+
+### Forma ad-hoc
+
+Se $x_i$ pudesse assumir valores entre zero e um (ou seja, se pudéssemos selecionar apenas pedaços de municípios), a solução seria trivial. Bastaria colocar os municípios em ordem decrescente pela razão $v_i/w_i$ e escolher os municípios ou parte deles até obter $W$.
+
+Isso indica uma forma sub-ótima de resolver o problema. Chamamos essa solução de ad-hoc. A solução é encontrada assim:
+
+1. Colocar os municípios em ordem decrescente pela razão $v_i/w_i$,
+1. Escolher os municípios de maior razão até que a população do próximo município estoure $W$.
+1. Escolher outros municípios com maior razão na ordem até não ser possível incluir mais nenhum município.
+
+### Solução ótima
+
+A solução ótima pode ser encontrada usando a função `mknapsack()` do pacote `adagio`. Por exemplo, considere os vetores de pesos `w`, valores `p` e máximo `cap` abaixo.
+
+```{r}
+p <- c(15, 100, 90, 60, 40, 15, 10,  1)
+w <- c( 2,  20, 20, 30, 40, 30, 60, 10)
+cap <- 102
+```
+
+O vetor-solução é dado por
+
+```{r}
+is <- adagio::mknapsack(p, w, cap)
+is$ksack
+```
+
+## Dados
+
+As áreas e estimativas das populações dos municípios do Brasil em 2016 foram obtidas do IBGE. A leitura é realizada usando pacotes do `tidyverse`.
+
+**Pacotes:**
+
+```{r pkg, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(janitor)
+library(readxl)
+library(httr)
+```
+
+**Áreas:**
+
+```{r area, message=FALSE, warning=FALSE, eval = FALSE}
+url_area <- paste0(
+  'ftp://geoftp.ibge.gov.br',
+  '/organizacao_do_territorio/estrutura_territorial/areas_territoriais/2016/',
+  'AR_BR_RG_UF_MUN_2016.xls'
+) %>% GET(write_disk('area.xls', overwrite = TRUE))
+
+area <- read_excel('area.xls') %>%
+  clean_names() %>%
+  filter(!is.na(id)) %>% 
+  select(uf = nm_uf_sigla, cd_gcmun, muni = nm_mun_2016, area = ar_mun_2016)
+```
+
+```{r, message=FALSE, warning=FALSE, echo = FALSE}
+area <- read_excel('../../static/data/sao-paulo/area.xls') %>%
+  clean_names() %>%
+  filter(!is.na(id)) %>% 
+  select(uf = nm_uf_sigla, cd_gcmun, muni = nm_mun_2016, area = ar_mun_2016)
+```
+
+**População:**
+
+```{r pop, message=FALSE, warning=FALSE, eval = FALSE}
+url_pop <- paste0(
+  'ftp://ftp.ibge.gov.br',
+  '/Estimativas_de_Populacao/Estimativas_2016/',
+  'estimativa_TCU_2016_20170614.xls'
+) %>% GET(write_disk('pop.xls', overwrite = TRUE))
+
+loc <- locale(grouping_mark = '.', decimal_mark = ',')
+pop <- read_excel('pop.xls', skip = 1, sheet = 2) %>%
+  clean_names() %>%
+  filter(!is.na(cod_munic)) %>%
+  mutate(pop = parse_number(`população_estimada`, locale = loc),
+         cd_gcmun = paste0(cod_uf, cod_munic)) %>%
+  select(cd_gcmun, pop)
+```
+
+```{r message=FALSE, warning=FALSE, echo = FALSE}
+loc <- locale(grouping_mark = '.', decimal_mark = ',')
+pop <- read_excel('../../static/data/sao-paulo/pop.xls', skip = 1, sheet = 2) %>%
+  clean_names() %>%
+  filter(!is.na(cod_munic)) %>%
+  mutate(pop = parse_number(`população_estimada`, locale = loc),
+         cd_gcmun = paste0(cod_uf, cod_munic)) %>%
+  select(cd_gcmun, pop)
+```
+
+
+Para completar, temos os shapefiles dos municípios. Os originais foram baixados [nesse link](ftp://geoftp.ibge.gov.br/organizacao_do_territorio/malhas_territoriais/malhas_municipais/municipio_2016/Brasil/BR/), mas fiz um código para reduzir a resolução e preferi omitir do post. Se quiser ver, entre no [repositório que gera esse site](https://github.com/curso-r/site). Para ler os shapes usamos o pacote `sf`:
+
+```{r, message=FALSE, warning=FALSE, eval=FALSE, echo=FALSE}
+dir.create('mapa', showWarnings = FALSE)
+paste0(
+  'ftp://geoftp.ibge.gov.br',
+  '/organizacao_do_territorio/malhas_territoriais/',
+  'malhas_municipais/municipio_2016/Brasil/BR/br_municipios.zip'
+) %>% GET(write_disk('mapa/mapa.zip'))
+
+unzip('mapa/mapa.zip', exdir = 'mapa/')
+# omiti esse código
+nc <- st_read("mapa/BRMUE250GC_SIR.shp", quiet = TRUE) %>%
+  st_simplify(dTolerance = .1) %>% 
+  mutate(len = map_int(geometry, ~length(.x[[1]]))) %>% 
+  filter(len > 0) %>% 
+  clean_names() %>%
+  mutate(cd_geocmu = as.character(cd_geocmu)) %>%
+  select(cd_geocmu, geometry) %>%
+  as_tibble()
+saveRDS(nc, 'sf_municipios.rds', compress = 'bzip2')
+```
+
+No final, vamos dar um join das tabelas:
+
+```{r}
+dados <- area %>% 
+  left_join(pop, 'cd_gcmun') %>%
+  mutate(razao = area / pop) %>%
+  filter(!is.na(pop))
+```
+
+## Resultados
+
+A solução ad-hoc e ótima são computadas com esse código:
+
+```{r}
+d_solucao <- dados %>% 
+  arrange(desc(razao)) %>% # ordena para solucao adhoc funcionar
+  mutate(area2 = as.integer(area * 1000), # necessario para mknapsack funcionar
+         s_knapsack = adagio::mknapsack(area2, pop, max(pop))$ksack,
+         acu = cumsum(pop),
+         s_adhoc0 = if_else(acu < max(pop), 1, 0),
+         s_adhoc = s_adhoc0) 
+```
+
+Agora, vamos melhorar a solução ad-hoc incluindo os melhores municípios.
+
+```{r}
+id_melhor <- 0
+pop_faltam <- with(d_solucao, max(pop) - sum(s_adhoc0 * pop))
+while (is.na(id_melhor)) {
+  # pega id do melhor municipio a ser incluido
+  id_melhor <- with(d_solucao, which(pop <= pop_faltam & s_adhoc == 0)[1])
+  if (is.na(id_melhor)) {
+    d_solucao$s_adhoc[id_melhor] <- 1
+    pop_faltam <- with(d_solucao, max(pop) - sum(s_adhoc * pop))
+  }
+}
+```
+
+A Tabela \@ref(tab:dif) mostra os municípios que foram classificados diferentemente nos dois métodos. Note que a solução ótima trocou apenas um município da solução adhoc (Nova Aurora - GO) pelo município de Monte Alegre de Minas - MG.
+
+```{r dif}
+d_solucao %>% 
+  filter(s_adhoc != s_knapsack) %>% 
+  select(uf, muni, area, pop, s_adhoc, s_knapsack) %>% 
+  knitr::kable(caption = 'Municípios diferentes nas duas soluções.')
+```
+
+A Tabela \@ref(tab:dif2) mostra a diferença dos resultados dos dois métodos. A solução ótima fica com apenas 92 pessoas a menos que São Paulo.
+
+```{r dif2, echo=FALSE}
+d_solucao %>%
+  summarise(sol_knapsack = sum(pop * s_knapsack),
+            sol_adhoc = sum(pop * s_adhoc),
+            area_knapsack = sum(area * s_knapsack),
+            area_adhoc = sum(area * s_adhoc),
+            max = max(pop)) %>%
+  gather(key, value, -max) %>%
+  separate(key, c('tipo', 'metodo'), sep = '_', fill = 'right') %>%
+  spread(tipo, value) %>%
+  mutate(dif = max - sol) %>%
+  add_row(metodo = 'São Paulo', area = '-', sol = .$max[1], dif = 0) %>%
+  select(-max) %>% 
+  set_names(c('Método', 'Área total', 'População total', 
+              'Diferença para sp')) %>% 
+  knitr::kable(caption = 'Diferença dos resultados.')
+```
+
+
+## Mapa final
+
+Visualmente, a solução ótima e a solução adhoc são idênticas. Por isso vou mostrar apenas como fica o mapa para a solução ótima.
+
+O resultado aparece na Figura \@ref(fig:final). É realmente impressionante ver que aquela regiãozinha vermelha tem a mesma população que toda a região azul do mapa.
+
+```{r echo=FALSE, eval=FALSE}
+p_final <- st_read("mapa/BRMUE250GC_SIR.shp", quiet = TRUE) %>%
+  clean_names() %>%
+  mutate_if(is.factor, as.character) %>% 
+  inner_join(d_solucao, c('cd_geocmu' = 'cd_gcmun')) %>% 
+  mutate(cd_geocmu = as.character(cd_geocmu)) %>%
+  mutate(Resultado = as.factor(case_when(
+    muni == 'SÃO PAULO' ~ 'São Paulo',
+    s_knapsack == 1 ~ 'Incluso',
+    TRUE ~ 'Não Incluso'
+  ))) %>%
+  ggplot() +
+  geom_sf(aes(fill = Resultado), size = 0, colour = 'gray40') +
+  theme_void(16) +
+  scale_fill_manual(values = c('royalblue', 'gray80', 'red'))
+```
+
+```{r final, fig.cap='Mapa do Brasil final.', echo=FALSE}
+knitr::include_graphics('https://raw.githubusercontent.com/curso-r/site/master/content/blog/img/mapa-final.png')
+```
+
+
+É isso! Happy coding ;)

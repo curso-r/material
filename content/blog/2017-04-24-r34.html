@@ -1,0 +1,118 @@
+---
+title: "R 3.4 disponível!"
+date: "2017-04-24T13:07:31+02:00"
+tags: ["r", "versão"]
+categories: ["divulgação", "r"]
+banner: "img/banners/fastr.jpg"
+author: ["Julio"]
+summary: "A versão 3.4 do R foi lançada nesse final de semana! A atualização tem foco principal em performance. Veja as mudanças."
+---
+
+
+
+<p>A versão 3.4 do R (You Stupid Darkness) foi lançada nesse final de semana! A atualização tem foco principal na performance. Principais mudanças:</p>
+<ol style="list-style-type: decimal">
+<li>Agora temos um compilador JIT (Just In Time) como padrão! Isso significa que você não precisará mais usar a função <code>compiler::cmpfun()</code> para acelerar suas funções na maioria dos casos. Mais sobre isso abaixo.</li>
+<li>O <code>for</code> ficou mais eficiente. Agora a alocação dinâmica de vetores está mais rápida, diminuindo ainda mais a diferença entre utilizar <code>for</code> e funcionais como <code>sapply()</code>, que trabalham com um vetor pré alocado. Mais sobre isso abaixo.</li>
+<li>Otimizações em operações com matrizes. Não vou entrar em detalhes, mas talvez vocês notem algumas melhorias.</li>
+<li>Agora o método padrão para ordenar vetores é <code>radix</code>, o que pode aumentar a velocidade de ordenações para vetores com mais de mil entradas.</li>
+</ol>
+<p>Para uma lista completa de mudanças, <a href="https://www.r-bloggers.com/r-3-4-0-is-released-with-new-speed-upgrades-and-bug-fixes/">veja esse post</a>.</p>
+<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-2"></span>
+<img src="/blog/2017-04-24-r34_files/figure-html/unnamed-chunk-2-1.png" alt="R mais rápido! Imagem emprestada do time do [Rcpp](https://github.com/RcppCore)." width="672" />
+<p class="caption">
+Figure 1: R mais rápido! Imagem emprestada do time do <a href="https://github.com/RcppCore">Rcpp</a>.
+</p>
+</div>
+<div id="jit" class="section level1">
+<h1>Mais sobre o JIT compiler</h1>
+<p>Veja esse exemplo extraído do livro <a href="https://csgillespie.github.io/efficientR/programming.html">Efficient R</a>. Observe a existência de um <code>&lt;bytecode ...&gt;</code> na parte de baixo de uma das funções. Isso significa que o pacote <code>compiler</code> converteu essa função em um código que pode ser interpretado mais rápido.</p>
+<pre class="r"><code>mean_r = function(x) {
+  m = 0
+  n = length(x)
+  for(i in seq_len(n))
+    m = m + x[i] / n
+  m
+}
+cmp_mean_r &lt;- compiler::cmpfun(mean_r)
+
+mean_r
+## function(x) {
+##   m = 0
+##   n = length(x)
+##   for(i in seq_len(n))
+##     m = m + x[i] / n
+##   m
+## }
+cmp_mean_r
+## function(x) {
+##   m = 0
+##   n = length(x)
+##   for(i in seq_len(n))
+##     m = m + x[i] / n
+##   m
+## }
+## &lt;bytecode: 0x7ff3f7c24aa8&gt;</code></pre>
+<p>Para mostrar a mudança, vamos comparar o desempenho das funções usando <code>microbenchmark()</code>. Essa função calcula o tempo de execução de uma expressão cem vezes e calcula estatísticas básicas dos tempos obtidos.</p>
+<p>No meu servidor, que ainda está com o R 3.3.2, o resultado foi esse. Observe que o tempo da função compilada é quase dez vezes o tempo da função sem compilar.</p>
+<pre class="r"><code>set.seed(1)
+x &lt;- rnorm(5000)
+microbenchmark::microbenchmark(mean_r(x), cmp_mean_r(x), mean(x))
+# Unit: microseconds
+#           expr      min       lq       mean    median        uq      max neval
+#      mean_r(x) 1931.835 2010.295 2302.82298 2102.5995 2357.6715 6186.706   100
+#  cmp_mean_r(x)  308.847  311.045  333.26221  314.8935  334.7330  569.117   100
+#        mean(x)   14.593   15.443   19.94897   19.0410   21.0405   51.375   100</code></pre>
+<p>No meu computador com o R 3.4, o resultado foi esse. Agora, a diferença entre a função sem compilar e compilada é praticamente impoerceptível. Esse é o efeito do JIT compiler.</p>
+<pre class="r"><code>set.seed(1)
+x &lt;- rnorm(5000)
+microbenchmark::microbenchmark(mean_r(x), cmp_mean_r(x), mean(x))
+# Unit: microseconds
+#           expr     min       lq     mean   median       uq     max neval
+#      mean_r(x) 332.322 332.7220 336.2287 333.0125 334.3785 395.954   100
+#  cmp_mean_r(x) 332.305 332.7345 337.0889 333.1460 337.0930 381.306   100
+#        mean(x)  13.807  14.0960  14.7349  14.3060  14.5540  30.313   100</code></pre>
+</div>
+<div id="for" class="section level1">
+<h1>Mais sobre o for</h1>
+<p>Veja esse código que calcula a média de mil valores em 100 entradas de uma lista.</p>
+<pre class="r"><code>set.seed(1)
+input &lt;- lapply(1:100, function(x) runif(1000))
+
+mean_for &lt;- function(x) {
+  vet &lt;- c()
+  for(i in seq_along(x)) {
+    vet[i] &lt;- mean(x[[i]])
+  }
+}
+mean_sapply &lt;- function(x) {
+  sapply(x, mean)
+}</code></pre>
+<p>No meu servidor, que ainda está com o R 3.3.2, o resultado foi esse. Veja como o desempenho do <code>for</code> é assustadoramente inferior.</p>
+<pre class="r"><code>microbenchmark::microbenchmark(mean_for(x), mean_sapply(x))
+# Unit: milliseconds
+#            expr      min       lq     mean   median       uq      max neval
+#     mean_for(x) 41.28675 43.22318 47.39574 44.02713 45.59184 84.80818   100
+#  mean_sapply(x) 14.78590 15.46421 16.36619 16.23018 17.28495 19.70854   100</code></pre>
+<p>No meu computador com o R 3.4, o resultado foi esse. Agora o <code>for</code> está praticamente empatado!</p>
+<pre class="r"><code>microbenchmark::microbenchmark(mean_for(x), mean_sapply(x))
+# Unit: milliseconds
+#            expr      min       lq     mean   median       uq      max neval
+#     mean_for(x) 15.16583 15.45924 16.71064 16.14545 17.51002 25.61860   100
+#  mean_sapply(x) 14.43704 14.90485 16.20864 15.53319 16.56801 27.36536   100 </code></pre>
+<p>Mas cuidado! o <code>for</code> continua sendo uma ideia ruim no R, não só por desempenho, mas por questões de <em>design</em>. Utilizar funcionais ajuda na performance do computador e torna a vida do cientista de dados mais fácil (veja <a href="http://curso-r.com/blog/2017/04/10/2017-04-08-progress/">esse</a> e <a href="http://curso-r.com/blog/2017/03/19/2017-03-14-parallel/">esse</a> posts que discutem um pouco sobre isso.)</p>
+<div id="instalacao" class="section level2">
+<h2>Instalação</h2>
+<p>Se você usa Windows, uma dica é usar o pacote <code>installr</code>. Basta rodar isso aqui e ser feliz:</p>
+<pre class="r"><code>install.packages(&quot;installr&quot;)
+installr::updateR()</code></pre>
+<p>É isso! Happy coding ;)</p>
+<p>OBS: Se você ficou curiosa sobre o nome da versão, encontrei essa tirinha de 1965 do Peanuts. Acho que foi isso que deu origem ao nome!</p>
+<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-10"></span>
+<img src="/blog/2017-04-24-r34_files/figure-html/unnamed-chunk-10-1.png" alt="You Stupid Darknes! http://www.gocomics.com/peanuts/1965/09/09." width="960" />
+<p class="caption">
+Figure 2: You Stupid Darknes! <a href="http://www.gocomics.com/peanuts/1965/09/09" class="uri">http://www.gocomics.com/peanuts/1965/09/09</a>.
+</p>
+</div>
+</div>
+</div>

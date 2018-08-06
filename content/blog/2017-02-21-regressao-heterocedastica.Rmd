@@ -1,0 +1,141 @@
+---
+title: "Modelando a variância da normal"
+date: "2017-03-09T13:07:31+02:00"
+tags: ["modelagem", "regressão", "bayes"]
+categories: ["tutoriais", "r"]
+banner: "img/banners/banner-variancia-normal.png"
+author: ["Fernando"]
+summary: "Verificar as suposições dos modelos é muito importante quando fazemos inferência estatística. Em particular, a suposição de homocedasticidade dos modelos de regressão linear é especialmente importante, pois influencia o cálculo de erros padrão, intervalos de confiança e valores-p. Neste post, vou mostrar três pacotes do R que ajustam modelos de regressão linear heterocedastica."
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, 
+                      comment = '', error = FALSE, cache = TRUE)
+library(magrittr)
+```
+
+Verificar as suposições dos modelos é muito importante quando fazemos inferência estatística. Em particular, a suposição de homocedasticidade[^homo_def] dos modelos de regressão linear é especialmente importante, pois modifica o cálculo de erros padrão, intervalos de confiança e valores-p.
+
+[^homo_def]: Uma regressão linear é homocedástica quando a variabilidade dos erros não depende das covariáveis do modelo.
+
+Neste post, vou mostrar três pacotes do R que ajustam modelos da forma
+
+$$ Y_i = \beta_0 + \sum_{k=1}^p\beta_kx_{ik} + \epsilon_i, \ i = 1,\ldots,n$$
+
+$$ \epsilon_{i} \sim \textrm{N}(0,\sigma_i), \ i = 1,\ldots,n \ \textrm{independentes, com }\sigma_i^2 = \alpha x_i^2.  $$
+
+Além de mostrar como se faz, também vou ilustrar o desempenho dos pacotes em um exemplo simulado. O modelo que gerará os dados do exemplo terá a seguinte forma funcional
+
+$$ Y_i = \beta x_i + \epsilon_i, \ i = 1,...n $$
+$$ \epsilon_i \sim N(0, \sigma_i)\text{ independentes, com }\sigma_i = \alpha\sqrt{|x_i|},$$
+
+e os parâmetros do modelo serão os valores $\beta = 1$ e $\alpha = 4$. A heterocedasticidade faz com que os pontos desenhem um cone ao redor da reta de regressão.
+
+```{r}
+
+library(ggplot2)
+
+N <- 1000
+
+set.seed(11071995)
+X <- sample((N/100):(N*3), N)
+Y <- rnorm(N,X,4*sqrt(X))
+
+qplot(X,Y) + 
+  theme_bw(15) + 
+  geom_point(color = 'darkorange')
+
+X2 <- sqrt(X)
+dataset <- data.frame(Y,X,X2)
+
+```
+
+### Usando o pacote `gamlss`
+
+Quando se ajusta um GAMLSS, você pode modelar os parâmetros de locação, escala e curtose ao mesmo tempo em que escolhe a distribuição dos dados dentre uma grande gama de opções. Escolhendo a distribuição normal e modelando apenas os parâmetros de locação e escala, o GAMLSS ajusta modelos lineares normais com heterocedasticidade.
+
+No código abaixo, o parâmetro `formula = Y ~ X-1` indica que a função de regressão será constituída por um preditor linear em `X` sem intercepto. Já o parâmetro `sigma.formula = ~X2-1` indica que o desvio padrão será modelado por um preditor linear em `X2` (ou raiz de `X`), também sem intercepto.
+
+```{r}
+
+library(gamlss)
+
+fit_gamlss <- gamlss::gamlss(formula = Y ~ X-1,
+                             sigma.formula = ~X2-1,
+                             data = dataset,
+                             family = NO())
+```
+
+Conforme descrito no sumário abaixo, a estimativa de alfa está muito abaixo do valor simulado.
+
+```{r}
+summary(fit_gamlss)
+```
+
+### Usando o pacote `dglm`
+
+Quando se ajusta um Modelo Linear Generalizado Duplo (MLGD em português e DGLM em inglês), você tem uma flexibilidade parecida com a de um GAMLSS. Entretanto, você não pode definir um modelo para a curtose e a classe de distribuições disponível é bem menor.
+
+O código abaixo, similar ao utilizado para ajustar o GAMLSS, ajusta um DGLM aos dados simulados.
+
+```{r}
+library(dglm)
+
+fit <- dglm(Y~X-1, dformula = ~X2-1,data = dataset, family = gaussian, method = 'reml')
+```
+
+Novamente, verifica-se que o alfa estimado está muito distante do verdadeiro alfa.
+
+```{r}
+summary(fit)
+```
+
+### Usando o pacote `rstan`
+
+[Stan](http://mc-stan.org/) é uma linguagem de programação voltada para descrever e manipular objetos probabilísticos, como por exemplo variáveis aleatórias, processos estocásticos, distribuições de probabilidades etc. Essa linguagem foi projetada para tornar intuitivo e simples o ajuste de modelos estatísticos. Em particular, a forma de descrever modelos bayesianos é bem cômoda. 
+
+O `stan` possui várias interfaces para `R`. A mais básica é o `rstan`, que será utilizada aqui. A principal função desse pacote é a função `rstan`, que possui dois parâmetros básicos:
+
+- um parâmetro `model_code =`, que recebe um código que descreve o modelo na linguagem `stan`.
+- um parâmetro `data =`, que recebe uma lista contendo os inputs do modelo, tais como dados coletados, parâmetros de distribuições a priori, etc.
+
+Embora esse seja o mínimo que a função precisa, também podemos passar outras componentes. O parâmetro `verbose = FALSE` faz com que a função não imprima nada enquanto roda e o parâmetro `control = list(...)` passa uma lista de opções de controle para o algoritmo de ajuste.
+
+O retorno da função `stan()` é um objeto do tipo `stanfit`, que pode ser sumarizado da mesma forma que outros modelos em R, utilizando a função `summary()` e a função `plot()`.
+
+O código abaixo ilustra a aplicação da função `stan()` ao nosso exemplo.
+
+```{r, eval = FALSE}
+
+library(rstan)
+
+scode <- "data {
+  int<lower=0> N;
+  vector[N] y;
+  vector[N] x;
+}
+parameters {
+  real beta;
+  real<lower=0> alpha;
+}
+model {
+  beta ~ normal(0,10);
+  alpha ~ gamma(1,1);
+
+  y ~ normal(beta * x, alpha * sqrt(x));
+}"
+
+dados <- list(N = nrow(dataset), y = dataset$Y, x = dataset$X)
+
+fit_stan <- rstan::stan(model_code = scode, verbose = FALSE, data = dados,
+             control = list(adapt_delta = 0.99))
+```
+
+A figura abaixo descreve os intervalos de credibilidade obtidos para cada parâmetro do modelo. O ponto central de cada intervalo representa as estimativas pontuais dos parâmetros. Como se nota, as estimativas do modelo utilizando `stan` estão bem próximas dos valores verdadeiros.
+
+```{r, eval = FALSE}
+plot(fit_stan)
+```
+
+![](/img/blog/regressao-heterocedastica/imagem_fernando_1.jpg)
+

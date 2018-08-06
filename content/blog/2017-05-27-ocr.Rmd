@@ -1,0 +1,221 @@
+---
+title: "PDF e OCR"
+date: "2017-05-28T13:07:31+02:00"
+tags: ["pdf", "pacotes", "ocr"]
+categories: ["tutoriais", "r"]
+banner: "img/banners/pdf-to-text.jpg"
+author: ["Julio"]
+draft: false
+summary: "Já precisou extrair dados de arquivos pdf? Bom, eu já. Eu trabalho com jurimetria e preciso extrair dados de diários oficiais, petições, sentenças, então já viu né... A primeira pergunta que você precisa fazer antes de ler um pdf é: o arquivo é digital ou digitalizado?"
+---
+
+```{r include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, cache = TRUE)
+```
+
+
+Já precisou extrair dados de arquivos pdf? Bom, eu já. Eu trabalho com [jurimetria](http://abj.org.br) e preciso extrair dados de diários oficiais, petições, sentenças, então já viu né...
+
+A primeira pergunta que você precisa fazer antes de ler um pdf é: o arquivo é *digital* ou *digitalizado*? 
+
+- Se for digital, significa que ele pode ser transcrito diretamente para vários formatos: texto, html, xml e até mesmo `data.frame`s diretamente. 
+
+[Vamos usar esse exemplo de PDF digital](/data/ocr/pdf_digital.pdf) 
+
+Se estiver no desktop, é possível ver o documento abaixo:
+
+<object data="/data/ocr/pdf_digital.pdf" width="100%" height="375" type="application/pdf"></object>
+
+- Se for digitalizado, você precisará passar um algoritmo de OCR (Optical Character Recognition) para extrair os dados. Provavelmente seu output nesse caso será sempre texto.
+
+[Vamos usar esse exemplo de PDF digitalizado](/data/ocr/pdf_digitalizado.pdf)
+
+Se estiver no desktop, é possível ver o documento abaixo:
+
+<object data="/data/ocr/pdf_digitalizado.pdf" width="100%" height="375" type="application/pdf"></object>
+
+**Obs:** é possível que seu arquivo seja digitalizado, mas já com uma OCR passada no próprio arquivo. Nesse caso, você pode tratar o documento como digital.
+
+Os créditos dos pacotes abaixo vão todos para o [Jeroen Ooms](https://github.com/jeroen), um dos maiores autores de pacotes da comunidade `R` nos últimos dez anos. Sou fã desse cara!
+
+## Pacote `pdftools` para PDFs digitais
+
+Para instalar o `pdftools` no Windows e no Mac, basta rodar
+
+```{r eval=FALSE}
+install.packages("pdftools")
+```
+
+Para instalar no Linux, siga as instruções [desse link](https://github.com/ropensci/pdftools).
+
+### PDF para texto
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(stringr)
+library(pdftools)
+pdf <- '../../static/data/ocr/pdf_digital.pdf'
+txt <- pdf_text(pdf)
+
+# imprimindo só os 500 primeiros caracteres da primeira página
+cat(str_trunc(txt[1], 500))
+```
+
+### PDF para HTML ou XML
+
+Muitas vezes queremos pegar estruturas no texto que dependem da posição dos elementos. Por exemplo, o texto em um PDF pode estar dividido em várias colunas. Para isso, o ideal seria transformar o arquivo em dados semi-estruturados como HTML ou XML, que separam os elementos do conteúdo do PDF em *tags*.
+
+Infelizmente, o `pdftools` ainda não transforma em HTML nem XML. Para soltar um HTML, vamos montar uma função que chama `pdftohtml` do `poppler` por command line.
+
+```{r}
+pdf_html <- function(pdf) {
+  infos <- pdf_info(pdf)              # pega infos do pdf
+  html <- tempfile(fileext = '.html') # cria arquivo temporário
+  
+  # monta comando a ser executado. 
+  # não sei se funciona em Windows ;)
+  command <- sprintf('pdftohtml -f 1 -l %s -q -i -s -noframes %s %s', 
+                     infos$pages,
+                     normalizePath(pdf),
+                     html)
+  
+  system(command)                     # roda comando e salva
+  txt <- readr::read_file(html)       # lê arquivo salvo
+  file.remove(html)                   # remove arquivo temporário
+  txt
+}
+```
+
+Você pode brincar com o HTML usando o pacote `rvest`:
+
+```{r warning=FALSE, message=FALSE}
+library(rvest)
+```
+
+```{r eval=FALSE}
+html <- pdf_html(pdf)
+```
+
+```{r echo=FALSE}
+html <- readRDS('../../static/data/ocr/html_pdf.rds')
+```
+
+```{r}
+html %>% 
+  read_html() %>% 
+  html_nodes('div') %>% 
+  head()
+```
+
+### PDF para tabelas
+
+Use o `tabulizer`! Apesar de depender do odiado `rJava` (que é um pacote chato de instalar e configurar) o `tabulizer` é capaz de extrair os dados diretamente para tabelas, de forma simples e intuitiva.
+
+Para instalar o `tabulizer`, siga as instruções [dessa página](https://github.com/ropensci/tabulizer). Já adianto que pode não ser uma tarefa fácil, principalmente por conta do `rJava`.
+
+**Exemplo**: Uma vez montei esse código para estruturar um pdf contendo gastos em obras públicas. Além de usar o `tabulizer`, usei os pacotes usuais do `tidyverse` e a função `abjutils::rm_accent()` para tirar os acentos do texto.
+
+```{r warning=FALSE, message=FALSE, eval=FALSE}
+library(tabulizer)
+```
+
+Vamos usar [esse pdf de exemplo](https://github.com/curso-r/site/raw/master/content/blog/2017-05-27-ocr/pdf_compras.pdf). 
+
+Se estiver no desktop, é possível ver o documento abaixo:
+
+<object data="/blog/2017-05-27-ocr/pdf_compras.pdf" width="100%" type="application/pdf" height="375"></object>
+
+```{r eval=FALSE}
+# No meu pc demorou 40 segundos.
+tab <- extract_tables('../../static/data/ocr/pdf_compras.pdf')
+```
+
+```{r echo=FALSE}
+tab <- readRDS('../../static/data/ocr/tab_raw.rds')
+```
+
+Essa função serve para arrumar os nomes zoados que vêm no arquivo:
+
+```{r}
+arrumar_nomes <- function(x) {
+  x %>% 
+    tolower() %>% 
+    str_trim() %>% 
+    str_replace_all('[[:space:]]+', '_') %>% 
+    str_replace_all('%', 'p') %>% 
+    str_replace_all('r\\$', '') %>% 
+    abjutils::rm_accent()
+}
+```
+
+Agora veja a magia do `tidyverse` posta em prática:
+
+```{r warning=FALSE, message=FALSE}
+tab_tidy <- tab %>% 
+  # transforma matrizes em tibbles
+  map(as_tibble) %>% 
+  # empilha
+  bind_rows() %>% 
+  # arruma nomes a partir da primeira linha
+  set_names(arrumar_nomes(.[1,])) %>%
+  # tira primeira linha
+  slice(-1) %>% 
+  # tira espaços extras
+  mutate_all(funs(str_replace_all(., '[[:space:]]+', ' '))) %>% 
+  # tira espaços nas bordas
+  mutate_all(str_trim) 
+```
+
+A Tabela \@ref(tab:tabela) mostra as primeiras cinco linhas do resultado.
+
+```{r tabela, echo=FALSE}
+knitr::kable(head(tab_tidy, 5), caption = 'Base arrumada a partir de arquivo pdf, usando o pacote tabulizer.')
+```
+
+## Pacote `tesseract` para PDFs digitalizados
+
+O `tesseract` é uma biblioteca escrita em `C` e é uma das mais famosas ferramentas abertas para extração de textos a partir de imagens. O pacote em `R` de mesmo nome serve para usar essa biblioteca pelo `R` sem causar dores de cabeça.
+
+Para instalar o `tesseract` no Windows, basta rodar
+
+```{r eval=FALSE}
+install.packages('tesseract')
+```
+
+Para Mac e Linux, siga as instruções [dessa página](https://github.com/ropensci/tesseract).
+
+A principal função do pacote `tesseract` é a `ocr()`. Seu input é o caminho de uma imagem (pdf, jpeg, tiff, entre outras) e seu output é um texto. Logo, nosso primeiro passo é transformar o pdf em imagem.
+
+```{r}
+pdf <- '../../static/data/ocr/pdf_digitalizado.pdf'
+img <- pdf_render_page(
+  pdf = pdf,    # caminho do arquivo
+  page = 1,     # índice da página
+  dpi = 300     # resolução (pontos por polegada)
+)
+
+# salvando imagem num arquivo png
+png::writePNG(img, '../../static/data/ocr/pdf_digitalizado_img.png')
+```
+
+Se o PDF tiver mais páginas, você pode fazer um loop para salvar várias imagens. Agora, usamos a função `ocr()` no arquivo salvo.
+
+```{r eval=FALSE}
+library(tesseract)
+txt <- ocr('../../static/data/ocr/pdf_digitalizado_img.png')
+
+# imprimindo só os 300 primeiros caracteres do resultado
+cat(str_trunc(txt, 300))
+```
+
+```{r echo=FALSE}
+cat(str_trunc(readRDS("../../static/data/ocr/txt_ocr.rds"), 300))
+```
+
+
+## Wrap-up
+
+- Se seu pdf for digital, use `pdftools::pdf_text()`.
+- Se seu pdf for digitalizado, use `pdftools::pdf_render_page()`, depois `png::writePNG()` e por fim `tesseract::ocr()`.
+
+É isso. Happy coding ;)

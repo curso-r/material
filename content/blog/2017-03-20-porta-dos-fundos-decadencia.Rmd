@@ -1,0 +1,157 @@
+---
+title: "O Porta dos Fundos está em decadência?"
+date: "2017-03-20T23:26:00+03:00"
+tags: ["Porta dos Fundos","API", "YouTube"]
+categories: ["análises", "r"]
+banner: "img/banners/porta.jpg"
+author: ["William"]
+summary: "Há alguns anos eu acompanho o canal Porta dos Fundos no YouTube, assistindo os vídeos quase sempre no dia de lançamento. Nos últimos meses, no entanto, meu entusiasmo com o canal vem diminuindo. Não sei se eu que fiquei chato ou se outras pessoas compartilham a minha opinião de que o conteúdo do Porta piorou. Então resolvi scrapear informações do canal e montar algumas visualizações para tirar essa dúvida."
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, cache = TRUE)
+```
+
+Há alguns anos eu acompanho o canal Porta dos fundos no YouTube, assistindo os vídeos quase sempre no dia de lançamento. Mesmo dividido entre esquetes boas e ruins, me considero um fã da trupe de humoristas (e do Totoro também), principalmente pelo humor sarcástico e pela satirização de diversos tabus da nossa sociedade.
+
+Nos últimos meses, no entanto, meu entusiasmo com o canal vem diminuindo. A necessidade de postar três vídeos por semana para se manter relevante no sistema de recomendações do YouTube, o que mantém o canal rentável, me faz perdoar um ou outro conteúdo sem graça ou rasteiro, mas sinto que o que era exceção começou a virar regra.
+
+Não sei se eu que fiquei chato ou se outras pessoas compartilham a minha opinião. Então resolvi scrapear informações do canal e montar algumas visualizações para tirar essa dúvida.
+
+Segue um passo a passo de como fiz isso utilizando o R.
+
+# Passo 1: instalar e configurar o pacote `tuber`
+
+O pacote `tuber` contém funções que permitem acessar a API do YouTube utilizando o R. Assim, podemos ter acesso a diversas estatísticas como número de likes, número de views, comentários de vídeos, entre outras.
+
+Para instalar o pacote, rode o código `install.packages("tuber")` ou `devtools::install_github("soodoku/tuber", build_vignettes = TRUE)` para baixar a versão de desenvolvimento mais recente.
+
+Para utilizar o `tuber` é preciso um *id* e um *secret* do [Console de Desenvolvimento da Google](https://developers.google.com/youtube/v3/getting-started). Após criar uma conta, basta habilitar todas as APIs do YouTube e a Freebase API.
+
+Feito isso, rode o código abaixo com o *id* e *secret* obtidos pela plataforma para configurar o acesso do `tuber` à API.
+
+
+```{r, eval = F}
+library(tuber)
+
+yt_oauth(app_id = "seu_app_id", 
+         app_secret = "seu_app_secret")
+```
+
+Se tudo foi configurado corretamente, ele abrirá uma aba no seu navegador confirmando a autenticação, e você poderá voltar ao R para começar a scrapear.
+
+# Passo 2: buscar o id dos vídeos do canal
+
+Para organizar as informações dos vídeos em um banco de dados e gerar as visualizações, vamos utilizar as seguintes bibliotecas.
+
+```{r, eval = F}
+library(dplyr)          # Manipulação de dados
+library(tidyr)          # Manipulação de dados
+library(tibble)         # Criação de dataframes
+library(lubridate)      # Manipulação de datas
+library(purrr)          # Funcionais
+library(ggplot2)        # Gráficos
+```
+
+Precisamos do *id* de cada vídeo do Porta dos Fundos para baixar as suas estatísticas. A função `tuber::yt_search()` pesquisa por vídeos e suas informações. Rodando `yt_search(term = "Porta dos fundos")`, obtemos informações de alguns vídeos do canal, inclusive que o seu *channel id* é "UCEWHPFNilsT0IfQfutVzsag". O *channel id* é essencial para obtermos todos os vídeos do Porta.
+
+Por default, a função `yt_search()` retorna no máximo 50 resultados. Contudo, se setarmos os parâmetros `type = "video"` e `channal_id = "id_de_algum_canal"`, o número máximo passa a ser 500 resultados.
+
+Para facilitar o trabalho, eu criei a função `get_videos_porta()`. Ela recebe uma data de início e de término (em um dataframe com apenas uma linha) e devolve todos os vídeos do canal Porta dos Fundos nesse período.
+
+
+```{r, eval = F}
+get_videos_porta <- function(dates) {
+  
+  yt_search(term = "", 
+            type = "video",
+            channel_id = "UCEWHPFNilsT0IfQfutVzsag",
+            published_after = dates$start,
+            published_before = dates$end)
+  
+}
+```
+
+Cada linha do dataframe de datas a seguir representa períodos de um ano, de 2012 a 2017. Isso implica que, em cada busca, vou receber os vídeos do Porta dos Fundos para cada um desses anos. O mutate formata as datas no padrão exigido pela função `yt_search()`. Veja `help(yt_search)` para mais informações.
+
+```{r, eval = F}
+dates <- tibble(start = seq(ymd("2012-01-01"), ymd("2017-01-01"), by = "years"),
+                        end = seq(ymd("2012-12-31"), ymd("2017-12-31"), by = "years")) %>% 
+  mutate(start = paste(start, "T0:00:00Z", sep = ""),
+         end = paste(end, "T0:00:00Z", sep = ""))
+
+```
+
+Por fim, atribuímos ao objeto `videos` as informações de todos os videos do canal de 2012 a 2017.
+
+```{r, eval = F}
+
+videos <- by_row(.d = dates, ..f = get_videos_porta, .to = "videos_info")
+
+```
+
+
+# Passo 3: pegar as estatísticas de cada vídeo
+
+Para facilitar essa etapa, eu criei a função `get_videos_stats()`, que recebe um dataframe de uma linha contendo uma coluna `$video_id` e, usando a função `tuber::get_stats()`, faz o scrape das estatísticas do vídeo.
+
+```{r, eval = F}
+get_videos_stats <- function(df_row) {
+  
+  get_stats(video_id = df_row$video_id)
+}
+```
+
+Cada elemento da coluna `$video_info` contém um dataframe com as informações dos vídeos de um determinado ano. Com a função `dplyr::bind_rows()`, juntamos esses dataframes em um só. Então selecionamos as colunas de interesse: *title*, *publishedAt* e *video_id*. Por fim, utilizamos os *id's* para baixar as estatísticas de cada vídeo usando a função `get_videos_stats()`. As estatísticas são salvas na coluna `$videos_stats` do objeto `dados`.
+
+```{r, eval = F}
+dados <- bind_rows(videos$videos_info) %>% 
+  select(title, publishedAt, video_id) %>%
+  by_row(..f = get_videos_stats, .to = "videos_stats")
+```
+
+# Passo 4: as visualizações
+
+A primeira visualização que resolvi fazer foi um gráfico do número de visualizações pela data de publicação. Uma análise descuidada desse gráfico pode indicar uma clara redução dos números de views ao longo do tempo. No entanto, é preciso levar em conta que vídeos mais antigos tendem a ter mais views por simplesmente estarem disponíveis há mais tempo. Apesar disso, dois fatores me fazem acreditar que a magnitude do número de views de um vídeo é alcançada nos primeiros dias após o lançamento. O primeiro se deve ao sistema de recomendações do YouTube. Na página inicial, nem sempre os vídeos recomendados são dos canais que você se inscreveu. Na página de canais inscritos, se você tiver muitas inscrições, é fácil perder um vídeo ou outro de um dos canais que acompanha. O segundo se deve à enorme quantidade de conteúdo disponível hoje em dia, muito² maior do que há quatro, cinco anos. Eu, por exemplo, sou inscrito em mais de vinte canais e não consigo acompanhar nem cinco deles. Para quem não pode ficar o dia todo vendo vídeos, realmente há muita competição por espaço no YouTube.
+
+E apresento ainda um terceiro fator, contrariando a expectativa de existirem apenas dois. Vivemos na era do *hype*. O que é velho, o que é notícia da semana passada, já não interessa mais.
+
+```{r, eval = F}
+dados %>% 
+  mutate(views = map(videos_stats, .f = 'viewCount')) %>% 
+  unnest(views) %>% 
+  mutate(views = as.numeric(views),
+         publishedAt = as_date(publishedAt)) %>% 
+  ggplot(aes(x = publishedAt, y = views)) +
+  geom_line(aes(y = 1000000, colour = "1 Milhão")) +
+  geom_line(aes(y = 10000000, colour = '10 Milhões')) +
+  geom_line(aes(y = 20000000, colour = '20 Milhões')) +
+  geom_line() +
+  labs(x = "Data de publicação", y = "Visualizações") +
+  theme_bw()
+```
+
+![](/img/blog/porta-dos-fundos-decadencia/views_porta_png.png)
+
+Também fiz um gráfico da proporção likes/dislikes pela data de publicação do vídeo. Parece haver uma leve redução dessa proporção no último ano, mas é arriscado tirar uma conclusão. Refazendo essa análise no fim de 2017, talvez fique mais claro se o público do canal concorda comigo sobre a qualidade do conteúdo nos últimos tempos.
+
+```{r, eval = F}
+dados %>% 
+  mutate(likes = map(videos_stats, .f = 'likeCount'),
+         dislikes = map(videos_stats, .f = 'dislikeCount')) %>% 
+  unnest(likes, dislikes) %>% 
+  mutate(likes = as.numeric(likes),
+         dislikes = as.numeric(dislikes),
+         publishedAt = as_date(publishedAt),
+         prop = likes/dislikes) %>% 
+  ggplot(aes(x = publishedAt)) +
+  geom_line(aes(y = prop)) +
+  labs(x = "Data de publicação", y = "Likes/Dislikes") +
+  theme_bw()
+```
+
+![](/img/blog/porta-dos-fundos-decadencia/likes-dislikes_porta_png.png)
+
+O Porta dos Fundos é sem dúvida um gigante no YouTube, mas os indícios dessa sucinta análise colaboram com a minha opinião de que o canal já viveu dias (bem) melhores. Apesar de essa decadência poder ser só uma fase ruim, nunca é cedo para se reinventar, ter novas ideias, definir as regras do jogo, assim como eles fizeram no início.
+
+E se faltar ideias, vídeos com o Totoro são sempre uma boa alternativa.

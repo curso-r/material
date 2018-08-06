@@ -1,0 +1,61 @@
+---
+title: "leaflet com markerCluster"
+pubdate: "2017-03-04T23:26:00+03:00"
+date: "2017-03-01T23:26:00+03:00"
+tags: ["mapas", "leaflet"]
+categories: ["tutoriais", "r"]
+banner: "img/banners/markercluster.png"
+author: ["Julio"]
+summary: "O leaflet é uma biblioteca javascript para criação de mapas interativos. O pacote leaflet do R é um htmlwidget que permite gerar esses mapas de forma direta no R, para usar em documentos `RMarkdown` e Shiny."
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, cache = TRUE)
+```
+
+O [*leaflet*](leafletjs.com) é uma biblioteca javascript para criação de mapas interativos. O pacote [`leaflet`](https://rstudio.github.io/leaflet/) do R é um [`htmlwidget`](www.htmlwidgets.org/) que permite gerar esses mapas de forma direta no R, para usar em documentos `RMarkdown` e Shiny.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+library(dplyr)
+library(tidyr)
+library(abjData)
+
+# Constrói base de dados com label das varas
+dados_aj_lab <- dados_aj %>%
+  filter(tipo == 'Justiça Estadual e DF') %>%
+  replace_na(list(tel = 'Telefone indisponível')) %>% 
+  mutate(lab = paste(sprintf('<b>%s</b>', nome), 
+                     endereco1, endereco2, municipio_uf, tel,
+                     sep = '<br/>')) %>% 
+  select(lat, long, uf, municipio, nome, lab)
+```
+
+Uma das ferramentas que mais gosto do leaflet é a função `markerClusterOptions()`, que permite agrupar pontos no mapa em conjuntos de vários pontos.
+
+Como exemplo, utilizaremos uma base de dados que contém a localização e informações das varas da Justiça Estadual no Brasil. A Tabela \@ref(tab:aj) mostra as cinco primeiras linhas dessa base. A coluna `lab` já foi trabalhada para ser adicionada nos marcadores do mapa como popup.
+
+```{r aj, echo=FALSE}
+dados_aj_lab %>% 
+  head(5) %>% 
+  knitr::kable(caption = "Primeiras cinco linhas da base de dados de varas estaduais do Brasil.")
+```
+
+Para utilizar o pacote `leaflet`, basta instalar o pacote via `install.packages()`. Na Figura \@ref(fig:mapa), experimente passear pelo mapa. Procure também algum lugar que tenha várias varas juntas, para ver o que o `markerCluster` faz nesse caso.
+
+```{r mapa, fig.align='center', fig.cap='Mapa das varas estaduais do Brasil.', cache = FALSE}
+library(dplyr)
+library(leaflet)
+dados_aj_lab %>% 
+  leaflet() %>% 
+  addTiles() %>% 
+  addMarkers(lng = ~long, lat = ~lat, popup = ~lab,
+             clusterOptions = markerClusterOptions())
+```
+
+- A função `leaflet()` carrega o motor do *leaflet*, ainda em branco.
+- A função `addTiles()` adiciona as camadas de mapas de acordo com o zoom. É possível escolher temas para essas camadas.
+- A função `addMarkers()` mapeia as varas da base de dados de acordo com as respectivas latitude e longitude. 
+    - Note que é necessário adicionar um `~` antes das variáveis para mapeá-las da base de dados. 
+    - A opção `popup` permite adicionar um balão com informações ao clicar num marcador.
+    - A opção `clusterOptions` faz a mágica que agrupa os pontos. A região azul observada ao colocar o mouse sobre um cluster é a casca convexa dos marcadores agrupados.
+

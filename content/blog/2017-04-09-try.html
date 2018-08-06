@@ -1,0 +1,179 @@
+---
+title: "Tratando erros: the tidy way"
+date: "2017-04-20T13:07:31+02:00"
+tags: ["coding", "pacotes", "purrr"]
+categories: ["tutoriais", "r"]
+banner: "img/banners/error.jpg"
+author: ["Julio"]
+draft: false
+summary: "Tratar erros no R é importante para identificar problemas nos códigos e evitar retrabalho. Quem nunca rodou um algoritmo pesadíssimo que deu errado na última iteração? Nesse artigo, veremos como trabalhar com erros no R e a versão tidy dessas soluções."
+---
+
+
+
+<p>Tratar erros no R é importante para identificar problemas nos códigos e evitar retrabalho. Quem nunca rodou um algoritmo pesadíssimo que deu errado na última iteração? Nesse artigo, veremos como trabalhar com erros no R e a versão <code>tidy</code> dessas soluções.</p>
+<div id="usando-try-e-trycatch" class="section level2">
+<h2>Usando <code>try()</code> e <code>tryCatch()</code></h2>
+<p>A forma tradicional de tratar erros no R é com a função <code>tryCatch()</code>. Essa função tem como primeiro argumento uma expressão a ser avaliada e argumentos diversos para trabalhar com os erros. A versão mais compacta do <code>tryCatch()</code> é escrita assim:</p>
+<pre class="r"><code>tryCatch(sqrt(1), error = function(e) e)
+## [1] 1
+tryCatch(sqrt(&#39;a&#39;), error = function(e) e)
+## &lt;simpleError in sqrt(&quot;a&quot;): non-numeric argument to mathematical function&gt;</code></pre>
+<p>O <code>try()</code> é uma simplificação de <code>tryCatch()</code> que assume que não estamos interessados no erro, mas sim no resultado da função quando ela dá certo. O código abaixo não trava:</p>
+<pre class="r"><code>try(sqrt(1))
+## [1] 1
+try(sqrt(&#39;a&#39;))
+## Error in sqrt(&quot;a&quot;) : non-numeric argument to mathematical function</code></pre>
+<p>Existe até mesmo uma versão quieta do <code>try()</code>, usando o parâmetro <code>silent =</code>. Quando a expressão dá um erro, o <code>try()</code> retorna a mensagem de erro de forma invisível, ou seja, sem mostrar explicitamente para o usuário.</p>
+<pre class="r"><code>x &lt;- try(sqrt(&#39;a&#39;), silent = TRUE)
+x
+## [1] &quot;Error in sqrt(\&quot;a\&quot;) : non-numeric argument to mathematical function\n&quot;
+## attr(,&quot;class&quot;)
+## [1] &quot;try-error&quot;
+## attr(,&quot;condition&quot;)
+## &lt;simpleError in sqrt(&quot;a&quot;): non-numeric argument to mathematical function&gt;</code></pre>
+</div>
+<div id="usando-adverbios-do-purrr" class="section level2">
+<h2>Usando advérbios do <code>purrr</code></h2>
+<p>Hoje em dia, o jeito mais arrumado de tratar erros é usando as funções <code>purrr::possibly()</code> e suas amigas, <code>quietly()</code> e <code>safely()</code>. Note que todas essas palavras são advérbios: o objetivo delas é alterar o comportamento de outros verbos (outras funções). Essa forma de pensar nos nomes das funções (funções são verbos, modificadores de funções são advérbios) faz parte do <a href="http://curso-r.com/blog/2017/02/15/2017-02-16-manifesto-tidy/">princípio tidy</a>.</p>
+<ul>
+<li><code>safely()</code> retorna uma lista com elementos <code>result</code> e <code>error</code>. Quando a função não dá erro, <code>error</code> fica igual a <code>NULL</code>. Quando a função dá erro, <code>error</code> guarda a mensagem de erro e <code>result</code> guarda o valor do parâmetro <code>otherwise =</code>, que por padrão é <code>NULL</code>.</li>
+<li><code>possibly()</code> é uma versão mais otimista do <code>safely()</code>, que exige a definição de <code>otherwise =</code> e não guarda as mensagens de erro.</li>
+<li><code>quietly()</code> não trata erros (ou seja, ela trava quando dá erro), mas guarda informações sobre <em>warnings</em> e <em>messages</em>.</li>
+</ul>
+<pre><code>## Linking to ImageMagick 6.9.9.25
+## Enabled features: cairo, fontconfig, freetype, fftw, lcms, pango, rsvg, webp
+## Disabled features: ghostscript, x11</code></pre>
+<div class="figure"><span id="fig:unnamed-chunk-5"></span>
+<img src="/blog/2017-04-09-try_files/figure-html/unnamed-chunk-5-1.png" alt="Admita, você não imaginava que teria de pensar em gramática para programar em R." width="768" />
+<p class="caption">
+Figure 1: Admita, você não imaginava que teria de pensar em gramática para programar em R.
+</p>
+</div>
+<p>Vamos ver as três funções colocadas em prática. Como exemplo usaremos a função <code>log</code>, que i) retorna um número quando a entrada é um número positivo, ii) dá um warning quando a entrada é um número menor ou igual a zero, e iii) dá um erro se a entrada não é um número.</p>
+<pre class="r"><code>log(10)
+## [1] 2.302585
+log(-1)
+## Warning in log(-1): NaNs produced
+## [1] NaN
+log(&#39;a&#39;)
+## Error in log(&quot;a&quot;): non-numeric argument to mathematical function</code></pre>
+<p>Vamos fazer as versões modificadas de <code>log</code>:</p>
+<pre class="r"><code>library(purrr)
+safe_log &lt;- safely(log) # outra forma fancy de escrever isso: log %&gt;% safely()
+possible_log &lt;- possibly(log, otherwise = &#39;putz&#39;)
+quiet_log &lt;- quietly(log)</code></pre>
+<p>Vamos mapear os seguintes elementos nessas funções:</p>
+<pre class="r"><code>entradas &lt;- list(10, -1, &#39;a&#39;)</code></pre>
+<p>Agora, os resultados:</p>
+<pre class="r"><code>## Esse código vai travar
+map(entradas, log) 
+## Warning in .f(.x[[i]], ...): NaNs produced
+## Error in log(x = x, base = base): non-numeric argument to mathematical function</code></pre>
+<ul>
+<li><code>safely()</code>:</li>
+</ul>
+<pre class="r"><code>## Retorna uma lista com erros e resultados NULL
+map(entradas, safe_log)
+## Warning in .f(...): NaNs produced
+## [[1]]
+## [[1]]$result
+## [1] 2.302585
+## 
+## [[1]]$error
+## NULL
+## 
+## 
+## [[2]]
+## [[2]]$result
+## [1] NaN
+## 
+## [[2]]$error
+## NULL
+## 
+## 
+## [[3]]
+## [[3]]$result
+## NULL
+## 
+## [[3]]$error
+## &lt;simpleError in log(x = x, base = base): non-numeric argument to mathematical function&gt;</code></pre>
+<ul>
+<li><code>possibly()</code>:</li>
+</ul>
+<pre class="r"><code>## Retorna uma lista com os resultados que deram certo
+map(entradas, possible_log)
+## Warning in .f(...): NaNs produced
+## [[1]]
+## [1] 2.302585
+## 
+## [[2]]
+## [1] NaN
+## 
+## [[3]]
+## [1] &quot;putz&quot;</code></pre>
+<ul>
+<li><code>quietly()</code>:</li>
+</ul>
+<pre class="r"><code>## Também trava, mesmo problema de log
+map(entradas, quiet_log) 
+## Error in log(x = x, base = base): non-numeric argument to mathematical function
+
+## Quando funciona, retorna todos os warnings e messages
+map(entradas[1:2], quiet_log)
+## [[1]]
+## [[1]]$result
+## [1] 2.302585
+## 
+## [[1]]$output
+## [1] &quot;&quot;
+## 
+## [[1]]$warnings
+## character(0)
+## 
+## [[1]]$messages
+## character(0)
+## 
+## 
+## [[2]]
+## [[2]]$result
+## [1] NaN
+## 
+## [[2]]$output
+## [1] &quot;&quot;
+## 
+## [[2]]$warnings
+## [1] &quot;NaNs produced&quot;
+## 
+## [[2]]$messages
+## character(0)</code></pre>
+</div>
+<div id="combo-com-purrr-e-tibble" class="section level2">
+<h2>Combo com <code>purrr</code> e <code>tibble</code></h2>
+<p>Um combo que eu gosto bastante de usar é adicionar erros do código retornado por <code>safely()</code> dentro de uma <code>tibble</code>. Uma forma de fazer isso é com o código abaixo:</p>
+<pre class="r"><code>library(tibble)
+
+# adiciona um resultado default caso dê erro. No caso, NA.
+safe_log2 &lt;- log %&gt;% safely(otherwise = NA_real_)
+
+d_result &lt;- entradas %&gt;% 
+  map(safe_log2) %&gt;% 
+  # ao invés de uma lista de tamanho 3 com 2 elementos (result e error),
+  # temos uma lista de tamanho 2 (result e error) com 3 elementos.
+  transpose() %&gt;%    
+  # simplifica o vetor de resultados
+  simplify_all() %&gt;% 
+  # converte para data frame
+  as_tibble()
+
+d_result
+## # A tibble: 3 x 2
+##   result error            
+##    &lt;dbl&gt; &lt;list&gt;           
+## 1   2.30 &lt;NULL&gt;           
+## 2 NaN    &lt;NULL&gt;           
+## 3  NA    &lt;S3: simpleError&gt;</code></pre>
+<p>Assim, é possível guardar as informações dos erros de forma concisa, sem perder a informação dos erros.</p>
+<p>E é isso. Happy coding ;)</p>
+<p><strong>PS</strong>: Até pouco tempo atrás eu usava a função <code>dplyr::failwith()</code> para fazer o mesmo que <code>possibly()</code>. Porém, descobri que essa função <a href="https://github.com/tidyverse/dplyr/blob/master/NEWS.md#deprecated-and-defunct">será retirada do <code>dplyr</code> no futuro</a>. Então se você é um usuário de <code>failwith()</code>, está na hora de mudar!</p>
+</div>
