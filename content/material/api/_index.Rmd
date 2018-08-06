@@ -7,6 +7,7 @@ tags: ["API"]
 slug: "api"
 desc: "O fluxo da ciência de dados se encerra na parte de comunicação. Essa parte é responsável por transferir todo o conhecimento gerado durante a análise de dados. E isso não é nada fácil. A forma de construir a comunicação depende muito do interlocutor."
 requisitos: ["r-base", "dplyr"]
+layout: "article"
 ---
 
 ```{r setup, include=FALSE}

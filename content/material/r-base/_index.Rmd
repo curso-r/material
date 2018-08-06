@@ -7,6 +7,7 @@ tags: ["R-Básico"]
 slug: "r-base"
 desc: "Neste capítulo vamos introduzir o R, suas principais estruturas de dados e um pequeno vocabulário de funções úteis."
 requisitos: ["rstudio"]
+layout: "article"
 ---
 
 ```{r setup, include=FALSE}

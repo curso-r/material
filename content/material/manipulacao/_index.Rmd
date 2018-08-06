@@ -7,6 +7,7 @@ tags: ["Manipulação"]
 slug: "manipulacao"
 desc: "Em muitos projetos de ciência de dados a maior parte do trabalho está em transformar os dados para um formato que seja útil para fazer as análises. Neste tutorial vamos discutir os pacotes dplyr e tidyr que facilitam (e muito) a realização dessa tarefa."
 requisitos: ["r-base"]
+layout: "article"
 ---
 
 ```{r setup, include=FALSE}

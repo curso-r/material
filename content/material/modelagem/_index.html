@@ -7,6 +7,7 @@ tags: ["Modelagem"]
 slug: "modelagem"
 desc: "Criamos modelos estatísticos para fazer previsões ou estudar a relação entre as variáveis de um banco de dados. Os modelos são importantes pois resumem a informação de um banco de dados para um conjunto de regras que podem ser reutilizadas em outros momentos. Neste tutorial discutiremos regressão linear e árvores de decisão."
 requisitos: ["r-base", "ggplot"]
+layout: "article"
 ---
 
 
@@ -260,9 +261,9 @@ arvore &lt;- rpart(Survived ~ Sex + Age + Pclass, data = titanic)</code></pre>
 ##           CP nsplit rel error    xerror       xstd
 ## 1 0.44444444      0 1.0000000 1.0000000 0.04244576
 ## 2 0.02339181      1 0.5555556 0.5555556 0.03574957
-## 3 0.01461988      2 0.5321637 0.5818713 0.03635085
+## 3 0.01461988      2 0.5321637 0.5935673 0.03660811
 ## 4 0.01169591      4 0.5029240 0.5760234 0.03621995
-## 5 0.01000000      6 0.4795322 0.5233918 0.03497048
+## 5 0.01000000      6 0.4795322 0.5292398 0.03511588
 ## 
 ## Variable importance
 ##    Sex Pclass    Age 
