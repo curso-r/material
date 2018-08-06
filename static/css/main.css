@@ -68,6 +68,10 @@
   padding-right: 30px;
 }
 
+#author-date {
+  font-size: 12px;
+}
+
 /********  CSS DO NAVBAR  ********/
 
 nav[data-toggle='toc'] {

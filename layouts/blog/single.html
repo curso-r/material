@@ -19,6 +19,15 @@
         </div>
         
         <div class="col-sm-9" id="article">
+          <p class="text-right" id="author-date">
+            {{ if isset .Params "author" }} 
+            Por {{ range $index, $author := .Params.author }} 
+              {{ if gt $index 0 }},{{ end }} 
+              {{ . }} 
+              {{ end }} 
+              {{ end }}
+              em {{ dateFormat "02/01/2006" .Params.date }}
+          </p>
           {{.Content}}
         </div>  
         
