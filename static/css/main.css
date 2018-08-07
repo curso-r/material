@@ -2,6 +2,10 @@ body {
   font-family: "Source Sans Pro";
 }
 
+#navbarNav a {
+  color: white;
+}
+
 /** CSS DA LISTA DE POSTS **/
 
 #post-list {
