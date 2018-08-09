@@ -103,6 +103,16 @@ body {
   font-size: 12px;
 }
 
+/******** CSS da pagina doc urso *******/
+
+.curso-main {
+  margin-top: 30px;
+}
+
+.curso-main h1, p {
+  color: white;
+}
+
 /********  CSS DO NAVBAR  ********/
 
 nav[data-toggle='toc'] {

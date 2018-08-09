@@ -1,0 +1,32 @@
+<!doctype html5>
+<html>
+<head>
+  {{ partial "head.html" . }}
+</head>
+  <body data-spy="scroll" data-target="#toc">
+    {{ partial "header.html" . }}
+    
+    <div class="container curso-main">
+      
+      <div class="row">
+        
+        <div class="col-md-6">
+          <img src="/{{.Params.img}}" class="img-fluid"></img>
+        </div>
+        
+        <div class="col-md-6 text-right">
+          
+          <h1>{{.Title}}</h1>
+          <p>{{.Params.desc}}</p>
+          
+        </div>
+        
+      </div>
+      
+    </div>
+    
+  </body>
+  
+  {{ partial "scripts.html" .}}
+  
+</html>
